@@ -1,0 +1,35 @@
+
+plugins {
+    id 'java'
+    id 'application'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+}
+
+group 'me.linusdev'
+version '1.0'
+
+targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_11
+mainClassName = 'me.linusdev.discordbotapi.Main'
+compileJava.options.encoding = 'UTF-8'
+
+shadowJar {
+    archiveFileName = 'bot.${extension}'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    implementation 'me.linusdev:data:1.0'
+    implementation 'org.jetbrains:annotations:21.0.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+
