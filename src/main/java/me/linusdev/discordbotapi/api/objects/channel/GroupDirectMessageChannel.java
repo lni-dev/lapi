@@ -5,7 +5,7 @@ import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.Icon;
 import me.linusdev.discordbotapi.api.objects.Recipient;
-import me.linusdev.discordbotapi.api.objects.Snowflake;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.GroupDirectMessageChannelAbstract;
 import me.linusdev.discordbotapi.api.objects.enums.ChannelType;

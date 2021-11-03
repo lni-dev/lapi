@@ -4,8 +4,8 @@ package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.objects.Snowflake;
-import me.linusdev.discordbotapi.api.objects.SnowflakeAble;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.channel.*;
 import me.linusdev.discordbotapi.api.objects.enums.ChannelType;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +76,7 @@ public abstract class Channel implements SnowflakeAble {
             case GUILD_PRIVATE_THREAD:
                 return new GuildPrivateThread(lApi, id, type, data);
             case GUILD_STAGE_VOICE:
-                break; // todo
+                return new GuildStageChannel(lApi, id, type, data);
 
         }
 

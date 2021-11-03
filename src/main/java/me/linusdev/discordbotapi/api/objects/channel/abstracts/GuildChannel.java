@@ -1,7 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.PermissionOverwrites;
-import me.linusdev.discordbotapi.api.objects.Snowflake;
+import me.linusdev.discordbotapi.api.objects.permission.overwrite.PermissionOverwrites;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

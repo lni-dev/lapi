@@ -1,9 +1,9 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.Snowflake;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.ThreadMetadata;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 /**
  * <a href="https://discord.com/developers/docs/topics/threads" target="_top"> discord documentation</a>
  */
