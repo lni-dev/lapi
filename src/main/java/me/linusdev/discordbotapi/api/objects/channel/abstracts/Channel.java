@@ -51,7 +51,6 @@ public abstract class Channel implements SnowflakeAble {
         ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
         Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
 
-        //TODO add other channels
         switch (type){
             case UNKNOWN:
                 break;
