@@ -1,8 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.user.abstracts;
 
 import me.linusdev.discordbotapi.api.objects.Avatar;
-import me.linusdev.discordbotapi.api.objects.Snowflake;
-import me.linusdev.discordbotapi.api.objects.SnowflakeAble;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
 
 public interface BasicUserInformation extends SnowflakeAble {
