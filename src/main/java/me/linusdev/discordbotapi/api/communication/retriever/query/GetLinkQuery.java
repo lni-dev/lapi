@@ -8,14 +8,21 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import org.jetbrains.annotations.NotNull;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
+import static me.linusdev.discordbotapi.api.communication.PlaceHolder.*;
 
 public class GetLinkQuery implements Query{
 
     public enum Links{
         /**
-         * {@link PlaceHolder#CHANNEL_ID}
+         * @see PlaceHolder#CHANNEL_ID
          */
-        GET_CHANNEL(O_DISCORD_API_VERSION_LINK + "channels/" + PlaceHolder.CHANNEL_ID),
+        GET_CHANNEL(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID),
+
+        /**
+         * @see PlaceHolder#CHANNEL_ID
+         * @see PlaceHolder#MESSAGE_ID
+         */
+        GET_CHANNEL_MESSAGE(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID)
         ;
 
         private final String link;
