@@ -37,7 +37,7 @@ public class ChannelMention {
      * Creates a {@link ChannelMention} from {@link Data}
      * Required fields are {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #TYPE_KEY} and {@link #NAME_KEY}
      *
-     * @param data
+     * @param data {@link Data} to create this {@link ChannelMention}
      * @throws InvalidDataException if a required field is missing
      */
     public ChannelMention(@NotNull Data data) throws InvalidDataException {
