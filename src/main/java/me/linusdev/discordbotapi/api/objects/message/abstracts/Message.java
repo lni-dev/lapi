@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
+import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
@@ -152,7 +153,7 @@ public interface Message {
     /**
      * any attached files
      */
-    //@NotNull Attachment[] getAttachments();
+    @NotNull Attachment[] getAttachments();
 
     /**
      * any embedded content
