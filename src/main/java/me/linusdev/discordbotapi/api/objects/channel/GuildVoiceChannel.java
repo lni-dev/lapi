@@ -55,11 +55,11 @@ public class GuildVoiceChannel extends Channel implements GuildVoiceChannelAbstr
         int position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue(); //todo can position be missing?
 
         if (name == null) {
-            throw new InvalidDataException("field '" + NAME_KEY + "' missing or null in GuildVoiceChannel with id:" + getId());
+            throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in GuildVoiceChannel with id:" + getId()).addMissingFields(NAME_KEY);
         } else if (guildId == null) {
-            throw new InvalidDataException("field '" + GUILD_ID_KEY + "' missing or null in GuildVoiceChannel with id:" + getId());
+            throw new InvalidDataException(data, "field '" + GUILD_ID_KEY + "' missing or null in GuildVoiceChannel with id:" + getId()).addMissingFields(GUILD_ID_KEY);
         } else if (position == -1) {
-            throw new InvalidDataException("field '" + POSITION_KEY + "' missing or -1 in GuildVoiceChannel with id:" + getId());
+            throw new InvalidDataException(data, "field '" + POSITION_KEY + "' missing or -1 in GuildVoiceChannel with id:" + getId()).addMissingFields(POSITION_KEY);
         }
 
         this.name = name;

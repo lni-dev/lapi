@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
+import static me.linusdev.discordbotapi.api.objects.user.User.USERNAME_KEY;
+
 public class ChannelCategory extends Channel implements GuildChannel {
 
     private @NotNull String name;
@@ -45,11 +47,11 @@ public class ChannelCategory extends Channel implements GuildChannel {
         int position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue(); //todo can position be missing?
 
         if (name == null) {
-            throw new InvalidDataException("field '" + NAME_KEY + "' missing or null in ChannelCategory with id:" + getId());
+            throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in ChannelCategory with id:" + getId()).addMissingFields(NAME_KEY);
         } else if (guildId == null) {
-            throw new InvalidDataException("field '" + GUILD_ID_KEY + "' missing or null in ChannelCategory with id:" + getId());
+            throw new InvalidDataException(data, "field '" + GUILD_ID_KEY + "' missing or null in ChannelCategory with id:" + getId()).addMissingFields(GUILD_ID_KEY);
         } else if (position == -1) {
-            throw new InvalidDataException("field '" + POSITION_KEY + "' missing or -1 in ChannelCategory with id:" + getId());
+            throw new InvalidDataException(data, "field '" + POSITION_KEY + "' missing or -1 in ChannelCategory with id:" + getId()).addMissingFields(POSITION_KEY);
         }
 
         this.name = name;

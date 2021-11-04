@@ -43,7 +43,7 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
         ArrayList<Data> recipients = (ArrayList<Data>) data.get(RECIPIENTS_KEY);
 
         if(recipients == null)
-            throw new InvalidDataException("field '" + RECIPIENTS_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + RECIPIENTS_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(RECIPIENTS_KEY);
 
         this.recipients = new Recipient[recipients.size()];
         int i = 0;

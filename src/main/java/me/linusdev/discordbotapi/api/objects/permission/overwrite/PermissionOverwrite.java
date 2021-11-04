@@ -85,8 +85,8 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
         this.allow = (String) data.getOrDefault(ALLOW_KEY, "0");
         this.deny = (String) data.getOrDefault(DENY_KEY, "0");
 
-        if(this.id == null) throw new InvalidDataException("id in permission override may not be null");
-        if(this.type == -1) throw new InvalidDataException("type in permission override us unknown or unset");
+        if(this.id == null) throw new InvalidDataException(data, "id in permission override may not be null").addMissingFields(ID_KEY);
+        if(this.type == -1) throw new InvalidDataException(data, "type in permission override us unknown or unset").addMissingFields(TYPE_KEY);
 
         this.allowInt = new BigInteger(allow);
         this.denyInt = new BigInteger(deny);

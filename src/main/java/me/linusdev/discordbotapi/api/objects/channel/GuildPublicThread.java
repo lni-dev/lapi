@@ -52,15 +52,15 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         Data threadMetadataData = (Data) data.get(THREAD_METADATA_KEY);
 
         if (name == null) {
-            throw new InvalidDataException("field '" + NAME_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(NAME_KEY);
         } else if (guildId == null) {
-            throw new InvalidDataException("field '" + GUILD_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + GUILD_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(GUILD_ID_KEY);
         }else if(parentId == null){
-            throw new InvalidDataException("field '" + PARENT_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + PARENT_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(PARENT_ID_KEY);
         }else if(ownerId == null){
-            throw new InvalidDataException("field '" + OWNER_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + OWNER_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(OWNER_ID_KEY);
         }else if(threadMetadataData == null){
-            throw new InvalidDataException("field '" + THREAD_METADATA_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId());
+            throw new InvalidDataException(data, "field '" + THREAD_METADATA_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(THREAD_METADATA_KEY);
         }
 
         this.name = name;

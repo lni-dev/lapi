@@ -37,11 +37,11 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable {
         this.avatar = new Avatar((String) data.get(AVATAR_KEY));
 
         if(this.username == null)
-            throw new InvalidDataException("field '" + USERNAME_KEY + "' missing or null in Recipient with id:" + getId());
+            throw new InvalidDataException(data, "field '" + USERNAME_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(USERNAME_KEY);
         else if(this.discriminator == null)
-            throw new InvalidDataException("field '" + DISCRIMINATOR_KEY + "' missing or null in Recipient with id:" + getId());
+            throw new InvalidDataException(data, "field '" + DISCRIMINATOR_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(DISCRIMINATOR_KEY);
         else if(this.id == null)
-            throw new InvalidDataException("field '" + USER_ID_KEY + "' missing or null in Recipient with id:" + getId());
+            throw new InvalidDataException(data, "field '" + USER_ID_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(USER_ID_KEY);
         //TODO: Avatar null check?
 
     }
