@@ -1,15 +1,20 @@
 package me.linusdev.discordbotapi.api.objects.enums;
 
+import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This contains the different types of channels.
  * <a href="https://discord.com/developers/docs/resources/channel#channel-object-channel-types" target="_top">Representing discord documentation</a>
  */
-public enum ChannelType {
+public enum ChannelType implements SimpleDatable {
 
     /**
      * This is LApi specific, in case discord adds another channel type
+     *
+     * It's id is -2, cause -1 is sometimes used to check if the type field is missing in a {@link me.linusdev.data.Data}
      */
-    UNKNOWN(-1, "Unknown Channel", SimpleChannelType.UNKNOWN),
+    UNKNOWN(-2, "Unknown Channel", SimpleChannelType.UNKNOWN),
 
     /**
      * a text channel within a server
@@ -101,7 +106,13 @@ public enum ChannelType {
         return simpleChannelType;
     }
 
-    public static ChannelType fromId(int id) {
+    /**
+     * Converts from id to {@link ChannelType}
+     *
+     * @param id of the wanted {@link ChannelType}.
+     * @return {@link ChannelType} with given id or {@link #UNKNOWN} if no such {@link ChannelType} exists
+     */
+    public static @NotNull ChannelType fromId(int id) {
         for (ChannelType type : ChannelType.values())
             if (type.getId() == id) return type;
         return UNKNOWN;
@@ -120,5 +131,10 @@ public enum ChannelType {
     @Override
     public String toString() {
         return super.toString();
+    }
+
+    @Override
+    public Object simplify() {
+        return id;
     }
 }

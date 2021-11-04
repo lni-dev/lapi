@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.enums.ChannelType;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @see <a href="https://discord.com/developers/docs/resources/channel#channel-mention-object" target="_top">Channel Mention Object</a>
  */
-public class ChannelMention {
+public class ChannelMention implements Datable {
 
     public final static String ID_KEY = "id";
     public final static String GUILD_ID_KEY = "guild_id";
@@ -90,5 +91,17 @@ public class ChannelMention {
      */
     public @NotNull String getName(){
         return name;
+    }
+
+    @Override
+    public Data getData() {
+        Data data = new Data(4);
+
+        data.add(ID_KEY, id);
+        data.add(GUILD_ID_KEY, guildId);
+        data.add(TYPE_KEY, type);
+        data.add(NAME_KEY, name);
+
+        return data;
     }
 }
