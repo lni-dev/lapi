@@ -65,17 +65,31 @@ public class ChannelMention implements Datable {
     }
 
     /**
-     * id of the channel
+     * id of the channel as {@link Snowflake}
      */
-    public @NotNull Snowflake getId() {
+    public @NotNull Snowflake getIdAsSnowflake() {
         return id;
     }
 
     /**
-     * id of the guild containing the channel
+     * id of the channel as {@link String}
      */
-    public @NotNull Snowflake getGuildId() {
+    public String getId() {
+        return id.asString();
+    }
+
+    /**
+     * id as {@link Snowflake} of the guild containing the channel
+     */
+    public @NotNull Snowflake getGuildIdAsSnowflake() {
         return guildId;
+    }
+
+    /**
+     * id as {@link String} of the guild containing the channel
+     */
+    public String getGuildId() {
+        return guildId.asString();
     }
 
     /**
