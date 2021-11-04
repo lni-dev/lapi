@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
+import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -146,7 +147,7 @@ public interface Message {
     /**
      * channels specifically mentioned in this message
      */
-    //@Nullable ChannelMention[] getChannelMentions();
+    @Nullable ChannelMention[] getChannelMentions();
 
     /**
      * any attached files
