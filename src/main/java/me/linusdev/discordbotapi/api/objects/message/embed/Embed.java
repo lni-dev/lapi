@@ -10,7 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Embed sent in {@link me.linusdev.discordbotapi.api.objects.message.Message}.
+ * <br> Objects of this class are static and do not change its content. Even if the embed is changed on discords end
+ *
  * @see <a href="https://discord.com/developers/docs/resources/channel#embed-object" target="_top">Embed Object</a>
+ * @see <a href="https://cog-creators.github.io/discord-embed-sandbox/" target="_top">Discord Embed Sandbox</a>
  */
 public class Embed implements Datable {
 
@@ -43,6 +47,11 @@ public class Embed implements Datable {
     private final @Nullable Author author;
     private final @Nullable Field[] fields;
 
+
+    /**
+     * I advise you to use {@link EmbedBuilder} instead :)
+     */
+    @Deprecated()
     public Embed(@Nullable String title, @Nullable EmbedType type, @Nullable String description,
                  @Nullable String url, @Nullable String timestamp, @Nullable Integer color,
                  @Nullable Footer footer, @Nullable Image image, @Nullable Thumbnail thumbnail,
@@ -118,42 +127,79 @@ public class Embed implements Datable {
         return description;
     }
 
+    /**
+     * url of embed
+     */
     public @Nullable String getUrl() {
         return url;
     }
 
+    /**
+     * timestamp of embed content
+     */
     public @Nullable String getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * color code of the embed
+     */
     public @Nullable Integer getColor() {
         return color;
     }
 
+    /**
+     * footer information
+     * @see Footer
+     */
     public @Nullable Footer getFooter() {
         return footer;
     }
 
+    /**
+     * image information
+     * @see Image
+     */
     public @Nullable Image getImage() {
         return image;
     }
 
+    /**
+     * thumbnail information
+     * @see Thumbnail
+     */
     public @Nullable Thumbnail getThumbnail() {
         return thumbnail;
     }
 
+    /**
+     * video information
+     * @see Video
+     */
     public @Nullable Video getVideo() {
         return video;
     }
 
+    /**
+     * provider information
+     * @see Provider
+     */
     public @Nullable Provider getProvider() {
         return provider;
     }
 
+    /**
+     * author information
+     * @see Author
+     */
     public @Nullable Author getAuthor() {
         return author;
     }
 
+    /**
+     * fields information
+     * @see Field
+     */
     public @Nullable Field[] getFields() {
         return fields;
     }
