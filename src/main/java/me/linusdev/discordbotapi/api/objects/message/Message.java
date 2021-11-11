@@ -1,4 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.message;
 
-public class Message {
+/**
+ * Embed limits: 10 embeds per message
+ */
+public class Message{
 }
