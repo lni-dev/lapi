@@ -419,6 +419,7 @@ public class EmbedBuilder {
         return this;
     }
 
+
     /**
      * To facilitate showing rich content, rich embeds do not follow the traditional limits of message content. However, some limits are still in place to prevent excessively large embeds. The following table describes the limits
      * <br><br>
@@ -435,6 +436,7 @@ public class EmbedBuilder {
      *
      * @see <a href="https://discord.com/developers/docs/resources/channel#embed-limits" target="_top">Embed Limits</a>
      */
+    @SuppressWarnings("JavadocReference")
     public EmbedBuilder checkEmbed() throws InvalidEmbedException {
 
         if(title != null && title.length() > TITLE_CHAR_LIMIT)
