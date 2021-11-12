@@ -4,6 +4,9 @@ import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
+import me.linusdev.discordbotapi.api.objects.message.Reaction;
+import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
+import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
@@ -14,6 +17,35 @@ import java.util.List;
 
 /**
  *
+ * <a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a>
+ * //todo html this
+ * There are multiple message types that have a message_reference object. Since message references are generic attribution to a previous message, there will be more types of messages which have this information in the future.
+ * Crosspost messages
+ *
+ *     These are messages that originated from another channel (IS_CROSSPOST flag).
+ *     These messages have all three fields, with data of the original message that was crossposted.
+ *
+ * Channel Follow Add messages
+ *
+ *     These are automatic messages sent when a channel is followed into the current channel (type 12).
+ *     These messages have the channel_id and guild_id fields, with data of the followed announcement channel.
+ *
+ * Pin messages
+ *
+ *     These are automatic messages sent when a message is pinned (type 6).
+ *     These messages have message_id and channel_id, and guild_id if it is in a guild, with data of the message that was pinned.
+ *
+ * Replies
+ *
+ *     These are messages replying to a previous message (type 19).
+ *     These messages have message_id and channel_id, and guild_id if it is in a guild, with data of the message that was replied to. The channel_id and guild_id will be the same as the reply.
+ *     Replies are created by including a message_reference when sending a message. When sending, only message_id is required.
+ *
+ * Thread starter messsage
+ *
+ *     These are the first message in a public thread. They point back to the message in the parent channel from which the thread was started (type 21)
+ *     These messages have message_id, channel_id, and guild_id.
+ *     These messages will never have content, embeds, or attachments, mainly just the message_reference and referenced_message fields.
  *
  *
  *
@@ -158,12 +190,12 @@ public interface Message {
     /**
      * any embedded content
      */
-    //@NotNull Embed[] getEmbeds();
+    @NotNull Embed[] getEmbeds();
 
     /**
      * reactions to the message
      */
-    //@Nullable Reaction[] getReactions();
+    @Nullable Reaction[] getReactions();
 
     /**
      * used for validating a message was sent
@@ -195,13 +227,20 @@ public interface Message {
     }
 
     /**
-     * type of message
+     * type of message as int
      *
+     * @see #getTypeAsMessageType()
      * @see MessageType
      * @see  <a href="https://discord.com/developers/docs/resources/channel#message-object-message-types" target="_top">Message Types</a>
      */
     int getTypeAsValue();
 
+    /**
+     * type of message as {@link MessageType}
+     *
+     * @see MessageType
+     * @see  <a href="https://discord.com/developers/docs/resources/channel#message-object-message-types" target="_top">Message Types</a>
+     */
     default @Nullable MessageType getTypeAsMessageType(){
         return MessageType.fromValue(getTypeAsValue());
     }
@@ -209,7 +248,7 @@ public interface Message {
     /**
      * sent with Rich Presence-related chat embeds
      */
-    //@Nullable MessageActivity getMessageActivity();
+    @Nullable MessageActivity getMessageActivity();
 
     /**
      * sent with Rich Presence-related chat embeds
