@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects;
+package me.linusdev.discordbotapi.api.objects.todo;
 
 import me.linusdev.data.SimpleDatable;
 

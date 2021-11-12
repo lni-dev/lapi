@@ -1,7 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
-import me.linusdev.discordbotapi.api.objects.ThreadMetadata;
+import me.linusdev.discordbotapi.api.objects.channel.ThreadMetadata;
 import org.jetbrains.annotations.NotNull;
 
 /**
