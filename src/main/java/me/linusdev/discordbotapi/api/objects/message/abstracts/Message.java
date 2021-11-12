@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import me.linusdev.discordbotapi.api.objects.todo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import org.jetbrains.annotations.NotNull;
@@ -205,7 +206,7 @@ public interface Message {
     /**
      * roles specifically mentioned in this message
      */
-    //@NotNull Role[] getRoleMentions();
+    @NotNull Role[] getRoleMentions();
 
     /**
      * channels specifically mentioned in this message
