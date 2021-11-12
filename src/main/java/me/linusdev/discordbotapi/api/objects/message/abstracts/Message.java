@@ -4,6 +4,7 @@ import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
+import me.linusdev.discordbotapi.api.objects.message.MessageReference;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
@@ -18,34 +19,63 @@ import java.util.List;
 /**
  *
  * <a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a>
- * //todo html this
- * There are multiple message types that have a message_reference object. Since message references are generic attribution to a previous message, there will be more types of messages which have this information in the future.
- * Crosspost messages
+ * <p>There are multiple message types that have a message_reference object. Since message references are generic attribution
+ * to a previous message, there will be more types of messages which have this information in the future.
+ * </p>
  *
- *     These are messages that originated from another channel (IS_CROSSPOST flag).
- *     These messages have all three fields, with data of the original message that was crossposted.
+ * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-crosspost-messages" target="_top">Crosspost messages</a> </h3>
+ *     <li>
+ *         These are messages that originated from another channel ({@link MessageFlag#IS_CROSSPOST IS_CROSSPOST} flag).
+ *          <br> see {@link #getFlagsAsMessageFlags()}
+ *     </li>
+ *     <li>
+ *         These messages have all three fields, with data of the original message that was crossposted.
+ *     </li>
+ * </ul>
  *
- * Channel Follow Add messages
  *
- *     These are automatic messages sent when a channel is followed into the current channel (type 12).
- *     These messages have the channel_id and guild_id fields, with data of the followed announcement channel.
+ * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-channel-follow-add-messages" target="_top">Channel Follow Add messages</a></h3>
+ *      <li>
+ *          These are automatic messages sent when a channel is followed into the current channel ({@link MessageType#CHANNEL_FOLLOW_ADD type 12}).
+ *      </li>
+ *      <li>
+ *          These messages have the {@link MessageReference#getChannelId() channel_id} and {@link MessageReference#getGuildId() guild_id} fields, with data of the followed announcement channel.
+ *      </li>
+ * </ul>
  *
- * Pin messages
+ * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-pin-messages" target="_top">Pin messages</a></h3>
+ *      <li>
+ *          These are automatic messages sent when a message is pinned ({@link MessageType#CHANNEL_PINNED_MESSAGE type 6}).
+ *      </li>
+ *      <li>
+ *          These messages have {@link MessageReference#getMessageId() message_id} and {@link MessageReference#getChannelId() channel_id}, and {@link MessageReference#getGuildId() guild_id} (when testing guild_id was missing) if it is in a guild, with data of the message that was pinned.
+ *      </li>
+ * </ul>
  *
- *     These are automatic messages sent when a message is pinned (type 6).
- *     These messages have message_id and channel_id, and guild_id if it is in a guild, with data of the message that was pinned.
+ * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-replies" target="_top">Replies</a></h3>
+ *      <li>
+ *          These are messages replying to a previous message ({@link MessageType#REPLY type 19}).
+ *      </li>
+ *      <li>
+ *          These messages have {@link MessageReference#getMessageId() message_id} and {@link MessageReference#getChannelId() channel_id}, and {@link MessageReference#getGuildId() guild_id} if it is in a guild, with data of the message that was replied to. The channel_id and guild_id will be the same as the reply.
+ *      </li>
+ *      <li>
+ *          Replies are created by including a message_reference when sending a message. When sending, only message_id is required.
+ *          <br> TODO add @link
+ *      </li>
+ * </ul>
  *
- * Replies
- *
- *     These are messages replying to a previous message (type 19).
- *     These messages have message_id and channel_id, and guild_id if it is in a guild, with data of the message that was replied to. The channel_id and guild_id will be the same as the reply.
- *     Replies are created by including a message_reference when sending a message. When sending, only message_id is required.
- *
- * Thread starter messsage
- *
- *     These are the first message in a public thread. They point back to the message in the parent channel from which the thread was started (type 21)
- *     These messages have message_id, channel_id, and guild_id.
- *     These messages will never have content, embeds, or attachments, mainly just the message_reference and referenced_message fields.
+ * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-thread-starter-messsage" target="_top">Thread starter messsage</a></h3>
+ *      <li>
+ *          These are the first message in a public thread. They point back to the message in the parent channel from which the thread was started ({@link MessageType#THREAD_STARTER_MESSAGE type 21})
+ *      </li>
+ *      <li>
+ *          These messages have {@link MessageReference#getMessageId() message_id}, {@link MessageReference#getChannelId() channel_id}, and {@link MessageReference#getGuildId() guild_id}.
+ *      </li>
+ *      <li>
+ *          These messages will never have content, embeds, or attachments, mainly just the {@link #getMessageReference() message_reference}  and {@link #getReferencedMessage() referenced_message} fields.
+ *      </li>
+ * </ul>
  *
  *
  *
@@ -275,7 +305,7 @@ public interface Message {
     /**
      * data showing the source of a crosspost, channel follow add, pin, or reply message
      */
-    //@Nullable MessageReference getMessageReference();
+    @Nullable MessageReference getMessageReference();
 
     /**
      * message flags combined as a bitfield
