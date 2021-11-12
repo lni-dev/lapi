@@ -37,7 +37,10 @@ public class Main {
         // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
 
         // Guild Sticker Message
-        MessageRetriever msgRetriever = new MessageRetriever(api, "751169122775334942", "905396558969847879");
+        //MessageRetriever msgRetriever = new MessageRetriever(api, "751169122775334942", "905396558969847879");
+
+        // Guild Message with Reactions (also animated Emoji) https://ptb.discord.com/channels/317290087383826442/820084724693073921/854807543603003402
+        MessageRetriever msgRetriever = new MessageRetriever(api, "820084724693073921", "854807543603003402");
 
         Data data1 = msgRetriever.retrieveData();
         System.out.println(data1.getJsonString());
