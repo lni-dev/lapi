@@ -12,7 +12,14 @@ import java.util.List;
 /**
  * Embed sent in {@link me.linusdev.discordbotapi.api.objects.message.Message}.
  * <br> Objects of this class are static and do not change its content. Even if the embed is changed on discords end
+ * <br><br>
  *
+ * <h3 style="margin-bottom:0; padding-bottom:0"><a href="https://discord.com/developers/docs/reference#editing-message-attachments-using-attachments-within-embeds" target="_top">Using Attachments within Embeds</a>:</h3>
+ * <p>You can upload attachments when creating a message and use those attachments within your embed. To do this, you will want to upload files as part of your multipart/form-data body. Make sure that you're uploading files that contain a filename, as you will need a filename to reference against.</p>
+ * <p>Only filenames with proper image extensions are supported for the time being.</p>
+ * <p>In the {@link Embed} object ({@link EmbedBuilder}), you can then set an {@link Image} to use an attachment as its url with our attachment scheme syntax: "attachment://filename.png" ({@link Image#Image(String)}, url should be "attachment://filename.png" )</p>
+ * TODO add attachment @links
+ * <br><br>
  * @see <a href="https://discord.com/developers/docs/resources/channel#embed-object" target="_top">Embed Object</a>
  * @see <a href="https://cog-creators.github.io/discord-embed-sandbox/" target="_top">Discord Embed Sandbox</a>
  */
