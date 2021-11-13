@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.objects.guild.member.Member;
 import me.linusdev.discordbotapi.api.objects.message.MessageReference;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
+import me.linusdev.discordbotapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.todo.Role;
@@ -337,7 +338,7 @@ public interface Message {
     /**
      * sent if the message is a response to an Interaction
      */
-    //@Nullable MessageInteraction getMessageInteraction();
+    @Nullable MessageInteraction getMessageInteraction();
 
     /**
      * the thread that was started from this message, includes thread member object
