@@ -118,7 +118,7 @@ public enum Permissions {
      * @return a list of {@link Permissions}, which permissionBits are "contained" in bits
      */
     @NotNull
-    public static List<Permissions> getPermissionsFromBits(BigInteger bits){
+    public static List<Permissions> getPermissionsFromBits(@NotNull BigInteger bits){
 
         ArrayList<Permissions> perms = new ArrayList<>();
 

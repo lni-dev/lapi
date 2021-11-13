@@ -5,6 +5,7 @@ import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
+import me.linusdev.discordbotapi.api.objects.guild.member.Member;
 import me.linusdev.discordbotapi.api.objects.message.MessageReference;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
@@ -19,8 +20,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
+
+ * I was thinking about making several Interfaces for different types of messages, like
+ * I did with the channels, but I decided against it, duo to its complexity. Like a Reply and a Thread-Starter-Message
+ * having the same field (message_reference) but are different types of messages. It would also be really annoying to cast
+ * each message depending on it's type. <br><br>
  *
- * <a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a>
+ * <h1 style="margin-bottom:0;padding-bottom:0"><a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a> ({@link MessageType})</h1>
  * <p>There are multiple message types that have a message_reference object. Since message references are generic attribution
  * to a previous message, there will be more types of messages which have this information in the future.
  * </p>
@@ -79,13 +85,7 @@ import java.util.List;
  *      </li>
  * </ul>
  *
- *
- *
- * <br><br>
- * I was thinking about making several Interfaces for different types of messages, like
- * I did with the channels, but I decided against it, duo to its complexity. Like a Reply and a Thread-Starter-Message
- * having the same field (message_reference) but are different types of messages. It would also be really annoying to cast
- * each message depending on it's type.
+ * @see <a href="https://discord.com/developers/docs/resources/channel#message-object" target="_top">Message Object</a>
  */
 public interface Message {
     //todo implement some methods
@@ -155,7 +155,7 @@ public interface Message {
      *
      * todo add @links
      */
-    //@Nullable Member getMember();
+    @Nullable Member getMember();
 
     /**
      * contents of the message
