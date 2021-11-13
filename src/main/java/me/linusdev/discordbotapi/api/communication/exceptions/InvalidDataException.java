@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.communication.exceptions;
 
 import me.linusdev.data.Data;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,5 +64,29 @@ public class InvalidDataException extends LApiException{
      */
     public Data getData() {
         return data;
+    }
+
+    /**
+     *
+     * @param data Invalid {@link Data}
+     * @param message message to throw.
+     * @param clazz class in which the {@link Data} was used in. this will be added to the message like this: ". Invalid Data while creating " + clazz.getSimpleName() + "."
+     * @param checkIfNull array of Objects which may be null
+     * @param keys array of keys corresponding to the Objects, will be added as {@link #addMissingFields(String...)} if Object with same index in checkIfNull array is null
+     * @throws InvalidDataException always
+     */
+    public static void throwException(@NotNull Data data, @Nullable String message, @NotNull Class clazz, Object[] checkIfNull, @NotNull String[] keys) throws InvalidDataException {
+        message = (message == null ? "" : message) + " Invalid Data while creating " + clazz.getSimpleName() + ".";
+        InvalidDataException exception = new InvalidDataException(data, message);
+
+        if(checkIfNull.length > keys.length) throw new IllegalArgumentException("checkIfNull array may not be bigger than keys array. One or more keys are missing!");
+
+        int i = 0;
+        for(Object o : checkIfNull){
+            if(o == null) exception.addMissingFields(keys[i]);
+            i++;
+        }
+
+        throw exception;
     }
 }
