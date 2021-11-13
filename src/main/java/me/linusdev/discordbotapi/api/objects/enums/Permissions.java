@@ -15,50 +15,45 @@ import static me.linusdev.discordbotapi.api.objects.enums.SimpleChannelType.*;
  */
 public enum Permissions {
 
-    CREATE_INSTANT_INVITE   ("0000000001", "Allows creation of instant invites", TEXT, VOICE, STAGE),
-    KICK_MEMBERS            ("0000000002", "Allows kicking members"),
-    BAN_MEMBERS             ("0000000004", "Allows banning members"),
-    ADMINISTRATOR           ("0000000008", "Allows all permissions and bypasses channel permission overwrites"),
-    MANAGE_CHANNELS         ("0000000010", "Allows management and editing of channels", TEXT, VOICE, STAGE),
-    MANAGE_GUILD            ("0000000020", "Allows management and editing of the guild"),
-    ADD_REACTIONS           ("0000000040", "Allows for the addition of reactions to messages", TEXT),
-    VIEW_AUDIT_LOG          ("0000000080", "Allows for viewing of audit logs"),
-    PRIORITY_SPEAKER        ("0000000100", "Allows for using priority speaker in a voice channel", VOICE),
-    STREAM                  ("0000000200", "Allows the user to go live", VOICE),
-    VIEW_CHANNEL            ("0000000400", "Allows guild members to view a channel, which includes reading messages in text channels", TEXT, VOICE, STAGE),
-    SEND_MESSAGES           ("0000000800", "Allows for sending messages in a channel", TEXT),
-    SEND_TTS_MESSAGES       ("0000001000", "Allows for sending of /tts messages", TEXT),
-    MANAGE_MESSAGES         ("0000002000", "Allows for deletion of other users messages", TEXT),
-    EMBED_LINKS             ("0000004000", "Links sent by users with this permission will be auto-embedded", TEXT),
-    ATTACH_FILES            ("0000008000", "Allows for uploading images and files", TEXT),
-    READ_MESSAGE_HISTORY    ("0000010000", "Allows for reading of message history", TEXT),
-    MENTION_EVERYONE        ("0000020000", "Allows for using the @everyone tag to notify all users in a channel, and the @here tag to notify all online users in a channel", TEXT),
-    USE_EXTERNAL_EMOJIS     ("0000040000", "Allows the usage of custom emojis from other servers", TEXT),
-    VIEW_INSIGHTS     ("0000080000", "Allows for viewing guild insights"),
-    CONNECT                 ("0000100000", "Allows for joining of a voice channel", VOICE, STAGE),
-    SPEAK                   ("0000200000", "Allows for speaking in a voice channel", VOICE),
-    MUTE_MEMBERS            ("0000400000", "Allows for muting members in a voice channel", VOICE, STAGE),
-    DEAFEN_MEMBERS          ("0000800000", "Allows for deafening of members in a voice channel", VOICE, STAGE),
-    MOVE_MEMBERS            ("0001000000", "Allows for moving of members between voice channels", VOICE, STAGE),
-    USE_VAD                 ("0002000000", "Allows for using voice-activity-detection in a voice channel", VOICE),
-    CHANGE_NICKNAME         ("0004000000", "Allows for modification of own nickname"),
-    MANAGE_NICKNAMES        ("0008000000", "Allows for modification of other users nicknames"),
-
-    /**
-     * Manage Permissions
-     */
-    MANAGE_ROLES            ("0010000000", "Allows management and editing of roles", TEXT, VOICE, STAGE),
-    MANAGE_WEBHOOKS         ("0020000000", "Allows management and editing of webhooks", TEXT),
-    MANAGE_EMOJIS           ("0040000000", "Allows management and editing of emojis"),
-    USE_SLASH_COMMANDS      ("0080000000", "Allows members to use slash commands in text channels", TEXT),
-
-    /**
-     * todo (This permission is under active development and may be changed or removed.
-     */
-    REQUEST_TO_SPEAK        ("0100000000", "Allows for requesting to speak in stage channels)", STAGE),
-    MANAGE_THREADS          ("0400000000", "Allows for deleting and archiving threads, and viewing all private threads", TEXT),
-    USE_PUBLIC_THREADS      ("0800000000", "Allows for creating and participating in threads", TEXT),
-    USE_PRIVATE_THREADS     ("1000000000", "Allows for creating and participating in private threads", TEXT),
+    CREATE_INSTANT_INVITE       ("0000000001", "Allows creation of instant invites", TEXT, VOICE, STAGE),
+    KICK_MEMBERS                ("0000000002", "Allows kicking members"),
+    BAN_MEMBERS                 ("0000000004", "Allows banning members"),
+    ADMINISTRATOR               ("0000000008", "Allows all permissions and bypasses channel permission overwrites"),
+    MANAGE_CHANNELS             ("0000000010", "Allows management and editing of channels", TEXT, VOICE, STAGE),
+    MANAGE_GUILD                ("0000000020", "Allows management and editing of the guild"),
+    ADD_REACTIONS               ("0000000040", "Allows for the addition of reactions to messages", TEXT),
+    VIEW_AUDIT_LOG              ("0000000080", "Allows for viewing of audit logs"),
+    PRIORITY_SPEAKER            ("0000000100", "Allows for using priority speaker in a voice channel", VOICE),
+    STREAM                      ("0000000200", "Allows the user to go live", VOICE),
+    VIEW_CHANNEL                ("0000000400", "Allows guild members to view a channel, which includes reading messages in text channels", TEXT, VOICE, STAGE),
+    SEND_MESSAGES               ("0000000800", "Allows for sending messages in a channel", TEXT),
+    SEND_TTS_MESSAGES           ("0000001000", "Allows for sending of /tts messages", TEXT),
+    MANAGE_MESSAGES             ("0000002000", "Allows for deletion of other users messages", TEXT),
+    EMBED_LINKS                 ("0000004000", "Links sent by users with this permission will be auto-embedded", TEXT),
+    ATTACH_FILES                ("0000008000", "Allows for uploading images and files", TEXT),
+    READ_MESSAGE_HISTORY        ("0000010000", "Allows for reading of message history", TEXT),
+    MENTION_EVERYONE            ("0000020000", "Allows for using the @everyone tag to notify all users in a channel, and the @here tag to notify all online users in a channel", TEXT),
+    USE_EXTERNAL_EMOJIS         ("0000040000", "Allows the usage of custom emojis from other servers", TEXT),
+    VIEW_GUILD_INSIGHTS         ("0000080000", "Allows for viewing guild insights"),
+    CONNECT                     ("0000100000", "Allows for joining of a voice channel", VOICE, STAGE),
+    SPEAK                       ("0000200000", "Allows for speaking in a voice channel", VOICE),
+    MUTE_MEMBERS                ("0000400000", "Allows for muting members in a voice channel", VOICE, STAGE),
+    DEAFEN_MEMBERS              ("0000800000", "Allows for deafening of members in a voice channel", VOICE, STAGE),
+    MOVE_MEMBERS                ("0001000000", "Allows for moving of members between voice channels", VOICE, STAGE),
+    USE_VAD                     ("0002000000", "Allows for using voice-activity-detection in a voice channel", VOICE),
+    CHANGE_NICKNAME             ("0004000000", "Allows for modification of own nickname"),
+    MANAGE_NICKNAMES            ("0008000000", "Allows for modification of other users nicknames"),
+    MANAGE_ROLES                ("0010000000", "Allows management and editing of roles", TEXT, VOICE, STAGE),
+    MANAGE_WEBHOOKS             ("0020000000", "Allows management and editing of webhooks", TEXT),
+    MANAGE_EMOJIS_AND_STICKERS  ("0040000000", "Allows management and editing of emojis and stickers"),
+    USE_APPLICATION_COMMANDS    ("0080000000", "Allows members to use application commands, including slash commands and context menu commands.", TEXT),
+    REQUEST_TO_SPEAK            ("0100000000", "Allows for requesting to speak in stage channels)", STAGE),
+    MANAGE_THREADS              ("0400000000", "Allows for deleting and archiving threads, and viewing all private threads", TEXT),
+    USE_PUBLIC_THREADS          ("0800000000", "Allows for creating and participating in threads", TEXT),
+    USE_PRIVATE_THREADS         ("1000000000", "Allows for creating and participating in private threads", TEXT),
+    USE_EXTERNAL_STICKERS       ("2000000000", "Allows the usage of custom stickers from other servers", TEXT),
+    SEND_MESSAGES_IN_THREADS    ("4000000000", "Allows for sending messages in threads", TEXT),
+    START_EMBEDDED_ACTIVITIES   ("8000000000", "Allows for launching activities (applications with the EMBEDDED flag) in a voice channel", VOICE),
     ;
 
     /**
@@ -67,7 +62,7 @@ public enum Permissions {
     final @NotNull String hex;
 
     /**
-     * A description, on what the permission allows (as of 30.06.2021)
+     * A description, on what the permission allows (as of 30.06.2021) (updated 13.11.2021)
      */
     final @NotNull String description;
 
