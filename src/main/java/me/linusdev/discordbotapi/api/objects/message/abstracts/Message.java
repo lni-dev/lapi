@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
+import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
@@ -285,7 +286,7 @@ public interface Message {
      * sent with Rich Presence-related chat embeds
      * partial application object!
      */
-    //@Nullable Application getApplication();
+    @Nullable Application getApplication();
 
     /**
      * if the message is a response to an Interaction, this is the id of the interaction's application as {@link Snowflake},

@@ -2,18 +2,19 @@ package me.linusdev.discordbotapi.api.objects.application;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.application.team.Team;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 /**
  * @see <a href="https://discord.com/developers/docs/resources/application#application-object" target="_top">Application Object</a>
  */
 public class Application implements Datable {
-
-    //TODO
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -54,6 +55,27 @@ public class Application implements Datable {
     private final @Nullable Integer flags;
     private final @Nullable ApplicationFlag[] flagsArray;
 
+    /**
+     *
+     * @param id the id of the app
+     * @param name the name of the app
+     * @param icon the icon hash of the app
+     * @param description the description of the app
+     * @param rpcOrigins an array of rpc origin urls, if rpc is enabled
+     * @param botPublic when false only app owner can join the app's bot to guilds
+     * @param botRequireCodeGrant when true the app's bot will only join upon completion of the full oauth2 code grant flow
+     * @param termsOfServiceUrl the url of the app's terms of service
+     * @param privacyPolicyUrl the url of the app's privacy policy
+     * @param owner partial user object containing info on the owner of the application
+     * @param summary if this application is a game sold on Discord, this field will be the summary field for the store page of its primary sku
+     * @param verifyKey the hex encoded key for verification in interactions and the GameSDK's GetTicket
+     * @param team if the application belongs to a team, this will be a list of the members of that team
+     * @param guildId if this application is a game sold on Discord, this field will be the guild to which it has been linked
+     * @param primarySkuId if this application is a game sold on Discord, this field will be the id of the "Game SKU" that is created, if exists
+     * @param slug if this application is a game sold on Discord, this field will be the URL slug that links to the store page
+     * @param coverImage the application's default rich presence invite cover image hash
+     * @param flags the application's public flags
+     */
     public Application(@NotNull Snowflake id, @NotNull String name, @Nullable String icon, @NotNull String description, @Nullable String[] rpcOrigins,
                        boolean botPublic, boolean botRequireCodeGrant, @Nullable String termsOfServiceUrl, @Nullable String privacyPolicyUrl,
                        @Nullable User owner, @NotNull String summary, @NotNull String verifyKey, @Nullable Team team, @Nullable Snowflake guildId,
@@ -79,9 +101,220 @@ public class Application implements Datable {
         this.flagsArray = flags == null ? null : ApplicationFlag.getFlagsFromInteger(flags);
     }
 
+    /**
+     *
+     * @param data with required fields
+     * @return {@link Application}
+     * @throws InvalidDataException if (id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null) == true
+     */
+    public static @Nullable Application fromData(@Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
+
+        String id = (String) data.get(ID_KEY);
+        String name = (String) data.get(NAME_KEY);
+        String icon = (String) data.get(ICON_KEY);
+        String description = (String) data.get(DESCRIPTION_KEY);
+        ArrayList<Object> rpcOriginsList = (ArrayList<Object>) data.get(RPC_ORIGINS_KEY);
+        Boolean botPublic = (Boolean) data.get(BOT_PUBLIC_KEY);
+        Boolean botRequireCodeGrant = (Boolean) data.get(BOT_REQUIRE_CODE_GRANT_KEY);
+        String tosUrl = (String) data.get(TERMS_OF_SERVICE_URL_KEY);
+        String ppUrl = (String) data.get(PRIVACY_POLICY_URL_KEY);
+        Data ownerData = (Data) data.get(OWNER_KEY);
+        String summary = (String) data.get(SUMMARY_KEY);
+        String verifyKey = (String) data.get(VERIFY_KEY_KEY);
+        Data teamData = (Data) data.get(TEAM_KEY);
+        String guildId = (String) data.get(GUILD_ID_KEY);
+        String primarySkuId = (String) data.get(PRIMARY_SKU_ID_KEY);
+        String slug = (String) data.get(SLUG_KEY);
+        String coverImage = (String) data.get(COVER_IMAGE_KEY);
+        Number flags = (Number) data.get(FLAGS_KEY);
+
+        if(id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null){
+            InvalidDataException exception = new InvalidDataException(data, "Cannot create " + Application.class.getSimpleName());
+
+            if(id == null) exception.addMissingFields(ID_KEY);
+            if(name == null) exception.addMissingFields(NAME_KEY);
+            if(description == null) exception.addMissingFields(DESCRIPTION_KEY);
+            if(botPublic == null) exception.addMissingFields(BOT_PUBLIC_KEY);
+            if(botRequireCodeGrant == null) exception.addMissingFields(BOT_REQUIRE_CODE_GRANT_KEY);
+            if(summary == null) exception.addMissingFields(SUMMARY_KEY);
+            if(verifyKey == null) exception.addMissingFields(VERIFY_KEY_KEY);
+
+            throw exception;
+        }
+
+        String[] rpcOrigins = null;
+        if(rpcOriginsList != null){
+            rpcOrigins = new String[rpcOriginsList.size()];
+            int i = 0;
+            for(Object o : rpcOriginsList){
+                rpcOrigins[i++] = (String) o;
+            }
+        }
+
+        return new Application(Snowflake.fromString(id), name, icon, description, rpcOrigins, botPublic, botRequireCodeGrant, tosUrl, ppUrl,
+                ownerData == null ? null : User.fromData(ownerData), summary, verifyKey, teamData == null ? null : Team.fromData(teamData),
+                Snowflake.fromString(guildId), Snowflake.fromString(primarySkuId), slug, coverImage, flags == null ? null : flags.intValue());
+    }
+
+    /**
+     * 	the id as {@link Snowflake} of the app
+     */
+    public @NotNull Snowflake getIdAsSnowflake() {
+        return id;
+    }
+
+    /**
+     * 	the id as {@link String} of the app
+     */
+    public @NotNull String getId() {
+        return id.asString();
+    }
+
+    /**
+     * the name of the app
+     */
+    public @NotNull String getName() {
+        return name;
+    }
+
+    /**
+     * the icon hash of the app
+     */
+    public @Nullable String getIcon() {
+        return icon;
+    }
+
+    /**
+     * the description of the app
+     */
+    public @NotNull String getDescription() {
+        return description;
+    }
+
+    /**
+     * an array of rpc origin urls, if rpc is enabled
+     */
+    public @Nullable String[] getRpcOrigins() {
+        return rpcOrigins;
+    }
+
+    /**
+     * when false only app owner can join the app's bot to guilds
+     */
+    public boolean isBotPublic() {
+        return botPublic;
+    }
+
+    /**
+     * when true the app's bot will only join upon completion of the full oauth2 code grant flow
+     */
+    public boolean isBotRequireCodeGrant() {
+        return botRequireCodeGrant;
+    }
+
+    /**
+     * the url of the app's terms of service
+     */
+    public @Nullable String getTermsOfServiceUrl() {
+        return termsOfServiceUrl;
+    }
+
+    /**
+     * the url of the app's privacy policy
+     */
+    public @Nullable String getPrivacyPolicyUrl() {
+        return privacyPolicyUrl;
+    }
+
+    /**
+     * partial user object containing info on the owner of the application
+     */
+    public @Nullable User getOwner() {
+        return owner;
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the summary field for the store page of its primary sku
+     */
+    public @NotNull String getSummary() {
+        return summary;
+    }
+
+    /**
+     * the hex encoded key for verification in interactions and the GameSDK's GetTicket
+     */
+    public @NotNull String getVerifyKey() {
+        return verifyKey;
+    }
+
+    /**
+     * if the application belongs to a team, this will be a list of the members of that team
+     */
+    public @Nullable Team getTeam() {
+        return team;
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the guild id as {@link Snowflake} to which it has been linked
+     */
+    public @Nullable Snowflake getGuildIdAsSnowflake() {
+        return guildId;
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the guild id as {@link String} to which it has been linked
+     */
+    public @Nullable String getGuildId() {
+        return guildId == null ? null : guildId.asString();
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the id as {@link Snowflake} of the "Game SKU" that is created, if exists
+     */
+    public @Nullable Snowflake getPrimarySkuIdAsSnowflake() {
+        return primarySkuId;
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the id as {@link String} of the "Game SKU" that is created, if exists
+     */
+    public @Nullable String getPrimarySkuId() {
+        return primarySkuId == null ? null : primarySkuId.asString();
+    }
+
+    /**
+     * if this application is a game sold on Discord, this field will be the URL slug that links to the store page
+     */
+    public @Nullable String getSlug() {
+        return slug;
+    }
+
+    /**
+     * the application's default rich presence invite cover image hash
+     */
+    public @Nullable String getCoverImage() {
+        return coverImage;
+    }
+
+    /**
+     * the application's public flags
+     * @see #getFlagsArray()
+     */
+    public @Nullable Integer getFlags() {
+        return flags;
+    }
+
+    /**
+     * the application's public flags
+     * @see ApplicationFlag
+     */
+    public ApplicationFlag[] getFlagsArray() {
+        return flagsArray;
+    }
 
     @Override
-    public Data getData() {
+    public @NotNull Data getData() {
         Data data = new Data(8);
 
         data.add(ID_KEY, id);
