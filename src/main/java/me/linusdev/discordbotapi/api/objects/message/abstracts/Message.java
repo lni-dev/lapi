@@ -69,8 +69,8 @@ import java.util.List;
  *          These messages have {@link MessageReference#getMessageId() message_id} and {@link MessageReference#getChannelId() channel_id}, and {@link MessageReference#getGuildId() guild_id} if it is in a guild, with data of the message that was replied to. The channel_id and guild_id will be the same as the reply.
  *      </li>
  *      <li>
- *          Replies are created by including a message_reference when sending a message. When sending, only message_id is required.
- *          <br> TODO add @link
+ *          Replies are created by including a {@link #getMessageReference() message_reference} when sending a message. When sending, only {@link #getId() message_id} is required.
+ *          <br>
  *      </li>
  * </ul>
  *
