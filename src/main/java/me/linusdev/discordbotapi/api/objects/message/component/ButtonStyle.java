@@ -1,11 +1,14 @@
 package me.linusdev.discordbotapi.api.objects.message.component;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/message-components#button-object-button-styles" target="_top">Button Styles</a>
  */
 public enum ButtonStyle implements SimpleDatable {
+
+    UNKNOWN(0),
 
     /**
      * Name: Primary <br>
@@ -52,6 +55,19 @@ public enum ButtonStyle implements SimpleDatable {
 
     ButtonStyle(int value){
         this.value = value;
+    }
+
+    /**
+     *
+     * @param value int
+     * @return corresponding {@link ButtonStyle} or {@link #UNKNOWN} if none matches
+     */
+    public static @NotNull ButtonStyle fromValue(int value){
+        for(ButtonStyle style : ButtonStyle.values()){
+            if(style.value == value) return style;
+        }
+
+        return UNKNOWN;
     }
 
     @Override

@@ -2,8 +2,11 @@ package me.linusdev.discordbotapi.api.objects.message.component;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
+import me.linusdev.discordbotapi.api.objects.message.component.selectmenu.SelectMenu;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -40,7 +43,31 @@ public interface Component extends Datable {
     public static final String PLACEHOLDER_KEY = "placeholder";
     public static final String MIN_VALUES_KEY = "min_values";
     public static final String MAX_VALUES_KEY = "max_values";
-    public static final String COMPONENTS = "components";
+    public static final String COMPONENTS_KEY = "components";
+
+
+    public static @NotNull Component fromData(@NotNull Data data) throws InvalidDataException {
+        Number type = (Number) data.get(TYPE_KEY);
+
+        if(type == null){
+            InvalidDataException.throwException(data, null, Component.class, new Object[]{type}, new String[]{TYPE_KEY});
+            return null; //this will never happen, because above method will throw an Exception
+        }
+
+        int typeInt = type.intValue();
+
+        if(typeInt == ComponentType.ACTION_ROW.getValue()){
+            return ActionRow.fromData(data);
+
+        }else if(typeInt == ComponentType.BUTTON.getValue()){
+            return Button.fromData(data);
+
+        }else if(typeInt == ComponentType.SELECT_MENU.getValue()){
+            return SelectMenu.fromData(data);
+        }
+
+        return null;
+    }
 
     /**
      * {@link ComponentType component type}
