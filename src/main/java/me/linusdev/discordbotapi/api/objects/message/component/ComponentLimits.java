@@ -16,4 +16,9 @@ public final class ComponentLimits {
     public static final int MIN_VALUE_FIELD_MAX = 25;
     public static final int MAX_VALUE_FIELD_MAX = 25;
     public static final int ACTION_ROW_MAX_CHILD_COMPONENTS = 5;
+
+    //SelectOption Limits
+    public static final int SO_LABEL_MAX_CHARS = 100;
+    public static final int SO_VALUE_MAX_CHARS = 100;
+    public static final int SO_DESCRIPTION_MAX_CHARS = 100;
 }

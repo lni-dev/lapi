@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.message.component;
+package me.linusdev.discordbotapi.api.objects.message.component.button;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
@@ -13,40 +13,35 @@ public enum ButtonStyle implements SimpleDatable {
     /**
      * Name: Primary <br>
      * Color: blurple <br>
-     * Required field: custom_id <br>
-     * TODO: add @link
+     * Required field: {@link Button#getCustomId() custom_id} <br>
      */
     PRIMARY(1),
 
     /**
      * Name: Secondary <br>
      * Color: grey <br>
-     * Required field: custom_id <br>
-     * TODO: add @link
+     * Required field: {@link Button#getCustomId() custom_id} <br>
      */
     SECONDARY(2),
 
     /**
      * Name: Success <br>
      * Color: green <br>
-     * Required field: custom_id <br>
-     * TODO: add @link
+     * Required field: {@link Button#getCustomId() custom_id} <br>
      */
     SUCCESS(3),
 
     /**
      * Name: Danger <br>
      * Color: red <br>
-     * Required field: custom_id <br>
-     * TODO: add @link
+     * Required field: {@link Button#getCustomId() custom_id} <br>
      */
     DANGER(4),
 
     /**
      * Name: Link <br>
      * Color: grey, navigates to a URL <br>
-     * Required field: url <br>
-     * TODO: add @link
+     * Required field: {@link Button#getUrl() url} <br>
      */
     Link(5),
     ;

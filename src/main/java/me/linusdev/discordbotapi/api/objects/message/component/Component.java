@@ -3,10 +3,10 @@ package me.linusdev.discordbotapi.api.objects.message.component;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.enums.MessageType;
+import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
+import me.linusdev.discordbotapi.api.objects.message.component.button.Button;
 import me.linusdev.discordbotapi.api.objects.message.component.selectmenu.SelectMenu;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
@@ -23,12 +23,31 @@ import org.jetbrains.annotations.Nullable;
  *     </a>
  * </h2>
  * <p>
- *     Components are a new field on the message object, so you can use them whether you're sending messages or responding to a slash command or other interaction
- *     The top-level components field is an array of Action Row components.
- * </p> TODO: add @link
- *
+ *     Components are a new field on the {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message object}, so you can use them whether you're sending messages or responding to a slash command or other interaction
+ *     The top-level components field is an array of {@link ActionRow Action Row} components.
+ * </p>
+ * <br>
+ * <h2 style="margin-bottom:0;padding-bottom:0">
+ *     <a href="https://discord.com/developers/docs/interactions/message-components#custom-id" target="_top">
+ *         Custom ID
+ *     </a>
+ * </h2>
+ * <p>
+ *     Components, aside from {@link ActionRow Action Rows}, must have a custom_id field ({@link Button#getCustomId(), {@link SelectMenu#getCustomId()}}).
+ *     This field is defined by the developer (yes, YOU) when sending the component payload,
+ *     and is returned in the {@link me.linusdev.discordbotapi.api.objects.todo.Interaction interaction} payload sent when a user interacts with the component.
+ *     For example, if you set custom_id: click_me on a button,
+ *     you'll receive an {@link me.linusdev.discordbotapi.api.objects.todo.Interaction interaction} containing custom_id: click_me when a user clicks that button.
+ * </p>
+ * <p>
+ *     custom_id must be unique per component; multiple buttons on the same message must not share the same custom_id.
+ *     This field is a string of max {@value ComponentLimits#CUSTOM_ID_MAX_CHARS} characters, and can be used flexibly to maintain state or pass through other important data.
+ * </p>
  *
  * @see <a href="https://discord.com/developers/docs/interactions/message-components#component-object" target="_top">Component Object</a>
+ * @see ActionRow
+ * @see Button
+ * @see SelectMenu
  */
 public interface Component extends Datable {
 
@@ -45,7 +64,12 @@ public interface Component extends Datable {
     public static final String MAX_VALUES_KEY = "max_values";
     public static final String COMPONENTS_KEY = "components";
 
-
+    /**
+     *
+     * @param data {@link Data} to create Component
+     * @return {@link ActionRow}, {@link Button}, {@link SelectMenu} or {@link UnknownComponent}. Depending on {@link #getType()} stored in given data
+     * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
+     */
     public static @NotNull Component fromData(@NotNull Data data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
 
@@ -66,7 +90,7 @@ public interface Component extends Datable {
             return SelectMenu.fromData(data);
         }
 
-        return null;
+        return UnknownComponent.fromData(data);
     }
 
     /**

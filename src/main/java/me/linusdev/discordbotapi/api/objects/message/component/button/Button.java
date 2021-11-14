@@ -1,8 +1,12 @@
-package me.linusdev.discordbotapi.api.objects.message.component;
+package me.linusdev.discordbotapi.api.objects.message.component.button;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.discordbotapi.api.objects.message.component.Component;
+import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
+import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
+import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
 import me.linusdev.discordbotapi.api.objects.message.component.selectmenu.SelectMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +52,7 @@ import org.jetbrains.annotations.Nullable;
  *          Buttons
  *      </a>
  */
-public class Button implements Component{
+public class Button implements Component {
 
     private @NotNull ComponentType type;
     private @NotNull ButtonStyle style;

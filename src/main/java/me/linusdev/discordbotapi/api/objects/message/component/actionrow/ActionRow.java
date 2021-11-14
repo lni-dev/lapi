@@ -1,8 +1,11 @@
-package me.linusdev.discordbotapi.api.objects.message.component;
+package me.linusdev.discordbotapi.api.objects.message.component.actionrow;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.message.component.Component;
+import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
+import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
