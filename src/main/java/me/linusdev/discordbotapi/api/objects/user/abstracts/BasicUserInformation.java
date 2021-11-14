@@ -1,6 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.user.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.todo.Avatar;
+import me.linusdev.discordbotapi.api.objects.toodo.Avatar;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;

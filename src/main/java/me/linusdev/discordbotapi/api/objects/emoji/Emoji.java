@@ -4,7 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
-import me.linusdev.discordbotapi.api.objects.todo.Role;
+import me.linusdev.discordbotapi.api.objects.toodo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,6 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.todo.Icon;
+import me.linusdev.discordbotapi.api.objects.toodo.Icon;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

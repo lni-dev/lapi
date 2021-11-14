@@ -28,7 +28,7 @@ import java.util.ArrayList;
  *     Select menus support single-select and multi-select behavior, meaning you can prompt a user to choose just one item from a list,
  *     or multiple.
  *     When a user finishes making their choice by clicking out of the dropdown or closing the half-sheet,
- *     your app will receive an {@link me.linusdev.discordbotapi.api.objects.todo.Interaction interaction}.
+ *     your app will receive an {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction}.
  * </p>
  * <ul>
  *     <li>

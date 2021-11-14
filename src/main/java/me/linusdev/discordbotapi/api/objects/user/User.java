@@ -2,7 +2,7 @@ package me.linusdev.discordbotapi.api.objects.user;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.discordbotapi.api.objects.todo.Avatar;
+import me.linusdev.discordbotapi.api.objects.toodo.Avatar;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.user.abstracts.BasicUserInformation;

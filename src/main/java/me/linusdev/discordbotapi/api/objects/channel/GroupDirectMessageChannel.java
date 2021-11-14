@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.objects.channel;
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.todo.Icon;
+import me.linusdev.discordbotapi.api.objects.toodo.Icon;
 import me.linusdev.discordbotapi.api.objects.Recipient;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;

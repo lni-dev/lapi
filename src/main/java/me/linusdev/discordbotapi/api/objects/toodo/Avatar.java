@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.todo;
+package me.linusdev.discordbotapi.api.objects.toodo;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;

@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
  *     </a>
  * </h2>
  * <p>
- *     Buttons are interactive components that render on messages. They can be clicked by users, and send an {@link me.linusdev.discordbotapi.api.objects.todo.Interaction interaction} to your app when clicked.
+ *     Buttons are interactive components that render on messages. They can be clicked by users, and send an {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction} to your app when clicked.
  * </p>
  *
  *  <ul>
@@ -44,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  *          Link buttons must have a {@link #getUrl() url}, and cannot have a {@link #getCustomId() custom_id}
  *      </li>
  *      <li>
- *          Link buttons do not send an {@link me.linusdev.discordbotapi.api.objects.todo.Interaction interaction} to your app when clicked
+ *          Link buttons do not send an {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction} to your app when clicked
  *      </li>
  *  </ul>
  *

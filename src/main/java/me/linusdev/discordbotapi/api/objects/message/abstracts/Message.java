@@ -12,7 +12,7 @@ import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
-import me.linusdev.discordbotapi.api.objects.todo.Role;
+import me.linusdev.discordbotapi.api.objects.toodo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import org.jetbrains.annotations.NotNull;
