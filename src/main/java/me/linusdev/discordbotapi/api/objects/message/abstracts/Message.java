@@ -8,6 +8,7 @@ import me.linusdev.discordbotapi.api.objects.enums.MessageType;
 import me.linusdev.discordbotapi.api.objects.guild.member.Member;
 import me.linusdev.discordbotapi.api.objects.message.MessageReference;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
+import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
@@ -350,7 +351,7 @@ public interface Message {
     /**
      * sent if the message contains components like buttons, action rows, or other interactive components
      */
-    //@NotNull Component[] getComponents();
+    @NotNull Component[] getComponents();
 
 
     /**
