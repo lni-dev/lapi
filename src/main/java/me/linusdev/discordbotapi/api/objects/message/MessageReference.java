@@ -14,6 +14,12 @@ public class MessageReference implements Datable {
     private @Nullable Snowflake guildId;
     private boolean fallIfNotExists;
 
+    public static @Nullable MessageReference fromData(@Nullable Data data){
+        if(data == null) return null;
+        //TODO
+        return null;
+    }
+
     /**
      * id as {@link Snowflake} of the originating message
      */

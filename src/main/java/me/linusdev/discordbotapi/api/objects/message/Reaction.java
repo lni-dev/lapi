@@ -47,7 +47,7 @@ public class Reaction implements Datable {
      * @return {@link Reaction}
      * @throws InvalidDataException if {@link #COUNT_KEY}, {@link #ME_KEY} or {@link #EMOJI_KEY} field are missing
      */
-    public @NotNull Reaction fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Reaction fromData(@NotNull Data data) throws InvalidDataException {
         Number count = (Number) data.get(COUNT_KEY);
         Boolean mee = (Boolean) data.get(ME_KEY);
         Data emojiData = (Data) data.get(EMOJI_KEY);

@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
+import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
@@ -16,9 +17,11 @@ import me.linusdev.discordbotapi.api.objects.message.nonce.Nonce;
 import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.sticker.StickerItem;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.toodo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.discordbotapi.api.objects.user.UserMention;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +33,16 @@ import java.util.List;
  * I did with the channels, but I decided against it, duo to its complexity. Like a Reply and a Thread-Starter-Message
  * having the same field (message_reference) but are different types of messages. It would also be really annoying to cast
  * each message depending on it's type. <br><br>
+ *
+ *
+ * <h1 style="margin-bottom:0;padding-bottom:0"><a href="" target="_top">Limits</a></h1>
+ * <ul>
+ *     <li>
+ *         A Message can have up to 10 {@link Embed Embeds}
+ *     </li>
+ * </ul>
+ *
+
  *
  * <h1 style="margin-bottom:0;padding-bottom:0"><a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a> ({@link MessageType})</h1>
  * <p>There are multiple message types that have a message_reference object. Since message references are generic attribution
@@ -92,7 +105,7 @@ import java.util.List;
  *
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object" target="_top">Message Object</a>
  */
-public interface Message {
+public interface Message extends Datable {
 
     /**
      * id of the message as {@link Snowflake}
@@ -171,13 +184,13 @@ public interface Message {
      *
      * @return ISO8601 timestamp
      */
-    @NotNull String getTimestamp();
+    @NotNull ISO8601Timestamp getTimestamp();
 
     /**
      * when this message was edited (or {@code null} if never)
      * @return ISO8601 timestamp
      */
-    @Nullable String getEditedTimestamp();
+    @Nullable ISO8601Timestamp getEditedTimestamp();
 
     /**
      * whether this was a TTS message
@@ -191,7 +204,7 @@ public interface Message {
      *
      * @return {@code true} if this message mentions everyone
      */
-    boolean isMentionEveryone();
+    boolean mentionsEveryone();
 
     /**
      * users specifically mentioned in the message
@@ -206,7 +219,7 @@ public interface Message {
      *
      * @see <a href="https://discord.com/developers/docs/resources/channel#message-object-message-structure" target="_top" >Message Structure</a>
      */
-    @NotNull User[] getMentions();
+    @NotNull UserMention[] getMentions();
 
     /**
      * roles specifically mentioned in this message
@@ -320,7 +333,7 @@ public interface Message {
     /**
      * List of {@link MessageFlag} set for this {@link Message}
      * 
-     * Changes to this List do not have any effect on this Message!
+     * Changes to this List do not have any effect on this Message (on Discord, they might affect this Object)!
      * 
      * Every method call will create a new List!
      * @see MessageFlag#getFlagsFromBits(Long)
@@ -340,7 +353,7 @@ public interface Message {
     /**
      * sent if the message is a response to an Interaction
      */
-    @Nullable MessageInteraction getMessageInteraction();
+    @Nullable MessageInteraction getInteraction();
 
     /**
      * the thread that was started from this message, includes thread member object
@@ -352,7 +365,7 @@ public interface Message {
     /**
      * sent if the message contains components like buttons, action rows, or other interactive components
      */
-    @NotNull Component[] getComponents();
+    @Nullable Component[] getComponents();
 
 
     /**

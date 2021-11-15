@@ -76,7 +76,7 @@ public enum MessageFlag {
      * reads the set flags in given {@code long} bits
      * @param bits the set flags as long
      * @return Empty array if, bits == null or 0L.
-     * Array with {@link MessageFlag} corresponding to bits
+     * Array with {@link MessageFlag} corresponding to bits otherwise
      */
     public static @NotNull List<MessageFlag> getFlagsFromBits(@Nullable Long bits){
         ArrayList<MessageFlag> flags = new ArrayList<>();

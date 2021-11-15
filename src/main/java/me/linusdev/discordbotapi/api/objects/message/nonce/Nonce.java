@@ -18,7 +18,13 @@ public class Nonce implements SimpleDatable {
         this.integer = i;
     }
 
-    public static @Nullable Nonce fromStringOrInteger(Object stringOrInt){
+    /**
+     *
+     * @param stringOrInt {@link String} or {@link Integer} or {@code null}
+     * @return {@link Nonce} or {@code null} if stringOrInt was {@code null}
+     */
+    public static @Nullable Nonce fromStringOrInteger(@Nullable Object stringOrInt){
+        if(stringOrInt == null) return null;
         if(stringOrInt instanceof Number){
             return new Nonce(null, ((Number) stringOrInt).intValue());
         }else if(stringOrInt instanceof String){

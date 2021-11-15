@@ -15,6 +15,11 @@ public class ISO8601Timestamp implements SimpleDatable {
         this.timestamp = timestamp;
     }
 
+    /**
+     *
+     * @param timestamp ISO8601 Timestamp as {@link String} or {@code null}
+     * @return {@link ISO8601Timestamp} or {@code null} if timestamp parameter was {@code null}
+     */
     public static @Nullable ISO8601Timestamp fromString(@Nullable String timestamp){
         if(timestamp == null) return null;
         return new ISO8601Timestamp(timestamp);

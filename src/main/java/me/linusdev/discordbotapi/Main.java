@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.GuildStageChannel;
+import me.linusdev.discordbotapi.api.objects.message.Message;
 
 import java.io.IOException;
 
@@ -46,6 +47,9 @@ public class Main {
         MessageRetriever msgRetriever = new MessageRetriever(api, "714942057260515398", "908716411927547924");
 
         Data data1 = msgRetriever.retrieveData();
+
+        Message msg = new Message(api, data1);
+
         System.out.println(data1.getJsonString());
 
     }

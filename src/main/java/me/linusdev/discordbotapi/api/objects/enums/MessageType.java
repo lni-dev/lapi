@@ -57,14 +57,14 @@ public enum MessageType {
 
     /**
      * @param value
-     * @return {@link MessageType} with given value or {@code null} if no such {@link MessageType} exists
+     * @return {@link MessageType} with given value or {@link #DEFAULT} if no such {@link MessageType} exists
      */
-    public static @Nullable MessageType fromValue(int value){
+    public static @NotNull MessageType fromValue(int value){
         for(MessageType type : MessageType.values()){
             if(type.getValue() == value)
                 return type;
         }
-        return null;
+        return DEFAULT;
     }
 
 }

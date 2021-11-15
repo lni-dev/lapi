@@ -104,7 +104,7 @@ public class Application implements Datable {
     /**
      *
      * @param data with required fields
-     * @return {@link Application}
+     * @return {@link Application} or {@code null} if data was {@code null}
      * @throws InvalidDataException if (id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null) == true
      */
     public static @Nullable Application fromData(@Nullable Data data) throws InvalidDataException {
