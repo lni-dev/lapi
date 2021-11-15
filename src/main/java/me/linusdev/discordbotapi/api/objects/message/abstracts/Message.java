@@ -12,6 +12,7 @@ import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.discordbotapi.api.objects.message.messageactivity.MessageActivity;
+import me.linusdev.discordbotapi.api.objects.message.nonce.Nonce;
 import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.sticker.StickerItem;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -92,7 +93,6 @@ import java.util.List;
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object" target="_top">Message Object</a>
  */
 public interface Message {
-    //todo implement some methods
 
     /**
      * id of the message as {@link Snowflake}
@@ -235,9 +235,8 @@ public interface Message {
 
     /**
      * used for validating a message was sent
-     * todo what is this??
      */
-    //@Nullable Nonce getNonce();
+    @Nullable Nonce getNonce();
 
     /**
      * whether this message is pinned
