@@ -28,7 +28,7 @@ class VoiceRegions {
      */
     public void update(LApi lApi) throws LApiException, IOException, ParseException, InterruptedException {
         ArrayRetriever retriever = new ArrayRetriever(lApi, new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS));
-        ArrayList list = retriever.retrieveArray();
+        ArrayList<Object> list = retriever.retrieveArray();
 
         if(regions == null){
             regions = new ArrayList<>(list.size());

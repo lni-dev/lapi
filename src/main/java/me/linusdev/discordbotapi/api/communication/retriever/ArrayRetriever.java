@@ -20,8 +20,9 @@ public class ArrayRetriever extends Retriever{
         this.query = query;
     }
 
-    public ArrayList retrieveArray() throws LApiException, IOException, ParseException, InterruptedException {
+    @SuppressWarnings("unchecked cast")
+    public ArrayList<Object> retrieveArray() throws LApiException, IOException, ParseException, InterruptedException {
         Data data = lApi.sendLApiHttpRequest(query.getLApiRequest(), "array");
-        return (ArrayList) data.get("array");
+        return (ArrayList<Object>) data.get("array");
     }
 }
