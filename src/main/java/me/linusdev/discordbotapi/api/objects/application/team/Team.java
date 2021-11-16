@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.application.team;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +14,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/teams#data-models-team-object" target="_top">Team Object</a>
  */
-public class Team implements Datable {
+public class Team implements Datable, HasLApi {
 
     public static final String ICON_KEY = "icon";
     public static final String ID_KEY = "id";
@@ -47,6 +49,9 @@ public class Team implements Datable {
      */
     private final @NotNull Snowflake ownerUserId;
 
+
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param icon a hash of the image of the team's icon
@@ -55,7 +60,8 @@ public class Team implements Datable {
      * @param name the name of the team
      * @param ownerUserId the user id of the current team owner
      */
-    public Team(@Nullable String icon, @NotNull Snowflake id, @NotNull TeamMember[] members, @NotNull String name, @NotNull Snowflake ownerUserId){
+    public Team(@NotNull LApi lApi, @Nullable String icon, @NotNull Snowflake id, @NotNull TeamMember[] members, @NotNull String name, @NotNull Snowflake ownerUserId){
+        this.lApi = lApi;
         this.icon = icon;
         this.id = id;
         this.members = members;
@@ -69,7 +75,7 @@ public class Team implements Datable {
      * @return {@link Team}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #MEMBERS_KEY}, {@link #NAME_KEY} or {@link #OWNER_USER_ID_KEY} are missing
      */
-    public static @NotNull Team fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Team fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         String icon = (String) data.get(ICON_KEY);
         String id = (String) data.get(ID_KEY);
         ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
@@ -89,9 +95,9 @@ public class Team implements Datable {
         TeamMember[] members = new TeamMember[membersData.size()];
         int i = 0;
         for(Object o : membersData)
-            members[i++] = TeamMember.fromData((Data) o);
+            members[i++] = TeamMember.fromData(lApi, (Data) o);
 
-        return new Team(icon, Snowflake.fromString(id), members, name, Snowflake.fromString(ownerUserId));
+        return new Team(lApi, icon, Snowflake.fromString(id), members, name, Snowflake.fromString(ownerUserId));
     }
 
     /**
@@ -154,5 +160,10 @@ public class Team implements Datable {
         data.add(OWNER_USER_ID_KEY, ownerUserId);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

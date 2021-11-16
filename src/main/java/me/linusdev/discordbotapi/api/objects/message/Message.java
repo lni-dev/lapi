@@ -28,7 +28,7 @@ import java.util.List;
  *
  * {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message Message} Implementation
  *
- * @see me.linusdev.discordbotapi.api.objects.message.abstracts.Message Message
+ * @see me.linusdev.discordbotapi.api.objects.message.abstracts.Message Message for more information
  */
 public class Message extends AbstractMessage {
 
@@ -81,7 +81,7 @@ public class Message extends AbstractMessage {
 
 
         this.guildId = Snowflake.fromString(guildId);
-        this.member = Member.fromData(member);
+        this.member = Member.fromData(lApi, member);
 
         if(mentionChannelsData != null){
             this.mentionChannels = new ChannelMention[mentionChannelsData.size()];
@@ -96,7 +96,7 @@ public class Message extends AbstractMessage {
             this.reactions = new Reaction[reactionsData.size()];
             int i = 0;
             for(Object o : reactionsData)
-                this.reactions[i++] = Reaction.fromData((Data) o);
+                this.reactions[i++] = Reaction.fromData(lApi, (Data) o);
         }else {
             this.reactions = null;
         }
@@ -104,20 +104,20 @@ public class Message extends AbstractMessage {
         this.nonce = Nonce.fromStringOrInteger(nonce);
         this.webhookId = Snowflake.fromString(webhookId);
         this.activity = activity == null ? null : MessageActivity.fromData(activity);
-        this.application = Application.fromData(application);
+        this.application = Application.fromData(lApi, application);
         this.applicationId = Snowflake.fromString(applicationId);
         this.messageReference = MessageReference.fromData(messageReference);
         this.flagsAsLong = flags == null ? null : flags.longValue();
         this.flags = MessageFlag.getFlagsFromBits(flags == null ? null : flags.longValue());
         this.referencedMessage = referencedMessage == null ? null : new Message(lApi, referencedMessage);
-        this.interaction = MessageInteraction.fromData(interaction);
+        this.interaction = MessageInteraction.fromData(lApi, interaction);
         this.thread = thread == null ? null : (Thread) Channel.fromData(lApi, thread);
 
         if(components != null){
             this.components = new Component[components.size()];
             int i = 0;
             for(Object o : components)
-                this.components[i++] = Component.fromData((Data) o);
+                this.components[i++] = Component.fromData(lApi, (Data) o);
         }else {
             this.components = null;
         }
@@ -135,7 +135,7 @@ public class Message extends AbstractMessage {
             this.stickers = new Sticker[stickers.size()];
             int i = 0;
             for(Object o : stickers)
-                this.stickers[i++] = Sticker.fromData((Data) o);
+                this.stickers[i++] = Sticker.fromData(lApi, (Data) o);
         }else {
             this.stickers = null;
         }
@@ -233,9 +233,34 @@ public class Message extends AbstractMessage {
         return stickers;
     }
 
+    /**
+     *
+     * @return {@link Data} for this {@link Message}
+     */
     @Override
     public @NotNull Data getData() {
-        //TODO
-        return super.getData();
+        Data data = super.getData();
+
+        if(guildId != null) data.add(GUILD_ID_KEY, guildId);
+        if(member != null) data.add(MEMBER_KEY, member);
+        if(mentionChannels != null) data.add(MENTION_CHANNELS_KEY, mentionChannels);
+        if(reactions != null) data.add(REACTIONS_KEY, reactions);
+        if(nonce != null) data.add(NONCE_KEY, nonce);
+        if(webhookId != null) data.add(WEBHOOK_ID_KEY, webhookId);
+        if(activity != null) data.add(ACTIVITY_KEY, activity);
+        if(application != null) data.add(APPLICATION_KEY, application);
+        if(applicationId != null) data.add(APPLICATION_ID_KEY, applicationId);
+        if(messageReference != null) data.add(MESSAGE_REFERENCE_KEY, messageReference);
+        if(flagsAsLong != null) data.add(FLAGS_KEY, flagsAsLong);
+        if(referencedMessage != null) data.add(REFERENCED_MESSAGE_KEY, referencedMessage);
+        if(interaction != null) data.add(INTERACTION_KEY, interaction);
+        if(thread != null) data.add(THREAD_KEY, thread);
+        if(components != null) data.add(COMPONENTS_KEY, components);
+        if(stickerItems != null) data.add(STICKER_ITEMS_KEY, stickerItems);
+        if(stickers != null) data.add(STICKERS_KEY, stickers);
+
+        return data;
     }
+
+
 }

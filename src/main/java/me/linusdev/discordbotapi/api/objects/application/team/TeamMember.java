@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.application.team;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -13,7 +15,7 @@ import java.util.Objects;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/teams#data-models-team-member-object" target="_top"> Team Member Object</a>
  */
-public class TeamMember implements Datable {
+public class TeamMember implements Datable, HasLApi {
 
     public static final String MEMBERSHIP_STATE_KEY = "membership_state";
     public static final String PERMISSIONS_KEY = "permissions";
@@ -25,6 +27,8 @@ public class TeamMember implements Datable {
     private @NotNull final Snowflake teamId;
     private @NotNull final User user;
 
+    private @NotNull final LApi lApi;
+
     /**
      *
      * @param membershipState the user's membership state on the team
@@ -32,7 +36,9 @@ public class TeamMember implements Datable {
      * @param teamId the id of the parent team of which they are a member
      * @param user partial {@link User user} object. the avatar, discriminator, id, and username of the user
      */
-    public TeamMember(@NotNull MembershipState membershipState, @NotNull String[] permissions, @NotNull Snowflake teamId, @NotNull User user){
+    public TeamMember(@NotNull LApi lApi, @NotNull MembershipState membershipState, @NotNull String[] permissions, @NotNull Snowflake teamId, @NotNull User user){
+        this.lApi = lApi;
+
         this.membershipState = membershipState;
         this.permissions = permissions;
         this.teamId = teamId;
@@ -45,7 +51,7 @@ public class TeamMember implements Datable {
      * @return {@link TeamMember}
      * @throws InvalidDataException if {@link #MEMBERSHIP_STATE_KEY}, {@link #PERMISSIONS_KEY}, {@link #TEAM_ID_KEY} or {@link #USER_KEY} are missing or null
      */
-    public static @NotNull TeamMember fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull TeamMember fromData(final @NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number memberShipStateNumber = (Number) data.get(MEMBERSHIP_STATE_KEY);
         ArrayList<Objects> permissionArray = (ArrayList<Objects>) data.get(PERMISSIONS_KEY);
         String teamId = (String) data.get(TEAM_ID_KEY);
@@ -67,7 +73,7 @@ public class TeamMember implements Datable {
         for(Object o : permissionArray)
             permissions[i++] = (String) o;
 
-        return new TeamMember(MembershipState.fromValue(memberShipStateNumber.intValue()), permissions, Snowflake.fromString(teamId), User.fromData(userData));
+        return new TeamMember(lApi, MembershipState.fromValue(memberShipStateNumber.intValue()), permissions, Snowflake.fromString(teamId), User.fromData(lApi, userData));
     }
 
     /**
@@ -118,5 +124,10 @@ public class TeamMember implements Datable {
         data.add(USER_KEY, user);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

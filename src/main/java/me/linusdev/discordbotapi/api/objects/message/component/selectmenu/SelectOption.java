@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.message.component.selectmenu;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
@@ -12,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/message-components#select-menu-object-select-option-structure" target="_top">Select option</a>
  */
-public class SelectOption implements Datable {
+public class SelectOption implements Datable, HasLApi {
 
     public static final String LABEL_KEY = "label";
     public static final String VALUE_KEY = "value";
@@ -26,6 +28,8 @@ public class SelectOption implements Datable {
     private final @Nullable Emoji emoji;
     private final @Nullable Boolean default_;
 
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param label the user-facing name of the option, max {@value ComponentLimits#SO_LABEL_MAX_CHARS} characters
@@ -34,7 +38,8 @@ public class SelectOption implements Datable {
      * @param emoji partial {@link Emoji emoji} object: id, name, and animated
      * @param default_ will render this option as selected by default
      */
-    public SelectOption(@NotNull String label, @NotNull String value, @Nullable String description, @Nullable Emoji emoji, @Nullable Boolean default_){
+    public SelectOption(@NotNull LApi lApi, @NotNull String label, @NotNull String value, @Nullable String description, @Nullable Emoji emoji, @Nullable Boolean default_){
+        this.lApi = lApi;
         this.label = label;
         this.value = value;
         this.description = description;
@@ -48,7 +53,7 @@ public class SelectOption implements Datable {
      * @return {@link SelectOption}
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #VALUE_KEY} are missing
      */
-    public static @NotNull SelectOption fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull SelectOption fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         String label = (String) data.get(LABEL_KEY);
         String value = (String) data.get(VALUE_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
@@ -60,8 +65,8 @@ public class SelectOption implements Datable {
             return null; // this will never happen, because above method will throw an Exception
         }
 
-        return new SelectOption(label, value, description,
-                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(data), default_);
+        return new SelectOption(lApi, label, value, description,
+                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, data), default_);
     }
 
     /**
@@ -121,5 +126,10 @@ public class SelectOption implements Datable {
         if(default_ != null) data.add(DEFAULT_KEY, default_);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

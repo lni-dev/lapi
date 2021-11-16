@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 /**
  * @see Message
  */
-public abstract class AbstractMessage implements Datable, Message{
+public abstract class AbstractMessage implements Datable, Message, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String CHANNEL_ID_KEY = "channel_id";
@@ -110,7 +111,7 @@ public abstract class AbstractMessage implements Datable, Message{
 
         this.id = Snowflake.fromString(id);
         this.channelId = Snowflake.fromString(channelId);
-        this.author = User.fromData(author);
+        this.author = User.fromData(lApi, author);
         this.content = content;
         this.timestamp = ISO8601Timestamp.fromString(timestamp);
         this.editedTimestamp = ISO8601Timestamp.fromString(editedTimestamp);
@@ -219,6 +220,7 @@ public abstract class AbstractMessage implements Datable, Message{
         return type;
     }
 
+    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }

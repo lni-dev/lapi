@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.message.component.selectmenu;
 
 import me.linusdev.data.Data;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
@@ -44,7 +46,7 @@ import java.util.ArrayList;
  *
  * @see <a href="https://discord.com/developers/docs/interactions/message-components#select-menu-object" target="_top">Select Menu Object</a>
  */
-public class SelectMenu implements Component {
+public class SelectMenu implements Component, HasLApi {
 
     private final @NotNull ComponentType type;
     private final @NotNull String customId;
@@ -53,6 +55,8 @@ public class SelectMenu implements Component {
     private final @Nullable Integer minValues;
     private final @Nullable Integer maxValues;
     private final @Nullable Boolean disabled;
+
+    private final @NotNull LApi lApi;
 
     /**
      *
@@ -64,8 +68,9 @@ public class SelectMenu implements Component {
      * @param maxValues the maximum number of items that can be chosen; default 1, max {@value ComponentLimits#MAX_VALUE_FIELD_MAX}
      * @param disabled disable the select, default false
      */
-    public SelectMenu(@NotNull ComponentType type, @NotNull String customId, @NotNull SelectOption[] options,
+    public SelectMenu(@NotNull LApi lApi, @NotNull ComponentType type, @NotNull String customId, @NotNull SelectOption[] options,
                       @Nullable String placeholder, @Nullable Integer minValues, @Nullable Integer maxValues, @Nullable Boolean disabled){
+        this.lApi = lApi;
         this.type = type;
         this.customId = customId;
         this.options = options;
@@ -81,7 +86,7 @@ public class SelectMenu implements Component {
      * @return {@link SelectMenu}
      * @throws InvalidDataException if {@link #TYPE_KEY}, {@link #CUSTOM_ID_KEY} or {@link #OPTION_KEY} are missing or null
      */
-    public static @NotNull SelectMenu fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull SelectMenu fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
         String customId = (String) data.get(CUSTOM_ID_KEY);
         ArrayList<Object> optionsData = (ArrayList<Object>) data.get(OPTION_KEY);
@@ -100,10 +105,10 @@ public class SelectMenu implements Component {
         SelectOption[] options = new SelectOption[optionsData.size()];
         int i = 0;
         for(Object o : optionsData)
-            options[i++] = SelectOption.fromData((Data) o);
+            options[i++] = SelectOption.fromData(lApi, (Data) o);
 
 
-        return new SelectMenu(ComponentType.fromValue(type.intValue()), customId, options, placeholder,
+        return new SelectMenu(lApi, ComponentType.fromValue(type.intValue()), customId, options, placeholder,
                 min_values == null ? null : min_values.intValue(), max_values == null ? null : max_values.intValue(), disabled);
     }
 
@@ -180,5 +185,10 @@ public class SelectMenu implements Component {
         if(disabled != null) data.add(DISABLED_KEY, disabled);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

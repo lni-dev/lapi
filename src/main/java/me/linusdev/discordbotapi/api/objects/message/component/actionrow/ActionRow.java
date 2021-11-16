@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.message.component.actionrow;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
@@ -30,17 +32,20 @@ import java.util.ArrayList;
  *          Action Rows
  *     </a>
  */
-public class ActionRow implements Datable, Component{
+public class ActionRow implements Datable, Component, HasLApi {
 
     private final @NotNull ComponentType type;
     private final @NotNull Component[] components; //TODO: check if this is really @NotNull
+
+    private final @NotNull LApi lApi;
 
     /**
      *
      * @param type {@link ComponentType component type}
      * @param components a list of child components
      */
-    public ActionRow(@NotNull ComponentType type, @NotNull Component[] components){
+    public ActionRow(@NotNull LApi lApi, @NotNull ComponentType type, @NotNull Component[] components){
+        this.lApi = lApi;
         this.type = type;
         this.components = components;
     }
@@ -51,7 +56,7 @@ public class ActionRow implements Datable, Component{
      * @return {@link ActionRow}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #COMPONENTS_KEY} are missing
      */
-    public static @NotNull ActionRow fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull ActionRow fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
         ArrayList<Object> componentsData = (ArrayList<Object>) data.get(COMPONENTS_KEY);
 
@@ -65,10 +70,10 @@ public class ActionRow implements Datable, Component{
         int i = 0;
         for(Object o : componentsData){
             Data d = (Data) o;
-            components[i++] = Component.fromData(d);
+            components[i++] = Component.fromData(lApi, d);
         }
 
-        return new ActionRow(ComponentType.fromValue(type.intValue()), components);
+        return new ActionRow(lApi, ComponentType.fromValue(type.intValue()), components);
     }
 
     @Override
@@ -95,5 +100,10 @@ public class ActionRow implements Datable, Component{
         data.add(COMPONENTS_KEY, components);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

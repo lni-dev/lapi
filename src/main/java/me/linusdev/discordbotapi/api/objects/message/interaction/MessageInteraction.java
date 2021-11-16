@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.message.interaction;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -19,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#message-interaction-object" target="_top">Message Interaction Object</a>
  */
-public class MessageInteraction implements Datable {
+public class MessageInteraction implements Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String TYPE_KEY = "type";
@@ -31,6 +33,8 @@ public class MessageInteraction implements Datable {
     private final @NotNull String name;
     private final @NotNull User user;
 
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param id id of the interaction
@@ -38,7 +42,8 @@ public class MessageInteraction implements Datable {
      * @param name the name of the application command
      * @param user the user who invoked the interaction
      */
-    public MessageInteraction(@NotNull Snowflake id, @NotNull InteractionType type, @NotNull String name, @NotNull User user){
+    public MessageInteraction(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull InteractionType type, @NotNull String name, @NotNull User user){
+        this.lApi = lApi;
         this.id = id;
         this.type = type;
         this.name = name;
@@ -51,7 +56,7 @@ public class MessageInteraction implements Datable {
      * @return {@link MessageInteraction} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #TYPE_KEY}, {@link #NAME_KEY} or {@link #USER_KEY} are null or missing
      */
-    public static @Nullable MessageInteraction fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable MessageInteraction fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -68,7 +73,7 @@ public class MessageInteraction implements Datable {
             return null;
         }
 
-        return new MessageInteraction(Snowflake.fromString(id), InteractionType.fromValue(type.intValue()), name, User.fromData(user));
+        return new MessageInteraction(lApi, Snowflake.fromString(id), InteractionType.fromValue(type.intValue()), name, User.fromData(lApi, user));
     }
 
     /**
@@ -119,5 +124,10 @@ public class MessageInteraction implements Datable {
         data.add(USER_KEY, user);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

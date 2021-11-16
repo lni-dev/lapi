@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.application;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.application.team.Team;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/application#application-object" target="_top">Application Object</a>
  */
-public class Application implements Datable {
+public class Application implements Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -55,6 +57,8 @@ public class Application implements Datable {
     private final @Nullable Integer flags;
     private final @Nullable ApplicationFlag[] flagsArray;
 
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param id the id of the app
@@ -76,10 +80,11 @@ public class Application implements Datable {
      * @param coverImage the application's default rich presence invite cover image hash
      * @param flags the application's public flags
      */
-    public Application(@NotNull Snowflake id, @NotNull String name, @Nullable String icon, @NotNull String description, @Nullable String[] rpcOrigins,
+    public Application(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name, @Nullable String icon, @NotNull String description, @Nullable String[] rpcOrigins,
                        boolean botPublic, boolean botRequireCodeGrant, @Nullable String termsOfServiceUrl, @Nullable String privacyPolicyUrl,
                        @Nullable User owner, @NotNull String summary, @NotNull String verifyKey, @Nullable Team team, @Nullable Snowflake guildId,
                        @Nullable Snowflake primarySkuId, @Nullable String slug, @Nullable String coverImage, @Nullable Integer flags){
+        this.lApi = lApi;
         this.id = id;
         this.name = name;
         this.icon = icon;
@@ -107,7 +112,7 @@ public class Application implements Datable {
      * @return {@link Application} or {@code null} if data was {@code null}
      * @throws InvalidDataException if (id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null) == true
      */
-    public static @Nullable Application fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Application fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -152,8 +157,8 @@ public class Application implements Datable {
             }
         }
 
-        return new Application(Snowflake.fromString(id), name, icon, description, rpcOrigins, botPublic, botRequireCodeGrant, tosUrl, ppUrl,
-                ownerData == null ? null : User.fromData(ownerData), summary, verifyKey, teamData == null ? null : Team.fromData(teamData),
+        return new Application(lApi, Snowflake.fromString(id), name, icon, description, rpcOrigins, botPublic, botRequireCodeGrant, tosUrl, ppUrl,
+                ownerData == null ? null : User.fromData(lApi, ownerData), summary, verifyKey, teamData == null ? null : Team.fromData(lApi, teamData),
                 Snowflake.fromString(guildId), Snowflake.fromString(primarySkuId), slug, coverImage, flags == null ? null : flags.intValue());
     }
 
@@ -337,5 +342,10 @@ public class Application implements Datable {
         if(flags != null) data.add(FLAGS_KEY, flags);
 
         return data;
+    }
+
+    @Override
+    public LApi getLApi() {
+        return lApi;
     }
 }

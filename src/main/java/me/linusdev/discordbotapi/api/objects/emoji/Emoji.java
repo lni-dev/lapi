@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.emoji;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.toodo.Role;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/emoji#emoji-resource" target="_top">Emoji Resource</a>
  */
-public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji {
+public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -67,6 +69,8 @@ public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emo
      */
     private final @Nullable Boolean available;
 
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param id emoji id
@@ -78,8 +82,9 @@ public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emo
      * @param animated whether this emoji is animated
      * @param available whether this emoji can be used, may be false due to loss of Server Boosts
      */
-    public Emoji(@Nullable Snowflake id, @Nullable String name, @Nullable Role[] roles, @Nullable User user, @Nullable Boolean requireColons,
+    public Emoji(@NotNull LApi lApi, @Nullable Snowflake id, @Nullable String name, @Nullable Role[] roles, @Nullable User user, @Nullable Boolean requireColons,
                  @Nullable Boolean managed, @Nullable Boolean animated, @Nullable Boolean available){
+        this.lApi = lApi;
         this.id = id;
         this.name = name;
         this.roles = roles;
@@ -96,7 +101,7 @@ public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emo
      * @return {@link Emoji}
      * @throws InvalidDataException if {@link #ID_KEY} and {@link #NAME_KEY} are both {@code null} or missing
      */
-    public static @NotNull Emoji fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Emoji fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
 
@@ -114,9 +119,9 @@ public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emo
         }
 
         Data userData = (Data) data.get(USER_KEY);
-        User user = userData == null ? null : User.fromData(userData);
+        User user = userData == null ? null : User.fromData(lApi, userData);
 
-        return new Emoji(Snowflake.fromString(id), name, roles, user,
+        return new Emoji(lApi, Snowflake.fromString(id), name, roles, user,
                 (Boolean) data.get(REQUIRE_COLONS_KEY), (Boolean) data.get(MANAGED_KEY),
                 (Boolean) data.get(ANIMATED_KEY),(Boolean) data.get(AVAILABLE_KEY));
     }
@@ -230,5 +235,10 @@ public class Emoji implements Datable, me.linusdev.discordbotapi.api.objects.emo
         if(available != null) data.add(ANIMATED_KEY, available);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

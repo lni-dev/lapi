@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.guild.member;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.enums.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -18,7 +20,7 @@ import java.util.List;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">Guild Member Object</a>
  */
-public class Member implements Datable {
+public class Member implements Datable, HasLApi {
 
     public static final String USER_KEY = "user";
     public static final String NICK_KEY = "nick";
@@ -44,6 +46,8 @@ public class Member implements Datable {
     private @Nullable final String permissionsString;
     private @Nullable final List<Permissions> permissions;
 
+    private @NotNull final LApi lApi;
+
     /**
      *
      * @param user the user this guild member represents
@@ -58,10 +62,10 @@ public class Member implements Datable {
      * @param pending whether the user has not yet passed the guild's Membership Screening requirements
      * @param permissionsString total permissions of the member in the channel, including overwrites, returned when in the interaction object
      */
-    public Member(@Nullable User user, @Nullable String nick, @Nullable Avatar avatar, @NotNull Snowflake[] roles, @NotNull String[] rolesAsString,
+    public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable Avatar avatar, @NotNull Snowflake[] roles, @NotNull String[] rolesAsString,
                   @NotNull ISO8601Timestamp joinedAt, @Nullable ISO8601Timestamp premiumSince, boolean deaf, boolean mute,
                   @Nullable Boolean pending, @Nullable String permissionsString){
-
+        this.lApi = lApi;
         this.user = user;
         this.nick = nick;
         this.avatar = avatar;
@@ -87,7 +91,7 @@ public class Member implements Datable {
      * @return {@link Member} or {@code null} if data was {@code null}
      * @throws InvalidDataException if {@link #ROLES_KEY}, {@link #JOINED_AT_KEY}, {@link #DEAF_KEY} or {@link #MUTE_KEY} are null or missing
      */
-    public static @Nullable Member fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Member fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
         Data userData = (Data) data.get(USER_KEY);
@@ -119,7 +123,7 @@ public class Member implements Datable {
             roles[i++] = Snowflake.fromString((String) o);
         }
 
-        return new Member(userData == null ? null : User.fromData(userData), nick, Avatar.fromHashString(avatar), roles, rolesAsString, ISO8601Timestamp.fromString(joinedAt),
+        return new Member(lApi, userData == null ? null : User.fromData(lApi, userData), nick, Avatar.fromHashString(avatar), roles, rolesAsString, ISO8601Timestamp.fromString(joinedAt),
                 ISO8601Timestamp.fromString(premiumSince), deaf, mute, pending, permissions);
     }
 
@@ -224,5 +228,10 @@ public class Member implements Datable {
         if(permissionsString != null) data.add(PERMISSIONS_KEY, permissionsString);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

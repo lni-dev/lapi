@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.message;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * <a href="https://discord.com/developers/docs/resources/channel#reaction-object" target="_top">Reaction Object</a>
  */
-public class Reaction implements Datable {
+public class Reaction implements Datable, HasLApi {
 
     public static final String COUNT_KEY = "count";
     public static final String ME_KEY = "me";
@@ -30,12 +32,15 @@ public class Reaction implements Datable {
      */
     private final @NotNull Emoji emoji;
 
+    private final @NotNull LApi lApi;
+
     /**
      * @param count times this emoji has been used to react
      * @param me whether the current user reacted using this emoji
      * @param emoji emoji information
      */
-    public Reaction(int count, boolean me, @NotNull Emoji emoji){
+    public Reaction(@NotNull LApi lApi, int count, boolean me, @NotNull Emoji emoji){
+        this.lApi = lApi;
         this.count = count;
         this.mee = me;
         this.emoji = emoji;
@@ -47,7 +52,7 @@ public class Reaction implements Datable {
      * @return {@link Reaction}
      * @throws InvalidDataException if {@link #COUNT_KEY}, {@link #ME_KEY} or {@link #EMOJI_KEY} field are missing
      */
-    public static @NotNull Reaction fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Reaction fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number count = (Number) data.get(COUNT_KEY);
         Boolean mee = (Boolean) data.get(ME_KEY);
         Data emojiData = (Data) data.get(EMOJI_KEY);
@@ -60,7 +65,7 @@ public class Reaction implements Datable {
             throw exception;
         }
 
-        return new Reaction(count.intValue(), mee, me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(emojiData));
+        return new Reaction(lApi, count.intValue(), mee, me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, emojiData));
     }
 
     /**
@@ -96,5 +101,10 @@ public class Reaction implements Datable {
         data.add(EMOJI_KEY, emoji);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

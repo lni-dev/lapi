@@ -1,12 +1,13 @@
 package me.linusdev.discordbotapi.api.objects.enums;
 
+import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object-message-types" target="_top">Message Types</a>
  */
-public enum MessageType {
+public enum MessageType implements SimpleDatable {
     DEFAULT                                         (0, "default"),
     RECIPIENT_ADD                                   (1, "recipient add"),
     RECIPIENT_REMOVE                                (2, "recipient remove"),
@@ -67,4 +68,8 @@ public enum MessageType {
         return DEFAULT;
     }
 
+    @Override
+    public Object simplify() {
+        return value;
+    }
 }

@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.sticker;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -19,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
  *      </a>
  * @see StickerItem
  */
-public class Sticker implements Datable {
+public class Sticker implements Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String PACK_ID_KEY = "pack_id";
@@ -47,6 +49,8 @@ public class Sticker implements Datable {
     private final @Nullable User user;
     private final @Nullable Integer sortValue;
 
+    private final @NotNull LApi lApi;
+
     /**
      *
      * @param id id of the sticker
@@ -62,7 +66,8 @@ public class Sticker implements Datable {
      * @param user the user that uploaded the guild sticker
      * @param sort_value the standard sticker's sort order within its pack
      */
-    public Sticker(@NotNull Snowflake id, @Nullable Snowflake packId, @NotNull String name, @Nullable String description, @NotNull String tags, String asset, @NotNull StickerType type, @NotNull StickerFormatType formatType, @Nullable Boolean available, @Nullable Snowflake guildId, @Nullable User user, @Nullable Integer sort_value) {
+    public Sticker(@NotNull LApi lApi, @NotNull Snowflake id, @Nullable Snowflake packId, @NotNull String name, @Nullable String description, @NotNull String tags, String asset, @NotNull StickerType type, @NotNull StickerFormatType formatType, @Nullable Boolean available, @Nullable Snowflake guildId, @Nullable User user, @Nullable Integer sort_value) {
+        this.lApi = lApi;
         this.id = id;
         this.packId = packId;
         this.name = name;
@@ -83,7 +88,7 @@ public class Sticker implements Datable {
      * @return {@link Sticker}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #TAGS_KEY}, {@link #TYPE_KEY} or {@link #FORMAT_TYPE_KEY} is null or missing
      */
-    public static @NotNull Sticker fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Sticker fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String packId = (String) data.get(PACK_ID_KEY);
         String name = (String) data.get(NAME_KEY);
@@ -104,9 +109,9 @@ public class Sticker implements Datable {
             return null; //this will never happen, because above method will throw an exception
         }
 
-        return new Sticker(Snowflake.fromString(id), Snowflake.fromString(packId), name, description,
+        return new Sticker(lApi, Snowflake.fromString(id), Snowflake.fromString(packId), name, description,
                 tags, asset, StickerType.fromValue(type.intValue()), StickerFormatType.fromValue(formatType.intValue()),
-                available, Snowflake.fromString(guildId), user == null ? null : User.fromData(data),
+                available, Snowflake.fromString(guildId), user == null ? null : User.fromData(lApi, data),
                 sortValue == null ? null : sortValue.intValue());
     }
 
@@ -243,5 +248,10 @@ public class Sticker implements Datable {
         if(sortValue != null) data.add(SORT_VALUE_KEY, sortValue);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

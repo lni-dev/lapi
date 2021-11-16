@@ -49,6 +49,7 @@ public class Main {
         Data data1 = msgRetriever.retrieveData();
 
         Message msg = new Message(api, data1);
+        System.out.println(msg.getData().getJsonString());
 
         System.out.println(data1.getJsonString());
 

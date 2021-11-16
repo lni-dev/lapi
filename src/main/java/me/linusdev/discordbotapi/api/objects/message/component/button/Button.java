@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.message.component.button;
 
 import me.linusdev.data.Data;
+import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
@@ -52,15 +54,17 @@ import org.jetbrains.annotations.Nullable;
  *          Buttons
  *      </a>
  */
-public class Button implements Component {
+public class Button implements Component, HasLApi {
 
-    private @NotNull ComponentType type;
-    private @NotNull ButtonStyle style;
-    private @Nullable String label;
-    private @Nullable Emoji emoji;
-    private @Nullable String customId;
-    private @Nullable String url;
-    private @Nullable Boolean disabled;
+    private final @NotNull ComponentType type;
+    private final @NotNull ButtonStyle style;
+    private final @Nullable String label;
+    private final @Nullable Emoji emoji;
+    private final @Nullable String customId;
+    private final @Nullable String url;
+    private final @Nullable Boolean disabled;
+
+    private final @NotNull LApi lApi;
 
     /**
      *
@@ -72,8 +76,9 @@ public class Button implements Component {
      * @param url a url for link-style buttons
      * @param disabled whether the button is disabled (default false)
      */
-    public Button(@NotNull ComponentType type, @NotNull ButtonStyle style, @Nullable String label, @Nullable Emoji emoji,
+    public Button(@NotNull LApi lApi, @NotNull ComponentType type, @NotNull ButtonStyle style, @Nullable String label, @Nullable Emoji emoji,
                   @Nullable String customId, @Nullable String url, @Nullable Boolean disabled){
+        this.lApi = lApi;
         this.type = type;
         this.style = style;
         this.label = label;
@@ -89,7 +94,7 @@ public class Button implements Component {
      * @return {@link Button}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #STYLE_KEY}
      */
-    public static @NotNull Button fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Button fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
         Number style = (Number)  data.get(STYLE_KEY);
         String label = (String) data.get(LABEL_KEY);
@@ -103,8 +108,8 @@ public class Button implements Component {
             return null; // this will never happen, because above method will throw an Exception
         }
 
-        return new Button(ComponentType.fromValue(type.intValue()), ButtonStyle.fromValue(style.intValue()), label,
-                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(emoji), customId, url, disabled);
+        return new Button(lApi, ComponentType.fromValue(type.intValue()), ButtonStyle.fromValue(style.intValue()), label,
+                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, emoji), customId, url, disabled);
     }
 
     @Override
@@ -182,5 +187,10 @@ public class Button implements Component {
         if(disabled != null) data.add(DISABLED_KEY, disabled);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

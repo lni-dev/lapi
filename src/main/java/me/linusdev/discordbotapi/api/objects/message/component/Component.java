@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.message.component;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
 import me.linusdev.discordbotapi.api.objects.message.component.button.Button;
@@ -70,7 +71,7 @@ public interface Component extends Datable {
      * @return {@link ActionRow}, {@link Button}, {@link SelectMenu} or {@link UnknownComponent}. Depending on {@link #getType()} stored in given data
      * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
      */
-    public static @NotNull Component fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Component fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
 
         if(type == null){
@@ -81,13 +82,13 @@ public interface Component extends Datable {
         int typeInt = type.intValue();
 
         if(typeInt == ComponentType.ACTION_ROW.getValue()){
-            return ActionRow.fromData(data);
+            return ActionRow.fromData(lApi, data);
 
         }else if(typeInt == ComponentType.BUTTON.getValue()){
-            return Button.fromData(data);
+            return Button.fromData(lApi, data);
 
         }else if(typeInt == ComponentType.SELECT_MENU.getValue()){
-            return SelectMenu.fromData(data);
+            return SelectMenu.fromData(lApi, data);
         }
 
         return UnknownComponent.fromData(data);
