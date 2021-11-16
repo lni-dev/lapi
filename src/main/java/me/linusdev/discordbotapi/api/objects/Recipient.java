@@ -34,7 +34,7 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable {
     public Recipient(@NotNull Data data) throws InvalidDataException {
         this.username = (String) data.getOrDefault(USERNAME_KEY, null);
         this.discriminator = (String) data.getOrDefault(DISCRIMINATOR_KEY, null);
-        this.id = Snowflake.fromString((String) data.get(USER_ID_KEY));
+        this.id = Snowflake.fromString((String) data.get(ID_KEY));
         this.avatar = new Avatar((String) data.get(AVATAR_KEY));
 
         if(this.username == null)
@@ -42,7 +42,7 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable {
         else if(this.discriminator == null)
             throw new InvalidDataException(data, "field '" + DISCRIMINATOR_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(DISCRIMINATOR_KEY);
         else if(this.id == null)
-            throw new InvalidDataException(data, "field '" + USER_ID_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(USER_ID_KEY);
+            throw new InvalidDataException(data, "field '" + ID_KEY + "' missing or null in Recipient with id:" + getId()).addMissingFields(ID_KEY);
         //TODO: Avatar null check?
 
     }
@@ -73,7 +73,7 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable {
 
         data.add(USERNAME_KEY, username);
         data.add(DISCRIMINATOR_KEY, discriminator);
-        data.add(USER_ID_KEY, id);
+        data.add(ID_KEY, id);
         data.add(AVATAR_KEY, avatar);
 
         return data;

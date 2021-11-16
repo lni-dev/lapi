@@ -4,6 +4,7 @@ import me.linusdev.discordbotapi.api.objects.toodo.Avatar;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface BasicUserInformation extends SnowflakeAble {
 
@@ -36,7 +37,7 @@ public interface BasicUserInformation extends SnowflakeAble {
     /**
      * the {@link Avatar} of the user
      */
-    @NotNull
+    @Nullable
     Avatar getAvatar();
 
 }
