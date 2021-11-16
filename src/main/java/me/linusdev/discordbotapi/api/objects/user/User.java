@@ -52,7 +52,6 @@ import org.jetbrains.annotations.Nullable;
  * @see <a href="https://discord.com/developers/docs/resources/user#users-resource" target="_top">User Resource</a>
  */
 public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLApi {
-    //todo
     public static final String ID_KEY = "id";
     public static final String USERNAME_KEY = "username";
     public static final String DISCRIMINATOR_KEY = "discriminator";
