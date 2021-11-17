@@ -121,7 +121,7 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
         this.mentions = new UserMention[mentionsData.size()];
         int i = 0;
         for(Object o : mentionsData)
-            this.mentions[i++] = UserMention.fromData((Data) o);
+            this.mentions[i++] = UserMention.fromData(lApi, (Data) o);
 
         this.mentionRoles = new Role[mentionRolesData.size()];
         i = 0;

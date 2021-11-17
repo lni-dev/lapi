@@ -53,18 +53,26 @@ public enum UserFlag {
      * @return whether this {@link UserFlag} is set in given flags
      */
     public boolean isSet(int flags){
+        if(this == NONE) return flags == 0;
         return (flags & value) == value;
     }
 
     /**
+     *
+     * {@link #NONE} flag will only be contained in the returned Array, if given parameter flags == 0
      *
      * @param flags int with set bits
      * @return {@link UserFlag UserFlag[]} corresponding to flags int
      */
     public static @NotNull UserFlag[] getFlagsFromInt(@Nullable Integer flags){
         if(flags == null) return new UserFlag[0];
-        UserFlag[] flagsArray = new UserFlag[Integer.bitCount(flags)];
 
+        //even if no bit is set, we still have the NONE flag!
+        int setBits = Integer.bitCount(flags);
+        if(setBits == 0) return new UserFlag[]{NONE};
+
+        //this will NOT contain the NONE flag
+        UserFlag[] flagsArray = new UserFlag[setBits];
         int i = 0;
         for(UserFlag flag : UserFlag.values()){
             if(flag.isSet(flags)) flagsArray[i++] = flag;
