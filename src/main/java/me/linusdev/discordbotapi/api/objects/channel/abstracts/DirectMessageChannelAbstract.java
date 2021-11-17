@@ -1,6 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.Recipient;
+import me.linusdev.discordbotapi.api.objects.user.Recipient;
 import org.jetbrains.annotations.NotNull;
 
 public interface DirectMessageChannelAbstract extends TextChannel{

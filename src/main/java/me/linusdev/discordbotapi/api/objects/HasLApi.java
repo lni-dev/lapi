@@ -1,5 +1,6 @@
-package me.linusdev.discordbotapi.api;
+package me.linusdev.discordbotapi.api.objects;
 
+import me.linusdev.discordbotapi.api.LApi;
 import org.jetbrains.annotations.NotNull;
 
 public interface HasLApi {

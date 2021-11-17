@@ -1,6 +1,7 @@
-package me.linusdev.discordbotapi.api;
+package me.linusdev.discordbotapi.api.objects;
 
 import me.linusdev.data.Data;
+import me.linusdev.discordbotapi.api.LApi;
 
 /**
  * Objects implementing this can be updated by {@link LApi}

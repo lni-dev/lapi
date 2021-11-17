@@ -2,7 +2,7 @@ package me.linusdev.discordbotapi.api.objects.message.component.selectmenu;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.discordbotapi.api.HasLApi;
+import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
