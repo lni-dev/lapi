@@ -73,7 +73,7 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data sendLApiHttpRequest(LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException {
+    public Data sendLApiHttpRequest(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException {
         HttpResponse<String> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofString());
 
         StringReader reader = new StringReader(response.body());
@@ -82,7 +82,7 @@ public class LApi {
         return new JsonParser().readDataFromReader(reader);
     }
 
-    public LApiHttpRequest appendHeader(LApiHttpRequest request){
+    public LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request){
         request.header(getAuthorizationHeader());
         request.header(getUserAgentHeader());
         return request;
