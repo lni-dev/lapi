@@ -1,5 +1,11 @@
 package me.linusdev.discordbotapi.api.config;
 
+import me.linusdev.discordbotapi.api.communication.queue.Future;
+import me.linusdev.discordbotapi.api.communication.queue.Queueable;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class Config {
 
     /**
@@ -8,9 +14,14 @@ public class Config {
     public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 0x1L;
 
     private final long flags;
+    private final Queue<Future> queue;
 
-    public Config(long flags){
+    public Config(long flags, Queue<Future> queue){
         this.flags = flags;
+
+        if(queue == null)
+            this.queue = new ConcurrentLinkedQueue<Future>();
+        else this.queue = queue;
     }
 
     /**
@@ -22,4 +33,10 @@ public class Config {
         return (flags & flag) == flag;
     }
 
+    /**
+     * The Queue used by {@link me.linusdev.discordbotapi.api.LApi} to queue any {@link Queueable}
+     */
+    public Queue<Future> getQueue() {
+        return queue;
+    }
 }

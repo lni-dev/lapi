@@ -5,6 +5,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.communication.queue.Future;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.config.Config;
@@ -12,12 +13,13 @@ import me.linusdev.discordbotapi.api.objects.channel.GuildStageChannel;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class Main {
 
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException {
 
-        Config conf = new Config(Config.LOAD_VOICE_REGIONS_ON_STARTUP);
+        Config conf = new Config(Config.LOAD_VOICE_REGIONS_ON_STARTUP, null);
 
         LApi api = new LApi(Private.TOKEN, conf);
 
@@ -46,13 +48,21 @@ public class Main {
         //Guild message pinned
         //MessageRetriever msgRetriever = new MessageRetriever(api, "714942057260515398", "908716411927547924");
 
-        Data data1 = msgRetriever.retrieveData();
-        System.out.println(data1.getJsonString());
-
-        Message msg = new Message(api, data1);
-        System.out.println(msg.getData().getJsonString());
-
-
+        Future<Message> future = msgRetriever.queue();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                future.completeHere();
+            }
+        }).start();
+        long millis = System.currentTimeMillis();
+        try {
+            Message message = future.get();
+            System.out.println(message.getContent());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        System.out.println(System.currentTimeMillis() - millis);
 
     }
 }

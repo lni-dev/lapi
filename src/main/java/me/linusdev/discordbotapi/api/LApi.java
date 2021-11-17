@@ -7,6 +7,8 @@ import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
+import me.linusdev.discordbotapi.api.communication.queue.Future;
+import me.linusdev.discordbotapi.api.communication.queue.Queueable;
 import me.linusdev.discordbotapi.api.config.Config;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.Queue;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 
@@ -23,14 +26,16 @@ public class LApi {
     private static final String LAPI_URL = "https://";
     private static final String LAPI_VERSION = "1.0";
 
-    private final String token;
-    private final Config config;
+    private @NotNull final String token;
+    private @NotNull final Config config;
 
     private final LApiHttpHeader authorizationHeader;
     private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
             ATTRIBUTE_USER_AGENT_VALUE.replace(PlaceHolder.LAPI_URL, LAPI_URL).replace(PlaceHolder.LAPI_VERSION, LAPI_VERSION));
 
     private final HttpClient client = HttpClient.newHttpClient();
+
+    private final Queue<Future> queue;
 
     //stores and manages the voice regions
     private final VoiceRegions voiceRegions;
@@ -44,6 +49,36 @@ public class LApi {
         this.voiceRegions = new VoiceRegions();
         if(config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
             this.voiceRegions.init(this); //Todo add callback
+
+        this.queue = config.getQueue();
+    }
+
+    /**
+     *
+     * This queues a {@link Queueable} in {@link #queue}.<br>
+     * This is used for sending a lot of {@link LApiHttpRequest} after each is other and not at the same time.
+     * This will NOT wait the Thread until the {@link Queueable} has been completed.
+     * <br><br>
+     * If you want to wait your Thread you could use:
+     * <ul>
+     *     <li>
+     *         {@link Future#get()}, to wait until the {@link Queueable} has been gone through the {@link #queue} and {@link Queueable#completeHere() completed}
+     *     </li>
+     *     <li>
+     *          {@link Queueable#completeHere()}, to wait until the {@link Queueable} has been {@link Queueable#completeHere() completed}.
+     *          This wont assure, that several {@link LApiHttpRequest LApiHttpRequests} are sent at the same time
+     *     </li>
+     * </ul>
+     *
+     *
+     * @param queueable {@link Queueable}
+     * @param <T> Return Type of {@link Queueable}
+     * @return {@link Future<T>}
+     */
+    public <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable){
+        Future<T> future = new Future<T>(queueable);
+        queue.offer(future);
+        return future;
     }
 
     /**
