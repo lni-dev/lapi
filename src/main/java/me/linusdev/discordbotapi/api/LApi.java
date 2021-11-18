@@ -18,6 +18,7 @@ import java.io.StringReader;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Queue;
+import java.util.concurrent.*;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 
@@ -35,7 +36,10 @@ public class LApi {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
-    private final Queue<Future> queue;
+    private final Queue<Future<?>> queue;
+    private final ScheduledExecutorService scheduledExecutor;
+    private final ThreadPoolExecutor executor;
+    private final ExecutorService queueWorker;
 
     //stores and manages the voice regions
     private final VoiceRegions voiceRegions;
@@ -43,14 +47,37 @@ public class LApi {
     public LApi(@NotNull String token, @NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
         this.token = token;
         this.config = config;
-        this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, token));
+        this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
 
 
         this.voiceRegions = new VoiceRegions();
-        if(config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
+        if(this.config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
             this.voiceRegions.init(this); //Todo add callback
 
         this.queue = config.getQueue();
+        this.scheduledExecutor = Executors.newScheduledThreadPool(1);
+        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        this.queueWorker = Executors.newSingleThreadExecutor();
+        this.queueWorker.submit(new Runnable() {
+            @Override
+            public void run() {
+                while(true){
+                    synchronized (queue){
+                        if(queue.peek() == null) {
+                            try {
+                                queue.wait(10000L);
+                            } catch (InterruptedException ignored) {
+                                ignored.printStackTrace();
+                            }
+                        }
+
+                        if(queue.peek() == null) continue;
+
+                        queue.poll().completeHere();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -76,9 +103,35 @@ public class LApi {
      * @return {@link Future<T>}
      */
     public <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable){
-        Future<T> future = new Future<T>(queueable);
-        queue.offer(future);
+        final Future<T> future = new Future<T>(queueable);
+        this.queue(future);
         return future;
+    }
+
+    /**
+     * Queues given {@link Queueable} after a given amount of time. see {@link #queue(Queueable)}
+     *
+     * @param queueable {@link Queueable}
+     * @param delay the delay to wait before queueing
+     * @param timeUnit the {@link TimeUnit} for the delay
+     * @param <T> Return Type of {@link Queueable}
+     * @return {@link Future<T>}
+     * @see #queue(Queueable)
+     */
+    public <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit){
+        final Future<T> future = new Future<T>(queueable);
+        scheduledExecutor.schedule(() -> this.queue(future), delay, timeUnit);
+        return future;
+    }
+
+    /**
+     * Queues given {@link Future} and notifies the {@link #queueWorker} Thread
+     */
+    private void queue(@NotNull final Future<?> future){
+        queue.offer(future);
+        synchronized (queue){
+            queue.notifyAll();
+        }
     }
 
     /**
@@ -117,6 +170,12 @@ public class LApi {
         return new JsonParser().readDataFromReader(reader);
     }
 
+    /**
+     * Appends the required headers to the {@link LApiHttpRequest}.<br>
+     * These headers are required for Discord to accept the request
+     * @param request the {@link LApiHttpRequest} to append the headers to
+     * @return the {@link LApiHttpRequest} with the appended headers
+     */
     public LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request){
         request.header(getAuthorizationHeader());
         request.header(getUserAgentHeader());

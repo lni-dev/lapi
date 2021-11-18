@@ -14,13 +14,13 @@ public class Config {
     public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 0x1L;
 
     private final long flags;
-    private final Queue<Future> queue;
+    private final Queue<Future<?>> queue;
 
-    public Config(long flags, Queue<Future> queue){
+    public Config(long flags, Queue<Future<?>> queue){
         this.flags = flags;
 
         if(queue == null)
-            this.queue = new ConcurrentLinkedQueue<Future>();
+            this.queue = new ConcurrentLinkedQueue<Future<?>>();
         else this.queue = queue;
     }
 
@@ -36,7 +36,7 @@ public class Config {
     /**
      * The Queue used by {@link me.linusdev.discordbotapi.api.LApi} to queue any {@link Queueable}
      */
-    public Queue<Future> getQueue() {
+    public Queue<Future<?>> getQueue() {
         return queue;
     }
 }

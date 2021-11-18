@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 public class Main {
 
-    public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException {
+    public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException {
 
         Config conf = new Config(Config.LOAD_VOICE_REGIONS_ON_STARTUP, null);
 
@@ -26,15 +26,6 @@ public class Main {
         ChannelRetriever retriever = new ChannelRetriever(api, "902836109892010005");
         Data data = retriever.retrieveData();
         System.out.println(data.getJsonString());
-
-        GuildStageChannel channel = (GuildStageChannel) retriever.retrieveChannel();
-        System.out.println(channel);
-
-
-        System.out.println(channel.getName());
-        System.out.println(channel.getGuildId());
-        System.out.println(channel.getParentId());
-        System.out.println(channel.getTopic());
 
         // Private Message
         // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
@@ -49,20 +40,16 @@ public class Main {
         //MessageRetriever msgRetriever = new MessageRetriever(api, "714942057260515398", "908716411927547924");
 
         Future<Message> future = msgRetriever.queue();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                future.completeHere();
+
+        future.then((message, error) -> {
+            if(error != null){
+                error.getThrowable().printStackTrace();
+                return;
             }
-        }).start();
-        long millis = System.currentTimeMillis();
-        try {
-            Message message = future.get();
-            System.out.println(message.getContent());
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        System.out.println(System.currentTimeMillis() - millis);
+            System.out.println("Message Content: " + message.getContent());
+        });
+
+        System.out.println("test");
 
     }
 }

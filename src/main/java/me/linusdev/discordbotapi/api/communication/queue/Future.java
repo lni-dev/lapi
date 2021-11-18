@@ -76,7 +76,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * waits this Thread and calls {@link Queueable#completeHere()}.<br>
      * Instead of using this you probably want to use {@link Queueable#completeHere()} directly
      *
-     * This method will also {@link #notify()} all Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)}
+     * This method will also {@link #notifyAll() notify} all Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)}
      *
      * This method will also call all Listeners: {@link #then}
      *
@@ -87,7 +87,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
 
         if(this.cancelled){
             synchronized (this) {
-                this.notify();
+                this.notifyAll();
             }
             return;
         }
@@ -95,7 +95,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         this.result = queueable.completeHere();
 
         synchronized (this) {
-            this.notify();
+            this.notifyAll();
         }
 
         if(then != null) then.accept(result.get(), result.getError());
@@ -134,8 +134,8 @@ public class Future<T> implements java.util.concurrent.Future<T> {
 
     /**
      * {@link Consumer#accept(Object)} will be called after {@link Queueable#completeHere()}.<br>
-     * {@link #then(BiConsumer)} will be called before too
-     * {@link #get()} will be notified before too
+     * {@link #then(BiConsumer)} will be called before too.<br>
+     * {@link #get()} will be notified before too.<br>
      * <br>
      * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
      *
