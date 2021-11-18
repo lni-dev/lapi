@@ -1,8 +1,9 @@
-package me.linusdev.discordbotapi.api.objects.channel;
+package me.linusdev.discordbotapi.api.objects.channel.thread;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.enums.Permissions;
 import me.linusdev.discordbotapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -12,7 +13,10 @@ import me.linusdev.discordbotapi.api.objects.enums.ChannelType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GuildPublicThread extends Channel implements Thread, GuildChannel {
+import java.math.BigInteger;
+import java.util.List;
+
+public class GuildNewsThread extends Channel implements Thread, GuildChannel {
 
     private @NotNull String name;
     private @NotNull Snowflake guildId;
@@ -24,9 +28,14 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
     private @NotNull ThreadMetadata threadMetadata;
     private int messageCount;
     private int memberCount;
+    private @Nullable ThreadMember member;
+    private @Nullable Integer defaultAutoArchiveDuration;
+    private @Nullable String permissionsAsString;
+    private @Nullable List<Permissions> permissions;
 
-    public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name, @NotNull Snowflake guildId, @NotNull Snowflake parentId, int rateLimitPerUser,
-                             @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp, @NotNull Snowflake ownerId, @NotNull ThreadMetadata threadMetadata, int messageCount, int memberCount) {
+    public GuildNewsThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name, @NotNull Snowflake guildId, @NotNull Snowflake parentId, int rateLimitPerUser,
+                             @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp, @NotNull Snowflake ownerId, @NotNull ThreadMetadata threadMetadata, int messageCount, int memberCount,
+                           @Nullable ThreadMember member, @Nullable Integer defaultAutoArchiveDuration, @Nullable String permissionsAsString, @Nullable List<Permissions> permissions) {
         super(lApi, id, type);
 
         this.name = name;
@@ -39,9 +48,13 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         this.threadMetadata = threadMetadata;
         this.messageCount = messageCount;
         this.memberCount = memberCount;
+        this.member = member;
+        this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
+        this.permissionsAsString = permissionsAsString;
+        this.permissions = permissions;
     }
 
-    public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public GuildNewsThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
         super(lApi, id, type, data);
 
         String name = (String) data.get(NAME_KEY);
@@ -49,6 +62,9 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         Snowflake parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
         Snowflake ownerId = Snowflake.fromString((String) data.get(OWNER_ID_KEY));
         Data threadMetadataData = (Data) data.get(THREAD_METADATA_KEY);
+        Data member = (Data) data.get(MEMBER_KEY);
+        Integer defaultAutoArchiveDuration = (Integer) data.get(DEFAULT_AUTO_ARCHIVE_DURATION_KEY);
+        String permissionsAsString = (String) data.get(PERMISSIONS_KEY);
 
         if (name == null) {
             throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(NAME_KEY);
@@ -72,6 +88,10 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         this.threadMetadata = new ThreadMetadata(threadMetadataData);
         this.memberCount = ((Number) data.getOrDefault(MEMBER_COUNT_KEY, 0)).intValue();
         this.messageCount = ((Number) data.getOrDefault(MESSAGE_COUNT_KEY, 0)).intValue();
+        this.member = ThreadMember.fromData(member);
+        this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
+        this.permissionsAsString = permissionsAsString;
+        this.permissions = permissionsAsString == null ? null : Permissions.getPermissionsFromBits(new BigInteger(permissionsAsString));
 
     }
 
@@ -113,6 +133,26 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
     @Override
     public @NotNull ThreadMetadata getThreadMetadata() {
         return threadMetadata;
+    }
+
+    @Override
+    public @Nullable ThreadMember getMember() {
+        return member;
+    }
+
+    @Override
+    public @Nullable Integer getDefaultAutoArchiveDuration() {
+        return defaultAutoArchiveDuration;
+    }
+
+    @Override
+    public @Nullable String getPermissionsAsString() {
+        return permissionsAsString;
+    }
+
+    @Override
+    public @Nullable List<Permissions> getPermissions() {
+        return permissions;
     }
 
     @Override

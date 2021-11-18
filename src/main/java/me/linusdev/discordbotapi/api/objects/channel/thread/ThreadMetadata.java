@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.channel;
+package me.linusdev.discordbotapi.api.objects.channel.thread;
 
 
 import me.linusdev.data.Data;

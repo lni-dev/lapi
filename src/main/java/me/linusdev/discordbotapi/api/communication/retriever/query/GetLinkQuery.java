@@ -14,7 +14,13 @@ public class GetLinkQuery implements Query{
 
     public enum Links{
         /**
+         * Get a {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel} by ID.
+         * Returns a {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel object}.
+         * If the channel is a {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread},
+         * a thread member object is included in the returned result.
+         *
          * @see PlaceHolder#CHANNEL_ID
+         * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel" target="_top">Get Channel</a>
          */
         GET_CHANNEL(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID),
 
