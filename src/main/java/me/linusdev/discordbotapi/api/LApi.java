@@ -36,10 +36,12 @@ public class LApi {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
+    //Queue
     private final Queue<Future<?>> queue;
     private final ScheduledExecutorService scheduledExecutor;
-    private final ThreadPoolExecutor executor;
     private final ExecutorService queueWorker;
+
+    private final ThreadPoolExecutor executor;
 
     //stores and manages the voice regions
     private final VoiceRegions voiceRegions;
@@ -49,17 +51,14 @@ public class LApi {
         this.config = config;
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
 
-
-        this.voiceRegions = new VoiceRegions();
-        if(this.config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
-            this.voiceRegions.init(this); //Todo add callback
-
+        //Queue
         this.queue = config.getQueue();
         this.scheduledExecutor = Executors.newScheduledThreadPool(1);
         this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         this.queueWorker = Executors.newSingleThreadExecutor();
         this.queueWorker.submit(new Runnable() {
             @Override
+            @SuppressWarnings({"InfiniteLoopStatement"})
             public void run() {
                 while(true){
                     synchronized (queue){
@@ -78,6 +77,12 @@ public class LApi {
                 }
             }
         });
+
+        this.voiceRegions = new VoiceRegions();
+        if(this.config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
+            this.voiceRegions.init(this); //Todo add callback
+
+
     }
 
     /**
