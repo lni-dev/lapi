@@ -12,32 +12,21 @@ import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
-public class MessageRetriever extends Retriever implements Queueable<Message> {
-
-    private final @NotNull Query query;
+public class MessageRetriever extends Retriever<Message> {
 
     public MessageRetriever(@NotNull LApi lApi, @NotNull String channelId, @NotNull String messageId) {
-        super(lApi);
-        this.query = new GetLinkQuery(lApi, GetLinkQuery.Links.GET_CHANNEL_MESSAGE,
+        super(lApi, new GetLinkQuery(lApi, GetLinkQuery.Links.GET_CHANNEL_MESSAGE,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId),
-                new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId));
+                new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId)));
     }
 
-    public Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.sendLApiHttpRequest(query.getLApiRequest());
-    }
 
     @Override
-    public @NotNull Container<Message> completeHere() {
-        Container<Message> container;
-        try {
-            container = new Container<>(new Message(lApi, retrieveData()), null);
-        } catch (LApiException | IOException | ParseException | InterruptedException e) {
-            container = new Container<Message>(null, new Error(e));
-        }
-        return container;
+    public @Nullable Message retrieve() throws LApiException, IOException, ParseException, InterruptedException {
+        return new Message(lApi, retrieveData());
     }
 }
