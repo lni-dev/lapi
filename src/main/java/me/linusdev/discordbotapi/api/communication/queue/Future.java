@@ -8,9 +8,50 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * TODO
+ * When {@link Queueable#queue()} is called, the Queueable will call
+ * {@link me.linusdev.discordbotapi.api.LApi#queue(Queueable) LApi.queue(Queueable)}.
+ * This will create a new {@link Future<Queueable> Future&lt;Queueable&gt;} and adds it to the
+ * {@link me.linusdev.discordbotapi.api.LApi#queue LApi.queue}.
+ * The Future will now pass through the queue. If the Future is {@link #cancel(boolean) cancled},
+ * it will remain in the queue and pass through it, but it won't be {@link #completeHere() completed}
+ * <br>
+ * <br>
+ * <h3 style="margin-bottom:0;padding-bottom:0">Before the future will supposedly {@link Queueable#completeHere() complete}:</h3>
+ * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     {@link #beforeComplete} Listener will be called before and can still {@link #cancel(boolean)} this Future
+ * </p> <br>
+ *
+ * <h3 style="margin-bottom:0;padding-bottom:0">Once the Future has finished (if it wasn't canceled):</h3>
+ * Meaning that {@link Queueable#completeHere()} has been called and finished. The following actions will follow
+ * in following order
+ * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     <li>
+ *         all Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)} will be resumed
+ *     </li>
+ *     <li>
+ *         {@link #then(BiConsumer)} Listener will be called
+ *     </li>
+ *     <li>
+ *         {@link #then(Consumer)} Listener will be called
+ *     </li>
+ * </ul><br>
+ *
+ * <h3 style="margin-bottom:0;padding-bottom:0">If the Future was {@link #cancel(boolean) cancled}:</h3>
+ * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     <li>
+ *         All Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)} will be resumed and {@code null} will
+ *         be returned
+ *     </li>
+ *     <li>
+ *         {@link Queueable#completeHere()} will not be called
+ *     </li>
+ *     <li>
+ *         {@link #beforeComplete(Consumer)} Listener will not be called
+ *     </li>
+ * </ul>
  *
  * @param <T> the result Class
  */
@@ -21,6 +62,9 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     private @Nullable Container<T> result = null;
 
     private @Nullable BiConsumer<T, Error> then;
+    private @Nullable Consumer<T> thenSingle;
+    private @Nullable Consumer<Future<T>> beforeComplete;
+
 
 
     public Future(@NotNull Queueable<T> queueable){
@@ -39,12 +83,15 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * @see Queueable#completeHere()
      */
     public void completeHere(){
+        if(!cancelled && beforeComplete != null) beforeComplete.accept(this);
+
         if(this.cancelled){
             synchronized (this) {
                 this.notify();
             }
             return;
         }
+
         this.result = queueable.completeHere();
 
         synchronized (this) {
@@ -52,17 +99,51 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         }
 
         if(then != null) then.accept(result.get(), result.getError());
+        if(thenSingle != null) thenSingle.accept(result.get());
     }
 
 
     //listener
 
     /**
-     *
-     * @param consumer to consume the result once it has been retrieved
+     * {@link Consumer#accept(Object)} will be called before {@link Queueable#completeHere()}.<br>
+     * <br>
+     * You can still cancel the {@link Future} in this Listener
+     * @param beforeComplete to handle the Future before {@link Queueable#completeHere()} will be called
+     * @return this
      */
-    public Future<T> then(BiConsumer<T, Error> consumer){
-        this.then = consumer;
+    public @NotNull Future<T> beforeComplete(Consumer<Future<T>> beforeComplete){
+        this.beforeComplete = beforeComplete;
+        return this;
+    }
+
+    /**
+     * {@link BiConsumer#accept(Object, Object)} will be called after {@link Queueable#completeHere()}.<br>
+     * {@link #get()} will be notified before too
+     * <br>
+     * <br> Error will be {@code null} if no Error occurred
+     * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
+     *
+     * @param then to consume the result once it has been retrieved
+     * @return this
+     */
+    public @NotNull Future<T> then(@Nullable BiConsumer<T, Error> then){
+        this.then = then;
+        return this;
+    }
+
+    /**
+     * {@link Consumer#accept(Object)} will be called after {@link Queueable#completeHere()}.<br>
+     * {@link #then(BiConsumer)} will be called before too
+     * {@link #get()} will be notified before too
+     * <br>
+     * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
+     *
+     * @param thenSingle to consume the result once it has been retrieved
+     * @return this
+     */
+    public @NotNull Future<T> then(@Nullable Consumer<T> thenSingle){
+        this.thenSingle = thenSingle;
         return this;
     }
 
@@ -74,6 +155,15 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     public Error getError(){
         if(result == null) return null;
         return result.getError();
+    }
+
+    /**
+     *
+     * @return {@code true} if an Error has occurred, {@code false} otherwise or if {@link #result} == {@code null}
+     */
+    public boolean hasError(){
+        if(result == null) return false;
+        return result.hasError();
     }
 
     /**
