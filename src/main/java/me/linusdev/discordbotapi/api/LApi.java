@@ -5,6 +5,7 @@ import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.discordbotapi.api.communication.queue.Future;
@@ -150,7 +151,7 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data sendLApiHttpRequest(LApiHttpRequest request) throws IOException, InterruptedException, ParseException {
+    public Data sendLApiHttpRequest(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
         return sendLApiHttpRequest(request, null);
     }
 
@@ -166,7 +167,7 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data sendLApiHttpRequest(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException {
+    public Data sendLApiHttpRequest(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
         HttpResponse<String> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofString());
 
         StringReader reader = new StringReader(response.body());

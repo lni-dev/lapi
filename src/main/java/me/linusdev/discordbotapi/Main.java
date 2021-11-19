@@ -5,14 +5,18 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.discordbotapi.api.communication.queue.Future;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.config.Config;
-import me.linusdev.discordbotapi.api.objects.channel.GuildStageChannel;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 
 import java.io.IOException;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
@@ -50,6 +54,15 @@ public class Main {
         });
 
         System.out.println("test");
+
+        Message message = future.get();
+        System.out.println(message.getData().getJsonString());
+
+        LApiHttpBody body = new LApiHttpBody(0, message.getData());
+        LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);
+        HttpRequest r = request.getHttpRequest();
+        HttpResponse<String> response = api.getClient().send(r, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.body());
 
     }
 }

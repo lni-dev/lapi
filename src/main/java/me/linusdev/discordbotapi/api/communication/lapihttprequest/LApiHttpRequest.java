@@ -1,7 +1,8 @@
 package me.linusdev.discordbotapi.api.communication.lapihttprequest;
 
-import me.linusdev.data.AbstractData;
 import me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpMultiPartBodyPublisher;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,12 +10,13 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class LApiHttpRequest {
 
     private final String uri;
     private final Method method;
-    private final AbstractData data;
+    private final LApiHttpBody body;
     private final ArrayList<LApiHttpHeader> headers;
     private Duration timeout;
 
@@ -25,12 +27,12 @@ public class LApiHttpRequest {
      * @param data to put if method supports data
      * @throws IllegalRequestMethodException
      */
-    public LApiHttpRequest(@NotNull String uri, @NotNull Method method, @Nullable AbstractData data) throws IllegalRequestMethodException {
+    public LApiHttpRequest(@NotNull String uri, @NotNull Method method, @Nullable LApiHttpBody body) throws IllegalRequestMethodException {
         this.uri = uri;
         this.method = method;
-        this.data = data;
+        this.body = body;
 
-        if(!(method == Method.GET || method == Method.DELETE) && data == null)
+        if(!(method == Method.GET || method == Method.DELETE) && body == null)
             throw new IllegalRequestMethodException("LApiHttpRequest's data may not be null with a request method other than GET or DELETE");
 
         this.headers = new ArrayList<>();
@@ -62,14 +64,34 @@ public class LApiHttpRequest {
         this.timeout = timeout;
     }
 
-    public HttpRequest getHttpRequest() {
-        assert data != null;
+    /**
+     * builds a {@link HttpRequest}
+     * @return built {@link HttpRequest}
+     * @throws IllegalRequestMethodException if {@link #body} is {@code null} and {@link #method} is not {@link Method#GET GET} or {@link Method#DELETE DELETE}
+     */
+    public HttpRequest getHttpRequest() throws IllegalRequestMethodException {
         HttpRequest.Builder builder =  HttpRequest.newBuilder(URI.create(uri));
 
-        if(method == Method.GET) builder.GET();
-        else if(method == Method.DELETE) builder.DELETE();
-        else
-            builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(data.getJsonString().toString()));
+        if(body != null){
+            if(body.isMultiPart()) {
+                LApiHttpMultiPartBodyPublisher publisher = new LApiHttpMultiPartBodyPublisher(body);
+                builder.header("Content-Type", "multipart/form-data; boundary=" + publisher.getBoundaryString());
+                builder.method(method.getMethod(), publisher);
+            }else if(body.hasJsonPart()){
+                builder.header("Content-Type", "application/json");
+                builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(Objects.requireNonNull(body.getJsonPart()).getJsonString().toString()));
+            }else{
+                //TODO add the support of single file bodies
+                throw new UnsupportedOperationException();
+            }
+        }else{
+            if(method == Method.GET)
+                builder.GET();
+            else if(method == Method.DELETE)
+                builder.DELETE();
+            else
+                throw new IllegalRequestMethodException("body may not be null for request method " + method.toString());
+        }
 
         for(LApiHttpHeader header : headers)
             builder.header(header.getName(), header.getValue());
