@@ -3,9 +3,12 @@ package me.linusdev.discordbotapi.api.communication;
 public class PlaceHolder {
 
     public static final String GUILD_ID = "<guild-id>";
-    public static final String USER_ID = "<user-id>";
+    public static final String USER_ID = "{user.id}";
     public static final String CHANNEL_ID = "{channel.id}";
     public static final String MESSAGE_ID = "{message.id}";
+
+    public static final String EMOJI = "{emoji}";
+
     public static final String TOKEN = "<token>";
     public static final String LAPI_URL = "<LApi-url>";
     public static final String LAPI_VERSION = "<LApi-version>";
