@@ -5,6 +5,8 @@ import me.linusdev.data.Entry;
 import me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpMultiPartBodyPublisher;
+import me.linusdev.discordbotapi.log.LogInstance;
+import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +79,7 @@ public class LApiHttpRequest {
      * @throws IllegalRequestMethodException if {@link #body} is {@code null} and {@link #method} is not {@link Method#GET GET} or {@link Method#DELETE DELETE}
      */
     public HttpRequest getHttpRequest() throws IllegalRequestMethodException {
+        LogInstance log = Logger.getLogger(this.getClass().getSimpleName(), Logger.Type.INFO);
         StringBuilder uri = new StringBuilder(this.uri);
         //Add query string params
 
@@ -95,6 +98,8 @@ public class LApiHttpRequest {
                         .append(entry.getValue());
             }
         }
+
+        log.info("Creating HttpRequest: " + method + " " + uri);
 
         HttpRequest.Builder builder =  HttpRequest.newBuilder(URI.create(uri.toString()));
 
