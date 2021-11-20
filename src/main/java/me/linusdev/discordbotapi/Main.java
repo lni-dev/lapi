@@ -5,7 +5,8 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
-import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.Reaction;
+import me.linusdev.discordbotapi.api.objects.user.User;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -36,19 +37,18 @@ public class Main {
             }
         })*/;
 
-        api.getChannelMessagesRetriever("763440854332604428", "786539902111842337", 5, null)
-                .queue((messages, error) -> {
-                    System.out.println("Then...");
-                    if(error != null){
-                        System.out.println("Error");
-                        error.getThrowable().printStackTrace();
-                        return;
-                    }
+       api.getMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
+           if(error != null) error.getThrowable().printStackTrace();
+           Reaction[] reactions = message.getReactions();
 
-                    for(Message msg : messages){
-                        System.out.println(msg.getContent());
-                    }
-                });
+           Reaction reaction = reactions[0];
+           api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
+               if(e != null) e.getThrowable().printStackTrace();
+              for(User user : list){
+                  System.out.println(user.getUsername());
+              }
+           });
+       });
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
         LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);

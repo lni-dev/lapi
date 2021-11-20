@@ -16,7 +16,9 @@ import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,8 +87,6 @@ public class LApi {
 
                             queue.poll().completeHereAndIgnoreQueueThread();
                         }
-                        System.out.println("throw");
-                        throw new RuntimeException();
                     }
                 }catch (Throwable t){
                     //This is so any exceptions in this Thread are caught and printed.
@@ -330,7 +330,7 @@ public class LApi {
     }
 
     /**
-     * This should retrieve the latest 50 or less {@link Message messages} in given {@link Channel channel}.
+     * This should retrieve the latest 50 or less {@link Message messages} in given {@link Channel channel}. The newest {@link Message message} will have index 0
      * <br><br>
      * See {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)} for more information<br><br>
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
@@ -341,6 +341,59 @@ public class LApi {
         return getChannelMessagesRetriever(channelId, null, null, null);
     }
 
+    /**
+     *
+     * <p>
+     *     This is used to retrieve the {@link User users}, that have reacted with a specific {@link Emoji}.<br>
+     *     If you want to retrieve more than 100 {@link User users},
+     *     you will have to chain this Queueable with the last {@link User#getId() user's id} as afterUserId.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel}
+     * @param messageId the id of the {@link Message}
+     * @param emoji the {@link Emoji}
+     * @param afterUserId the {@link User} after which you want to retrieve. This should be {@code null}, if this is your first retrieve
+     * @param limit max number of users to return (1-100). Will be 25 if {@code null}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
+     */
+    public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable String afterUserId, @Nullable Integer limit){
+        Data queryStringsData = null;
+
+        if(afterUserId != null || limit != null) {
+            queryStringsData = new Data(2);
+            if (afterUserId != null) queryStringsData.add(GetLinkQuery.AFTER_KEY, afterUserId);
+            if (limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
+        }
+
+        String emojiString;
+        if(emoji.isStandardEmoji()){
+            emojiString = emoji.getName();
+        }else{
+            emojiString = emoji.getName() + ":" + emoji.getId();
+        }
+
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_REACTIONS, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId), new PlaceHolder(PlaceHolder.EMOJI, emojiString));
+        return new ArrayRetriever<>(this, query, User::fromData);
+    }
+
+    /**
+     *
+     * <p>
+     *     This is used to retrieve the {@link User users}, that have reacted with a specific {@link Emoji}.<br>
+     *     If you want to retrieve more than 100 {@link User users},
+     *     you will have to chain {@link #getReactionsRetriever(String, String, Emoji, String, Integer)}.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel}
+     * @param messageId the id of the {@link Message}
+     * @param emoji the {@link Emoji}
+     * @param limit max number of users to return (1-100). Will be 25 if {@code null}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
+     */
+    public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable Integer limit){
+        return getReactionsRetriever(channelId, messageId, emoji, null, limit);
+    }
 
 
     //Getter
