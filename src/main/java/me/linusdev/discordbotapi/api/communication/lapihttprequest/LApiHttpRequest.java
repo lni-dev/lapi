@@ -24,7 +24,7 @@ public class LApiHttpRequest {
      *
      * @param uri internet location
      * @param method any {@link Method}
-     * @param data to put if method supports data
+     * @param body of the request
      * @throws IllegalRequestMethodException
      */
     public LApiHttpRequest(@NotNull String uri, @NotNull Method method, @Nullable LApiHttpBody body) throws IllegalRequestMethodException {

@@ -51,11 +51,11 @@ public class LApi {
         this.token = token;
         this.config = config;
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
+        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
         //Queue
         this.queue = config.getQueue();
         this.scheduledExecutor = Executors.newScheduledThreadPool(1);
-        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         this.queueWorker = Executors.newSingleThreadExecutor();
         this.queueWorker.submit(new Runnable() {
             @Override
