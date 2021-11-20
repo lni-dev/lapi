@@ -68,11 +68,9 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     private @Nullable Consumer<Future<T>> beforeComplete;
 
 
-
     public Future(@NotNull Queueable<T> queueable){
         this.queueable = queueable;
     }
-
 
     /**
      * waits this Thread and calls {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>

@@ -7,13 +7,17 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 public class Main {
 
-    public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException {
+    public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
+
+        Logger.start();
 
         Config conf = new Config(0, null);
         LApi api = new LApi(Private.TOKEN, conf);
@@ -45,7 +49,7 @@ public class Main {
            api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
                if(e != null) e.getThrowable().printStackTrace();
               for(User user : list){
-                  System.out.println(user.getUsername());
+                  //System.out.println(user.getUsername());
               }
            });
        });

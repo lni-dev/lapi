@@ -19,6 +19,8 @@ import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.log.LogInstance;
+import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +59,9 @@ public class LApi {
     //stores and manages the voice regions
     private final VoiceRegions voiceRegions;
 
+    //Logger
+    private final LogInstance log = Logger.getLogger("LApi", Logger.Type.INFO);
+
     public LApi(@NotNull String token, @NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
         this.token = token;
         this.config = config;
@@ -71,8 +76,9 @@ public class LApi {
             @Override
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run() {
+                queueThread = Thread.currentThread();
+                log.log("Started queue thread: " + queueThread.getName());
                 try {
-                    queueThread = Thread.currentThread();
                     while (true) {
                         synchronized (queue) {
                             if (queue.peek() == null) {
@@ -85,14 +91,22 @@ public class LApi {
 
                             if (queue.peek() == null) continue;
 
-                            queue.poll().completeHereAndIgnoreQueueThread();
+                            if(Logger.DEBUG_LOG){
+                                log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
+                                long millis = System.currentTimeMillis();
+                                queue.poll().completeHereAndIgnoreQueueThread();
+                                long finishMillis = System.currentTimeMillis() - millis;
+                                log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
+                            }else{
+                                queue.poll().completeHereAndIgnoreQueueThread();
+                            }
+
                         }
                     }
                 }catch (Throwable t){
                     //This is so any exceptions in this Thread are caught and printed.
                     //Otherwise, they would just vanish and no one would know what happened
-                    t.printStackTrace();
-                    //TODO add log!
+                    log.error(t);
                 }
             }
         });
@@ -150,8 +164,7 @@ public class LApi {
             }catch (Throwable t){
                 //This is so any exceptions in this Thread are caught and printed.
                 //Otherwise, they would just vanish and no one would know what happened
-                t.printStackTrace();
-                //TODO add log!
+                log.error(t);
             }
         }, delay, timeUnit);
         return future;
