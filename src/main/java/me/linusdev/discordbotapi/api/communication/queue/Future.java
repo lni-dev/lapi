@@ -118,6 +118,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         if(then != null) then.accept(result.get(), result.getError());
         if(thenSingle != null) thenSingle.accept(result.get());
 
+        //stop the checking thread
         keepRunning.set(false);
 
     }
