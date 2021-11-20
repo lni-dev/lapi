@@ -2,7 +2,7 @@ package me.linusdev.discordbotapi.api.objects.message.component;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
 import me.linusdev.discordbotapi.api.objects.message.component.button.Button;

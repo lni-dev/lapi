@@ -1,15 +1,15 @@
-package me.linusdev.discordbotapi.api;
+package me.linusdev.discordbotapi.api.lapiandqueue;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.VoiceRegions;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.discordbotapi.api.communication.queue.Future;
-import me.linusdev.discordbotapi.api.communication.queue.Queueable;
 import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
@@ -49,7 +49,6 @@ public class LApi {
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService queueWorker;
     private volatile Thread queueThread;
-    private final boolean allowQueueThreadToWait = false;
 
     private final ThreadPoolExecutor executor;
 
@@ -84,15 +83,16 @@ public class LApi {
 
                             if (queue.peek() == null) continue;
 
-                            queue.poll().completeHere();
+                            queue.poll().completeHereAndIgnoreQueueThread();
                         }
+                        System.out.println("throw");
+                        throw new RuntimeException();
                     }
                 }catch (Throwable t){
                     //This is so any exceptions in this Thread are caught and printed.
                     //Otherwise, they would just vanish and no one would know what happened
                     t.printStackTrace();
                     //TODO add log!
-                    throw t;
                 }
             }
         });
@@ -113,10 +113,10 @@ public class LApi {
      * If you want to wait your Thread you could use:
      * <ul>
      *     <li>
-     *         {@link Future#get()}, to wait until the {@link Queueable} has been gone through the {@link #queue} and {@link Queueable#completeHere() completed}
+     *         {@link Future#get()}, to wait until the {@link Queueable} has been gone through the {@link #queue} and {@link Queueable#completeHereAndIgnoreQueueThread() completed}
      *     </li>
      *     <li>
-     *          {@link Queueable#completeHere()}, to wait until the {@link Queueable} has been {@link Queueable#completeHere() completed}.
+     *          {@link Queueable#completeHereAndIgnoreQueueThread()}, to wait until the {@link Queueable} has been {@link Queueable#completeHereAndIgnoreQueueThread() completed}.
      *          This wont assure, that several {@link LApiHttpRequest LApiHttpRequests} are sent at the same time
      *     </li>
      * </ul>
@@ -152,7 +152,6 @@ public class LApi {
                 //Otherwise, they would just vanish and no one would know what happened
                 t.printStackTrace();
                 //TODO add log!
-                throw t;
             }
         }, delay, timeUnit);
         return future;
@@ -215,6 +214,18 @@ public class LApi {
         return request;
     }
 
+    /**
+     * This checks whether the currentThread is the queue-thread and throws an {@link LApiRuntimeException} if that is the case
+     * @throws LApiRuntimeException if the currentThread is the queue Thread
+     */
+    public void checkQueueThread() throws LApiRuntimeException {
+        if(Thread.currentThread().equals(queueThread)){
+            throw new LApiRuntimeException("You cannot invoke Future.get() or Queueable.completeHere() on the queue-thread" +
+                    ", because this could lead to an infinite wait loop. You should also not wait or sleep the " +
+                    "queue-thread, because this will delay all other queued Futures");
+        }
+    }
+
     //Retriever
 
     /**
@@ -222,7 +233,7 @@ public class LApi {
      * @param channelId the id of the {@link Channel}, which should be retrieved
      * @return {@link Queueable} which can retrieve the {@link Channel}
      * @see Queueable#queue()
-     * @see Queueable#completeHere()
+     * @see Queueable#completeHereAndIgnoreQueueThread()
      */
     public @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId){
         return new ChannelRetriever(this, channelId);
@@ -333,19 +344,6 @@ public class LApi {
 
 
     //Getter
-
-
-    public Thread getQueueThread() {
-        return queueThread;
-    }
-
-    public ThreadPoolExecutor getExecutor() {
-        return executor;
-    }
-
-    public boolean allowQueueThreadToWait() {
-        return allowQueueThreadToWait;
-    }
 
     public LApiHttpHeader getAuthorizationHeader() {
         return authorizationHeader;

@@ -1,12 +1,11 @@
 package me.linusdev.discordbotapi.api.communication.retriever.query;
 
 import me.linusdev.data.Data;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;

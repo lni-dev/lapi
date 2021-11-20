@@ -1,5 +1,7 @@
-package me.linusdev.discordbotapi.api.communication.queue;
+package me.linusdev.discordbotapi.api.lapiandqueue;
 
+import me.linusdev.discordbotapi.api.other.Container;
+import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,29 +14,29 @@ import java.util.function.Consumer;
  *
  * @param <T> Type of the data that should be retrieved
  */
-public interface Queueable<T> extends HasLApi {
+public abstract class Queueable<T> implements HasLApi {
 
     /**
      * queues this {@link Queueable} and returns a {@link Future}<br>
-     * see {@link Future} and {@link me.linusdev.discordbotapi.api.LApi#queue(Queueable) LApi.queue(Queueable)} for more information!
+     * see {@link Future} and {@link LApi#queue(Queueable) LApi.queue(Queueable)} for more information!
      * @return {@link Future}
      * @see Future
-     * @see me.linusdev.discordbotapi.api.LApi#queue(Queueable) LApi.queue(Queueable)
+     * @see LApi#queue(Queueable) LApi.queue(Queueable)
      */
-    default @NotNull Future<T> queue(){
+    public @NotNull Future<T> queue(){
         return getLApi().queue(this);
     }
 
     /**
      * Queues this {@link Queueable} after given delay and returns a {@link Future}.<br>
-     * See {@link Future} and {@link me.linusdev.discordbotapi.api.LApi#queueAfter(Queueable, long, TimeUnit)}  LApi.queueAfter(Queueable, long, TimeUnit)} for more information!
+     * See {@link Future} and {@link LApi#queueAfter(Queueable, long, TimeUnit)}  LApi.queueAfter(Queueable, long, TimeUnit)} for more information!
      * @param delay the delay
      * @param timeUnit {@link TimeUnit} to use for the delay
      * @return {@link Future}
      * @see Future
-     * @see me.linusdev.discordbotapi.api.LApi#queueAfter(Queueable, long, TimeUnit) LApi.queueAfter(Queueable, long, TimeUnit)
+     * @see LApi#queueAfter(Queueable, long, TimeUnit) LApi.queueAfter(Queueable, long, TimeUnit)
      */
-    default @NotNull Future<T> queueAfter(long delay, TimeUnit timeUnit){
+    public @NotNull Future<T> queueAfter(long delay, TimeUnit timeUnit){
         return getLApi().queueAfter(this, delay, timeUnit);
     }
 
@@ -46,7 +48,7 @@ public interface Queueable<T> extends HasLApi {
      * @see #queue()
      * @see Future#then(BiConsumer)
      */
-    default @NotNull Future<T> queue(BiConsumer<T, Error> then){
+    public @NotNull Future<T> queue(BiConsumer<T, Error> then){
         return queue().then(then);
     }
 
@@ -58,7 +60,7 @@ public interface Queueable<T> extends HasLApi {
      * @see #queue()
      * @see Future#then(Consumer)
      */
-    default @NotNull Future<T> queue(Consumer<T> then){
+    public @NotNull Future<T> queue(Consumer<T> then){
         return queue().then(then);
     }
 
@@ -70,7 +72,7 @@ public interface Queueable<T> extends HasLApi {
      * @see #queue()
      * @see Future#beforeComplete(Consumer)
      */
-    default @NotNull Future<T> queueAndSetBeforeComplete(Consumer<Future<T>> beforeComplete){
+    public @NotNull Future<T> queueAndSetBeforeComplete(Consumer<Future<T>> beforeComplete){
         return queue().beforeComplete(beforeComplete);
     }
 
@@ -81,13 +83,18 @@ public interface Queueable<T> extends HasLApi {
      * @throws ExecutionException if an {@link Error} occurred. If you use this method, you won't have access to this Error.
      * @throws InterruptedException if the Thread was interrupted
      */
-    default @NotNull T queueAndWait() throws ExecutionException, InterruptedException {
+    public @NotNull T queueAndWait() throws ExecutionException, InterruptedException {
         return queue().get();
+    }
+
+    public @NotNull Container<T> completeHere(){
+        getLApi().checkQueueThread();
+        return completeHereAndIgnoreQueueThread();
     }
 
     /**
      * Complete this {@link Queueable<T>} in this Thread.
      */
-    @NotNull Container<T> completeHere();
+    protected abstract @NotNull Container<T> completeHereAndIgnoreQueueThread();
 
 }

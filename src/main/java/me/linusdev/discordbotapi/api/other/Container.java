@@ -1,5 +1,6 @@
-package me.linusdev.discordbotapi.api.communication.queue;
+package me.linusdev.discordbotapi.api.other;
 
+import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

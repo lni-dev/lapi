@@ -1,9 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.message;
 
 import me.linusdev.data.Data;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;

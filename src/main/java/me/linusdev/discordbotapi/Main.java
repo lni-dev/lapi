@@ -1,27 +1,14 @@
 package me.linusdev.discordbotapi;
 
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
-import me.linusdev.discordbotapi.api.communication.queue.Error;
-import me.linusdev.discordbotapi.api.communication.queue.Future;
-import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.config.Config;
-import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 
 import java.io.IOException;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 
 public class Main {
 
@@ -52,13 +39,6 @@ public class Main {
         api.getChannelMessagesRetriever("763440854332604428", "786539902111842337", 5, null)
                 .queue((messages, error) -> {
                     System.out.println("Then...");
-                    synchronized (messages){
-                        try {
-                            messages.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
                     if(error != null){
                         System.out.println("Error");
                         error.getThrowable().printStackTrace();

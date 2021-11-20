@@ -1,7 +1,8 @@
 package me.linusdev.discordbotapi.api.config;
 
-import me.linusdev.discordbotapi.api.communication.queue.Future;
-import me.linusdev.discordbotapi.api.communication.queue.Queueable;
+import me.linusdev.discordbotapi.api.lapiandqueue.Future;
+import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -34,7 +35,7 @@ public class Config {
     }
 
     /**
-     * The Queue used by {@link me.linusdev.discordbotapi.api.LApi} to queue any {@link Queueable}
+     * The Queue used by {@link LApi} to queue any {@link Queueable}
      */
     public Queue<Future<?>> getQueue() {
         return queue;

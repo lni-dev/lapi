@@ -1,6 +1,7 @@
-package me.linusdev.discordbotapi.api.communication.queue;
+package me.linusdev.discordbotapi.api.lapiandqueue;
 
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.other.Container;
+import me.linusdev.discordbotapi.api.other.Error;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,26 +9,25 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
  * When {@link Queueable#queue()} is called, the Queueable will call
- * {@link me.linusdev.discordbotapi.api.LApi#queue(Queueable) LApi.queue(Queueable)}.
+ * {@link LApi#queue(Queueable) LApi.queue(Queueable)}.
  * This will create a new {@link Future<Queueable> Future&lt;Queueable&gt;} and adds it to the
- * {@link me.linusdev.discordbotapi.api.LApi#queue LApi.queue}.
+ * {@link LApi#queue LApi.queue}.
  * The Future will now pass through the queue. If the Future is {@link #cancel(boolean) cancled},
  * it will remain in the queue and pass through it, but it won't be {@link #completeHere() completed}
  * <br>
  * <br>
- * <h3 style="margin-bottom:0;padding-bottom:0">Before the future will supposedly {@link Queueable#completeHere() complete}:</h3>
+ * <h3 style="margin-bottom:0;padding-bottom:0">Before the future will supposedly {@link Queueable#completeHereAndIgnoreQueueThread() complete}:</h3>
  * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     {@link #beforeComplete} Listener will be called before and can still {@link #cancel(boolean)} this Future
  * </p> <br>
  *
  * <h3 style="margin-bottom:0;padding-bottom:0">Once the Future has finished (if it wasn't canceled):</h3>
- * Meaning that {@link Queueable#completeHere()} has been called and finished. The following actions will follow
+ * Meaning that {@link Queueable#completeHereAndIgnoreQueueThread()} has been called and finished. The following actions will follow
  * in following order
  * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     <li>
@@ -48,7 +48,7 @@ import java.util.function.Consumer;
  *         be returned
  *     </li>
  *     <li>
- *         {@link Queueable#completeHere()} will not be called
+ *         {@link Queueable#completeHereAndIgnoreQueueThread()} will not be called
  *     </li>
  *     <li>
  *         {@link #beforeComplete(Consumer)} Listener will not be called
@@ -75,16 +75,26 @@ public class Future<T> implements java.util.concurrent.Future<T> {
 
 
     /**
-     * waits this Thread and calls {@link Queueable#completeHere()}.<br>
-     * Instead of using this you probably want to use {@link Queueable#completeHere()} directly
+     * waits this Thread and calls {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
+     * Instead of using this you probably want to use {@link Queueable#completeHereAndIgnoreQueueThread()} directly
      *
      * This method will also {@link #notifyAll() notify} all Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)}
      *
-     * This method will also call all Listeners: {@link #then}
+     * This method will also call all Listeners: {@link #beforeComplete}, {@link #then} and {@link #thenSingle}
      *
-     * @see Queueable#completeHere()
+     * @see Queueable#completeHereAndIgnoreQueueThread()
      */
     public void completeHere(){
+        queueable.getLApi().checkQueueThread();
+        completeHereAndIgnoreQueueThread();
+    }
+
+    /**
+     * This is only for {@link LApi}. DO NOT USE!<br><br>
+     *
+     * This allows {@link #completeHere()} to be executed on the queue thread.
+     */
+    protected void completeHereAndIgnoreQueueThread(){
         if(!cancelled && beforeComplete != null) beforeComplete.accept(this);
 
         if(this.cancelled){
@@ -94,43 +104,25 @@ public class Future<T> implements java.util.concurrent.Future<T> {
             return;
         }
 
-        this.result = queueable.completeHere();
+        this.result = queueable.completeHereAndIgnoreQueueThread();
 
         synchronized (this) {
             this.notifyAll();
         }
 
-        //TODO there must be a better solution
-        AtomicBoolean keepRunning = new AtomicBoolean(true);
-        if(!queueable.getLApi().allowQueueThreadToWait()){
-            final LApi lApi = queueable.getLApi();
-            new Thread(() -> {
-                while (keepRunning.get()){
-                    if(lApi.getQueueThread().getState() != Thread.State.RUNNABLE){
-                        lApi.getQueueThread().interrupt();
-                        System.out.println("DO NOT MAKE THE QUEUE THREAD WAIT!");
-                    }
-                }
-            }).start();
-        }
-
         //Fire the then listeners
         if(then != null) then.accept(result.get(), result.getError());
         if(thenSingle != null) thenSingle.accept(result.get());
-
-        //stop the checking thread
-        keepRunning.set(false);
-
     }
 
 
     //listener
 
     /**
-     * {@link Consumer#accept(Object)} will be called before {@link Queueable#completeHere()}.<br>
+     * {@link Consumer#accept(Object)} will be called before {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * <br>
      * You can still cancel the {@link Future} in this Listener
-     * @param beforeComplete to handle the Future before {@link Queueable#completeHere()} will be called
+     * @param beforeComplete to handle the Future before {@link Queueable#completeHereAndIgnoreQueueThread()} will be called
      * @return this
      */
     public @NotNull Future<T> beforeComplete(Consumer<Future<T>> beforeComplete){
@@ -139,7 +131,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     }
 
     /**
-     * {@link BiConsumer#accept(Object, Object)} will be called after {@link Queueable#completeHere()}.<br>
+     * {@link BiConsumer#accept(Object, Object)} will be called after {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * {@link #get()} will be notified before too
      * <br>
      * <br> Error will be {@code null} if no Error occurred
@@ -154,7 +146,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     }
 
     /**
-     * {@link Consumer#accept(Object)} will be called after {@link Queueable#completeHere()}.<br>
+     * {@link Consumer#accept(Object)} will be called after {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * {@link #then(BiConsumer)} will be called before too.<br>
      * {@link #get()} will be notified before too.<br>
      * <br>
@@ -211,7 +203,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     }
 
     /**
-     * whether {@link #queueable} has {@link Queueable#completeHere() completed}
+     * whether {@link #queueable} has {@link Queueable#completeHereAndIgnoreQueueThread() completed}
      * @return {@link #result} != {@code null}
      */
     @Override
@@ -223,7 +215,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * Waits if necessary for the computation to complete, and then
      * retrieves its result.
      * <br><br>
-     * It won't call {@link #completeHere()}. {@link me.linusdev.discordbotapi.api.LApi LApi} does this.
+     * It won't call {@link #completeHere()}. {@link LApi LApi} does this.
      *
      * @return the computed result, should never be {@code null}
      * @throws CancellationException if the computation was cancelled
@@ -235,6 +227,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     @Override
     public T get() throws InterruptedException, ExecutionException {
         if(result != null) return result.get();
+        queueable.getLApi().checkQueueThread();
 
         synchronized (this){
             this.wait();
@@ -250,7 +243,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * to complete, and then retrieves its result, if available.
      *
      * <br><br>
-     * It won't call {@link #completeHere()}. {@link me.linusdev.discordbotapi.api.LApi LApi} does this.
+     * It won't call {@link #completeHere()}. {@link LApi LApi} does this.
      *
      * @param timeout the maximum time to wait
      * @param unit the time unit of the timeout argument
@@ -265,6 +258,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     @Override
     public T get(long timeout, @NotNull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if(result != null) return result.get();
+        queueable.getLApi().checkQueueThread();
 
         synchronized (this) {
             this.wait(unit.toMillis(timeout));

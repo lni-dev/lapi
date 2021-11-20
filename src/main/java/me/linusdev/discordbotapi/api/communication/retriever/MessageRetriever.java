@@ -1,7 +1,7 @@
 package me.linusdev.discordbotapi.api.communication.retriever;
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;

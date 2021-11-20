@@ -1,6 +1,6 @@
 package me.linusdev.discordbotapi.api.communication.retriever.converter;
 
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 
 

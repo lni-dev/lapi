@@ -2,14 +2,13 @@ package me.linusdev.discordbotapi.api.communication.retriever;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.queue.Container;
-import me.linusdev.discordbotapi.api.communication.queue.Error;
-import me.linusdev.discordbotapi.api.communication.queue.Queueable;
+import me.linusdev.discordbotapi.api.other.Container;
+import me.linusdev.discordbotapi.api.other.Error;
+import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +19,7 @@ import java.io.IOException;
  * It is used to retrieve an Object from Discords endpoint ({@link MessageRetriever for example a Message}).
  * @param <T> the class of the Object that should be retrieved
  */
-public abstract class Retriever<T> implements Queueable<T>, HasLApi {
+public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
     protected final @NotNull LApi lApi;
     protected final @NotNull Query query;
 
@@ -36,11 +35,11 @@ public abstract class Retriever<T> implements Queueable<T>, HasLApi {
 
     /**
      * Retrieves the wanted Objects JSON and saves it into a {@link Data}.<br>
-     * You are probably looking for {@link Queueable#queue()} or {@link #completeHere()}
+     * You are probably looking for {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()}
      *
      * @return {@link Data} with all JSON fields
      * @see Queueable#queue()
-     * @see #completeHere()
+     * @see #completeHereAndIgnoreQueueThread()
      */
     public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException{
         return lApi.sendLApiHttpRequest(query.getLApiRequest());
@@ -48,15 +47,15 @@ public abstract class Retriever<T> implements Queueable<T>, HasLApi {
 
     /**
      * Retrieves the Object. This will happen on the current Thread! <br>
-     * I suggest you use {@link Queueable#queue()} or {@link #completeHere()} instead!
+     * I suggest you use {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()} instead!
      * @return retrieved Object
      * @see Queueable#queue()
-     * @see #completeHere()
+     * @see #completeHereAndIgnoreQueueThread()
      */
     public @Nullable abstract T retrieve() throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
-    public @NotNull Container<T> completeHere() {
+    public @NotNull Container<T> completeHereAndIgnoreQueueThread() {
         Container<T> container;
         try {
             container = new Container<T>(retrieve(), null);

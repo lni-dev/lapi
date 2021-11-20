@@ -2,19 +2,17 @@ package me.linusdev.discordbotapi.api;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.SimpleGetLinkQuery;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.Function;
 
-class VoiceRegions {
+public class VoiceRegions {
     ArrayList<VoiceRegion> regions = null;
 
     public VoiceRegions(){
