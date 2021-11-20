@@ -2,14 +2,17 @@ package me.linusdev.discordbotapi.api;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.SimpleGetLinkQuery;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 class VoiceRegions {
     ArrayList<VoiceRegion> regions = null;
@@ -27,26 +30,25 @@ class VoiceRegions {
      * @throws InterruptedException
      */
     public void update(LApi lApi) throws LApiException, IOException, ParseException, InterruptedException {
-        ArrayRetriever retriever = new ArrayRetriever(lApi, new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS));
-        ArrayList<Object> list = retriever.retrieve();
+        ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<Data, VoiceRegion>(lApi,
+                new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
+        ArrayList<VoiceRegion> list = retriever.retrieve();
 
         if(regions == null){
-            regions = new ArrayList<>(list.size());
+            regions = list;
         }
 
         loop:
-        for(Object o : list){
-            Data data = (Data) o;
-            String id = (String) data.get(VoiceRegion.ID_KEY);
+        for(VoiceRegion o : list){
 
             for(VoiceRegion region : regions){
-                if(region.equalsId(id)){
-                    region.updateSelfByData(data);
+                if(region.equalsId(o.getId())){
+                    region.updateSelfByData(o.getData());
                     continue loop;
                 }
             }
 
-            regions.add(VoiceRegion.fromData(data));
+            regions.add(o);
         }
 
     }
@@ -60,20 +62,17 @@ class VoiceRegions {
      * @throws InterruptedException
      */
     public void init(LApi lApi) throws LApiException, IOException, ParseException, InterruptedException {
-        ArrayRetriever retriever = new ArrayRetriever(lApi, new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS));
-        ArrayList<Object> list = retriever.retrieve();
+        ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<Data, VoiceRegion>(lApi,
+                new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
-        regions = new ArrayList<>(list.size());
-
-        for(Object o : list)
-            regions.add(VoiceRegion.fromData((Data) o));
+        regions = retriever.retrieve();
     }
 
     /**
      *
      * @return true if {@link #regions} is not {@code null}
      */
-    public boolean initialized(){
+    public boolean isInitialized(){
         return regions != null;
     }
 

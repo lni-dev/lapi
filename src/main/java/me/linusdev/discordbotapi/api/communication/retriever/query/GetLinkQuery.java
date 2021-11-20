@@ -1,19 +1,28 @@
 package me.linusdev.discordbotapi.api.communication.retriever.query;
 
+import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
+import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 import static me.linusdev.discordbotapi.api.communication.PlaceHolder.*;
 
 public class GetLinkQuery implements Query{
+
+    public static final String AROUND_KEY = "around";
+    public static final String BEFORE_KEY = "before";
+    public static final String AFTER_KEY = "after";
+    public static final String LIMIT_KEY = "limit";
+    public static final String _KEY = "";
 
     public enum Links{
         /**
@@ -37,15 +46,31 @@ public class GetLinkQuery implements Query{
          * Returns an array of {@link me.linusdev.discordbotapi.api.objects.message.Message message objects} on success.
          * </p>
          * <br>
-         * TODO: This Requires Query String parameters (https://discord.com/developers/docs/resources/channel#get-channel-messages-query-string-params)
-         * <p>
+         * <p style="margin-bottom:0;padding-bottom:0;">
+         *     This can have <a href="https://discord.com/developers/docs/resources/channel#get-channel-messages-query-string-params" target="_top">Query String parameters</a>:
+         * </p>
+         * <ul style="margin-bottom:0;padding-bottom:0;margin-top:0;padding-top:0;">
+         *     <li>
+         *         {@link #AROUND_KEY} get messages around this message ID
+         *     </li>
+         *     <li>
+         *         {@link #BEFORE_KEY} get messages before this message ID
+         *     </li>
+         *     <li>
+         *         {@link #AFTER_KEY} get messages after this message ID
+         *     </li>
+         *     <li>
+         *         {@link #LIMIT_KEY} max number of messages to return (1-100). Default: 50
+         *     </li>
+         * </ul>
+         * <p style="margin-top:0;padding-top:0;">
          *    The before, after, and around keys are mutually exclusive, only one may be passed at a time.
          * </p>
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-messages" target="_top">Get Channel Messages</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-messages-query-string-params" target="_top">Query String Params</a>
          */
-        GET_CHANNEL_MESSAGES(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/messages"),
+        GET_CHANNEL_MESSAGES(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages", true),
 
         /**
          * <p>
@@ -58,7 +83,7 @@ public class GetLinkQuery implements Query{
          * @see PlaceHolder#MESSAGE_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-message" target="_top">Get Channel Message</a>
          */
-        GET_CHANNEL_MESSAGE(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
+        GET_CHANNEL_MESSAGE(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
 
         /**
          * <p>
@@ -69,15 +94,17 @@ public class GetLinkQuery implements Query{
          *     you must encode it in the format name:id with the emoji name and emoji id.
          * </p>
          * <br>
-         * TODO: This Requires Query String parameters (https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params)
          *
+         * <p>
+         *     This can have <a href="https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params" target="_top">Query String parameters</a>
+         * </p>
          * @see PlaceHolder#CHANNEL_ID
          * @see PlaceHolder#MESSAGE_ID
          * @see PlaceHolder#EMOJI
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-reactions" target="_top">Get Reactions</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params" target="_top">Query String Params</a>
          */
-        GET_REACTIONS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI),
+        GET_REACTIONS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI, true),
 
         /**
          * <p>
@@ -90,7 +117,7 @@ public class GetLinkQuery implements Query{
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-invites" target="_top">Get Channel Invites</a>
          */
-        GET_CHANNEL_INVITES(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/invites"),
+        GET_CHANNEL_INVITES(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/invites"),
 
         /**
          * <p>
@@ -99,7 +126,7 @@ public class GetLinkQuery implements Query{
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-pinned-messages" target="_top">Get Pinned Messages</a>
          */
-        GET_PINNED_MESSAGES(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/pins"),
+        GET_PINNED_MESSAGES(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/pins"),
 
         /**
          * <p>
@@ -110,7 +137,7 @@ public class GetLinkQuery implements Query{
          * @see PlaceHolder#USER_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-thread-member" target="_top">Get Thread Member</a>
          */
-        GET_THREAD_MEMBER(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/thread-members/" + USER_ID),
+        GET_THREAD_MEMBER(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/thread-members/" + USER_ID),
 
         /**
          * <p>
@@ -123,7 +150,7 @@ public class GetLinkQuery implements Query{
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-thread-members" target="_top">List Thread Members</a>
          */
-        LIST_THREAD_MEMBERS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/thread-members"),
+        LIST_THREAD_MEMBERS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/thread-members"),
 
         /**
          * <p>
@@ -138,7 +165,7 @@ public class GetLinkQuery implements Query{
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-active-threads-response-body" target="_top">Response Body</a>
          */
         @Deprecated(since = "v10", forRemoval = true)
-        LIST_ACTIVE_THREADS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/threads/active"),
+        LIST_ACTIVE_THREADS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/threads/active"),
 
         /**
          * <p>
@@ -150,14 +177,16 @@ public class GetLinkQuery implements Query{
          *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
          *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
          * </p>
-         * TODO: This Requires Query String parameters (https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params)
+         * <p>
+         *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params" target="_top">Query String parameters</a>
+         * </p>
          *
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads" target="_top"> List Public Archived Threads</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body" target="_top"> Response Body</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params" target="_top"> Query String Params</a>
          */
-        LIST_PUBLIC_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/threads/archived/public"),
+        LIST_PUBLIC_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/threads/archived/public", true),
 
         /**
          * <p>
@@ -167,12 +196,16 @@ public class GetLinkQuery implements Query{
          *     Requires both the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
          *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permissions.
          * </p>
+         * <p>
+         *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params" target="_top">Query String parameters</a>
+         * </p>
+         *
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads" target="_top"> List Private Archived Threads</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body" target="_top"> Response Body</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params" target="_top"> Query String Params</a>
          */
-        LIST_PRIVATE_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/threads/archived/private"),
+        LIST_PRIVATE_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/threads/archived/private", true),
 
         /**
          * <p>
@@ -181,18 +214,35 @@ public class GetLinkQuery implements Query{
          *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
          *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
          * </p>
+         * <p>
+         *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params" target="_top">Query String parameters</a>
+         * </p>
+         *
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads" target="_top"> List Private Archived Threads</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-response-body" target="_top"> Response Body</a>
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params" target="_top"> Query String Params</a>
          */
-        LIST_JOINED_PRIVATE_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "/channels/" + CHANNEL_ID + "/users/@me/threads/archived/private"),
+        LIST_JOINED_PRIVATE_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/users/@me/threads/archived/private", true),
         ;
 
         private final String link;
+        private final boolean canHaveQueryData;
+
+        Links(String link, boolean canHaveQueryData){
+            this.link = link;
+            this.canHaveQueryData = canHaveQueryData;
+        }
 
         Links(String link){
-            this.link = link;
+            this(link, false);
+        }
+
+        /**
+         * whether this link accepts query data for additional params
+         */
+        public boolean canHaveQueryData() {
+            return canHaveQueryData;
         }
 
         public String getLink() {
@@ -202,12 +252,18 @@ public class GetLinkQuery implements Query{
 
     private final LApi lApi;
     private final Links link;
+    private final Data queryData;
     private final PlaceHolder[] placeHolders;
 
-    public GetLinkQuery(@NotNull LApi lApi, @NotNull Links link, PlaceHolder... placeHolders){
+    public GetLinkQuery(@NotNull LApi lApi, @NotNull Links link, @Nullable Data queryData, PlaceHolder... placeHolders){
         this.lApi = lApi;
         this.link = link;
+        this.queryData = queryData;
         this.placeHolders = placeHolders;
+    }
+
+    public GetLinkQuery(@NotNull LApi lApi, @NotNull Links link, PlaceHolder... placeHolders){
+        this(lApi, link, null, placeHolders);
     }
 
     @Override
@@ -219,6 +275,10 @@ public class GetLinkQuery implements Query{
     public LApiHttpRequest getLApiRequest() throws LApiException {
         String uri = link.getLink();
         for(PlaceHolder p : placeHolders) uri = p.place(uri);
+
+        if(queryData != null){
+            return lApi.appendHeader(new LApiHttpRequest(uri, getMethod(), null, queryData));
+        }
 
         return lApi.appendHeader(new LApiHttpRequest(uri, getMethod()));
     }

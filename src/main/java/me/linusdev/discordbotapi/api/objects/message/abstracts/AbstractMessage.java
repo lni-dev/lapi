@@ -82,7 +82,7 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    protected AbstractMessage(LApi lApi, @NotNull Data data) throws InvalidDataException, LApiException {
+    protected AbstractMessage(LApi lApi, @NotNull Data data) throws InvalidDataException{
         this.lApi = lApi;
 
         String id = (String) data.get(ID_KEY);
@@ -106,7 +106,7 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
             InvalidDataException.throwException(data, null, AbstractMessage.class,
                     new Object[]{id, channelId, author, content, timestamp, tts, mentionEveryone, mentionsData, mentionRolesData, attachmentsData, embedsData, pinned, type},
                     new String[]{ID_KEY, CHANNEL_ID_KEY, AUTHOR_KEY, CONTENT_KEY, TIMESTAMP_KEY, TTS_KEY, MENTION_EVERYONE_KEY, MENTIONS_KEY, MENTION_ROLES_KEY, ATTACHMENTS_KEY, EMBEDS_KEY, PINNED_KEY, TYPE_KEY});
-            throw new LApiException(); //this will never happen, because above method will throw an exception
+            throw new RuntimeException(); //this will never happen, because above method will throw an exception
         }
 
         this.id = Snowflake.fromString(id);

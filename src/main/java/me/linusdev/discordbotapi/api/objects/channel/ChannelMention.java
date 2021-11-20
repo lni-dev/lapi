@@ -44,7 +44,7 @@ public class ChannelMention implements Datable {
     public ChannelMention(@NotNull Data data) throws InvalidDataException {
         Snowflake id = Snowflake.fromString((String) data.get(ID_KEY));
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
-        int type = (Integer) data.get(TYPE_KEY, -1);
+        int type = ((Number) data.get(TYPE_KEY, -1)).intValue();
         String name = (String) data.get(NAME_KEY);
 
         if(id == null || guildId == null || type == -1 || name == null) {

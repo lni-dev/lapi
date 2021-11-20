@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.communication.queue;
 
+import me.linusdev.discordbotapi.api.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,6 +8,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -98,8 +100,26 @@ public class Future<T> implements java.util.concurrent.Future<T> {
             this.notifyAll();
         }
 
+        //TODO there must be a better solution
+        AtomicBoolean keepRunning = new AtomicBoolean(true);
+        if(!queueable.getLApi().allowQueueThreadToWait()){
+            final LApi lApi = queueable.getLApi();
+            new Thread(() -> {
+                while (keepRunning.get()){
+                    if(lApi.getQueueThread().getState() != Thread.State.RUNNABLE){
+                        lApi.getQueueThread().interrupt();
+                        System.out.println("DO NOT MAKE THE QUEUE THREAD WAIT!");
+                    }
+                }
+            }).start();
+        }
+
+        //Fire the then listeners
         if(then != null) then.accept(result.get(), result.getError());
         if(thenSingle != null) thenSingle.accept(result.get());
+
+        keepRunning.set(false);
+
     }
 
 

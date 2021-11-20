@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.voice.region;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.objects.Updatable;
 
 /**

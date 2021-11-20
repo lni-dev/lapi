@@ -58,7 +58,7 @@ public class Message extends AbstractMessage {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    public Message(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException, LApiException {
+    public Message(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         super(lApi, data);
 
         String guildId = (String) data.get(GUILD_ID_KEY);

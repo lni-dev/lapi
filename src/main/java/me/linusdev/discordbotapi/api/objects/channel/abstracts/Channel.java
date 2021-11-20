@@ -3,6 +3,7 @@ package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.LApi;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.objects.channel.thread.GuildNewsThread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.GuildPrivateThread;
@@ -55,7 +56,7 @@ public abstract class Channel implements SnowflakeAble {
 
 
     @Nullable
-    public static Channel fromData(@NotNull LApi lApi, @NotNull Data data) throws LApiException {
+    public static Channel fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
         Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
 

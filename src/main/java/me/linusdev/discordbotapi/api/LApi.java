@@ -10,7 +10,13 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeade
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.discordbotapi.api.communication.queue.Future;
 import me.linusdev.discordbotapi.api.communication.queue.Queueable;
+import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.discordbotapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +24,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.*;
 
@@ -25,7 +32,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
 
 public class LApi {
 
-    private static final String LAPI_URL = "https://";
+    private static final String LAPI_URL = "https://twitter.com/Linus_Dev";
     private static final String LAPI_VERSION = "1.0";
 
     private @NotNull final String token;
@@ -41,6 +48,8 @@ public class LApi {
     private final Queue<Future<?>> queue;
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService queueWorker;
+    private volatile Thread queueThread;
+    private final boolean allowQueueThreadToWait = false;
 
     private final ThreadPoolExecutor executor;
 
@@ -61,20 +70,29 @@ public class LApi {
             @Override
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run() {
-                while(true){
-                    synchronized (queue){
-                        if(queue.peek() == null) {
-                            try {
-                                queue.wait(10000L);
-                            } catch (InterruptedException ignored) {
-                                ignored.printStackTrace();
+                try {
+                    queueThread = Thread.currentThread();
+                    while (true) {
+                        synchronized (queue) {
+                            if (queue.peek() == null) {
+                                try {
+                                    queue.wait(10000L);
+                                } catch (InterruptedException ignored) {
+                                    ignored.printStackTrace();
+                                }
                             }
+
+                            if (queue.peek() == null) continue;
+
+                            queue.poll().completeHere();
                         }
-
-                        if(queue.peek() == null) continue;
-
-                        queue.poll().completeHere();
                     }
+                }catch (Throwable t){
+                    //This is so any exceptions in this Thread are caught and printed.
+                    //Otherwise, they would just vanish and no one would know what happened
+                    t.printStackTrace();
+                    //TODO add log!
+                    throw t;
                 }
             }
         });
@@ -126,7 +144,17 @@ public class LApi {
      */
     public <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit){
         final Future<T> future = new Future<T>(queueable);
-        scheduledExecutor.schedule(() -> this.queue(future), delay, timeUnit);
+        scheduledExecutor.schedule(() -> {
+            try {
+                this.queue(future);
+            }catch (Throwable t){
+                //This is so any exceptions in this Thread are caught and printed.
+                //Otherwise, they would just vanish and no one would know what happened
+                t.printStackTrace();
+                //TODO add log!
+                throw t;
+            }
+        }, delay, timeUnit);
         return future;
     }
 
@@ -169,7 +197,6 @@ public class LApi {
      */
     public Data sendLApiHttpRequest(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
         HttpResponse<String> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofString());
-
         StringReader reader = new StringReader(response.body());
         if(arrayKey != null)
             return new JsonParser().readDataFromReader(reader, true, arrayKey);
@@ -186,6 +213,138 @@ public class LApi {
         request.header(getAuthorizationHeader());
         request.header(getUserAgentHeader());
         return request;
+    }
+
+    //Retriever
+
+    /**
+     *
+     * @param channelId the id of the {@link Channel}, which should be retrieved
+     * @return {@link Queueable} which can retrieve the {@link Channel}
+     * @see Queueable#queue()
+     * @see Queueable#completeHere()
+     */
+    public @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId){
+        return new ChannelRetriever(this, channelId);
+    }
+
+    /**
+     *
+     * @param channelId the id of the {@link Channel}, in which the message was sent
+     * @param messageId the id of the {@link Message}
+     * @return {@link Queueable} which can retrieve the {@link Message}
+     */
+    public @NotNull Queueable<Message> getMessageRetriever(@NotNull String channelId, @NotNull String messageId){
+        return new MessageRetriever(this, channelId, messageId);
+    }
+
+    public enum AnchorType {
+        /**
+         * Retrieve objects around the given object
+         */
+        AROUND,
+
+        /**
+         * Retrieve objects before the given object
+         */
+        BEFORE,
+
+        /**
+         * Retrieve objects after the given object
+         */
+        AFTER,
+        ;
+    }
+
+    /**
+     * <p>
+     *     This is used to retrieve a bunch of {@link Message messages} in a {@link Channel channel}.
+     * </p>
+     * <p>
+     *     If anchorType is {@code null}, it should use {@link AnchorType#AROUND}, but it may result in unexpected behavior.
+     * </p>
+     * <p>
+     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link Message messages} in the {@link Channel channel}.
+     * </p>
+     * <p>
+     *     If limit is {@code null}, the limit will be 50
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
+     * @param anchorMessageId the message around, before or after which you want to retrieve messages.
+     *                       The {@link Message} with this id will most likely be included in the result.
+     *                        If this is {@code null}, it will retrieve the latest messages in the channel<br><br>
+     * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50<br><br>
+     * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CHANNEL_MESSAGES
+     */
+    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
+
+        Data queryStringsData = null;
+
+        if(anchorMessageId != null || limit != null){
+            queryStringsData = new Data(2);
+
+            if(anchorMessageId != null) {
+                if (anchorType == AnchorType.AROUND) queryStringsData.add(GetLinkQuery.AROUND_KEY, anchorMessageId);
+                else if (anchorType == AnchorType.BEFORE)
+                    queryStringsData.add(GetLinkQuery.BEFORE_KEY, anchorMessageId);
+                else if (anchorType == AnchorType.AFTER) queryStringsData.add(GetLinkQuery.AFTER_KEY, anchorMessageId);
+            }
+
+            if(limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
+        }
+
+
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_MESSAGES, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ArrayRetriever<Data, Message>(this, query, Message::new);
+    }
+
+    /**
+     * This will retrieve 50 or less {@link Message messages}.<br><br> For more information see
+     * {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)}<br><br>
+     *
+     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
+     * @param anchorMessageId the message around, before or after which you want to retrieve messages.
+     *                       The {@link Message} with this id will most likely be included in the result.
+     *                       If this is {@code null}, it will retrieve the latest messages in the channel.<br><br>
+     * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
+     */
+    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
+        return getChannelMessagesRetriever(channelId, anchorMessageId, null, anchorType);
+    }
+
+    /**
+     * This should retrieve the latest 50 or less {@link Message messages} in given {@link Channel channel}.
+     * <br><br>
+     * See {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)} for more information<br><br>
+     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
+     */
+    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId) {
+        return getChannelMessagesRetriever(channelId, null, null, null);
+    }
+
+
+
+    //Getter
+
+
+    public Thread getQueueThread() {
+        return queueThread;
+    }
+
+    public ThreadPoolExecutor getExecutor() {
+        return executor;
+    }
+
+    public boolean allowQueueThreadToWait() {
+        return allowQueueThreadToWait;
     }
 
     public LApiHttpHeader getAuthorizationHeader() {

@@ -60,8 +60,8 @@ public abstract class Retriever<T> implements Queueable<T>, HasLApi {
         Container<T> container;
         try {
             container = new Container<T>(retrieve(), null);
-        } catch (LApiException | IOException | ParseException | InterruptedException e) {
-            container = new Container<T>(null, new Error(e));
+        } catch (Throwable t) {
+            container = new Container<T>(null, new Error(t));
         }
         return container;
     }
