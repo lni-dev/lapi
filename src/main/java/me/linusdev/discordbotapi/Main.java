@@ -41,7 +41,7 @@ public class Main {
             }
         })*/;
 
-       api.getMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
+       api.getChannelMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
            if(error != null) error.getThrowable().printStackTrace();
            Reaction[] reactions = message.getReactions();
 

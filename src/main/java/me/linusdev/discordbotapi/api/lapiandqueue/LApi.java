@@ -258,7 +258,7 @@ public class LApi {
      * @param messageId the id of the {@link Message}
      * @return {@link Queueable} which can retrieve the {@link Message}
      */
-    public @NotNull Queueable<Message> getMessageRetriever(@NotNull String channelId, @NotNull String messageId){
+    public @NotNull Queueable<Message> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId){
         return new MessageRetriever(this, channelId, messageId);
     }
 

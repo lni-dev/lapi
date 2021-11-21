@@ -9,6 +9,8 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.discordbotapi.api.objects.invite.Invite;
+import me.linusdev.discordbotapi.api.objects.invite.InviteMetadata;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -116,8 +118,8 @@ public class GetLinkQuery implements Query{
 
         /**
          * <p>
-         *     Returns a list of {@link me.linusdev.discordbotapi.api.objects.toodo.Invite invite objects}
-         *     (with {@link me.linusdev.discordbotapi.api.objects.toodo.InviteMetadata invite metadata}) for the channel.
+         *     Returns a list of {@link Invite invite objects}
+         *     (with {@link InviteMetadata invite metadata}) for the channel.
          *     Only usable for guild channels. Requires the
          *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_CHANNELS MANAGE_CHANNELS}
          *     permission.

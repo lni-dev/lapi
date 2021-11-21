@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.toodo;
+package me.linusdev.discordbotapi.api.objects.invite;
 
 /**
  * <p>
@@ -6,5 +6,9 @@ package me.linusdev.discordbotapi.api.objects.toodo;
  * </p>
  * @see <a href="https://discord.com/developers/docs/resources/invite#invite-metadata-object" target="_top">Invite Metadata Object</a>
  */
-public class InviteMetadata extends Invite{
+public class InviteMetadata{
+
+    //TODO
+
+    //this won't implement Datable, but instead have a function to extend an already existing Data by its values
 }
