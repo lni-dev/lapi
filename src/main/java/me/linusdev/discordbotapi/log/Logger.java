@@ -48,7 +48,7 @@ public class Logger {
         Files.createFile(logFile);
 
         writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
-        log(Type.INFO, Logger.class.getSimpleName(), "Log started...");
+        log(Type.INFO, Logger.class.getSimpleName(), null, "Log started...", false);
     }
 
     public static void close() throws IOException {
@@ -81,10 +81,25 @@ public class Logger {
         }
     }
 
-    public static void log(Type type, String source, String toLog){
+    public static void log(Type type, String source, @Nullable String name, String toLog, boolean autoAlign){
         if(!ENABLE_LOG) return;
         try {
-            finalLog(String.format("(%s - %s) %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, toLog));
+            if(autoAlign){
+                String pre;
+                if(name == null){
+                    pre = String.format("(%s - %s) %s: ", logDateFormat.format(new Date(System.currentTimeMillis())), source, type);
+                }else{
+                    pre = String.format("(%s - %s) %s: %s: ", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name);
+                }
+                toLog = toLog.replace("\n", "\n" + " ".repeat(pre.length()));
+                finalLog(pre + toLog + "\n");
+            }else {
+                if (name == null) {
+                    finalLog(String.format("(%s - %s) %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, toLog));
+                } else {
+                    finalLog(String.format("(%s - %s) %s: %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name, toLog));
+                }
+            }
             writer.flush();
         } catch (IOException e) {
             e.printStackTrace();

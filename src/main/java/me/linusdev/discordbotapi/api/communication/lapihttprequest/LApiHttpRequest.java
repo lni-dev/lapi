@@ -111,8 +111,7 @@ public class LApiHttpRequest {
                 builder.method(method.getMethod(), publisher);
             }else if(body.hasJsonPart()){
                 builder.header("Content-Type", "application/json");
-                //body.getJsonPart().getJsonString().toString()
-                builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString("a"));
+                builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(body.getJsonPart().getJsonString().toString()));
             }else{
                 //TODO add the support of single file bodies
                 throw new UnsupportedOperationException();
@@ -130,6 +129,56 @@ public class LApiHttpRequest {
             builder.header(header.getName(), header.getValue());
 
         builder.timeout(timeout);
+
+        if(Logger.DEBUG_LOG){
+            HttpRequest request = builder.build();
+            HttpHeaders headers =  request.headers();
+            StringBuilder string = new StringBuilder();
+            for( Map.Entry<String, List<String>> header :headers.map().entrySet()){
+                for(String s : header.getValue()){
+                    string.append(header.getKey())
+                            .append(": ")
+                            .append(s)
+                            .append("\n");
+                }
+            }
+
+            //remove last \n
+            log.debugAlign(string.substring(0, string.length()-1), "Headers");
+            StringBuilder string2 = new StringBuilder();
+
+            Optional<HttpRequest.BodyPublisher> body = request.bodyPublisher();
+            if(body.isEmpty()){
+                string2.append("empty body");
+            }else{
+                body.get().subscribe(new Flow.Subscriber<ByteBuffer>() {
+                    @Override
+                    public void onSubscribe(Flow.Subscription subscription) {
+                        subscription.request(Long.MAX_VALUE);
+                    }
+
+                    @Override
+                    public void onNext(ByteBuffer item) {
+                        string2.append(new String(item.array()));
+                    }
+
+                    @Override
+                    public void onError(Throwable throwable) {
+                        string2.append("Error: ")
+                                .append(throwable.toString());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+            }
+
+            log.debugAlign(string2.toString(), "Body");
+
+            return request;
+        }
 
         return builder.build();
     }
