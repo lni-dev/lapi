@@ -11,8 +11,61 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
+ * <p>
+ *     A {@link Queueable} is an Object, that can be queued and execute a Task (mostly retrieving an Object).<br>
+ *     By invoking {@link #queue()}, a {@link Future} will be created and {@link LApi#queue(Future) queued}.
+ *     All Objects in the {@link LApi#queue queue} will be completed in the queued order. Two Tasks may never
+ *     run at the same time. For more information about the process, see {@link Future}.
+ * </p>
  *
- * @param <T> Type of the data that should be retrieved
+ * <p>
+ *     Usually the {@link Future#result result} of the {@link Queueable} should be processed right after it has been retrieved.
+ *     This can be achieved using Listeners like {@link Future#then(BiConsumer)}. These can be set directly when queuing by
+ *     calling {@link Queueable#queue(BiConsumer)} or {@link Queueable#queue(Consumer)}.
+ *     <b style="color:red">{@link Object#wait()}, {@link Thread#sleep(long)} or any other waiting tasks may never be called inside these listeners!</b>.
+ *     This will delay the queue and could lead to an endless {@link Object#wait()}
+ * </p><br><br>
+ *
+ * <h3 style="margin-bottom:0;padding-bottom:0">How to use a {@link Queueable}:</h3>
+ * <pre>{@code
+ * LApi api = new LApi(Private.TOKEN, config);
+ *
+ * //Retrieve the Message with id=912377554105688074
+ * //inside the channel with id=912377387868639282
+ * Queueable<Message> msgRetriever
+ *         = api.getChannelMessageRetriever(
+ *                   "912377387868639282", //channel-id
+ *                   "912377554105688074"  //message-id
+ *                   );
+ *
+ * //Queue and create a BiConsumer
+ * msgRetriever.queue(new BiConsumer<Message, Error>() {
+ *      @Override
+ *      public void accept(Message message, Error error) {
+ *          //This will be executed once the message has been retrieved
+ *          if(error != null){
+ *              System.out.println("Error!");
+ *              return;
+ *          }
+ *
+ *          System.out.println(message.getContent());
+ *      }
+ * });
+ *
+ * //Or simpler using a lambda expression
+ * msgRetriever.queue((message, error) -> {
+ *             //This will be executed once the message has been retrieved
+ *             if(error != null){
+ *                 System.out.println("Error!");
+ *                 return;
+ *             }
+ *
+ *             System.out.println(message.getContent());
+ *         });
+ * }</pre>
+ *
+ * @param <T> Type of the data that should be retrieved / the result of the Task
+ * @see Future
  */
 public abstract class Queueable<T> implements HasLApi {
 
