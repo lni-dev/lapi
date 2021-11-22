@@ -4,11 +4,14 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.objects.invite.TargetType;
 import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
+import me.linusdev.discordbotapi.log.LogInstance;
+import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,6 +63,9 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
         try {
             container = new Container<T>(retrieve(), null);
         } catch (Throwable t) {
+            LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
+            log.error("Exception while trying to retrieve " + query.toString());
+            log.error(t);
             container = new Container<T>(null, new Error(t));
         }
         return container;

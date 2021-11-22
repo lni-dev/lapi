@@ -5,8 +5,10 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class Main {
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
 
         Logger.start();
+        LogInstance log = Logger.getLogger("main");
 
         Config conf = new Config(0, null);
         LApi api = new LApi(Private.TOKEN, conf);
@@ -39,20 +42,34 @@ public class Main {
             public void accept(Channel channel, Error error) {
                 System.out.println("Channel Type:" + channel.getType());
             }
-        })*/;
+        })*/
+        ;
 
-       api.getChannelMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
-           if(error != null) error.getThrowable().printStackTrace();
-           Reaction[] reactions = message.getReactions();
+        log.log("getChannelMessageRetriever");
+        api.getChannelMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
+            if (error != null) error.getThrowable().printStackTrace();
+            Reaction[] reactions = message.getReactions();
 
-           Reaction reaction = reactions[0];
-           api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
-               if(e != null) e.getThrowable().printStackTrace();
-              for(User user : list){
-                  //System.out.println(user.getUsername());
-              }
-           });
-       });
+            Reaction reaction = reactions[0];
+            api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
+                if (e != null) e.getThrowable().printStackTrace();
+                for (User user : list) {
+                    System.out.println(user.getUsername());
+                }
+            });
+        });
+
+        log.log("getChannelInvites");
+        api.getChannelInvites("387972238256898048").queue((invites, error) -> {
+            System.out.println("retrieved invites....");
+            if (error != null) {
+                error.getThrowable().printStackTrace();
+                return;
+            }
+            for (Invite invite : invites) {
+                System.out.println(invite.getCode());
+            }
+        });
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
         LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);

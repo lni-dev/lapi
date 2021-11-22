@@ -46,5 +46,8 @@ public class SimpleGetLinkQuery implements Query {
             return lApi.appendHeader(new LApiHttpRequest(link.getLink(), Method.GET));
     }
 
-
+    @Override
+    public String asString() {
+        return link.getLink();
+    }
 }

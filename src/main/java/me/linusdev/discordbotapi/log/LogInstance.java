@@ -29,7 +29,7 @@ public class LogInstance {
     }
 
     public void errorAlign(String errorLog){
-        Logger.log(Logger.Type.ERROR, source, null, errorLog, false);
+        Logger.log(Logger.Type.ERROR, source, null, errorLog, true);
     }
 
     public void debug(String debugLog){

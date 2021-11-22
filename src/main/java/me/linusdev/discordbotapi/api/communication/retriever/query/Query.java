@@ -7,4 +7,5 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 public interface Query {
     Method getMethod();
     LApiHttpRequest getLApiRequest() throws LApiException;
+    String asString();
 }

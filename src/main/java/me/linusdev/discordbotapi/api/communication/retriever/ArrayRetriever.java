@@ -49,4 +49,9 @@ public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
     public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
         return lApi.sendLApiHttpRequest(query.getLApiRequest(), "array");
     }
+
+    @Override
+    public String toString() {
+        return "ArrayRetriever " + query.asString();
+    }
 }

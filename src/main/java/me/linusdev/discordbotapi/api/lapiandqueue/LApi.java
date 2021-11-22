@@ -177,9 +177,12 @@ public class LApi {
      */
     private void queue(@NotNull final Future<?> future){
         queue.offer(future);
-        synchronized (queue){
-            queue.notifyAll();
-        }
+        new Thread(() -> {
+            //TODO catch exception
+            synchronized (queue){
+                queue.notifyAll();
+            }
+        }).start();
     }
 
     /**

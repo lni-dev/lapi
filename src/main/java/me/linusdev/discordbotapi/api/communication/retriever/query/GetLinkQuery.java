@@ -292,4 +292,11 @@ public class GetLinkQuery implements Query{
 
         return lApi.appendHeader(new LApiHttpRequest(uri, getMethod()));
     }
+
+    @Override
+    public String asString() {
+        String uri = link.getLink();
+        for(PlaceHolder p : placeHolders) uri = p.place(uri);
+        return uri;
+    }
 }
