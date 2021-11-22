@@ -29,7 +29,7 @@ public enum Method {
     DELETE("DELETE"),
 
     /**
-     * TODO
+     * The PUT method adds an object to a collection on Discord
      */
     PUT("PUT"),
 
