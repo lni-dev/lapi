@@ -15,13 +15,14 @@ public class QueueThreadFactory implements ThreadFactory {
     private final AtomicInteger id;
 
     public QueueThreadFactory(){
-        this.group = Thread.currentThread().getThreadGroup();
+        this.group = new ThreadGroup("queue-thread-group");
+
         this.id = new AtomicInteger(0);
     }
 
     @Override
     public Thread newThread(@NotNull Runnable r) {
-        QueueThread queueThread = new QueueThread(group, r, "queueThread-" + id.getAndIncrement());
+        QueueThread queueThread = new QueueThread(group, r, "queue-thread-" + id.getAndIncrement());
 
         if(!queueThread.isDaemon())
             queueThread.setDaemon(false);
