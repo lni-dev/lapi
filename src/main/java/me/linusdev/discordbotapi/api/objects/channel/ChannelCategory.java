@@ -13,6 +13,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
+/**
+ *
+ * This represents a {@link ChannelType#GUILD_CATEGORY guild category} in discord.
+ *
+ * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-channel-category" target="_top">Example Channel Category</a>
+ */
 public class ChannelCategory extends Channel implements GuildChannel {
 
     private @NotNull String name;

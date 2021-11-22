@@ -40,7 +40,7 @@ public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
         ArrayList<R> resultArray = new ArrayList<>(dataArray.size());
 
         for(Object o : dataArray)
-            resultArray.add(converter.apply(lApi, (C) o));
+            resultArray.add(converter.convert(lApi, (C) o));
 
         return resultArray;
     }
