@@ -22,8 +22,8 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
     private @NotNull String name;
     private @Nullable String topic;
     private boolean nsfw;
-    private @NotNull Snowflake guildId;
-    private int position;
+    private @Nullable Snowflake guildId;
+    private @Nullable Integer position;
     private @NotNull PermissionOverwrites permissionOverwrites;
     private @Nullable Snowflake parentId;
     private int rateLimitPerUser;
@@ -32,7 +32,7 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
 
     public GuildTextChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
                             @NotNull String name, @Nullable String topic, boolean nsfw,
-                            @NotNull Snowflake guildId, int position, @NotNull PermissionOverwrites permissionOverwrites,
+                            @Nullable Snowflake guildId, @Nullable Integer position, @NotNull PermissionOverwrites permissionOverwrites,
                             @Nullable Snowflake parentId, int rateLimitPerUser, @Nullable Snowflake lastMessageId,
                             @Nullable String lastPinTimestamp) {
         super(lApi, id, type);
@@ -55,21 +55,21 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
 
         String name = (String) data.get(NAME_KEY);
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
-        int position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue(); //todo can position be missing?
+        Number position = (Number) data.get(POSITION_KEY);
 
         if (name == null) {
             throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(NAME_KEY);
-        } else if (guildId == null) {
+        }/* else if (guildId == null) { guildId may be null....
             throw new InvalidDataException(data, "field '" + GUILD_ID_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(GUILD_ID_KEY);
-        } else if (position == -1) {
+        } else if (position == -1) { position may be null...
             throw new InvalidDataException(data, "field '" + POSITION_KEY + "' missing or -1 in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(POSITION_KEY);
-        }
+        }*/
 
         this.name = name;
         this.topic = (String) data.get(TOPIC_KEY);
         this.nsfw = (boolean) data.getOrDefault(NSFW_KEY, false);
         this.guildId = guildId;
-        this.position = position;
+        this.position = position == null ? null : position.intValue();
         this.permissionOverwrites = new PermissionOverwrites((ArrayList<Data>) data.getOrDefault(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
         this.parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
         this.rateLimitPerUser = ((Number) data.getOrDefault(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
@@ -94,14 +94,15 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
     }
 
     @Override
-    public @NotNull Snowflake getGuildIdAsSnowflake() {
+    public @Nullable Snowflake getGuildIdAsSnowflake() {
         return guildId;
     }
 
 
     @Override
-    public @NotNull String getGuildId() {
-        return getGuildIdAsSnowflake().asString();
+    public @Nullable String getGuildId() {
+        if(guildId == null) return null;
+        return guildId.asString();
     }
 
     @Override
