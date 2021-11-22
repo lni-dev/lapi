@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 /**
  * When {@link Queueable#queue()} is called, the Queueable will call
  * {@link LApi#queue(Queueable) LApi.queue(Queueable)}.
- * This will create a new {@link Future<Queueable> Future&lt;Queueable&gt;} and adds it to the
+ * This will create a new {@link Future<Queueable> Future&lt;Queueable&gt;} and add it to the
  * {@link LApi#queue LApi.queue}.
  * The Future will now pass through the queue. If the Future is {@link #cancel(boolean) cancled},
  * it will remain in the queue and pass through it, but it won't be {@link #completeHere() completed}
@@ -54,19 +54,24 @@ import java.util.function.Consumer;
  *     <li>
  *         {@link #beforeComplete(Consumer)} Listener will not be called
  *     </li>
- * </ul>
- *
+ * </ul><br>
+ * 
+ * <h3 style="margin-bottom:0;padding-bottom:0">If {@link #then(BiConsumer)} or {@link #then(Consumer)} is set after the {@link #result} has already been retrieved:</h3>
+ * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     The Listener will be called immediately in the setting thread
+ * </p>
+ * 
  * @param <T> the result Class
  */
 public class Future<T> implements java.util.concurrent.Future<T> {
 
     private final @NotNull Queueable<T> queueable;
-    private boolean cancelled = false;
-    private @Nullable Container<T> result = null;
+    private volatile boolean cancelled = false;
+    private volatile @Nullable Container<T> result = null;
 
-    private @Nullable BiConsumer<T, Error> then;
-    private @Nullable Consumer<T> thenSingle;
-    private @Nullable Consumer<Future<T>> beforeComplete;
+    private volatile @Nullable BiConsumer<T, Error> then;
+    private volatile @Nullable Consumer<T> thenSingle;
+    private volatile @Nullable Consumer<Future<T>> beforeComplete;
 
 
     public Future(@NotNull Queueable<T> queueable) {
@@ -94,6 +99,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * This allows {@link #completeHere()} to be executed on the queue thread.
      */
     protected void completeHereAndIgnoreQueueThread() {
+        final Consumer<Future<T>> beforeComplete = this.beforeComplete;
         if (!cancelled && beforeComplete != null) beforeComplete.accept(this);
 
         if (this.cancelled) {
@@ -109,7 +115,9 @@ public class Future<T> implements java.util.concurrent.Future<T> {
             this.notifyAll();
         }
         //Fire the then listeners
+        final BiConsumer<T, Error> then = this.then;
         if (then != null) then.accept(result.get(), result.getError());
+        final Consumer<T> thenSingle = this.thenSingle;
         if (thenSingle != null) thenSingle.accept(result.get());
 
     }
@@ -121,6 +129,11 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * {@link Consumer#accept(Object)} will be called before {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * <br>
      * You can still cancel the {@link Future} in this Listener
+     * 
+     * <p>
+     *     If the {@link #result} has already been retrieved, or is currently being retrieved, at the time, this Listener is set,
+     *     the Listener will never be called
+     * </p>
      *
      * @param beforeComplete to handle the Future before {@link Queueable#completeHereAndIgnoreQueueThread()} will be called
      * @return this
@@ -136,15 +149,18 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * <br>
      * <br> Error will be {@code null} if no Error occurred
      * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
+     * <br>
+     * <p>
+     *     If a {@link #result} has already been retrieved, {@link #then} will be executed immediately in the calling thread 
+     * </p>
      *
      * @param then to consume the result once it has been retrieved
      * @return this
      */
     public @NotNull Future<T> then(@Nullable BiConsumer<T, Error> then) {
-
-        Logger.log(Logger.Type.DEBUG, "Future " + queueable.toString(), null, "set then listener", false);
+        Logger.log(Logger.Type.DEBUG, "Future", null, "set then listener", false);
         this.then = then;
-
+        if(then != null && result != null) then.accept(result.get(), result.getError());
         return this;
     }
 
@@ -152,17 +168,19 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * {@link Consumer#accept(Object)} will be called after {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * {@link #then(BiConsumer)} will be called before too.<br>
      * {@link #get()} will be notified before too.<br>
-     * <br>
      * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
+     * <br>
+     * <p>
+     *     If a {@link #result} has already been retrieved, {@link #thenSingle} will be executed immediately in the calling thread 
+     * </p>
      *
      * @param thenSingle to consume the result once it has been retrieved
      * @return this
      */
     public @NotNull Future<T> then(@Nullable Consumer<T> thenSingle) {
-
         Logger.log(Logger.Type.DEBUG, "Future", null, "set thenSingle listener", false);
         this.thenSingle = thenSingle;
-
+        if(thenSingle != null && result != null) thenSingle.accept(result.get());
         return this;
     }
 

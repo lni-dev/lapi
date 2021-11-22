@@ -54,7 +54,7 @@ public class LApi {
     private final Queue<Future<?>> queue;
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService queueWorker;
-    private volatile Thread queueThread;
+    private volatile QueueThread queueThread;
 
     private final ThreadPoolExecutor executor;
 
@@ -73,19 +73,19 @@ public class LApi {
         //Queue
         this.queue = config.getQueue();
         this.scheduledExecutor = Executors.newScheduledThreadPool(1);
-        this.queueWorker = Executors.newSingleThreadExecutor();
+        this.queueWorker = Executors.newSingleThreadExecutor(new QueueThreadFactory());
         this.queueWorker.submit(new Runnable() {
             @Override
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run() {
-                queueThread = Thread.currentThread();
+                queueThread = (QueueThread) Thread.currentThread();
                 log.log("Started queue thread: " + queueThread.getName());
                 try {
                     while (true) {
                         synchronized (queue) {
                             if (queue.peek() == null) {
                                 try {
-                                    queue.wait(10000L);
+                                    queueThread.wait(queue, 10000L);
                                 } catch (InterruptedException ignored) {
                                     ignored.printStackTrace();
                                 }
@@ -177,12 +177,14 @@ public class LApi {
      */
     private void queue(@NotNull final Future<?> future){
         queue.offer(future);
-        new Thread(() -> {
-            //TODO catch exception
+        if(queueThread.isWaiting()){
+            //If the queue is waiting, notify it.
+            //If it is not waiting, it is currently working on something and will
+            //automatically move to the next entry ones it is free again
             synchronized (queue){
                 queue.notifyAll();
             }
-        }).start();
+        }
     }
 
     /**
