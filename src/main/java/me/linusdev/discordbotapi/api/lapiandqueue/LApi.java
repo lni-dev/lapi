@@ -13,10 +13,12 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.log.LogInstance;
@@ -408,6 +410,26 @@ public class LApi {
         return getReactionsRetriever(channelId, messageId, emoji, null, limit);
     }
 
+    /**
+     * <p>
+     *     Returns a list of {@link Invite invite} objects (with {@link Invite#getInviteMetadata() invite metadata})
+     *     for the {@link Channel channel}. Only usable for guild channels.
+     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_CHANNELS MANAGE_CHANNELS} permission.
+     * </p>
+     *
+     * <p>
+     *     In case you didn't know, yes invites to a guild are always bound to a specific channel
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel}, you want a list of invites for
+     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Invite invites} for given channel
+     * @see GetLinkQuery.Links#GET_CHANNEL_INVITES
+     */
+    public @NotNull Queueable<ArrayList<Invite>> getChannelInvites(@NotNull String channelId){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_INVITES,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ArrayRetriever<Data, Invite>(this, query, Invite::fromData);
+    }
 
     //Getter
 
