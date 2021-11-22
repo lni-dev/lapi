@@ -54,8 +54,7 @@ public abstract class Channel implements SnowflakeAble {
     private final @NotNull ChannelType type;
 
 
-    @Nullable
-    public static Channel fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Channel fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
         Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
 
@@ -87,7 +86,13 @@ public abstract class Channel implements SnowflakeAble {
 
         }
 
-        return null;
+        //TODO return a Channel, which contains the given data
+        return new Channel(lApi, id, type) {
+            @Override
+            public @Nullable Snowflake getGuildIdAsSnowflake() {
+                return null;
+            }
+        };
     }
 
 
