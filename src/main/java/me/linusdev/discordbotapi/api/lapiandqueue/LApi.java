@@ -12,11 +12,13 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeade
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
@@ -430,10 +432,49 @@ public class LApi {
      * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Invite invites} for given channel
      * @see GetLinkQuery.Links#GET_CHANNEL_INVITES
      */
-    public @NotNull Queueable<ArrayList<Invite>> getChannelInvites(@NotNull String channelId){
+    public @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_INVITES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ArrayRetriever<Data, Invite>(this, query, Invite::fromData);
+    }
+
+    /**
+     * <p>
+     *     Returns all pinned messages in the channel as an array of message objects.
+     * </p>
+     * <p>
+     *     The max amount of pinned messages is 50
+     * </p>
+     *
+     * <p>
+     *     In my testing, the the message array was always sorted, so that the last pinned message had index 0.
+     *     Independent from when the message was actual sent
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel}, you want the pinned messages from
+     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Message pinned messages} for given channel
+     * @see GetLinkQuery.Links#GET_PINNED_MESSAGES
+     */
+    public @NotNull Queueable<ArrayList<Message>> getPinnedMessagesRetriever(@NotNull String channelId){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_PINNED_MESSAGES,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ArrayRetriever<Data, Message>(this, query, Message::new);
+    }
+
+    /**
+     * <p>
+     *     Returns a {@link me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember thread member} object
+     *     for the specified user if they are a member of the thread, returns a 404 response otherwise.
+     * </p>
+     *
+     * @param channelId the id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread}, the user is a member of
+     * @param userId the {@link User#getId() user id}
+     * @return {@link Queueable} to retrieve the {@link ThreadMember} matching given user in given thread
+     */
+    public @NotNull Queueable<ThreadMember> getThreadMember(@NotNull String channelId, @NotNull String userId){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_THREAD_MEMBER,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
+        return new ConvertingRetriever<ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     //Getter

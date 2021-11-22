@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi;
 
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
@@ -16,6 +17,7 @@ import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 
@@ -72,15 +74,16 @@ public class Main {
 
             Reaction reaction = reactions[0];
             api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
-                if (e != null) e.getThrowable().printStackTrace();
-                for (User user : list) {
-                    System.out.println(user.getUsername());
+                if (e != null){
+                    e.getThrowable().printStackTrace();
+                    return;
                 }
+                System.out.println(Arrays.toString(list.stream().map(User::getUsername).toArray()));
             });
         });
 
         log.log("getChannelInvites");
-        api.getChannelInvites("387972238256898048").queue((invites, error) -> {
+        api.getChannelInvitesRetriever("387972238256898048").queue((invites, error) -> {
             System.out.println("retrieved invites....");
             if (error != null) {
                 System.out.println("error");
@@ -91,6 +94,33 @@ public class Main {
             for (Invite invite : invites) {
                 System.out.println(invite.getCode());
             }
+        });
+
+        api.getPinnedMessagesRetriever("912377387868639282").queue(((messages, error) -> {
+            if(error != null){
+                System.out.println(error);
+                return;
+            }
+
+            for(Message message : messages){
+                System.out.println("Pinned Message: " + message.getContent());
+            }
+
+        }));
+
+        api.getThreadMember("912398268238037022", "247421526532554752").queue((member, error) -> {
+            if(error != null){
+                System.out.println("Error");
+                if(error.getThrowable() instanceof InvalidDataException){
+                    InvalidDataException e = (InvalidDataException) error.getThrowable();
+                    System.out.println(e.getMissingFields());
+                    System.out.println(e.getData().getJsonString().toString());
+                }
+                return;
+            }
+
+            System.out.println(member.getJoinTimestamp());
+            System.out.println(member.getUserId());
         });
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());

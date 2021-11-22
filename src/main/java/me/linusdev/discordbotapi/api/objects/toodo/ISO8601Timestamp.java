@@ -33,4 +33,13 @@ public class ISO8601Timestamp implements SimpleDatable {
     public @NotNull Object simplify() {
         return timestamp;
     }
+
+    /**
+     *
+     * @return the ISO8601 timestamp string
+     */
+    @Override
+    public String toString() {
+        return timestamp;
+    }
 }

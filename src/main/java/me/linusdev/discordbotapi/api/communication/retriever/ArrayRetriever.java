@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
- * This class is used to retrieve any JSON Array and convert it to an {@link ArrayList} of type {@link R}
+ * This class is used to retrieve any Array and convert it to an {@link ArrayList} of type {@link R}
  * @param <C> the class which will be retrieved from the Discord Api, usually {@link Data}
  * @param <R> the result class, to which {@link C} should be converted to
  */
@@ -26,7 +26,7 @@ public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
      *
      * @param lApi {@link LApi}
      * @param query {@link Query} for the HttpRequest
-     * @param converter {@link Function} to convert from {@link C} to {@link R}
+     * @param converter {@link Converter} to convert from {@link C} to {@link R}
      */
     public ArrayRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<C, R> converter) {
         super(lApi, query);
@@ -48,10 +48,5 @@ public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
     @Override
     public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
         return lApi.sendLApiHttpRequest(query.getLApiRequest(), "array");
-    }
-
-    @Override
-    public String toString() {
-        return "ArrayRetriever " + query.asString();
     }
 }

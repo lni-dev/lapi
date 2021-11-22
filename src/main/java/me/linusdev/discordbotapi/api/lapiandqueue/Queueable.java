@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  *     This can be achieved using Listeners like {@link Future#then(BiConsumer)}. These can be set directly when queuing by
  *     calling {@link Queueable#queue(BiConsumer)} or {@link Queueable#queue(Consumer)}.
  *     <b style="color:red">{@link Object#wait()}, {@link Thread#sleep(long)} or any other waiting tasks may never be called inside these listeners!</b>.
- *     This will delay the queue and could lead to an endless {@link Object#wait()}
+ *     This will delay the queue and could lead to an infinite {@link Object#wait()}
  * </p><br><br>
  *
  * <h3 style="margin-bottom:0;padding-bottom:0">How to use a {@link Queueable}:</h3>

@@ -42,9 +42,11 @@ public class Logger {
         }
 
         Date date = new Date(System.currentTimeMillis());
-        logFile = logFolder.resolve(fileDateFormat.format(date) + logFileEnding);
+        //logFile = logFolder.resolve(fileDateFormat.format(date) + logFileEnding);
+        logFile = logFolder.resolve("LApi-log" + logFileEnding);
 
-        if(Files.exists(logFile)) throw new IOException(logFile.toString() + " already exists");
+        //if(Files.exists(logFile)) throw new IOException(logFile.toString() + " already exists");
+        if(Files.exists(logFile)) Files.delete(logFile);
         Files.createFile(logFile);
 
         writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
