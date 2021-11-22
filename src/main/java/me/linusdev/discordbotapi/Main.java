@@ -5,15 +5,19 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
+import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 
 public class Main {
 
@@ -22,8 +26,24 @@ public class Main {
         Logger.start();
         LogInstance log = Logger.getLogger("main");
 
-        Config conf = new Config(0, null);
-        LApi api = new LApi(Private.TOKEN, conf);
+        Config config = new Config(0, null);
+        LApi api = new LApi(Private.TOKEN, config);
+
+        //Retrieve the Message with id=912377554105688074 inside the channel with id=912377387868639282
+        Queueable<Message> msgRetriever
+                = api.getChannelMessageRetriever(
+                        "912377387868639282",
+                        "912377554105688074");
+        msgRetriever.queue((message, error) -> {
+            //This will be executed once the message has been retrieved
+            if(error != null){
+                System.out.println("Error!");
+                return;
+            }
+
+            System.out.println(message.getContent());
+        });
+
 
         // Private Message
         // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
@@ -63,7 +83,9 @@ public class Main {
         api.getChannelInvites("387972238256898048").queue((invites, error) -> {
             System.out.println("retrieved invites....");
             if (error != null) {
-                error.getThrowable().printStackTrace();
+                System.out.println("error");
+                log.error(error.getThrowable());
+                //error.getThrowable().printStackTrace();
                 return;
             }
             for (Invite invite : invites) {
