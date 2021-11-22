@@ -7,11 +7,11 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
+import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.user.User;
-import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 
@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiConsumer;
 
 public class Main {
 
@@ -108,7 +107,7 @@ public class Main {
 
         }));
 
-        api.getThreadMember("912398268238037022", "247421526532554752").queue((member, error) -> {
+        api.getThreadMemberRetriever("912398268238037022", "247421526532554752").queue((member, error) -> {
             if(error != null){
                 System.out.println("Error");
                 if(error.getThrowable() instanceof InvalidDataException){
@@ -121,6 +120,20 @@ public class Main {
 
             System.out.println(member.getJoinTimestamp());
             System.out.println(member.getUserId());
+        });
+
+        api.listThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
+            if(error != null){
+                System.out.println("Error");
+                return;
+            }
+
+            System.out.println("list thread member: ");
+
+            for(ThreadMember member : threadMembers){
+                System.out.println(member.getUserId());
+                System.out.println(member.getJoinTimestamp());
+            }
         });
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());

@@ -14,7 +14,6 @@ import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -470,11 +469,30 @@ public class LApi {
      * @param channelId the id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread}, the user is a member of
      * @param userId the {@link User#getId() user id}
      * @return {@link Queueable} to retrieve the {@link ThreadMember} matching given user in given thread
+     * @see GetLinkQuery.Links#GET_THREAD_MEMBER
      */
-    public @NotNull Queueable<ThreadMember> getThreadMember(@NotNull String channelId, @NotNull String userId){
+    public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_THREAD_MEMBER,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
         return new ConvertingRetriever<ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+    }
+
+    /**
+     * <p>
+     *     Returns array of thread members objects that are members of the thread.
+     * </p>
+     * <p>
+     *     This endpoint is restricted according to whether the GUILD_MEMBERS Privileged Intent is enabled for your application.
+     * </p>
+     * TODO add @links
+     * @param channelId the channel id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread}
+     * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
+     * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
+     */
+    public @NotNull Queueable<ArrayList<ThreadMember>> listThreadMembersRetriever(@NotNull String channelId){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ArrayRetriever<Data, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     //Getter
