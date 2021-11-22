@@ -122,7 +122,7 @@ public class Main {
             System.out.println(member.getUserId());
         });
 
-        api.listThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
+        api.getListThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
             if(error != null){
                 System.out.println("Error");
                 return;

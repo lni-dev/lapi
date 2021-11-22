@@ -17,6 +17,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
@@ -79,7 +80,7 @@ public class LApi {
             @Override
             @SuppressWarnings({"InfiniteLoopStatement"})
             public void run() {
-                queueThread = (QueueThread) Thread.currentThread();
+                queueThread = (QueueThread) java.lang.Thread.currentThread();
                 log.log("Started queue thread: " + queueThread.getName());
                 try {
                     while (true) {
@@ -240,7 +241,7 @@ public class LApi {
      * @throws LApiRuntimeException if the currentThread is the queue Thread
      */
     public void checkQueueThread() throws LApiRuntimeException {
-        if(Thread.currentThread().equals(queueThread)){
+        if(java.lang.Thread.currentThread().equals(queueThread)){
             throw new LApiRuntimeException("You cannot invoke Future.get() or Queueable.completeHere() on the queue-thread" +
                     ", because this could lead to an infinite wait loop. You should also not wait or sleep the " +
                     "queue-thread, because this will delay all other queued Futures");
@@ -489,10 +490,31 @@ public class LApi {
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
      */
-    public @NotNull Queueable<ArrayList<ThreadMember>> listThreadMembersRetriever(@NotNull String channelId){
+    public @NotNull Queueable<ArrayList<ThreadMember>> getListThreadMembersRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ArrayRetriever<Data, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+    }
+
+    /**
+     * <p>
+     *     Returns all active threads in the channel, including public and private threads. Threads are ordered by their id, in descending order.
+     * </p>
+     * <p>
+     *     This route is deprecated and will be removed in v10. It is replaced by List Active Guild Threads.
+     * </p>
+     * TODO add LIST_ACTIVE_GUILD_THREADS @link
+     * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Thread threads} from
+     * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link Thread threads}
+     * @see GetLinkQuery.Links#LIST_ACTIVE_THREADS
+     */
+    @SuppressWarnings("removal")
+    @Deprecated(since = "api v10", forRemoval = true)
+    public @NotNull Queueable<ArrayList<Thread>> getListActiveThreadsRetriever(@NotNull String channelId){
+        //TODO response body
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_ACTIVE_THREADS,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ArrayRetriever<Data, Thread>(this, query, (lApi, data) -> (Thread) Channel.fromData(lApi, data));
     }
 
     //Getter
