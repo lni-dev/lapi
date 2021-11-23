@@ -32,21 +32,11 @@ public class Main {
         Config config = new Config(0, null);
         LApi api = new LApi(Private.TOKEN, config);
 
-        //Retrieve the Message with id=912377554105688074 inside the channel with id=912377387868639282
-        Queueable<Message> msgRetriever
-                = api.getChannelMessageRetriever(
-                        "912377387868639282",
-                        "912377554105688074");
-        msgRetriever.queue((message, error) -> {
-            //This will be executed once the message has been retrieved
-            if(error != null){
-                System.out.println("Error!");
-                return;
-            }
+        User currentUser = api.getCurrentUserRetriever().queueAndWait();
 
-            System.out.println(message.getContent());
-        });
-
+        System.out.println(currentUser.getUsername());
+        System.out.println(currentUser.isBot());
+        System.out.println(currentUser.getId());
 
         // Private Message
         // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
@@ -124,7 +114,7 @@ public class Main {
             System.out.println(member.getUserId());
         });
 
-        api.getListThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
+        api.getThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
             if(error != null){
                 System.out.println("Error");
                 return;
@@ -139,7 +129,7 @@ public class Main {
         });
 
 
-        api.getListActiveThreadsRetriever("912377387868639282").queue((threadResponseBody, error) -> {
+        api.getActiveThreadsRetriever("912377387868639282").queue((threadResponseBody, error) -> {
             if(error != null){
                 System.out.println("Error");
                 System.out.println(((InvalidDataException) error.getThrowable()).getData().getJsonString());
@@ -158,7 +148,7 @@ public class Main {
             System.out.println(threadResponseBody.hasMore());
         });
 
-        api.getListPublicArchivedThreadsRetriever("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
+        api.getPublicArchivedThreadsRetriever("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
             if(error != null){
                 System.out.println("Error");
                 return;
@@ -177,6 +167,8 @@ public class Main {
             System.out.println(listThreadsResponseBody.hasMore());
 
         });
+
+
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
         LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);

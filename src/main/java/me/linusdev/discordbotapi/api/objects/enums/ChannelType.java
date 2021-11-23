@@ -72,7 +72,9 @@ public enum ChannelType implements SimpleDatable {
     GUILD_PUBLIC_THREAD(11, "Guild Public Thread", SimpleChannelType.THREAD),
 
     /**
-     * a temporary sub-channel within a GUILD_TEXT channel that is only viewable by those invited and those with the MANAGE_THREADS permission
+     * a temporary sub-channel within a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel
+     * that is only viewable by those invited and those with the
+     * {@link Permissions#MANAGE_THREADS MANAGE_THREADS} permission
      */
     GUILD_PRIVATE_THREAD(12, "Guild Private Chat", SimpleChannelType.THREAD),
 

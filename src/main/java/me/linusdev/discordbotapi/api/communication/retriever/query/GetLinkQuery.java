@@ -26,6 +26,13 @@ public class GetLinkQuery implements Query{
     public static final String _KEY = "";
 
     public enum Links{
+
+        /*
+         *
+         * Channel https://discord.com/developers/docs/resources/channel#channels-resource
+         *
+         */
+
         /**
          * Get a {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel} by ID.
          * Returns a {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel object}.
@@ -234,6 +241,66 @@ public class GetLinkQuery implements Query{
          * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params" target="_top"> Query String Params</a>
          */
         LIST_JOINED_PRIVATE_ARCHIVED_THREADS(O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/users/@me/threads/archived/private", true),
+
+
+
+        /*
+         *
+         * User https://discord.com/developers/docs/resources/user#users-resource
+         *
+         */
+
+        /**
+         * <p>
+         *     Returns the {@link me.linusdev.discordbotapi.api.objects.user.User user object} of the requester's account. For OAuth2, this requires the identify scope,
+         *     which will return the object without an email, and optionally the email scope,
+         *     which returns the object with an email.
+         * </p>
+         *
+         * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user" target="_top">Get Current User</a>
+         */
+        GET_CURRENT_USER(O_DISCORD_API_VERSION_LINK + "users/@me"),
+
+        /**
+         * Returns a {@link me.linusdev.discordbotapi.api.objects.user.User user object} for a given user ID.
+         *
+         * @see <a href="https://discord.com/developers/docs/resources/user#get-user" target="_top">Get User</a>
+         * @see PlaceHolder#USER_ID
+         */
+        GET_USER(O_DISCORD_API_VERSION_LINK + "users/" + USER_ID),
+
+        /**
+         * Returns a list of partial {@link me.linusdev.discordbotapi.api.objects.toodo.Guild guild} objects the current user is a member of. Requires the guilds OAuth2 scope.
+         * <br><br>
+         * <h3 style="margin:0;padding:0">
+         *     This can have Query String parameters:<br>
+         * </h3>
+         * <ul style="margin:0;padding:0">
+         *     <li>
+         *         {@value #BEFORE_KEY}: get guilds before this guild ID
+         *     </li>
+         *     <li>
+         *         {@value #AFTER_KEY}: get guilds after this guild ID
+         *     </li>
+         *     <li>
+         *         {@value #LIMIT_KEY}: max number of guilds to return (1-200). Default: 200
+         *     </li>
+         * </ul>
+         *
+         * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds" target="_top">Get Current User Guilds</a>
+         * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds-query-string-params" target="_top">Query String Params</a>
+         */
+        GET_CURRENT_USER_GUILDS(O_DISCORD_API_VERSION_LINK + "users/@me/guilds"),
+
+        /**
+         * Returns a list of {@link me.linusdev.discordbotapi.api.objects.user.connection.Connection connection}
+         * objects. Requires the connections OAuth2 scope.
+         *
+         * @see <a href="https://discord.com/developers/docs/resources/user#get-user-connections" target="_top">Get User Connections</a>
+         */
+        GET_CURRENT_USER_CONNECTIONS(O_DISCORD_API_VERSION_LINK + "users/@me/connections"),
+
+
         ;
 
         private final String link;
