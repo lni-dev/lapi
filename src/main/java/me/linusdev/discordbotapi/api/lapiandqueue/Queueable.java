@@ -20,7 +20,7 @@ import java.util.function.Consumer;
  *
  * <p>
  *     Usually the {@link Future#result result} of the {@link Queueable} should be processed right after it has been retrieved.
- *     This can be achieved using Listeners like {@link Future#then(BiConsumer)}. These can be set directly when queuing by
+ *     This can be achieved by using listeners like {@link Future#then(BiConsumer)}. These can be set directly when queuing by
  *     calling {@link Queueable#queue(BiConsumer)} or {@link Queueable#queue(Consumer)}.
  *     <b style="color:red">{@link Object#wait()}, {@link Thread#sleep(long)} or any other waiting tasks may never be called inside these listeners!</b>.
  *     This will delay the queue and could lead to an infinite {@link Object#wait()}
@@ -77,7 +77,7 @@ public abstract class Queueable<T> implements HasLApi {
      * @see LApi#queue(Queueable) LApi.queue(Queueable)
      */
     public @NotNull Future<T> queue(){
-        return getLApi().queue(this);
+        return getLApi().queue(this, null, null, null);
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class Queueable<T> implements HasLApi {
      * @see Future#then(BiConsumer)
      */
     public @NotNull Future<T> queue(BiConsumer<T, Error> then){
-        return queue().then(then);
+        return getLApi().queue(this, then, null, null);
     }
 
     /**
@@ -113,8 +113,8 @@ public abstract class Queueable<T> implements HasLApi {
      * @see #queue()
      * @see Future#then(Consumer)
      */
-    public @NotNull Future<T> queue(Consumer<T> then){
-        return queue().then(then);
+    public @NotNull Future<T> queue(Consumer<T> thenSingle){
+        return getLApi().queue(this, null, thenSingle, null);
     }
 
     /**
@@ -126,7 +126,7 @@ public abstract class Queueable<T> implements HasLApi {
      * @see Future#beforeComplete(Consumer)
      */
     public @NotNull Future<T> queueAndSetBeforeComplete(Consumer<Future<T>> beforeComplete){
-        return queue().beforeComplete(beforeComplete);
+        return getLApi().queue(this, null, null, beforeComplete);
     }
 
     /**

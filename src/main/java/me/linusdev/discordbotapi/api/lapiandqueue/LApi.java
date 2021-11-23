@@ -26,6 +26,7 @@ import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,8 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 
@@ -144,11 +147,17 @@ public class LApi {
      *
      *
      * @param queueable {@link Queueable}
+     * @param beforeComplete {@link Future#beforeComplete(Consumer)} will be set with given {@link Consumer}, if beforeComplete is not {@code null}
+     * @param then {@link Future#then(BiConsumer)} will be set with given {@link BiConsumer}, if then is not {@code null}
+     * @param thenSingle {@link Future#then(Consumer)} will be set with given {@link Consumer}, if thenSingle is not {@code null}
      * @param <T> Return Type of {@link Queueable}
      * @return {@link Future<T>}
      */
-    public <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable){
+    protected <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete){
         final Future<T> future = new Future<T>(queueable);
+        if(beforeComplete != null) future.beforeComplete(beforeComplete);
+        if(then != null) future.then(then);
+        if(thenSingle != null) future.then(thenSingle);
         this.queue(future);
         return future;
     }
@@ -493,7 +502,7 @@ public class LApi {
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
      */
-    public @NotNull Queueable<ArrayList<ThreadMember>> getListThreadMembersRetriever(@NotNull String channelId){
+    public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ArrayRetriever<Data, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
@@ -514,7 +523,7 @@ public class LApi {
      */
     @SuppressWarnings("removal")
     @Deprecated(since = "api v10", forRemoval = true)
-    public @NotNull Queueable<ListThreadsResponseBody> getListActiveThreadsRetriever(@NotNull String channelId){
+    public @NotNull Queueable<ListThreadsResponseBody> getActiveThreadsRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_ACTIVE_THREADS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
@@ -531,14 +540,19 @@ public class LApi {
      *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
+     * </p>
+     *
      * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
-     * @param before optional returns threads before this timestamp. {@code null} if you want from the start
+     * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getListPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
+    public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
 
         Data queryStringsData = null;
         if(before != null || limit != null) {
@@ -550,6 +564,161 @@ public class LApi {
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+    }
+
+    /**
+     * <p>
+     *     Returns archived threads in the channel that are public.
+     *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_TEXT GUILD_TEXT} channel,
+     *     returns threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_PUBLIC_THREAD}.
+     *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
+     *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
+     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     * </p>
+     *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more with {@link #getPublicArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId) {
+        return getPublicArchivedThreadsRetriever(channelId, null, null);
+    }
+
+    /**
+     *
+     * <p>
+     *     Returns archived threads in the channel that are of {@link Channel#getType() type}
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
+     *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
+     *     Requires both the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permissions.
+     * </p>
+     *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
+     * @param limit optional maximum number of threads to return. {@code null} if you want no limit
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_PRIVATE_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
+        Data queryStringsData = null;
+        if(before != null || limit != null) {
+            queryStringsData = new Data(2);
+            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+        }
+
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+    }
+
+    /**
+     *
+     * <p>
+     *     Returns archived threads in the channel that are of {@link Channel#getType() type}
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
+     *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
+     *     Requires both the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permissions.
+     * </p>
+     *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} with
+     *     {@link #getPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_PRIVATE_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     * @see #getPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId){
+        return getPrivateArchivedThreadsRetriever(channelId, null, null);
+    }
+
+    /**
+     * <p>
+     *     Returns archived threads in the channel that are of {@link Channel#getType() type}
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
+     *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
+     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     * </p>
+     *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
+     * @param limit optional maximum number of threads to return. {@code null} if you want no limit
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
+        Data queryStringsData = null;
+        if(before != null || limit != null) {
+            queryStringsData = new Data(2);
+            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+        }
+
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+    }
+
+    /**
+     * <p>
+     *     Returns archived threads in the channel that are of {@link Channel#getType() type}
+     *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
+     *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
+     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     * </p>
+     *
+     * <p>
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} with
+     *     {@link #getJoinedPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     * @see #getJoinedPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId) {
+        return getJoinedPrivateArchivedThreadsRetriever(channelId, null, null);
+    }
+
+    /**
+     * <p>
+     *     Returns the {@link me.linusdev.discordbotapi.api.objects.user.User user object} of the requester's account. For OAuth2, this requires the identify scope,
+     *     which will return the object without an email, and optionally the email scope,
+     *     which returns the object with an email.
+     * </p>
+     *
+     * @return {@link Queueable} to retrieve the current {@link User user} (your bot)
+     * @see GetLinkQuery.Links#GET_CURRENT_USER
+     */
+    public @NotNull Queueable<User> getCurrentUserRetriever(){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CURRENT_USER);
+        return new ConvertingRetriever<>(this, query, User::fromData);
     }
 
     //Getter
