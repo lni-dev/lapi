@@ -66,6 +66,17 @@ public class InvalidDataException extends LApiException{
         return data;
     }
 
+    @Override
+    public String getMessage() {
+        String msg = super.getMessage() + " Missing or null fields: ";
+
+        for(String s : missingFields){
+            msg += s + ", ";
+        }
+
+        return msg;
+    }
+
     /**
      *
      * @param data Invalid {@link Data}

@@ -15,13 +15,16 @@ import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
+import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
@@ -505,16 +508,48 @@ public class LApi {
      * </p>
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
      * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Thread threads} from
-     * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link Thread threads}
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see GetLinkQuery.Links#LIST_ACTIVE_THREADS
+     * @see ListThreadsResponseBody
      */
     @SuppressWarnings("removal")
     @Deprecated(since = "api v10", forRemoval = true)
-    public @NotNull Queueable<ArrayList<Thread>> getListActiveThreadsRetriever(@NotNull String channelId){
-        //TODO response body
+    public @NotNull Queueable<ListThreadsResponseBody> getListActiveThreadsRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_ACTIVE_THREADS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, Thread>(this, query, (lApi, data) -> (Thread) Channel.fromData(lApi, data));
+        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+    }
+
+    /**
+     * <p>
+     *     Returns archived threads in the channel that are public.
+     *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_TEXT GUILD_TEXT} channel,
+     *     returns threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_PUBLIC_THREAD}.
+     *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
+     *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
+     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
+     * @param before optional returns threads before this timestamp. {@code null} if you want from the start
+     * @param limit optional maximum number of threads to return. {@code null} if you want no limit
+     * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
+     * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
+     * @see ListThreadsResponseBody
+     */
+    public @NotNull Queueable<ListThreadsResponseBody> getListPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
+
+        Data queryStringsData = null;
+        if(before != null || limit != null) {
+            queryStringsData = new Data(2);
+            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+        }
+
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
     }
 
     //Getter

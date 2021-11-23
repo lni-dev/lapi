@@ -7,6 +7,7 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
+import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
@@ -20,6 +21,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
+@SuppressWarnings("removal")
 public class Main {
 
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
@@ -134,6 +136,46 @@ public class Main {
                 System.out.println(member.getUserId());
                 System.out.println(member.getJoinTimestamp());
             }
+        });
+
+
+        api.getListActiveThreadsRetriever("912377387868639282").queue((threadResponseBody, error) -> {
+            if(error != null){
+                System.out.println("Error");
+                System.out.println(((InvalidDataException) error.getThrowable()).getData().getJsonString());
+                return;
+            }
+            System.out.println("getListActiveThreadsRetriever...");
+
+            for(Thread thread : threadResponseBody.getThreads()){
+                System.out.println(thread.getName());
+            }
+
+            for(ThreadMember member : threadResponseBody.getMembers()){
+                System.out.println(member.getUserId());
+            }
+
+            System.out.println(threadResponseBody.hasMore());
+        });
+
+        api.getListPublicArchivedThreadsRetriever("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
+            if(error != null){
+                System.out.println("Error");
+                return;
+            }
+
+            System.out.println("getListPublicArchivedThreadsRetriever...");
+
+            for(Thread thread : listThreadsResponseBody.getThreads()){
+                System.out.println(thread.getName());
+            }
+
+            for(ThreadMember member : listThreadsResponseBody.getMembers()){
+                System.out.println(member.getUserId());
+            }
+
+            System.out.println(listThreadsResponseBody.hasMore());
+
         });
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
