@@ -721,6 +721,26 @@ public class LApi {
         return new ConvertingRetriever<>(this, query, User::fromData);
     }
 
+    /**
+     *
+     * <p>
+     *     Returns a {@link me.linusdev.discordbotapi.api.objects.user.User user object} for a given user ID.
+     * </p>
+     *
+     * <p>
+     *     You can probably retrieve every user, even if your bot does not share guild with them
+     * </p>
+     *
+     * @param userId the id of the {@link User user} you want to retrieve
+     * @return {@link Queueable} to retrieve {@link User user} with given id
+     * @see GetLinkQuery.Links#GET_USER
+     */
+    public @NotNull Queueable<User> getUserRetriever(@NotNull String userId){
+        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_USER,
+                new PlaceHolder(PlaceHolder.USER_ID, userId));
+        return new ConvertingRetriever<>(this, query, User::fromData);
+    }
+
     //Getter
 
     public LApiHttpHeader getAuthorizationHeader() {

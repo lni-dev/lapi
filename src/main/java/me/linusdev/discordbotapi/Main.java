@@ -168,6 +168,20 @@ public class Main {
 
         });
 
+        api.getUserRetriever("378980330281107457").queue((user, error) -> {
+            if(error != null){
+                System.out.println("Error");
+                error.getThrowable().printStackTrace();
+                if(error.getThrowable() instanceof InvalidDataException){
+                    System.out.println("Invalid Data:");
+                    System.out.println(((InvalidDataException) error.getThrowable()).getData().getJsonString());
+                }
+                return;
+            }
+
+            System.out.println("Username: " + user.getUsername());
+        });
+
 
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());

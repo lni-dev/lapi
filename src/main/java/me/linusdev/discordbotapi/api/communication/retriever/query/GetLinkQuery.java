@@ -262,7 +262,9 @@ public class GetLinkQuery implements Query{
         GET_CURRENT_USER(O_DISCORD_API_VERSION_LINK + "users/@me"),
 
         /**
-         * Returns a {@link me.linusdev.discordbotapi.api.objects.user.User user object} for a given user ID.
+         * <p>
+         *     Returns a {@link me.linusdev.discordbotapi.api.objects.user.User user object} for a given user ID.
+         * </p>
          *
          * @see <a href="https://discord.com/developers/docs/resources/user#get-user" target="_top">Get User</a>
          * @see PlaceHolder#USER_ID
