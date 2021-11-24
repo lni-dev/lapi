@@ -10,6 +10,7 @@ import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpHeaders;
@@ -78,7 +79,7 @@ public class LApiHttpRequest {
      * @return built {@link HttpRequest}
      * @throws IllegalRequestMethodException if {@link #body} is {@code null} and {@link #method} is not {@link Method#GET GET} or {@link Method#DELETE DELETE}
      */
-    public HttpRequest getHttpRequest() throws IllegalRequestMethodException {
+    public HttpRequest getHttpRequest() throws IllegalRequestMethodException, IOException {
         LogInstance log = Logger.getLogger(this.getClass().getSimpleName(), Logger.Type.INFO);
         StringBuilder uri = new StringBuilder(this.uri);
         //Add query string params
@@ -234,7 +235,7 @@ public class LApiHttpRequest {
                 });
             }
 
-        } catch (IllegalRequestMethodException e) {
+        } catch (Exception e) {
             stringBuilder.append("Exception: ").append(e.getMessage());
         }
 

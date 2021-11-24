@@ -5,6 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +66,7 @@ public class Reaction implements Datable, HasLApi {
             throw exception;
         }
 
-        return new Reaction(lApi, count.intValue(), mee, me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, emojiData));
+        return new Reaction(lApi, count.intValue(), mee, EmojiObject.fromData(lApi, emojiData));
     }
 
     /**
@@ -85,8 +86,8 @@ public class Reaction implements Datable, HasLApi {
     /**
      * 	partial emoji object with emoji information
      *
-     * This {@link Emoji} has {@link Emoji#getId()}, {@link Emoji#getName()} and {@link me.linusdev.discordbotapi.api.objects.emoji.Emoji#isAnimated()} if it is an animated Emoji
-     * <br> {@link Emoji#getId()} may be {@code null} for Standard Emojis ({@link me.linusdev.discordbotapi.api.objects.emoji.Emoji#isStandardEmoji()})
+     * This {@link Emoji} has {@link Emoji#getId()}, {@link Emoji#getName()} and {@link EmojiObject#isAnimated()} if it is an animated Emoji
+     * <br> {@link Emoji#getId()} may be {@code null} for Standard Emojis ({@link EmojiObject#isStandardEmoji()})
      */
     public @NotNull Emoji getEmoji() {
         return emoji;

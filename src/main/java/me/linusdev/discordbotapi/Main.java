@@ -3,11 +3,14 @@ package me.linusdev.discordbotapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.file.types.FileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
@@ -18,15 +21,21 @@ import me.linusdev.discordbotapi.api.objects.message.component.button.Button;
 import me.linusdev.discordbotapi.api.objects.message.component.button.ButtonStyle;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.message.embed.EmbedBuilder;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import me.linusdev.discordbotapi.api.templates.attachment.AttachmentTemplate;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
+import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
+import me.linusdev.discordbotapi.api.templates.message.builder.TimestampStyle;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("removal")
 public class Main {
@@ -189,15 +198,20 @@ public class Main {
             System.out.println("Username: " + user.getUsername());
         });
 
-        api.createMessage("765540882387828746", new MessageTemplate("look below", false,
+        api.createMessage("912377387868639282", new MessageTemplate("look below", false,
                 new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
-                new Component[]{new ActionRow(api, ComponentType.ACTION_ROW,
+                null, null, new Component[]{new ActionRow(api, ComponentType.ACTION_ROW,
                         new Component[]{new Button(api, ComponentType.BUTTON,
                                 ButtonStyle.Link, "Klick mich UwU",
                                 null, null, "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
                                 null)}
-                )}, null
-        )).queue((message, error) -> {
+                )}, null,
+                new Attachment[]{
+                        new AttachmentTemplate("image.png",
+                                "fun image",
+                                Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
+                                FileType.PNG).setAttachmentId(0)
+        }));/*.queue((message, error) -> {
             if(error != null){
                 System.out.println("Error");
                 InvalidDataException e = (InvalidDataException)error.getThrowable();
@@ -206,8 +220,33 @@ public class Main {
             }
 
             System.out.println(message.getContent());
+            for(Attachment attachment : message.getAttachments()){
+                System.out.println(attachment.getId());
+                System.out.println(attachment.getDescription());
+            }
 
+        });*/
+
+        new MessageBuilder(api, null)
+                .setTTS(false)
+                .appendContent("Hi ")
+                .appendUserMention("765495017552478208")
+                .appendContent(", how are you doing?")
+                .appendContent("<@247421526532554752>")
+                .appendEmoji(new EmojiObject(api, Snowflake.fromString("776601688961712148"), "closecirclefill_red", null, null, null, null, false, null))
+                .appendTimestamp(System.currentTimeMillis(), TimeUnit.MILLISECONDS, TimestampStyle.LONG_DATE_WITH_TIME)
+                .getQueueable("912377387868639282")
+                .queue();
+
+        api.getChannelMessageRetriever("912377387868639282", "913107065285800026").queue(message -> {
+            String content = message.getContent();
+            Reaction reaction = message.getReactions()[1];
+            System.out.println(reaction.getData().getJsonString());
+            System.out.println(content);
         });
+
+        //7534015381736783882
+        //rainbowEnergy
 
         /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
         LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);

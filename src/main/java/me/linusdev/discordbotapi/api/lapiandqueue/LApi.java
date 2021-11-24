@@ -50,6 +50,11 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
 
 public class LApi {
 
+    /**
+     * The Discord id of the creator of this api UwU
+     */
+    public static final String CREATOR_ID = "247421526532554752";
+
     private static final String LAPI_URL = "https://twitter.com/Linus_Dev";
     private static final String LAPI_VERSION = "1.0";
 

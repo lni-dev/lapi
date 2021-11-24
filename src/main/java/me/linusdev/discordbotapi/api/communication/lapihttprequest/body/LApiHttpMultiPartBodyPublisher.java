@@ -3,6 +3,7 @@ package me.linusdev.discordbotapi.api.communication.lapihttprequest.body;
 import me.linusdev.data.parser.JsonParser;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -84,7 +85,7 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
 
     private final byte[][] byteArrays;
 
-    public LApiHttpMultiPartBodyPublisher(@NotNull LApiHttpBody body){
+    public LApiHttpMultiPartBodyPublisher(@NotNull LApiHttpBody body) throws IOException {
         //this is the boundary string, which is also used for the header
         this.boundaryString = BOUNDARY.replace("time", Long.toString(System.currentTimeMillis()));
         //before each boundary in the content there are two extra dashes!
@@ -110,9 +111,9 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
      *
      * @return an Array of byte-arrays. These are the bytes of this body
      */
-    private byte[][] getBytes(){
+    private byte[][] getBytes() throws IOException {
 
-        byte[][] bytes = new byte[4 + (fileParts.length * 3)][];
+        byte[][] bytes = new byte[4 + (fileParts.length * 4)][];
         int i = 0;
         bytes[i++] = boundaryBytes;
 
@@ -137,10 +138,11 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
 
         for(FilePart filePart : fileParts){
             String partHeader = "Content-Disposition: form-data; name=\"files[" + filePart.getAttachmentId() + "]\"; filename=\"" + filePart.getFilename() + "\"" + END_OF_LINE +
-            "Content-Type: " + filePart.getContentType() + END_OF_LINE + END_OF_LINE;
+            "Content-Type: " + filePart.getContentType().getContentTypeAsString() + END_OF_LINE + END_OF_LINE;
 
             bytes[i++] = partHeader.getBytes(StandardCharsets.UTF_8);
             bytes[i++] = filePart.getBytes();
+            bytes[i++] = END_OF_LINE.getBytes(StandardCharsets.UTF_8); //before the boundary we need a new line!
             if(i == bytes.length -1){
                 //                  ADD LAST BOUNDARY!
                 //the last boundary has to extra dashes at the end!

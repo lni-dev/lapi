@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.objects.attachment;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.file.types.ContentType;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.discordbotapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +30,7 @@ public class PartialAttachment implements Attachment {
     protected final @NotNull Snowflake id;
     protected final @Nullable String filename;
     protected final @Nullable String description;
-    protected final @Nullable String contentType;
+    protected final @Nullable AbstractContentType contentType;
     protected final @Nullable Integer size;
     protected final @Nullable String url;
     protected final @Nullable String proxyUrl;
@@ -36,7 +38,7 @@ public class PartialAttachment implements Attachment {
     protected final @Nullable Integer width;
     protected final @Nullable Boolean ephemeral;
 
-    public PartialAttachment(@NotNull Snowflake id, @Nullable String filename, @Nullable String description, @Nullable String contentType,
+    public PartialAttachment(@NotNull Snowflake id, @Nullable String filename, @Nullable String description, @Nullable AbstractContentType contentType,
                              @Nullable Integer size, @Nullable String url, @Nullable String proxyUrl, @Nullable Integer height,
                              @Nullable Integer width, @Nullable Boolean ephemeral){
         this.id = id;
@@ -59,7 +61,7 @@ public class PartialAttachment implements Attachment {
        this.id = Snowflake.fromString(id);
        this.filename = (String) data.get(FILENAME_KEY);
        this.description = (String) data.get(DESCRIPTION_KEY);
-       this.contentType = (String) data.get(CONTENT_TYPE_KEY);
+       this.contentType = ContentType.of((String) data.get(CONTENT_TYPE_KEY));
        this.url = (String) data.get(URL_KEY);
        this.proxyUrl = (String) data.get(PROXY_URL_KEY);
        this.ephemeral = (Boolean) data.get(EPHEMERAL_KEY);
@@ -94,7 +96,7 @@ public class PartialAttachment implements Attachment {
     }
 
     @Override
-    public @Nullable String getFileName() {
+    public @Nullable String getFilename() {
         return filename;
     }
 
@@ -104,7 +106,7 @@ public class PartialAttachment implements Attachment {
     }
 
     @Override
-    public @Nullable String getContentType() {
+    public @Nullable AbstractContentType getContentType() {
         return contentType;
     }
 

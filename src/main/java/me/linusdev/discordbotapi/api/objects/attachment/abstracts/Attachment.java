@@ -1,8 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.attachment.abstracts;
 
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -16,20 +16,25 @@ public interface Attachment extends Datable {
 
     /**
      * attachment id as {@link Snowflake}
+     *
+     * If you upload a new Attachment, this may be {@code null}
      */
-    @NotNull Snowflake getIdAsSnowflake();
+    @Nullable Snowflake getIdAsSnowflake();
 
     /**
      * attachment id as {@link String}
+     *
+     * If you upload a new Attachment, this may be {@code null}
      */
-    default @NotNull String getId(){
+    default @Nullable String getId(){
+        if(getIdAsSnowflake() == null) return null;
         return getIdAsSnowflake().asString();
     }
 
     /**
      * name of file attached
      */
-    @Nullable String getFileName();
+    @Nullable String getFilename();
 
     /**
      * description for the file
@@ -40,7 +45,7 @@ public interface Attachment extends Datable {
      * the attachment's media type
      * @see <a href="https://en.wikipedia.org/wiki/Media_type" target="_top">media type</a>
      */
-    @Nullable String getContentType();
+    @Nullable AbstractContentType getContentType();
 
     /**
      * size of file in bytes

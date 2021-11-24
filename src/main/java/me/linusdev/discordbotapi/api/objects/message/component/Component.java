@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  *     </a>
  * </h2>
  * <p>
- *     Components, aside from {@link ActionRow Action Rows}, must have a custom_id field ({@link Button#getCustomId(), {@link SelectMenu#getCustomId()}}).
+ *     Components, aside from {@link ActionRow Action Rows}, must have a custom_id field ({@link Button#getCustomId()}, {@link SelectMenu#getCustomId()}).
  *     This field is defined by the developer (yes, YOU) when sending the component payload,
  *     and is returned in the {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction} payload sent when a user interacts with the component.
  *     For example, if you set custom_id: click_me on a button,

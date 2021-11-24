@@ -1,7 +1,10 @@
 package me.linusdev.discordbotapi.api.communication.lapihttprequest.body;
 
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractContentType;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -23,7 +26,9 @@ public interface FilePart {
     /**
      * An Array of bytes to send in the {@link me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest HttpRequest}
      */
-    byte[] getBytes();
+    default byte[] getBytes() throws IOException {
+        return Files.readAllBytes(getPath());
+    }
 
     /**
      * The id of this attachment. For you to set, must be unique per message
@@ -33,5 +38,5 @@ public interface FilePart {
     /**
      * The Http content type of this file. For example: image/gif or image/png
      */
-    @NotNull String getContentType();
+    @NotNull AbstractContentType getContentType();
 }

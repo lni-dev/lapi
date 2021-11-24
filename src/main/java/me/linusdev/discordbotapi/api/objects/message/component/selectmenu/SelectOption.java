@@ -5,6 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +67,7 @@ public class SelectOption implements Datable, HasLApi {
         }
 
         return new SelectOption(lApi, label, value, description,
-                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, data), default_);
+                emoji == null ? null : EmojiObject.fromData(lApi, data), default_);
     }
 
     /**

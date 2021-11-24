@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.attachment;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Attachment extends PartialAttachment {
 
-    public Attachment(@NotNull Snowflake id, @NotNull String filename, @Nullable String description, @Nullable String contentType, @NotNull Integer size, @NotNull String url, @NotNull String proxyUrl, @Nullable Integer height, @Nullable Integer width, @Nullable Boolean ephemeral) {
+    public Attachment(@NotNull Snowflake id, @NotNull String filename, @Nullable String description, @Nullable AbstractContentType contentType, @NotNull Integer size, @NotNull String url, @NotNull String proxyUrl, @Nullable Integer height, @Nullable Integer width, @Nullable Boolean ephemeral) {
         super(id, filename, description, contentType, size, url, proxyUrl, height, width, ephemeral);
     }
 
@@ -44,8 +45,8 @@ public class Attachment extends PartialAttachment {
 
 
     @Override
-    public @NotNull String getFileName() {
-        return super.getFileName();
+    public @NotNull String getFilename() {
+        return super.getFilename();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class Attachment extends PartialAttachment {
     }
 
     @Override
-    public @Nullable String getContentType() {
+    public @Nullable AbstractContentType getContentType() {
         return super.getContentType();
     }
 

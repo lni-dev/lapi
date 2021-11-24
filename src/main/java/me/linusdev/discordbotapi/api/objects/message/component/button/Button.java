@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentLimits;
@@ -109,7 +110,7 @@ public class Button implements Component, HasLApi {
         }
 
         return new Button(lApi, ComponentType.fromValue(type.intValue()), ButtonStyle.fromValue(style.intValue()), label,
-                emoji == null ? null : me.linusdev.discordbotapi.api.objects.emoji.Emoji.fromData(lApi, emoji), customId, url, disabled);
+                emoji == null ? null : EmojiObject.fromData(lApi, emoji), customId, url, disabled);
     }
 
     @Override
@@ -132,8 +133,8 @@ public class Button implements Component, HasLApi {
     }
 
     /**
-     * partial {@link Emoji} or {@link me.linusdev.discordbotapi.api.objects.emoji.Emoji} with:
-     * <br> {@link Emoji#getId() id}, {@link Emoji#getName() name}, and {@link me.linusdev.discordbotapi.api.objects.emoji.Emoji#isAnimated() animated}
+     * partial {@link Emoji} or {@link EmojiObject} with:
+     * <br> {@link Emoji#getId() id}, {@link Emoji#getName() name}, and {@link EmojiObject#isAnimated() animated}
      */
     public @Nullable Emoji getEmoji() {
         return emoji;

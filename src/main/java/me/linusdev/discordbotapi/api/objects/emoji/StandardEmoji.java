@@ -1903,6 +1903,11 @@ public enum StandardEmoji implements Emoji {
         return hexCode;
     }
 
+    @Override
+    public boolean isAnimated() {
+        return false;
+    }
+
     /**
      * a {@link Data} for this Standard Emoji. Useful for generating JSON
      */
@@ -1910,8 +1915,8 @@ public enum StandardEmoji implements Emoji {
     public @NotNull Data getData() {
         Data data = new Data(2);
 
-        data.add(me.linusdev.discordbotapi.api.objects.emoji.Emoji.ID_KEY, null);
-        data.add(me.linusdev.discordbotapi.api.objects.emoji.Emoji.NAME_KEY, getUnicodeString());
+        data.add(EmojiObject.ID_KEY, null);
+        data.add(EmojiObject.NAME_KEY, getUnicodeString());
 
         return data;
     }
