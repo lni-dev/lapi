@@ -18,8 +18,8 @@ public class PlaceHolder {
 
     /**
      *
-     * @param name {@link #GUILD_ID}, {@link #USER_ID}, {@link #CHANNEL_ID}, {@link #TOKEN}, {@link #LAPI_URL} or {@link +LAPI_VERSION}
-     * @param value
+     * @param name {@link #GUILD_ID}, {@link #USER_ID}, {@link #CHANNEL_ID}, {@link #TOKEN}, {@link #LAPI_URL} or {@link #LAPI_VERSION}
+     * @param value the value the placeholder should be replaced with
      */
     public PlaceHolder(String name, String value){
         this.name = name;

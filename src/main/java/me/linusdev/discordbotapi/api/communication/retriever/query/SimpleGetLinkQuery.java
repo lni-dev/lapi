@@ -8,12 +8,14 @@ import org.jetbrains.annotations.NotNull;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK;
 
+/**
+ * This class will probably be removed, it is replaced by {@link GetLinkQuery}
+ */
+@Deprecated
 public class SimpleGetLinkQuery implements Query {
 
     public enum Links{
         GET_BOT_APPLICATION(O_DISCORD_API_VERSION_LINK + "oauth2/applications/@me"),
-        GET_SELF_USER(O_DISCORD_API_VERSION_LINK + "users/@me"),
-        GET_SELF_USER_GUILDS(O_DISCORD_API_VERSION_LINK + "users/@me/guilds)"),
         GET_VOICE_REGIONS(O_DISCORD_API_VERSION_LINK + "voice/regions"),
         ;
 
@@ -49,5 +51,10 @@ public class SimpleGetLinkQuery implements Query {
     @Override
     public String asString() {
         return link.getLink();
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }

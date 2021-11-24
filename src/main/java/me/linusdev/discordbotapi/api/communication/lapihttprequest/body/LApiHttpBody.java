@@ -14,52 +14,42 @@ import java.util.ArrayList;
 public class LApiHttpBody {
 
     private @Nullable Data jsonPart;
-    private final @NotNull ArrayList<FilePart> fileParts;
+    private final @NotNull FilePart[] fileParts;
 
     //TODO single file (especially image) body
 
     /**
      *
-     * @param assumedFileAmount how many file-parts you will probably add to this Body
+     * @param fileParts the file-parts for this Body
      * @param jsonPart the json-part of this Body, may be {@code null}
      */
-    public LApiHttpBody(@Range(from = 0, to= Integer.MAX_VALUE) int assumedFileAmount, @Nullable Data jsonPart){
+    public LApiHttpBody(@Nullable Data jsonPart, FilePart[] fileParts){
         this.jsonPart = jsonPart;
-        fileParts = new ArrayList<>(assumedFileAmount);
+        this.fileParts = fileParts;
     }
 
     /**
-     * Creates a new {@link LApiHttpBody} which will probably not hold any file-parts
+     * Creates a new {@link LApiHttpBody} which will not hold any file-parts
      *
      * @param jsonPart the json-part of this Body, may be {@code null}
      */
     public LApiHttpBody(@Nullable Data jsonPart){
-        this(0, jsonPart);
+        this(jsonPart, new FilePart[0]);
     }
 
     /**
      *
-     * @param assumedFileAmount how many file-parts you will probably add to this Body
+     * @param fileParts the file-parts for this body
      */
-    public LApiHttpBody(int assumedFileAmount){
-        this(assumedFileAmount, null);
+    public LApiHttpBody(FilePart[] fileParts){
+        this(null, fileParts);
     }
 
     /**
-     * Creates a new {@link LApiHttpBody} which will probably not hold any file-parts
+     * Creates a new {@link LApiHttpBody} which will not hold any file-parts
      */
     public LApiHttpBody(){
-        this(0);
-    }
-
-    /**
-     * adds a {@link FilePart}
-     * @param filePart {@link FilePart} to add
-     * @return this
-     */
-    public LApiHttpBody addFilePart(FilePart filePart){
-        this.fileParts.add(filePart);
-        return this;
+        this(null, new FilePart[0]);
     }
 
     /**
@@ -83,7 +73,7 @@ public class LApiHttpBody {
      * @return {@code true} if this Body has file-parts, {@code false} otherwise
      */
     public boolean hasFileParts(){
-        return fileParts.size() != 0;
+        return fileParts.length != 0;
     }
 
     /**
@@ -91,7 +81,7 @@ public class LApiHttpBody {
      */
     public boolean isMultiPart(){
         //TODO in the future, this may not be true. If a single file is uploaded, we don't it a multipart
-        return fileParts.size() != 0;
+        return fileParts.length != 0;
     }
 
     /**
@@ -107,7 +97,7 @@ public class LApiHttpBody {
      * The order of the file-parts should be kept. <br>
      * You should not change the order or content of the returned {@link ArrayList}
      */
-    public @NotNull ArrayList<FilePart> getFileParts() {
+    public @NotNull FilePart[] getFileParts() {
         return fileParts;
     }
 }

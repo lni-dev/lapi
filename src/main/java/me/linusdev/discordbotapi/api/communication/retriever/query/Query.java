@@ -3,13 +3,14 @@ package me.linusdev.discordbotapi.api.communication.retriever.query;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
+import me.linusdev.discordbotapi.api.objects.HasLApi;
 
 /**
  * A {@link Query} is used to build a {@link LApiHttpRequest HttpRequest}.<br>
  * The name query might be a bit misleading. As this is not only a GET request.
  * POST, PUT, DELETE, ... may also be represented by a {@link Query}
  */
-public interface Query {
+public interface Query extends HasLApi {
 
     /**
      * The method used for this {@link Query}

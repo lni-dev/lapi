@@ -79,7 +79,7 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
      * JSON string, all "\n"s are already converted to "{@link #END_OF_LINE}". This String will also always end with a "{@link #END_OF_LINE}"
      */
     private String json;
-    private final ArrayList<FilePart> fileParts;
+    private final FilePart[] fileParts;
 
 
     private final byte[][] byteArrays;
@@ -112,7 +112,7 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
      */
     private byte[][] getBytes(){
 
-        byte[][] bytes = new byte[4 + (fileParts.size() * 3)][];
+        byte[][] bytes = new byte[4 + (fileParts.length * 3)][];
         int i = 0;
         bytes[i++] = boundaryBytes;
 

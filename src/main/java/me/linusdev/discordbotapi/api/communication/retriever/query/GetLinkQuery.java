@@ -368,4 +368,9 @@ public class GetLinkQuery implements Query{
         for(PlaceHolder p : placeHolders) uri = p.place(uri);
         return uri;
     }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
+    }
 }

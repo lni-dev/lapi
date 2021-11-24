@@ -15,6 +15,9 @@ import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
+import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
+import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
+import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -27,6 +30,7 @@ import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.other.Error;
+import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -739,6 +743,14 @@ public class LApi {
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_USER,
                 new PlaceHolder(PlaceHolder.USER_ID, userId));
         return new ConvertingRetriever<>(this, query, User::fromData);
+    }
+
+
+    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
+        Query query = new LinkQuery(this, Link.CREATE_MESSAGE, message.getBody(), null,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+
+        return new ConvertingRetriever<>(this, query, Message::new);
     }
 
     //Getter
