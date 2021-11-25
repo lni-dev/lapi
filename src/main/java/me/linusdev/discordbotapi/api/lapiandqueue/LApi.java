@@ -30,6 +30,7 @@ import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.other.Error;
+import me.linusdev.discordbotapi.api.templates.message.AllowedMentions;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
@@ -750,12 +751,72 @@ public class LApi {
         return new ConvertingRetriever<>(this, query, User::fromData);
     }
 
-
+    /**
+     * <p>
+     *     This will create a new {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message}
+     *     in the channel with given id
+     * </p>
+     *
+     * <p>
+     *     For a simple {@link MessageTemplate} creation see
+     *     {@link me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder MessageBuilder}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} the message should be created in
+     * @param message the message to create
+     * @return {@link Queueable} to create the message
+     * @see Link#CREATE_MESSAGE
+     */
     public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
         Query query = new LinkQuery(this, Link.CREATE_MESSAGE, message.getBody(), null,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
 
         return new ConvertingRetriever<>(this, query, Message::new);
+    }
+
+    /**
+     * <p>
+     *     This will create a new {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message}
+     *     in the channel with given id.
+     * </p>
+     *
+     * <p>
+     *     This allows you to control if mentions are allowed. For a better control see
+     *     {@link me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder MessageBuilder}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} the message should be created in
+     * @param content the text content of the message
+     * @param allowMentions whether this message is allowed to mention user, roles, everyone, here, etc.
+     * @return {@link Queueable} to create the message
+     * @see Link#CREATE_MESSAGE
+     */
+    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
+        return createMessage(channelId, new MessageTemplate(
+                content,
+                false, null,
+                allowMentions ? null : AllowedMentions.noneAllowed(),
+                null, null, null, null
+                ));
+    }
+
+    /**
+     * <p>
+     *     This will create a new {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message}
+     *     in the channel with given id.
+     * </p>
+     *
+     * <p>
+     *     All mentions will be allowed. For more control see {@link #createMessage(String, String, boolean)}
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} the message should be created in
+     * @param content the text content of the message
+     * @return {@link Queueable} to create the message
+     * @see Link#CREATE_MESSAGE
+     */
+    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull String content){
+        return createMessage(channelId, content,true);
     }
 
     //Getter

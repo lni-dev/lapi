@@ -3,6 +3,7 @@ package me.linusdev.discordbotapi.api.templates.message;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +60,15 @@ public class AllowedMentions implements Datable {
         this.roles = roles;
         this.users = users;
         this.repliedUser = repliedUser;
+    }
+
+    /**
+     * Creates a new {@link AllowedMentions} object, with an empty parse array. Thereby not allowing any mentions
+     */
+    @Contract(value = "-> new", pure = true)
+    @NotNull
+    public static AllowedMentions noneAllowed(){
+        return new AllowedMentions(new AllowedMentionType[0], null, null, false);
     }
 
 

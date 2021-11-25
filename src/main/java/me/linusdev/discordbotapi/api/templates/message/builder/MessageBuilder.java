@@ -72,8 +72,7 @@ public class MessageBuilder implements HasLApi {
 
     private final StringBuilder content;
 
-    private final Embed[] embeds = new Embed[10];
-    private int embedIndex = 0;
+    private ArrayList<Embed> embeds = null;
 
     private boolean tts;
 
@@ -112,10 +111,23 @@ public class MessageBuilder implements HasLApi {
     }
 
     /**
-     * checks if this would build a valid {@link MessageTemplate}
-     * @return
+     * checks if this would build a valid {@link MessageTemplate}.<br>
+     *
+     * Does not check if the Embeds have less than {@value Limits#MAX_EMBED_CHARACTERS} or
+     * if the message is within the 8 MB (including all attachments and the http request) limit.
+     *
+     * @return this
      */
-    public MessageBuilder check(){
+    public MessageBuilder check() throws LimitException {
+        if(content.length() > Limits.MAX_CONTENT_CHARACTERS)
+            throw new LimitException("Message content may not be bigger than " + Limits.MAX_CONTENT_CHARACTERS + " characters");
+
+        if(embeds != null && embeds.size() > Limits.MAX_EMBEDS)
+            throw new LimitException("Message may not have more than " + Limits.MAX_EMBEDS + " embeds");
+
+        if(stickerIds != null && stickerIds.size() > Limits.MAX_STICKERS)
+            throw new LimitException("Message may not have more than " + Limits.MAX_STICKERS + " stickers");
+
         //TODO
         return this;
     }
@@ -124,7 +136,7 @@ public class MessageBuilder implements HasLApi {
      * Will {@link #check()} and then build a {@link MessageTemplate}
      * @return {@link MessageTemplate} built with this builder
      */
-    public MessageTemplate build(){
+    public MessageTemplate build() throws LimitException {
         return build(true);
     }
 
@@ -133,14 +145,14 @@ public class MessageBuilder implements HasLApi {
      * @param check whether to {@link #check()} before building
      * @return {@link MessageTemplate} built with this builder
      */
-    public MessageTemplate build(boolean check){
+    public MessageTemplate build(boolean check) throws LimitException {
 
         if(check) check();
 
         return new MessageTemplate(
                 content.toString(),
                 tts,
-                embedIndex == 0 ? null : embeds,
+                embeds == null ? null : embeds.toArray(new Embed[0]),
                 new AllowedMentions(
                         parse == null ? null : parse.toArray(new AllowedMentionType[0]),
                         roles == null ? null : roles.toArray(new String[0]),
@@ -158,7 +170,7 @@ public class MessageBuilder implements HasLApi {
      * @param channelId the id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
-    public Queueable<Message> getQueueable(@NotNull String channelId){
+    public Queueable<Message> getQueueable(@NotNull String channelId) throws LimitException {
         return lApi.createMessage(channelId, build());
     }
 
@@ -412,11 +424,10 @@ public class MessageBuilder implements HasLApi {
      *
      * @param embed the {@link Embed} to add
      * @return this
-     * @throws LimitException if you are trying to add more than 10 embeds
      */
-    public MessageBuilder addEmbed(@NotNull Embed embed) throws LimitException {
-        if(embedIndex == embeds.length) throw new LimitException("A message cannot have more than 10 embeds");
-        embeds[embedIndex++] = embed;
+    public MessageBuilder addEmbed(@NotNull Embed embed) {
+        if(embeds == null) embeds = new ArrayList<>();
+        embeds.add(embed);
         return this;
     }
 
