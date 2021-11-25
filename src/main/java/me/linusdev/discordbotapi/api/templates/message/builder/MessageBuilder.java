@@ -128,7 +128,9 @@ public class MessageBuilder implements HasLApi {
         if(stickerIds != null && stickerIds.size() > Limits.MAX_STICKERS)
             throw new LimitException("Message may not have more than " + Limits.MAX_STICKERS + " stickers");
 
-        //TODO
+        if(content.length() == 0 && embeds == null && stickerIds == null && attachments == null){
+            throw new LimitException("Cannot create a completely empty message!");
+        }
         return this;
     }
 
@@ -150,7 +152,7 @@ public class MessageBuilder implements HasLApi {
         if(check) check();
 
         return new MessageTemplate(
-                content.toString(),
+                content.length() == 0 ? null : content.toString(),
                 tts,
                 embeds == null ? null : embeds.toArray(new Embed[0]),
                 new AllowedMentions(
