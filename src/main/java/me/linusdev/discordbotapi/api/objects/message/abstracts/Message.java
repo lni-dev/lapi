@@ -23,6 +23,7 @@ import me.linusdev.discordbotapi.api.objects.toodo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.user.UserMention;
+import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +40,14 @@ import java.util.List;
  * <h1 style="margin-bottom:0;padding-bottom:0"><a href="" target="_top">Limits</a></h1>
  * <ul>
  *     <li>
- *         A Message can have up to 10 {@link Embed Embeds}
+ *         A Message can have up to {@value MessageBuilder.Limits#MAX_EMBEDS} {@link Embed Embeds}.
+ *         And up to {@value MessageBuilder.Limits#MAX_EMBED_CHARACTERS} characters inside these
+ *     </li>
+ *     <li>
+ *         A Message can have up to {@value MessageBuilder.Limits#MAX_STICKERS} {@link Sticker Stickers}
+ *     </li>
+ *     <li>
+ *         Message {@link #getContent() content} can contain uo to {@value MessageBuilder.Limits#MAX_CONTENT_CHARACTERS} characters
  *     </li>
  * </ul>
  *

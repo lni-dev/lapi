@@ -71,8 +71,14 @@ public enum MentionType {
     TIMESTAMP_STYLED                ("<t:" + PlaceHolder.TIMESTAMP +":" + TIMESTAMP_STYLE + ">"),
 
 
-
+    /**
+     * This will mention everyone who is in the guild
+     */
     EVERYONE                        ("@everyone"),
+
+    /**
+     * This will mention everyone who has access to the channel
+     */
     HERE                            ("@here"),
     ;
 

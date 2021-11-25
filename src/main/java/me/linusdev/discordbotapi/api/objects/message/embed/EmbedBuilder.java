@@ -11,6 +11,14 @@ import java.util.List;
  *
  * before building, it may be checked ({@link #checkEmbed()}) first
  *
+ *
+ * <p>
+ *     In the {@link Embed} object ({@link EmbedBuilder}), you can then set an {@link Image} to use an
+ *     {@link me.linusdev.discordbotapi.api.templates.attachment.AttachmentTemplate attachment} as its url with
+ *     our attachment scheme syntax: "attachment://filename.png" ({@link Image#Image(String)}, url should be "attachment://filename.png" )
+ * </p>
+ * TODO: method to use attachmentTemplate instead of image-links
+ *
  * @see Embed
  * @see #checkEmbed() Embed rules
  */

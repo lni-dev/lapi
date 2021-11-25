@@ -2,9 +2,11 @@ package me.linusdev.discordbotapi.api.objects.toodo;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
+import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
 
-public class Role implements Datable {
+public class Role implements Datable, SnowflakeAble {
 
     //todo
 
@@ -16,5 +18,10 @@ public class Role implements Datable {
     public Data getData() {
         Data data = new Data(0);
         return data;
+    }
+
+    @Override
+    public @NotNull Snowflake getIdAsSnowflake() {
+        return null;
     }
 }

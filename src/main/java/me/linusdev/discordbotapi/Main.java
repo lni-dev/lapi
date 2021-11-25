@@ -245,6 +245,13 @@ public class Main {
             System.out.println(content);
         });
 
+        new MessageBuilder(api)
+                .appendContent("Hello, ")
+                .appendEveryoneMention()
+                .appendContent(" how are you?")
+                .getQueueable("912377387868639282")
+                .queue();
+
         //7534015381736783882
         //rainbowEnergy
 

@@ -18,6 +18,7 @@ public enum Link {
      * Post a message to a guild text or DM channel. Returns a {@link me.linusdev.discordbotapi.api.objects.message.Message message} object.
      *
      * @see PlaceHolder#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
      */
     CREATE_MESSAGE(POST, O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages"),
     ;
