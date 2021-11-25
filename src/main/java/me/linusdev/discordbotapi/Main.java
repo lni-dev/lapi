@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi;
 
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.file.types.FileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
@@ -25,6 +26,7 @@ import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.templates.attachment.AttachmentTemplate;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
+import me.linusdev.discordbotapi.api.templates.message.builder.MentionType;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.discordbotapi.api.templates.message.builder.TimestampStyle;
 import me.linusdev.discordbotapi.log.LogInstance;
@@ -245,12 +247,16 @@ public class Main {
             System.out.println(content);
         });
 
+        Embed e = new EmbedBuilder()
+                .setTitle("Hi")
+                .setDescription(MentionType.USER.get(new PlaceHolder(PlaceHolder.USER_ID, LApi.CREATOR_ID))).build();
+
+        api.createMessage("912377387868639282", e).queue();
+
         new MessageBuilder(api)
-                .appendContent("Hello, ")
-                .appendEveryoneMention()
-                .appendContent(" how are you?")
-                .getQueueable("912377387868639282")
-                .queue();
+                .addEmbed(e)
+                .allowAllUserMentions()
+                .getQueueable("912377387868639282").queue();
 
         //7534015381736783882
         //rainbowEnergy

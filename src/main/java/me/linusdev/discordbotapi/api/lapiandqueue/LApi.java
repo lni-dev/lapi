@@ -27,6 +27,7 @@ import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.other.Error;
@@ -817,6 +818,42 @@ public class LApi {
      */
     public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull String content){
         return createMessage(channelId, content,true);
+    }
+
+    /**
+     * <p>
+     *     This will create a new {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message}
+     *     in the channel with given id.
+     * </p>
+     *
+     * @param channelId the id of the {@link Channel} the message should be created in
+     * @param embeds the embeds for the message
+     * @param allowMentions mentions inside embeds will never ping the user. In case that ever changes, you can adjust the behavior here
+     * @return {@link Queueable} to create the message
+     * @see Link#CREATE_MESSAGE
+     */
+    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
+        return createMessage(channelId,
+                new MessageTemplate(null, false, embeds,
+                        allowMentions ? null : AllowedMentions.noneAllowed(),
+                        null, null, null, null
+                ));
+    }
+
+    /**
+     * <p>
+     *     This will create a new {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message message}
+     *     in the channel with given id.
+     * </p>
+     *
+     *
+     * @param channelId the id of the {@link Channel} the message should be created in
+     * @param embeds the embeds for the message
+     * @return {@link Queueable} to create the message
+     * @see Link#CREATE_MESSAGE
+     */
+    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
+        return createMessage(channelId, true, embeds);
     }
 
     //Getter
