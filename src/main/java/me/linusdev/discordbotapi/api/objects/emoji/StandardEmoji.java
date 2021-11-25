@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This is a list of Standard/Unicode Emojis. Discord will replace some of these for two other Emojis
+ * This is a list of Standard/Unicode Emojis. Discord will replace some of these for two (or more) other Emojis
  * <br><br>
  * Strg-f to search in most IDEs :)
  */
