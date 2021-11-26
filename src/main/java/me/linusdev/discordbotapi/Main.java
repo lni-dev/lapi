@@ -256,7 +256,7 @@ public class Main {
         new MessageBuilder(api)
                 .addEmbed(e)
                 .allowAllUserMentions()
-                .getQueueable("912377387868639282").queue();
+                .getQueueable("912377387868639282").queue(message -> System.out.println(message.getTimestamp()));
 
         //7534015381736783882
         //rainbowEnergy
