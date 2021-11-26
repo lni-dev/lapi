@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects;
+package me.linusdev.discordbotapi.api.lapiandqueue.updatable;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
