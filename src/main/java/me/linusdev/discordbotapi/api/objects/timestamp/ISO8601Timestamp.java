@@ -1,11 +1,14 @@
-package me.linusdev.discordbotapi.api.objects.toodo;
+package me.linusdev.discordbotapi.api.objects.timestamp;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -19,7 +22,8 @@ public class ISO8601Timestamp implements SimpleDatable {
 
     //2021-11-25T22:22:47.664000+00:00
     public static final DateTimeFormatter ISO8601_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-    //DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSxxxxx"); I guess there already is one from java .-.
+    public static final DateTimeFormatter FORMATTER_TO_ISO8601 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSxxxxx");
+    // the last one won#t use Z for a +00:00 offset, but +00:00 instead, like Discord does too
 
     private @NotNull final String timestamp;
 
@@ -29,6 +33,19 @@ public class ISO8601Timestamp implements SimpleDatable {
      */
     public ISO8601Timestamp(@NotNull String timestamp){
         this.timestamp = timestamp;
+    }
+
+    /**
+     * This will create a new {@link ISO8601Timestamp} of given milliseconds
+     *
+     * @param millis the millisecond since 01.01.1970 00:00:00+00:00
+     * @return {@link ISO8601Timestamp}
+     */
+    @NotNull
+    @Contract(value = "_ -> new", pure = true)
+    public static  ISO8601Timestamp of(long millis){
+        OffsetDateTime offsetDateTime = Instant.ofEpochMilli(millis).atOffset(ZoneOffset.ofHoursMinutes(0, 0));
+        return new ISO8601Timestamp(offsetDateTime.format(FORMATTER_TO_ISO8601));
     }
 
     /**
