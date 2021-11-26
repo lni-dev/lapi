@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.embed;
 
+import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,6 +101,22 @@ public class EmbedBuilder {
     public EmbedBuilder setTimestamp(String timestamp) {
         this.timestamp = timestamp;
         return this;
+    }
+
+    /**
+     * timestamp of embed content
+     * @param timestamp {@link ISO8601Timestamp} to use
+     */
+    public EmbedBuilder setTimestamp(@NotNull ISO8601Timestamp timestamp){
+        return setTimestamp(timestamp.getTimestamp());
+    }
+
+    /**
+     * timestamp of embed content
+     * @param millis the milliseconds since 01.01.1970 00:00:00+00:00
+     */
+    public EmbedBuilder setTimestamp(long millis){
+        return setTimestamp(ISO8601Timestamp.of(millis));
     }
 
     /**
