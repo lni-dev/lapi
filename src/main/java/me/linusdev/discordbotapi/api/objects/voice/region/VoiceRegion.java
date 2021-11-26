@@ -2,8 +2,7 @@ package me.linusdev.discordbotapi.api.objects.voice.region;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
-import me.linusdev.discordbotapi.api.objects.Updatable;
+import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/voice#voice-region-object" target="_top">Voice Region Object</a>
