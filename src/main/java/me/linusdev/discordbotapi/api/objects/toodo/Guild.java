@@ -5,19 +5,19 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
-import me.linusdev.discordbotapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
-import me.linusdev.discordbotapi.api.objects.guild.enums.ExplicitContentFilterLevel;
-import me.linusdev.discordbotapi.api.objects.guild.enums.MFALevel;
-import me.linusdev.discordbotapi.api.objects.guild.enums.VerificationLevel;
+import me.linusdev.discordbotapi.api.objects.guild.enums.*;
+import me.linusdev.discordbotapi.api.objects.guild.voice.VoiceState;
+import me.linusdev.discordbotapi.api.objects.guild.voice.manager.VoiceStatesManager;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
+import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Guild implements Datable, HasLApi, SnowflakeAble {
 
-    private final @NotNull LApi lApi;
+    /*private final @NotNull LApi lApi;
 
     private final @NotNull Snowflake id;
     private final @NotNull String name;
@@ -42,8 +42,19 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
     private final @NotNull MFALevel mfaLevel;
     private final @Nullable Snowflake applicationId;
     private final @NotNull Snowflake systemChannelId;
+    private final int systemChannelFlagsAsInt;
+    private final @NotNull SystemChannelFlag[] systemChannelFlags;
+    private final @Nullable Snowflake rulesChannelId;
 
+    //Create Guild
+    private final @Nullable ISO8601Timestamp joinedAt;
+    private final @Nullable Boolean large;
+    private final @Nullable Boolean unavailable;
+    private final @Nullable Integer memberCount;
+    private final @Nullable VoiceStatesManager voiceStatesManager;
+    private final @
 
+    */
 
     public static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable Data data){
         if(data == null) return null;
