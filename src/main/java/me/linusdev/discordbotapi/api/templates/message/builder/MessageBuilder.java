@@ -14,6 +14,7 @@ import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
 import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
+import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.toodo.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.templates.attachment.AttachmentTemplate;
@@ -407,7 +408,24 @@ public class MessageBuilder implements HasLApi {
         return this;
     }
 
-    //TODO appendTimestamp with ISO8601 Timestamp...
+    /**
+     * This will append a timestamp with given {@link TimestampStyle style} at the end of the current content.
+     * @param timestamp the timestamp to append
+     * @param timestampStyle the {@link TimestampStyle style} to use for this timestamp
+     * @return this
+     */
+    public MessageBuilder appendTimestamp(@NotNull ISO8601Timestamp timestamp, @Nullable TimestampStyle timestampStyle){
+        return appendTimestamp(timestamp.toEpochSeconds(), TimeUnit.SECONDS, timestampStyle);
+    }
+
+    /**
+     * This will append a timestamp with the default {@link TimestampStyle style} at the end of the current content.
+     * @param timestamp the timestamp to append
+     * @return this
+     */
+    public MessageBuilder appendTimestamp(@NotNull ISO8601Timestamp timestamp){
+        return appendTimestamp(timestamp.toEpochSeconds(), TimeUnit.SECONDS);
+    }
 
     /**
      * This will append some content at the end of the currently existing message content
