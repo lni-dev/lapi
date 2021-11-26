@@ -4,7 +4,7 @@ package me.linusdev.discordbotapi.api.objects.channel.thread;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.toodo.ISO8601Timestamp;
+import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
