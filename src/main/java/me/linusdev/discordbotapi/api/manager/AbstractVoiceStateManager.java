@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.guild.voice.manager;
+package me.linusdev.discordbotapi.api.manager;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.objects.guild.member.Member;
