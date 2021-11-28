@@ -13,6 +13,8 @@ public enum ContentType implements AbstractContentType {
     IMAGE_PNG("image/png"),
     IMAGE_JPEG("image/jpeg"),
     IMAGE_GIF("image/gif"),
+    IMAGE_WEBP("image/webp"),
+    IMAGE_SVG("image/svg+xml"),
 
     MULTIPART_FORM_DATA("multipart/form-data"),
     ;

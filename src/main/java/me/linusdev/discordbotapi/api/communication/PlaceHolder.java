@@ -2,11 +2,18 @@ package me.linusdev.discordbotapi.api.communication;
 
 public class PlaceHolder {
 
-    public static final String GUILD_ID = "<guild-id>";
-    public static final String USER_ID = "{user.id}";
+    public static final String GUILD_ID = "{guild.id}";
     public static final String CHANNEL_ID = "{channel.id}";
     public static final String ROLE_ID = "{role.id}";
     public static final String MESSAGE_ID = "{message.id}";
+    public static final String APPLICATION_ID = "{application.id}";
+    public static final String ACHIEVEMENT_ID = "{achievement.id}";
+    public static final String STICKER_PACK_BANNER_ASSET_ID = "{stickerpackbannerasset.id}";
+    public static final String STICKER_ID = "{sticker.id}";
+    public static final String TEAM_ID = "{team.id}";
+
+    public static final String USER_ID = "{user.id}";
+    public static final String USER_DISCRIMINATOR = "{user.discriminator}";
 
     public static final String EMOJI = "{emoji}";
     public static final String EMOJI_NAME = "{emoji.name}";
@@ -14,6 +21,9 @@ public class PlaceHolder {
 
     public static final String TIMESTAMP = "{timestamp}";
     public static final String TIMESTAMP_STYLE = "{timestamp.style}";
+
+    public static final String FILE_ENDING = "<file-ending>";
+    public static final String HASH = "<hash>";
 
     public static final String TOKEN = "<token>";
     public static final String LAPI_URL = "<LApi-url>";

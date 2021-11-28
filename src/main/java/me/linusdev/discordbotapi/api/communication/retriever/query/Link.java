@@ -12,7 +12,7 @@ import static me.linusdev.discordbotapi.api.communication.lapihttprequest.Method
  * These are links to communicate with the official discord api.
  * Some more links are still in {@link GetLinkQuery.Links}
  */
-public enum Link {
+public enum Link implements AbstractLink{
 
     /**
      * Post a message to a guild text or DM channel. Returns a {@link me.linusdev.discordbotapi.api.objects.message.Message message} object.
@@ -31,10 +31,12 @@ public enum Link {
         this.link = link;
     }
 
+    @Override
     public @NotNull Method getMethod() {
         return method;
     }
 
+    @Override
     public @NotNull String getLink() {
         return link;
     }

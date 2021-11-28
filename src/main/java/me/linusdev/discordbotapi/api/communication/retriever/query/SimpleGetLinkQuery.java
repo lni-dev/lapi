@@ -14,7 +14,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
 @Deprecated
 public class SimpleGetLinkQuery implements Query {
 
-    public enum Links{
+    public enum Links implements AbstractLink{
         GET_BOT_APPLICATION(O_DISCORD_API_VERSION_LINK + "oauth2/applications/@me"),
         GET_VOICE_REGIONS(O_DISCORD_API_VERSION_LINK + "voice/regions"),
         ;
@@ -25,7 +25,13 @@ public class SimpleGetLinkQuery implements Query {
             this.link = link;
         }
 
-        public String getLink() {
+        @Override
+        public @NotNull Method getMethod() {
+            return Method.GET;
+        }
+
+        @Override
+        public @NotNull String getLink() {
             return link;
         }
     }

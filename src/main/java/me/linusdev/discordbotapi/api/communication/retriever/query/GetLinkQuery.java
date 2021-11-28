@@ -26,7 +26,7 @@ public class GetLinkQuery implements Query{
     public static final String LIMIT_KEY = "limit";
     public static final String _KEY = "";
 
-    public enum Links{
+    public enum Links implements AbstractLink{
 
         /*
          *
@@ -323,6 +323,11 @@ public class GetLinkQuery implements Query{
          */
         public boolean canHaveQueryData() {
             return canHaveQueryData;
+        }
+
+        @Override
+        public @NotNull Method getMethod() {
+            return Method.GET;
         }
 
         public String getLink() {
