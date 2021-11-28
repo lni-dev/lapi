@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.invite.InviteMetadata;
 import org.jetbrains.annotations.NotNull;
@@ -272,7 +273,7 @@ public class GetLinkQuery implements Query{
         GET_USER(O_DISCORD_API_VERSION_LINK + "users/" + USER_ID),
 
         /**
-         * Returns a list of partial {@link me.linusdev.discordbotapi.api.objects.toodo.Guild guild} objects the current user is a member of. Requires the guilds OAuth2 scope.
+         * Returns a list of partial {@link Guild guild} objects the current user is a member of. Requires the guilds OAuth2 scope.
          * <br><br>
          * <h3 style="margin:0;padding:0">
          *     This can have Query String parameters:<br>

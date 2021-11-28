@@ -8,7 +8,7 @@ import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
-import me.linusdev.discordbotapi.api.objects.toodo.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
