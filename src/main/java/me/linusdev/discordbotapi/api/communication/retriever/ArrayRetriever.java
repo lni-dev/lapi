@@ -11,14 +11,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.Function;
 
 /**
  * This class is used to retrieve any Array and convert it to an {@link ArrayList} of type {@link R}
  * @param <C> the class which will be retrieved from the Discord Api, usually {@link Data}
  * @param <R> the result class, to which {@link C} should be converted to
  */
-public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
+public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
 
     private final @NotNull Converter<C, R> converter;
 
@@ -47,6 +46,6 @@ public class ArrayRetriever<C, R> extends Retriever<ArrayList<R>>{
 
     @Override
     public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.sendLApiHttpRequest(query.getLApiRequest(), "array");
+        return lApi.getResponseAsData(query.getLApiRequest(), "array");
     }
 }

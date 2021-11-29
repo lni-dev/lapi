@@ -17,7 +17,7 @@ import java.io.IOException;
  *
  * @param <R> the result class, the {@link Data} should be converted to
  */
-public class ConvertingRetriever<R> extends Retriever<R>{
+public class ConvertingRetriever<R> extends DataRetriever<R>{
 
     private final Converter<Data, R> converter;
 

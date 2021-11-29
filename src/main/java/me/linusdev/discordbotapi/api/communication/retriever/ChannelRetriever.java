@@ -17,7 +17,7 @@ import java.io.IOException;
  * @see Channel
  * @see me.linusdev.discordbotapi.api.objects.enums.ChannelType
  */
-public class ChannelRetriever extends Retriever<Channel>{
+public class ChannelRetriever extends DataRetriever<Channel>{
 
     public ChannelRetriever(@NotNull LApi lApi, @NotNull String id){
         super(lApi, new GetLinkQuery(lApi, GetLinkQuery.Links.GET_CHANNEL, new PlaceHolder(PlaceHolder.CHANNEL_ID, id)));

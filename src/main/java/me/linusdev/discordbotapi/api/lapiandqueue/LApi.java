@@ -38,8 +38,7 @@ import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
@@ -213,7 +212,7 @@ public class LApi {
     }
 
     /**
-     * @see #sendLApiHttpRequest(LApiHttpRequest, String)
+     * @see #getResponseAsData(LApiHttpRequest, String)
      *
      * Cannot parse pure Arrays!
      *
@@ -223,8 +222,8 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data sendLApiHttpRequest(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
-        return sendLApiHttpRequest(request, null);
+    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
+        return getResponseAsData(request, null);
     }
 
     /**
@@ -239,12 +238,17 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data sendLApiHttpRequest(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
-        HttpResponse<String> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofString());
-        StringReader reader = new StringReader(response.body());
+    public Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
+        Reader reader = new InputStreamReader(getResponseAtInputStream(request));
+
         if(arrayKey != null)
             return new JsonParser().readDataFromReader(reader, true, arrayKey);
         return new JsonParser().readDataFromReader(reader);
+    }
+
+    public InputStream getResponseAtInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException {
+        HttpResponse<InputStream> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofInputStream());
+        return response.body();
     }
 
     /**

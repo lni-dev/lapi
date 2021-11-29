@@ -4,7 +4,6 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.objects.invite.TargetType;
 import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
@@ -37,28 +36,16 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
     }
 
     /**
-     * Retrieves the wanted Objects JSON and saves it into a {@link Data}.<br>
-     * You are probably looking for {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()}
-     *
-     * @return {@link Data} with all JSON fields
-     * @see Queueable#queue()
-     * @see #completeHereAndIgnoreQueueThread()
-     */
-    public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException{
-        return lApi.sendLApiHttpRequest(query.getLApiRequest());
-    }
-
-    /**
      * Retrieves the Object. This will happen on the current Thread! <br>
      * I suggest you use {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()} instead!
      * @return retrieved Object
      * @see Queueable#queue()
      * @see #completeHereAndIgnoreQueueThread()
      */
-    public @Nullable abstract T retrieve() throws LApiException, IOException, ParseException, InterruptedException;
+    protected @Nullable abstract T retrieve() throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
-    public @NotNull Container<T> completeHereAndIgnoreQueueThread() {
+    protected @NotNull Container<T> completeHereAndIgnoreQueueThread() {
         Container<T> container;
         try {
             container = new Container<T>(retrieve(), null);

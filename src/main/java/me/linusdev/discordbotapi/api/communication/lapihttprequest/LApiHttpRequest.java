@@ -144,6 +144,8 @@ public class LApiHttpRequest {
                 }
             }
 
+            if(string.length() == 0) string.append("None\n"); // if we have no headers, add "None\n"
+
             //remove last \n
             log.debugAlign(string.substring(0, string.length()-1), "Headers");
             StringBuilder string2 = new StringBuilder();

@@ -4,7 +4,11 @@ import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -71,10 +75,10 @@ public abstract class Queueable<T> implements HasLApi {
 
     /**
      * queues this {@link Queueable} and returns a {@link Future}<br>
-     * see {@link Future} and {@link LApi#queue(Queueable) LApi.queue(Queueable)} for more information!
+     * see {@link Future} and {@link LApi#queue(Queueable, BiConsumer, Consumer, Consumer)  LApi.queue(...)} for more information!
      * @return {@link Future}
      * @see Future
-     * @see LApi#queue(Queueable) LApi.queue(Queueable)
+     * @see LApi#queue(Queueable, BiConsumer, Consumer, Consumer)  LApi.queue(...)
      */
     public @NotNull Future<T> queue(){
         return getLApi().queue(this, null, null, null);
@@ -139,6 +143,17 @@ public abstract class Queueable<T> implements HasLApi {
     public @NotNull T queueAndWait() throws ExecutionException, InterruptedException {
         return queue().get();
     }
+
+    /**
+     *
+     * Note that this has different implementations and may not always write to the file, what you would expect.
+     *
+     * @param file Path to the file to save to
+     * @param overwriteIfExists whether to overwrite the file if it already exists.
+     * @param after {@link BiConsumer}, what to do after the file as been written or an error has occurred
+     * @return {@link Future}
+     */
+    public abstract @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after);
 
     public @NotNull Container<T> completeHere(){
         getLApi().checkQueueThread();

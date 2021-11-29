@@ -22,4 +22,9 @@ public class Error {
     public @Nullable Throwable getThrowable() {
         return throwable;
     }
+
+    @Override
+    public String toString() {
+        return "" + throwable;
+    }
 }

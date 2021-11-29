@@ -30,7 +30,9 @@ public class VoiceRegions {
     public void update(LApi lApi) throws LApiException, IOException, ParseException, InterruptedException {
         ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<Data, VoiceRegion>(lApi,
                 new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
-        ArrayList<VoiceRegion> list = retriever.retrieve();
+        ArrayList<VoiceRegion> list = retriever.completeHere().get();
+
+        if(list == null) return;
 
         if(regions == null){
             regions = list;
@@ -63,7 +65,7 @@ public class VoiceRegions {
         ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<Data, VoiceRegion>(lApi,
                 new SimpleGetLinkQuery(lApi, SimpleGetLinkQuery.Links.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
-        regions = retriever.retrieve();
+        retriever.queue(list -> regions = list);
     }
 
     /**

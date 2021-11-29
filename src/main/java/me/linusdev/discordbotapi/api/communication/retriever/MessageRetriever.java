@@ -33,7 +33,7 @@ import java.io.IOException;
  *
  * @see Message
  */
-public class MessageRetriever extends Retriever<Message> {
+public class MessageRetriever extends DataRetriever<Message> {
 
     public MessageRetriever(@NotNull LApi lApi, @NotNull String channelId, @NotNull String messageId) {
         super(lApi, new GetLinkQuery(lApi, GetLinkQuery.Links.GET_CHANNEL_MESSAGE,
