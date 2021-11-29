@@ -6,6 +6,9 @@ import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see <a href="https://discord.com/developers/docs/topics/permissions#role-object" target="_top">Role Object</a>
+ */
 public class Role implements Datable, SnowflakeAble {
 
     //todo
