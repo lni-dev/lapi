@@ -3,7 +3,6 @@ package me.linusdev.discordbotapi.api.objects.channel;
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.toodo.Icon;
 import me.linusdev.discordbotapi.api.objects.user.Recipient;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -19,19 +18,19 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
     private @NotNull Recipient[] recipients;
     private @Nullable Snowflake lastMessageId;
     private @Nullable String lastPinTimestamp;
-    private @Nullable Icon icon;
+    private @Nullable String iconHash;
     private @NotNull Snowflake ownerId;
     private @Nullable Snowflake applicationId;
 
     public GroupDirectMessageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
-                                @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp,
-                                     @Nullable Icon icon, @NotNull Snowflake ownerId, @Nullable Snowflake applicationId) {
+                                     @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp,
+                                     @Nullable String iconHash, @NotNull Snowflake ownerId, @Nullable Snowflake applicationId) {
         super(lApi, id, type);
 
         this.recipients = recipients;
         this.lastMessageId = lastMessageId;
         this.lastPinTimestamp = lastPinTimestamp;
-        this.icon = icon;
+        this.iconHash = iconHash;
         this.ownerId = ownerId;
         this.applicationId = applicationId;
 
@@ -47,11 +46,11 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
 
         this.recipients = new Recipient[recipients.size()];
         int i = 0;
-        for(Data d : recipients) this.recipients[i++] = new Recipient(d);
+        for(Data d : recipients) this.recipients[i++] = new Recipient(lApi, d);
 
         this.lastMessageId = Snowflake.fromString((String) data.get(LAST_MESSAGE_ID_KEY));
         this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);
-        this.icon = new Icon((String) data.get(ICON_KEY));
+        this.iconHash = (String) data.get(ICON_KEY);
         this.ownerId = Snowflake.fromString((String) data.get(OWNER_ID_KEY));
         this.applicationId = Snowflake.fromString((String) data.get(APPLICATION_ID_KEY));
 
@@ -72,9 +71,11 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
     }
 
     @Override
-    public @Nullable Icon getIcon() {
-        return icon;
+    public @Nullable String getIconHash() {
+        return iconHash;
     }
+
+
 
     @Override
     public @NotNull Snowflake getOwnerIdAsSnowflake() {

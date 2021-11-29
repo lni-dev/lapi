@@ -2,13 +2,15 @@ package me.linusdev.discordbotapi.api.objects.user;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
+import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.toodo.Avatar;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
-import me.linusdev.discordbotapi.api.objects.toodo.Banner;
 import me.linusdev.discordbotapi.api.objects.user.abstracts.BasicUserInformation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,11 +73,11 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
     private final @NotNull Snowflake id;
     private final @NotNull String username;
     private final @NotNull String discriminator;
-    private final @Nullable Avatar avatar;
+    private final @Nullable String avatarHash;
     private final @Nullable Boolean bot;
     private final @Nullable Boolean system;
     private final @Nullable Boolean mfaEnabled;
-    private final @Nullable Banner banner;
+    private final @Nullable String bannerHash;
     private final @Nullable Integer accentColor;
     private final @Nullable String locale;
     private final @Nullable Boolean verified;
@@ -94,11 +96,11 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @param id the user's id
      * @param username the user's username, not unique across the platform
      * @param discriminator the user's 4-digit discord-tag
-     * @param avatar the user's avatar hash
+     * @param avatarHash the user's avatar hash
      * @param bot whether the user belongs to an OAuth2 application
      * @param system whether the user is an Official Discord System user (part of the urgent message system)
      * @param mfaEnabled whether the user has two factor enabled on their account
-     * @param banner the user's banner hash
+     * @param bannerHash the user's banner hash
      * @param accentColor the user's banner color encoded as an integer representation of hexadecimal color code
      * @param locale the user's chosen language option
      * @param verified whether the email on this account has been verified
@@ -109,16 +111,16 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @param publicFlagsAsInt the public flags on a user's account
      * @param publicFlags the public flags on a user's account
      */
-    public User(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull String username, @NotNull String discriminator, @Nullable Avatar avatar, @Nullable Boolean bot, @Nullable Boolean system, @Nullable Boolean mfaEnabled, @Nullable Banner banner, @Nullable Integer accentColor, @Nullable String locale, @Nullable Boolean verified, @Nullable String email, @Nullable Integer flagsAsInt, @NotNull UserFlag[] flags, @Nullable PremiumType premiumType, @Nullable Integer publicFlagsAsInt, @NotNull UserFlag[] publicFlags) {
+    public User(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull String username, @NotNull String discriminator, @Nullable String avatarHash, @Nullable Boolean bot, @Nullable Boolean system, @Nullable Boolean mfaEnabled, @Nullable String bannerHash, @Nullable Integer accentColor, @Nullable String locale, @Nullable Boolean verified, @Nullable String email, @Nullable Integer flagsAsInt, @NotNull UserFlag[] flags, @Nullable PremiumType premiumType, @Nullable Integer publicFlagsAsInt, @NotNull UserFlag[] publicFlags) {
         this.lApi = lApi;
         this.id = id;
         this.username = username;
         this.discriminator = discriminator;
-        this.avatar = avatar;
+        this.avatarHash = avatarHash;
         this.bot = bot;
         this.system = system;
         this.mfaEnabled = mfaEnabled;
-        this.banner = banner;
+        this.bannerHash = bannerHash;
         this.accentColor = accentColor;
         this.locale = locale;
         this.verified = verified;
@@ -141,11 +143,11 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
         String id = (String) data.get(ID_KEY);
         String username = (String) data.get(USERNAME_KEY);
         String discriminator = (String) data.get(DISCRIMINATOR_KEY);
-        String avatar = (String) data.get(AVATAR_KEY);
+        String avatarHash = (String) data.get(AVATAR_KEY);
         Boolean bot = (Boolean) data.get(BOT_KEY);
         Boolean system = (Boolean) data.get(SYSTEM_KEY);
         Boolean mfaEnabled = (Boolean) data.get(MFA_ENABLED_KEY);
-        String banner = (String) data.get(BANNER_KEY);
+        String bannerHash = (String) data.get(BANNER_KEY);
         Number accentColor = (Number) data.get(ACCENT_COLOR_KEY);
         String locale = (String) data.get(LOCALE_KEY);
         Boolean verified = (Boolean) data.get(VERIFIED_KEY);
@@ -161,8 +163,8 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
             return null; //this will never happen, because above method will throw an exception
         }
 
-        return new User(lApi, Snowflake.fromString(id), username, discriminator, Avatar.fromHashString(avatar),
-                bot, system, mfaEnabled, Banner.fromHashString(banner), accentColor == null ? null : accentColor.intValue(),
+        return new User(lApi, Snowflake.fromString(id), username, discriminator, avatarHash,
+                bot, system, mfaEnabled, bannerHash, accentColor == null ? null : accentColor.intValue(),
                 locale, verified, email, flags == null ? null : flags.intValue(),
                 UserFlag.getFlagsFromInt(flags == null ? null : flags.intValue()),
                 premiumType == null ? null : PremiumType.fromValue(premiumType.intValue()),
@@ -199,8 +201,8 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * the user's avatar hash
      */
     @Override
-    public @Nullable Avatar getAvatar() {
-        return avatar;
+    public @Nullable String getAvatarHash() {
+        return avatarHash;
     }
 
     /**
@@ -243,8 +245,29 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
     /**
      * the user's banner hash
      */
-    public @Nullable Banner getBanner() {
-        return banner;
+    public @Nullable String getBannerHash() {
+        return bannerHash;
+    }
+
+    /**
+     *
+     * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
+     * @param fileType see {@link CDNImage#ofUserBanner(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    public @NotNull CDNImageRetriever getBanner(int desiredSize, @NotNull AbstractFileType fileType){
+        if(getBannerHash() == null) throw new IllegalArgumentException("This user object has no banner hash");
+        return new CDNImageRetriever(CDNImage.ofUserBanner(lApi, getId(), getBannerHash(), fileType), desiredSize, true);
+    }
+
+    /**
+     *
+     * @param fileType see {@link CDNImage#ofUserBanner(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    public @NotNull CDNImageRetriever getBanner(@NotNull AbstractFileType fileType){
+        if(getBannerHash() == null) throw new IllegalArgumentException("This user object has no banner hash");
+        return new CDNImageRetriever(CDNImage.ofUserBanner(lApi, getId(), getBannerHash(), fileType));
     }
 
     /**
@@ -322,11 +345,11 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
         data.add(ID_KEY, id);
         data.add(USERNAME_KEY, username);
         data.add(DISCRIMINATOR_KEY, discriminator);
-        data.add(AVATAR_KEY, avatar);
+        data.add(AVATAR_KEY, avatarHash);
         if(bot != null) data.add(BOT_KEY, bot);
         if(system != null) data.add(SYSTEM_KEY, system);
         if(mfaEnabled != null) data.add(MFA_ENABLED_KEY, mfaEnabled);
-        if(banner != null) data.add(BANNER_KEY, banner);
+        if(bannerHash != null) data.add(BANNER_KEY, bannerHash);
         if(accentColor != null) data.add(ACCENT_COLOR_KEY, accentColor);
         if(locale != null) data.add(LOCALE_KEY, locale);
         if(verified != null) data.add(VERIFIED_KEY, verified);

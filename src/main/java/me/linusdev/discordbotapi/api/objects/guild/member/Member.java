@@ -2,12 +2,14 @@ package me.linusdev.discordbotapi.api.objects.guild.member;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.enums.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
-import me.linusdev.discordbotapi.api.objects.toodo.Avatar;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +37,7 @@ public class Member implements Datable, HasLApi {
 
     private @Nullable final User user;
     private @Nullable final String nick;
-    private @Nullable final Avatar avatar;
+    private @Nullable final String avatarHash;
     private @NotNull final Snowflake[] roles;
     private @NotNull final String[] rolesAsString;
     private @NotNull final ISO8601Timestamp joinedAt;
@@ -52,7 +54,7 @@ public class Member implements Datable, HasLApi {
      *
      * @param user the user this guild member represents
      * @param nick this users guild nickname
-     * @param avatar the member's guild avatar hash
+     * @param avatarHash the member's guild avatar hash
      * @param roles array of role object ids as {@link Snowflake Snowflake[]}
      * @param rolesAsString array of role object ids as {@link String String[]}
      * @param joinedAt when the user joined the guild
@@ -62,13 +64,13 @@ public class Member implements Datable, HasLApi {
      * @param pending whether the user has not yet passed the guild's Membership Screening requirements
      * @param permissionsString total permissions of the member in the channel, including overwrites, returned when in the interaction object
      */
-    public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable Avatar avatar, @NotNull Snowflake[] roles, @NotNull String[] rolesAsString,
+    public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable String avatarHash, @NotNull Snowflake[] roles, @NotNull String[] rolesAsString,
                   @NotNull ISO8601Timestamp joinedAt, @Nullable ISO8601Timestamp premiumSince, boolean deaf, boolean mute,
                   @Nullable Boolean pending, @Nullable String permissionsString){
         this.lApi = lApi;
         this.user = user;
         this.nick = nick;
-        this.avatar = avatar;
+        this.avatarHash = avatarHash;
         this.roles = roles;
         this.rolesAsString = rolesAsString;
         this.joinedAt = joinedAt;
@@ -96,7 +98,7 @@ public class Member implements Datable, HasLApi {
 
         Data userData = (Data) data.get(USER_KEY);
         String nick = (String) data.get(NICK_KEY);
-        String avatar = (String) data.get(AVATAR_KEY);
+        String avatarHash = (String) data.get(AVATAR_KEY);
         ArrayList<Object> rolesList = (ArrayList<Object>) data.get(ROLES_KEY);
         String joinedAt = (String) data.get(JOINED_AT_KEY);
         String premiumSince = (String) data.get(PREMIUM_SINCE_KEY);
@@ -123,7 +125,7 @@ public class Member implements Datable, HasLApi {
             roles[i++] = Snowflake.fromString((String) o);
         }
 
-        return new Member(lApi, userData == null ? null : User.fromData(lApi, userData), nick, Avatar.fromHashString(avatar), roles, rolesAsString, ISO8601Timestamp.fromString(joinedAt),
+        return new Member(lApi, userData == null ? null : User.fromData(lApi, userData), nick, avatarHash, roles, rolesAsString, ISO8601Timestamp.fromString(joinedAt),
                 ISO8601Timestamp.fromString(premiumSince), deaf, mute, pending, permissions);
     }
 
@@ -144,8 +146,24 @@ public class Member implements Datable, HasLApi {
     /**
      * the member's guild avatar hash
      */
-    public @Nullable Avatar getAvatar() {
-        return avatar;
+    public @Nullable String getAvatarHash() {
+        return avatarHash;
+    }
+
+    /**
+     *
+     * TODO docs
+     *
+     * @see CDNImageRetriever
+     * @see CDNImage
+     * @see me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery
+     */
+    public @NotNull CDNImageRetriever getAvatar(int desiredSize, @NotNull String guildId, @Nullable String userId, @NotNull AbstractFileType fileType){
+
+        if(userId == null && user == null) throw new IllegalArgumentException("No userId given");
+        if(getAvatarHash() == null) throw new IllegalArgumentException("This member object has no avatar hash");
+
+        return new CDNImageRetriever(CDNImage.ofGuildMemberAvatar(lApi, guildId, userId == null ? user.getId() : userId, getAvatarHash(), fileType));
     }
 
     /**
@@ -218,7 +236,7 @@ public class Member implements Datable, HasLApi {
 
         if(user != null) data.add(USER_KEY, user);
         if(nick != null) data.add(NICK_KEY, nick);
-        if(avatar != null) data.add(AVATAR_KEY, avatar);
+        if(avatarHash != null) data.add(AVATAR_KEY, avatarHash);
         data.add(ROLES_KEY, roles);
         data.add(JOINED_AT_KEY, joinedAt);
         if(premiumSince != null) data.add(PREMIUM_SINCE_KEY, premiumSince);

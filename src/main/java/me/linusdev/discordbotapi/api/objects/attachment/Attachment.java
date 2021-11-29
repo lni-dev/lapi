@@ -8,9 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Todo: maybe rename this to RetrievedAttachment and make another class for UploadAttachment
- *
- * Attachment used for example in retrieved {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message}s
+ * Attachment used for example in retrieved {@link me.linusdev.discordbotapi.api.objects.message.abstracts.Message messages}
  */
 public class Attachment extends PartialAttachment {
 

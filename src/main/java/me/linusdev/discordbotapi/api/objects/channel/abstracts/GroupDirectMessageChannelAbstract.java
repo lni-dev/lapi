@@ -1,6 +1,5 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
-import me.linusdev.discordbotapi.api.objects.toodo.Icon;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +10,7 @@ public interface GroupDirectMessageChannelAbstract extends TextChannel, DirectMe
      * group dm icon
      */
     @Nullable
-    Icon getIcon();
+    String getIconHash();
 
     /**
      * snowflake-id of the creator of the group DM

@@ -42,7 +42,7 @@ public class DirectMessageChannel extends Channel implements DirectMessageChanne
 
         this.recipients = new Recipient[recipients.size()];
         int i = 0;
-        for(Data d : recipients) this.recipients[i++] = new Recipient(d);
+        for(Data d : recipients) this.recipients[i++] = new Recipient(lApi, d);
 
         this.lastMessageId = Snowflake.fromString((String) data.get(LAST_MESSAGE_ID_KEY));
         this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);

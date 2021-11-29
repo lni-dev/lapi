@@ -3,20 +3,13 @@ package me.linusdev.discordbotapi.api.objects.guild;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.manager.*;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
-import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
-import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
 import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
-import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.discordbotapi.api.objects.toodo.Banner;
-import me.linusdev.discordbotapi.api.objects.toodo.Icon;
 import me.linusdev.discordbotapi.api.objects.toodo.Role;
-import me.linusdev.discordbotapi.api.objects.toodo.Splash;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -83,10 +76,9 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
 
     protected @NotNull Snowflake id;
     protected @NotNull String name;
-    protected @Nullable Icon icon;
-    protected @Nullable Icon iconHash;
-    protected @Nullable Splash splash;
-    protected @Nullable Splash discoverySplash;
+    protected @Nullable String iconHash;
+    protected @Nullable String splashHash;
+    protected @Nullable String discoverySplashHash;
     protected @Nullable Boolean owner;
     protected @NotNull Snowflake ownerId;
     protected @Nullable String permissions; //TODO PermissionsList
@@ -111,7 +103,7 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
     protected @Nullable Integer maxMembers;
     protected @Nullable String vanityUrlCode;
     protected @Nullable String description;
-    protected @Nullable Banner banner;
+    protected @Nullable String bannerHash;
     protected @Nullable PremiumTier premiumTier;
     protected @Nullable Integer premiumSubscriptionCount;
     protected @NotNull String preferredLocale;
@@ -124,8 +116,8 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
     protected @Nullable Sticker[] stickers;
 
     public Guild(
-            @NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name, @Nullable Icon icon,
-            @Nullable Icon iconHash, @Nullable Splash splash, @Nullable Splash discoverySplash,
+            @NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name,
+            @Nullable String iconHash, @Nullable String splashHash, @Nullable String discoverySplashHash,
             @Nullable Boolean owner, @NotNull Snowflake ownerId, @Nullable String permissions,
             @Nullable VoiceRegion region, @Nullable Snowflake afkChannelId, int afkTimeout,
             @Nullable Boolean widgetEnabled, @Nullable Snowflake widgetChannelId,
@@ -136,7 +128,7 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
             @Nullable Snowflake applicationId, @NotNull Snowflake systemChannelId, int systemChannelFlagsAsInt,
             @NotNull SystemChannelFlag[] systemChannelFlags, @Nullable Snowflake rulesChannelId,
             @Nullable Integer maxPresences, @Nullable Integer maxMembers, @Nullable String vanityUrlCode,
-            @Nullable String description, @Nullable Banner banner, @Nullable PremiumTier premiumTier,
+            @Nullable String description, @Nullable String bannerHash, @Nullable PremiumTier premiumTier,
             @Nullable Integer premiumSubscriptionCount, @NotNull String preferredLocale,
             @Nullable Snowflake publicUpdatesChannelId, @Nullable Integer maxVideoChannelUsers,
             @Nullable Integer approximateMemberCount, @Nullable Integer approximatePresenceCount,
@@ -145,10 +137,9 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
         this.lApi = lApi;
         this.id = id;
         this.name = name;
-        this.icon = icon;
         this.iconHash = iconHash;
-        this.splash = splash;
-        this.discoverySplash = discoverySplash;
+        this.splashHash = splashHash;
+        this.discoverySplashHash = discoverySplashHash;
         this.owner = owner;
         this.ownerId = ownerId;
         this.permissions = permissions;
@@ -173,7 +164,7 @@ public class Guild implements Datable, HasLApi, SnowflakeAble {
         this.maxMembers = maxMembers;
         this.vanityUrlCode = vanityUrlCode;
         this.description = description;
-        this.banner = banner;
+        this.bannerHash = bannerHash;
         this.premiumTier = premiumTier;
         this.premiumSubscriptionCount = premiumSubscriptionCount;
         this.preferredLocale = preferredLocale;

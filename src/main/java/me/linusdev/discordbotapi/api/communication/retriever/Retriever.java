@@ -15,9 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * A Retriever is a {@link Queueable} that can be {@link LApi#queue(Queueable) queued}.
+ * A Retriever is a {@link Queueable} that can be {@link LApi#queue(Queueable, BiConsumer, Consumer, Consumer) queued}.
  * It is used to retrieve an Object from Discords endpoint ({@link MessageRetriever for example a Message}).
  * @param <T> the class of the Object that should be retrieved
  */
