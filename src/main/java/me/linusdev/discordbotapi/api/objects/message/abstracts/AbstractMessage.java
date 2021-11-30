@@ -10,7 +10,7 @@ import me.linusdev.discordbotapi.api.objects.enums.MessageType;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.discordbotapi.api.objects.toodo.Role;
+import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.user.UserMention;
 import org.jetbrains.annotations.NotNull;

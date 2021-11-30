@@ -19,7 +19,7 @@ import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.sticker.StickerItem;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.discordbotapi.api.objects.toodo.Role;
+import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.user.UserMention;
