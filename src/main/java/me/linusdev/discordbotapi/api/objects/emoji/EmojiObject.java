@@ -115,7 +115,7 @@ public class EmojiObject implements Datable, me.linusdev.discordbotapi.api.objec
         if(rolesData != null){
             roles = new Role[rolesData.size()];
             int i = 0;
-            for(Object o : rolesData) roles[i++] = Role.fromData((Data) o);
+            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (Data) o);
         }
 
         Data userData = (Data) data.get(USER_KEY);
