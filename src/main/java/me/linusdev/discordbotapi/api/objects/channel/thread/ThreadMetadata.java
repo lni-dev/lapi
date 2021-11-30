@@ -4,6 +4,7 @@ package me.linusdev.discordbotapi.api.objects.channel.thread;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,7 +96,7 @@ public class ThreadMetadata implements Datable {
 
     /**
      * Threads that have locked set to true can only be unarchived by
-     * a user with the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permission
+     * a user with the {@link Permission#MANAGE_THREADS MANAGE_THREADS} permission
      */
     public boolean isLocked() {
         return locked;

@@ -10,6 +10,7 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
@@ -41,6 +42,7 @@ public class Test {
 
         });
 
+        System.out.println(new BigInteger(new byte[]{1}));
 
     }
 

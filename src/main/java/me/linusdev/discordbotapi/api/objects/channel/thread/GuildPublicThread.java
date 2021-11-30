@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.objects.channel.thread;
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.enums.Permissions;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -31,11 +31,10 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
     private @Nullable ThreadMember member;
     private @Nullable Integer defaultAutoArchiveDuration;
     private @Nullable String permissionsAsString;
-    private @Nullable List<Permissions> permissions;
 
     public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name, @NotNull Snowflake guildId, @NotNull Snowflake parentId, int rateLimitPerUser,
                              @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp, @NotNull Snowflake ownerId, @NotNull ThreadMetadata threadMetadata, int messageCount, int memberCount,
-                             @Nullable ThreadMember member, @Nullable Integer defaultAutoArchiveDuration, @Nullable String permissionsAsString, @Nullable List<Permissions> permissions) {
+                             @Nullable ThreadMember member, @Nullable Integer defaultAutoArchiveDuration, @Nullable String permissionsAsString) {
         super(lApi, id, type);
 
         this.name = name;
@@ -51,7 +50,6 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         this.member = member;
         this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
         this.permissionsAsString = permissionsAsString;
-        this.permissions = permissions;
     }
 
     public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
@@ -91,7 +89,6 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
         this.member = ThreadMember.fromData(member);
         this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
         this.permissionsAsString = permissionsAsString;
-        this.permissions = permissionsAsString == null ? null : Permissions.getPermissionsFromBits(new BigInteger(permissionsAsString));
 
     }
 
@@ -148,11 +145,6 @@ public class GuildPublicThread extends Channel implements Thread, GuildChannel {
     @Override
     public @Nullable String getPermissionsAsString() {
         return permissionsAsString;
-    }
-
-    @Override
-    public @Nullable List<Permissions> getPermissions() {
-        return permissions;
     }
 
     @Override

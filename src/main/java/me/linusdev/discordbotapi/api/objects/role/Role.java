@@ -5,7 +5,8 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.enums.Permissions;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,6 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
     private final @Nullable String unicodeEmoji;
     private final  int position;
     private final @NotNull String permissions;
-    private @Nullable List<Permissions> permissionsList = null;
     private final boolean managed;
     private final boolean mentionable;
     private final @Nullable RoleTags tags;
@@ -165,14 +165,17 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
 
     /**
      * permission bit set. String representation of a number.
+     * @see #getPermissions()
      */
     public String getPermissionsAsString() {
         return permissions;
     }
 
-    public List<Permissions> getPermissionsList() {
-        //TODO
-        return permissionsList;
+    /**
+     * the permissions as {@link Permissions}
+     */
+    public Permissions getPermissions() {
+        return Permissions.ofString(permissions);
     }
 
     /**

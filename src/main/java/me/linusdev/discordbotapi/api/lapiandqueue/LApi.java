@@ -25,6 +25,7 @@ import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.Message;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
@@ -448,7 +449,7 @@ public class LApi {
      * <p>
      *     Returns a list of {@link Invite invite} objects (with {@link Invite#getInviteMetadata() invite metadata})
      *     for the {@link Channel channel}. Only usable for guild channels.
-     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_CHANNELS MANAGE_CHANNELS} permission.
+     *     Requires the {@link Permission#MANAGE_CHANNELS MANAGE_CHANNELS} permission.
      * </p>
      *
      * <p>
@@ -552,7 +553,7 @@ public class LApi {
      *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
      *     threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
-     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
      * <p>
@@ -589,7 +590,7 @@ public class LApi {
      *     When called on a {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
      *     threads of {@link Channel#getType() type} {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
-     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
      * <p>
@@ -611,8 +612,8 @@ public class LApi {
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
      *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
-     *     Requires both the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
-     *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permissions.
+     *     Requires both the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
+     *     {@link Permission#MANAGE_THREADS MANAGE_THREADS} permissions.
      * </p>
      *
      * <p>
@@ -646,8 +647,8 @@ public class LApi {
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
      *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
-     *     Requires both the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
-     *     {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#MANAGE_THREADS MANAGE_THREADS} permissions.
+     *     Requires both the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
+     *     {@link Permission#MANAGE_THREADS MANAGE_THREADS} permissions.
      * </p>
      *
      * <p>
@@ -670,7 +671,7 @@ public class LApi {
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
      *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
      *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
-     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
      * <p>
@@ -703,7 +704,7 @@ public class LApi {
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
      *     {@link me.linusdev.discordbotapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
      *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
-     *     Requires the {@link me.linusdev.discordbotapi.api.objects.enums.Permissions#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
+     *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
      * <p>

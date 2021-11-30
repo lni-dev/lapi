@@ -8,7 +8,8 @@ import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.objects.enums.Permissions;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -46,7 +47,6 @@ public class Member implements Datable, HasLApi {
     private final boolean mute;
     private @Nullable final Boolean pending;
     private @Nullable final String permissionsString;
-    private @Nullable final List<Permissions> permissions;
 
     private @NotNull final LApi lApi;
 
@@ -79,12 +79,6 @@ public class Member implements Datable, HasLApi {
         this.mute = mute;
         this.pending = pending;
         this.permissionsString = permissionsString;
-
-        if(permissionsString != null)
-            permissions = Permissions.getPermissionsFromBits(new BigInteger(permissionsString));
-        else
-            permissions = null;
-
     }
 
     /**
@@ -221,10 +215,10 @@ public class Member implements Datable, HasLApi {
 
     /**
      * total permissions of the member in the channel, including overwrites, returned when in the interaction object
-     * as {@link List} of {@link Permissions}
+     * as {@link Permissions}
      */
-    public @Nullable List<Permissions> getPermissions() {
-        return permissions;
+    public @Nullable Permissions getPermissions() {
+        return Permissions.ofString(permissionsString);
     }
 
     /**

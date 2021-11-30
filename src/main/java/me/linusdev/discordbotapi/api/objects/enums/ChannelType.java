@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.enums;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -74,7 +75,7 @@ public enum ChannelType implements SimpleDatable {
     /**
      * a temporary sub-channel within a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel
      * that is only viewable by those invited and those with the
-     * {@link Permissions#MANAGE_THREADS MANAGE_THREADS} permission
+     * {@link Permission#MANAGE_THREADS MANAGE_THREADS} permission
      */
     GUILD_PRIVATE_THREAD(12, "Guild Private Chat", SimpleChannelType.THREAD),
 

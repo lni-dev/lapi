@@ -7,7 +7,7 @@ public interface GuildTextChannelAbstract extends GuildChannel, TextChannel{
     /**
      * amount of seconds a user has to wait before sending another message (0-21600);
      * bots, as well as users with the permission manage_messages or manage_channel, are unaffected
-     * //todo @link Permissions
+     * //todo @link Permission
      */
     int getRateLimitPerUser();
 

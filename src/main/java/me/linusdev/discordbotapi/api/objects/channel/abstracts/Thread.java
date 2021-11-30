@@ -1,7 +1,8 @@
 package me.linusdev.discordbotapi.api.objects.channel.abstracts;
 
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.discordbotapi.api.objects.enums.Permissions;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +62,7 @@ public interface Thread extends TextChannel {
     /**
      * amount of seconds a user has to wait before sending another message (0-21600);
      * bots, as well as users with the permission manage_messages or manage_channel, are unaffected
-     * //todo @link Permissions
+     * //todo @link Permission
      */
     int getRateLimitPerUser();
 
@@ -91,6 +92,8 @@ public interface Thread extends TextChannel {
      * computed permissions for the invoking user in the channel, including overwrites,
      * only included when part of the resolved data received on a slash command interaction
      */
-    @Nullable List<Permissions> getPermissions();
+    default @Nullable Permissions getPermissions(){
+        return Permissions.ofString(getPermissionsAsString());
+    }
 
 }

@@ -3,9 +3,10 @@ package me.linusdev.discordbotapi.api.objects.permission.overwrite;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
-import me.linusdev.discordbotapi.api.objects.enums.Permissions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -48,13 +49,8 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
      */
     private @NotNull final String deny;
 
-    private @NotNull final BigInteger allowInt;
-    private @NotNull final BigInteger denyInt;
 
     private @Nullable Data data;
-
-    private @Nullable List<Permissions> allowedPermissions = null;
-    private @Nullable List<Permissions> deniedPermissions = null;
 
 
     /**
@@ -69,8 +65,6 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
         this.type = type;
         this.allow = allow;
         this.deny = deny;
-        this.allowInt = new BigInteger(allow);
-        this.denyInt = new BigInteger(deny);
     }
 
     /**
@@ -87,9 +81,6 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
 
         if(this.id == null) throw new InvalidDataException(data, "id in permission override may not be null").addMissingFields(ID_KEY);
         if(this.type == -1) throw new InvalidDataException(data, "type in permission override us unknown or unset").addMissingFields(TYPE_KEY);
-
-        this.allowInt = new BigInteger(allow);
-        this.denyInt = new BigInteger(deny);
     }
 
     @Override
@@ -129,32 +120,20 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
         return deny;
     }
 
+    /**
+     * @return a {@link List} of {@link Permission} which are allowed by this {@link PermissionOverwrite}
+     */
     @NotNull
-    public BigInteger getAllowPermissionBitsAsInt() {
-        return allowInt;
-    }
-
-    @NotNull
-    public BigInteger getDenyPermissionBitsAsInt() {
-        return denyInt;
+    public Permissions getAllowPermissions() {
+        return Permissions.ofString(allow);
     }
 
     /**
-     * @return a {@link List} of {@link Permissions} which are allowed by this {@link PermissionOverwrite}
+     * @return a {@link List} of {@link Permission} which are denied by this {@link PermissionOverwrite}
      */
     @NotNull
-    public List<Permissions> getAllowPermissions() {
-        if(allowedPermissions == null) allowedPermissions = Permissions.getPermissionsFromBits(getAllowPermissionBitsAsInt());
-        return allowedPermissions;
-    }
-
-    /**
-     * @return a {@link List} of {@link Permissions} which are denied by this {@link PermissionOverwrite}
-     */
-    @NotNull
-    public List<Permissions> getDenyPermissions() {
-        if(deniedPermissions == null) deniedPermissions = Permissions.getPermissionsFromBits(getDenyPermissionBitsAsInt());
-        return deniedPermissions;
+    public Permissions getDenyPermissions() {
+        return Permissions.ofString(deny);
     }
 
     @Override
