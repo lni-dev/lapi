@@ -139,7 +139,8 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @return {@link User}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #USERNAME_KEY}, {@link #DISCRIMINATOR_KEY} are missing or null
      */
-    public static @NotNull User fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @Nullable User fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         String username = (String) data.get(USERNAME_KEY);
         String discriminator = (String) data.get(DISCRIMINATOR_KEY);

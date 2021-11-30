@@ -42,8 +42,6 @@ public class Test {
 
         });
 
-        System.out.println(new BigInteger(new byte[]{1}));
-
     }
 
 
