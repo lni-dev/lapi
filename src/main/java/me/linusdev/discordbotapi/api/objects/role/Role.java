@@ -2,7 +2,11 @@ package me.linusdev.discordbotapi.api.objects.role;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
+import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.permission.Permission;
@@ -147,6 +151,27 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
      */
     public @Nullable String getIconHash() {
         return iconHash;
+    }
+
+    /**
+     *
+     * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
+     * @param fileType see {@link CDNImage#ofRoleIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the icon
+     */
+    public @NotNull CDNImageRetriever getIcon(int desiredSize, @NotNull AbstractFileType fileType){
+        if(getIconHash() == null) throw new IllegalArgumentException("This role object has no icon hash");
+        return new CDNImageRetriever(CDNImage.ofRoleIcon(lApi, getId(), getIconHash(), fileType), desiredSize, true);
+    }
+
+    /**
+     *
+     * @param fileType see {@link CDNImage#ofRoleIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the icon
+     */
+    public @NotNull CDNImageRetriever getIcon(@NotNull AbstractFileType fileType){
+        if(getIconHash() == null) throw new IllegalArgumentException("This role object has no icon hash");
+        return new CDNImageRetriever(CDNImage.ofRoleIcon(lApi, getId(), getIconHash(), fileType));
     }
 
     /**
