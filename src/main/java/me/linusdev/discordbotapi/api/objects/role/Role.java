@@ -13,6 +13,7 @@ import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,8 +94,10 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
      * @return {@link Role}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #COLOR_KEY}, {@link #HOIST_KEY}, {@link #POSITION_KEY}, {@link #PERMISSIONS_KEY}, {@link #MANAGED_KEY} or {@link #MENTIONABLE_KEY} are missing or {@code null}
      */
+    @Contract("_, null -> null; _, !null -> !null")
     @SuppressWarnings("ConstantConditions")
-    public static @NotNull Role fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @Nullable Role fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
         Number color = (Number) data.get(COLOR_KEY);

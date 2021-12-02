@@ -11,6 +11,7 @@ import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.channel.*;
 import me.linusdev.discordbotapi.api.objects.enums.ChannelType;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,7 +55,9 @@ public abstract class Channel implements SnowflakeAble {
     private final @NotNull ChannelType type;
 
 
-    public static @NotNull Channel fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    @Contract("_, null -> null; _, !null -> !null")
+    public static @Nullable Channel fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
         ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
         Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
 
