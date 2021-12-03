@@ -61,7 +61,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @return {@link ResolvedData}
      * @throws InvalidDataException see {@link User#fromData(LApi, Data)}, {@link Member#fromData(LApi, Data)}, {@link Role#fromData(LApi, Data)}, {@link Channel#fromData(LApi, Data)}, {@link me.linusdev.discordbotapi.api.objects.message.Message#Message(LApi, Data)}
      */
-    public static @Nullable ResolvedData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ResolvedData fromData(@NotNull LApi lApi, Object data) throws InvalidDataException {
         if(data == null) return null;
         ArrayList<User> users = data.getAndConvertArrayList(USERS_KEY,
                 (ExceptionConverter<Data, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible));
