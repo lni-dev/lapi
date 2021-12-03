@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.command.option.type;
+package me.linusdev.discordbotapi.api.objects.command.option;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;

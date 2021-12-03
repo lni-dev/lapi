@@ -5,7 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.objects.command.option.type.ApplicationCommandOptionType;
+import me.linusdev.discordbotapi.api.objects.command.option.ApplicationCommandOptionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
