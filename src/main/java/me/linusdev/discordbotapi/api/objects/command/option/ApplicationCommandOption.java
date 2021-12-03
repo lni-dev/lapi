@@ -60,7 +60,7 @@ public class ApplicationCommandOption implements Datable, HasLApi {
      * @param channelTypes if the option is a channel type, the channels shown will be restricted to these types
      * @param minValue if the option is an {@link ApplicationCommandOptionType#INTEGER INTEGER} or {@link ApplicationCommandOptionType#NUMBER NUMBER} type, the minimum value permitted
      * @param maxValue if the option is an {@link ApplicationCommandOptionType#INTEGER INTEGER} or {@link ApplicationCommandOptionType#NUMBER NUMBER} type, the maximum value permitted
-     * @param autocomplete enable autocomplete interactions for this option
+     * @param autocomplete enable autocomplete interactions for this option. may not be set to true if choices are present.
      */
     public ApplicationCommandOption(@NotNull LApi lApi, @NotNull ApplicationCommandOptionType type, @NotNull String name, @NotNull String description, @Nullable Boolean required, @Nullable ApplicationCommandOptionChoice[] choices, @Nullable ApplicationCommandOption[] options, @Nullable ChannelType[] channelTypes, @Nullable Number minValue, @Nullable Number maxValue, @Nullable Boolean autocomplete) {
         this.lApi = lApi;
