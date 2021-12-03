@@ -1,6 +1,9 @@
 package me.linusdev.discordbotapi.api.objects.message.abstracts;
 
+import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.attachment.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
@@ -24,6 +27,7 @@ import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.user.UserMention;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -115,6 +119,19 @@ import java.util.List;
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object" target="_top">Message Object</a>
  */
 public interface Message extends Datable, SnowflakeAble {
+
+    /**
+     * see {@link me.linusdev.discordbotapi.api.objects.message.Message Message implemantion}
+     * @param lApi {@link LApi}
+     * @param data {@link Data}
+     * @return {@link me.linusdev.discordbotapi.api.objects.message.Message Message}
+     */
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable me.linusdev.discordbotapi.api.objects.message.Message fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
+        return new me.linusdev.discordbotapi.api.objects.message.Message(lApi, data);
+    }
+
 
     /**
      * id of the message as {@link Snowflake}
