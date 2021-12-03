@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.command;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types" target="_top">Application Command Types</a>
@@ -34,6 +35,19 @@ public enum ApplicationCommandType implements SimpleDatable {
 
     ApplicationCommandType(int value) {
         this.value = value;
+    }
+
+    /**
+     *
+     * @param value int
+     * @return {@link ApplicationCommandType} matching given value or {@link #UNKNOWN} if none matches
+     */
+    public static @NotNull ApplicationCommandType ofValue(int value){
+        for(ApplicationCommandType type : ApplicationCommandType.values()){
+            if(type.value == value) return type;
+        }
+
+        return UNKNOWN;
     }
 
     public int getValue() {
