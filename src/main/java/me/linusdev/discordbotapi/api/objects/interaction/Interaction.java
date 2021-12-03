@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.objects.toodo;
+package me.linusdev.discordbotapi.api.objects.interaction;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
@@ -6,8 +6,6 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.guild.member.Member;
-import me.linusdev.discordbotapi.api.objects.interaction.InteractionData;
-import me.linusdev.discordbotapi.api.objects.interaction.InteractionType;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;

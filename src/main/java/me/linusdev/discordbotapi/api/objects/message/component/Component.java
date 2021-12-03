@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.interaction.Interaction;
 import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
 import me.linusdev.discordbotapi.api.objects.message.component.button.Button;
 import me.linusdev.discordbotapi.api.objects.message.component.selectmenu.SelectMenu;
@@ -36,9 +37,9 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  *     Components, aside from {@link ActionRow Action Rows}, must have a custom_id field ({@link Button#getCustomId()}, {@link SelectMenu#getCustomId()}).
  *     This field is defined by the developer (yes, YOU) when sending the component payload,
- *     and is returned in the {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction} payload sent when a user interacts with the component.
+ *     and is returned in the {@link Interaction interaction} payload sent when a user interacts with the component.
  *     For example, if you set custom_id: click_me on a button,
- *     you'll receive an {@link me.linusdev.discordbotapi.api.objects.toodo.Interaction interaction} containing custom_id: click_me when a user clicks that button.
+ *     you'll receive an {@link Interaction interaction} containing custom_id: click_me when a user clicks that button.
  * </p>
  * <p>
  *     custom_id must be unique per component; multiple buttons on the same message must not share the same custom_id.
