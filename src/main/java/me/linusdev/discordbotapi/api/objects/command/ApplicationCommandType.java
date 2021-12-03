@@ -42,7 +42,7 @@ public enum ApplicationCommandType implements SimpleDatable {
      * @param value int
      * @return {@link ApplicationCommandType} matching given value or {@link #UNKNOWN} if none matches
      */
-    public static @NotNull ApplicationCommandType ofValue(int value){
+    public static @NotNull ApplicationCommandType fromValue(int value){
         for(ApplicationCommandType type : ApplicationCommandType.values()){
             if(type.value == value) return type;
         }
