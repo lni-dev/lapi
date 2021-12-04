@@ -6,6 +6,7 @@ import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
+import me.linusdev.discordbotapi.api.objects.command.ApplicationCommand;
 import me.linusdev.discordbotapi.api.objects.enums.ChannelType;
 import me.linusdev.discordbotapi.api.objects.enums.SimpleChannelType;
 import org.jetbrains.annotations.Contract;
@@ -52,7 +53,7 @@ public class ApplicationCommandOption implements Datable, HasLApi {
      *
      * @param lApi {@link LApi}
      * @param type the type of option
-     * @param name 	1-{@value #NAME_MAX_CHARS} character name TODO link restrictions https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming
+     * @param name 	1-{@value #NAME_MAX_CHARS} character name. see {@link ApplicationCommand restrictions}
      * @param description 1-{@value #DESCRIPTION_MAX_CHARS} character description
      * @param required if the parameter is required or optional--default false
      * @param choices choices for {@link ApplicationCommandOptionType#STRING STRING}, {@link ApplicationCommandOptionType#INTEGER INTEGER}, and {@link ApplicationCommandOptionType#NUMBER NUMBER} types for the user to pick from, max {@value #MAX_CHOICES_AMOUNT}
