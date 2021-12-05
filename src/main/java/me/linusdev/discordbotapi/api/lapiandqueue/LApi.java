@@ -5,8 +5,10 @@ import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.VoiceRegions;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
@@ -14,6 +16,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
+import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
 import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
@@ -859,6 +862,23 @@ public class LApi {
      */
     public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
         return createMessage(channelId, true, embeds);
+    }
+
+    //Gateway
+
+    /**
+     * <p>
+     *     Returns an object based on the information in Get Gateway, plus additional metadata that can help during the
+     *     operation of large or sharded bots. Unlike the Get Gateway, this route should not be cached for extended
+     *     periods of time as the value is not guaranteed to be the same per-call, and changes as the bot joins/leaves
+     *     guilds.
+     * </p>
+     * @return {@link Queueable} to get a {@link GetGatewayResponse}
+     * @see Link#GET_GATEWAY_BOT
+     */
+    public @NotNull Queueable<GetGatewayResponse> getGatewayBot(){
+        Query query = new LinkQuery(this, Link.GET_GATEWAY_BOT, null, null);
+        return new ConvertingRetriever<>(this, query, (lApi, data) -> GetGatewayResponse.fromData(data));
     }
 
     //Getter

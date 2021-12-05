@@ -21,6 +21,26 @@ public enum Link implements AbstractLink{
      * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
      */
     CREATE_MESSAGE(POST, O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages"),
+
+    /**
+     * Returns an object with a single valid WSS URL, which the client can use for Connecting.
+     * Clients should cache this value and only call this endpoint to retrieve a new URL if
+     * they are unable to properly establish a connection using the cached version of the URL.
+     *
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway" target="_top">Get Gateway</a>
+     */
+    GET_GATEWAY(GET, O_DISCORD_API_VERSION_LINK + "gateway"),
+
+    /**
+     * Returns an object based on the information in Get Gateway,
+     * plus additional metadata that can help during the operation of large or sharded bots.
+     * Unlike the Get Gateway, this route should not be cached for extended periods of time
+     * as the value is not guaranteed to be the same per-call, and changes as the bot joins/leaves
+     * guilds.
+     *
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway-bot" target="_top">Get Gateway Bot</a>
+     */
+    GET_GATEWAY_BOT(GET, O_DISCORD_API_VERSION_LINK + "gateway/bot"),
     ;
 
     private final @NotNull Method method;
