@@ -1,19 +1,32 @@
 package me.linusdev.discordbotapi;
 
+import me.linusdev.data.Data;
+import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.file.types.FileType;
+import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
+import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.log.Logger;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.io.StringReader;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.WebSocket;
+import java.nio.ByteBuffer;
 import java.nio.file.Paths;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static me.linusdev.discordbotapi.api.lapiandqueue.LApi.CREATOR_ID;
 
@@ -26,20 +39,103 @@ public class Test {
         final LApi lApi = new LApi(Private.TOKEN, new Config(0, null));
 
 
-        lApi.getCurrentUserRetriever()
-                .queueAndWriteToFile(Paths.get("C:\\Users\\Linus\\Desktop\\DiscordBotApi\\download\\file.json"), true, (user, err) -> {
-            System.out.println(err);
-            assert user.getAvatarHash() != null;
-            System.out.println(user.getAvatarHash());
+        GetGatewayResponse gatewayResponse = lApi.getGatewayBot().queueAndWait();
 
-            CDNImageRetriever retriever = new CDNImageRetriever(
-                    CDNImage.ofUserAvatar(lApi, CREATOR_ID, (String) user.getAvatarHash(), FileType.PNG));
+        System.out.println(gatewayResponse.getUrl());
+        System.out.println(gatewayResponse.getShards());
+        System.out.println(gatewayResponse.getSessionStartLimit().getData().getJsonString());
 
-            retriever.queueAndWriteToFile(Paths.get("C:\\Users\\Linus\\Desktop\\DiscordBotApi\\download\\file.png"), true,
-                    (inputStream, error) -> {
-                        System.out.println(error);
-            });
+        HttpClient client = lApi.getClient();
 
+        client.newWebSocketBuilder().header(lApi.getAuthorizationHeader().getName(), lApi.getAuthorizationHeader().getValue()).buildAsync(URI.create(gatewayResponse.getUrl() + "?v=9&encoding=json"), new WebSocket.Listener() {
+            boolean started = false;
+            volatile AtomicInteger sequence = null;
+
+            @Override
+            public void onOpen(WebSocket webSocket) {
+                WebSocket.Listener.super.onOpen(webSocket);
+            }
+
+            @Override
+            public CompletionStage<?> onText(final WebSocket webSocket, CharSequence text, boolean last) {
+                System.out.println("received message....");
+                try {
+                    Data data = new JsonParser().readDataFromReader(new StringReader(text.toString()));
+                    System.out.println("message: " + data.getJsonString());
+
+                    GatewayPayload payload = GatewayPayload.fromData(data);
+
+                    if((payload.getOpcode() == 10 && !started)){
+                        started = true;
+                        sequence = new AtomicInteger(payload.getSequence());
+                        Data h = (Data) payload.getPayloadData();
+                        long heartBeat = ((Number) h.get("heartbeat_interval")).longValue();
+
+                        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+                            System.out.println("sending heartbeat");
+                            try{
+                                GatewayPayload send = new GatewayPayload(1, null, sequence.getAndIncrement(), null);
+                                webSocket.sendText(send.getData().getJsonString(), true);
+                            }catch (Throwable t){
+                                t.printStackTrace();
+                            }
+
+                        }, 0, heartBeat, TimeUnit.MILLISECONDS);
+
+                        String s = "{\n" +
+                                "  \"op\": 2,\n" +
+                                "  \"d\": {\n" +
+                                "    \"token\": \"" + Private.TOKEN + "\",\n" +
+                                "    \"intents\": " + 0x1FFFF + ",\n" + //   1 1111 1111 1111 1111
+                                "    \"properties\": {\n" +
+                                "      \"$os\": \"windows\",\n" +
+                                "      \"$browser\": \"LApi\",\n" +
+                                "      \"$device\": \"LApi\"\n" +
+                                "    }\n" +
+                                "  }\n" +
+                                "}";
+                        System.out.println(s);
+                        webSocket.sendText(s, true);
+
+
+                    }else if(payload.getOpcode() == 1){
+                        //send heartbeat
+                    }else if(payload.getOpcode() == 11){
+                        System.out.println("Heartbeat ack");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return WebSocket.Listener.super.onText(webSocket, text, last);
+            }
+
+            @Override
+            public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer data, boolean last) {
+                return WebSocket.Listener.super.onBinary(webSocket, data, last);
+            }
+
+            @Override
+            public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
+                return WebSocket.Listener.super.onPing(webSocket, message);
+            }
+
+            @Override
+            public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
+                return WebSocket.Listener.super.onPong(webSocket, message);
+            }
+
+            @Override
+            public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+                System.out.println("close: " + reason);
+                return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
+            }
+
+            @Override
+            public void onError(WebSocket webSocket, Throwable error) {
+                error.printStackTrace();
+                WebSocket.Listener.super.onError(webSocket, error);
+            }
         });
 
     }
