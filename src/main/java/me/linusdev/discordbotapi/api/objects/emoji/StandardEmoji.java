@@ -1904,6 +1904,11 @@ public enum StandardEmoji implements Emoji {
     }
 
     @Override
+    public @Nullable Boolean getAnimated() {
+        return null;
+    }
+
+    @Override
     public boolean isAnimated() {
         return false;
     }

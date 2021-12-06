@@ -56,6 +56,8 @@ public interface Emoji extends Datable {
         return getIdAsSnowflake() == null;
     }
 
+    @Nullable Boolean getAnimated();
+
     boolean isAnimated();
 
     @Contract(value = "_, _, _ -> new", pure = true)
@@ -74,6 +76,11 @@ public interface Emoji extends Datable {
             @Override
             public @NotNull String getName() {
                 return name;
+            }
+
+            @Override
+            public @Nullable Boolean getAnimated() {
+                return animated ? true : null;
             }
 
             @Override
