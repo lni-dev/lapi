@@ -41,6 +41,15 @@ public class GatewayPayload implements Datable {
     }
 
     /**
+     * Creates a Heartbeat GatewayPayload with opcode {@value Gateway#HEARTBEAT_OPCODE} and given sequence.
+     * @return {@link GatewayPayload}
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#heartbeating" target="_top">Heartbeating</a>
+     */
+    public static @NotNull GatewayPayload newHeartbeat(int sequence){
+        return new GatewayPayload(Gateway.HEARTBEAT_OPCODE, null, sequence, null);
+    }
+
+    /**
      *
      * @param data {@link Data}
      * @return {@link GatewayPayload}

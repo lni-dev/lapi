@@ -9,6 +9,7 @@ package me.linusdev.discordbotapi.api.objects.message.component;
 public final class ComponentLimits {
 
     public static final int LABEL_MAX_CHARS = 80;
+    public static final int URL_MAX_CHARS = 512; //Only in ActivityButton AFAIK
     public static final int CUSTOM_ID_MAX_CHARS = 100;
     public static final int SELECT_OPTIONS_MAX = 25;
     public static final int PLACEHOLDER_MAX_CHARS = 100;

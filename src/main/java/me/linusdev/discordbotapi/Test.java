@@ -10,6 +10,12 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.file.types.FileType;
 import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
+import me.linusdev.discordbotapi.api.communication.gateway.activity.Activity;
+import me.linusdev.discordbotapi.api.communication.gateway.activity.ActivityType;
+import me.linusdev.discordbotapi.api.communication.gateway.identify.ConnectionProperties;
+import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.log.Logger;
@@ -58,7 +64,7 @@ public class Test {
 
             @Override
             public CompletionStage<?> onText(final WebSocket webSocket, CharSequence text, boolean last) {
-                System.out.println("received message....");
+                System.out.println("received message.... " + text);
                 try {
                     Data data = new JsonParser().readDataFromReader(new StringReader(text.toString()));
                     System.out.println("message: " + data.getJsonString());
@@ -74,7 +80,7 @@ public class Test {
                         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
                             System.out.println("sending heartbeat");
                             try{
-                                GatewayPayload send = new GatewayPayload(1, null, sequence.getAndIncrement(), null);
+                                GatewayPayload send = GatewayPayload.newHeartbeat(sequence.getAndIncrement());
                                 webSocket.sendText(send.getData().getJsonString(), true);
                             }catch (Throwable t){
                                 t.printStackTrace();
@@ -82,18 +88,27 @@ public class Test {
 
                         }, 0, heartBeat, TimeUnit.MILLISECONDS);
 
-                        String s = "{\n" +
-                                "  \"op\": 2,\n" +
-                                "  \"d\": {\n" +
-                                "    \"token\": \"" + Private.TOKEN + "\",\n" +
-                                "    \"intents\": " + 0x1FFFF + ",\n" + //   1 1111 1111 1111 1111
-                                "    \"properties\": {\n" +
-                                "      \"$os\": \"windows\",\n" +
-                                "      \"$browser\": \"LApi\",\n" +
-                                "      \"$device\": \"LApi\"\n" +
-                                "    }\n" +
-                                "  }\n" +
-                                "}";
+
+                        GatewayPayload identify = new GatewayPayload(
+                                2,
+                                new Identify(
+                                        Private.TOKEN,
+                                        new ConnectionProperties("windows", "LApi", "LApi"),
+                                        false,
+                                        250,
+                                        null, null,
+                                        new PresenceUpdate(
+                                                null,
+                                                new Activity[]{new Activity("Test", ActivityType.GAME, null,
+                                                        null, null, null, null,
+                                                        null, null, null, null, null,
+                                                        null, null, null)},
+                                                StatusType.ONLINE, false),
+                                        0x200),
+                                sequence.getAndIncrement(),
+                                null);
+
+                        String s = identify.getData().getJsonString().toString();
                         System.out.println(s);
                         webSocket.sendText(s, true);
 
@@ -137,7 +152,6 @@ public class Test {
                 WebSocket.Listener.super.onError(webSocket, error);
             }
         });
-
     }
 
 
