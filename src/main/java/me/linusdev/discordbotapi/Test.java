@@ -57,7 +57,7 @@ public class Test {
 
         client.newWebSocketBuilder().header(lApi.getAuthorizationHeader().getName(), lApi.getAuthorizationHeader().getValue()).buildAsync(URI.create(gatewayResponse.getUrl() + "?v=9&encoding=json"), new WebSocket.Listener() {
             boolean started = false;
-            volatile AtomicInteger sequence = null;
+            volatile int sequence = 0;
 
             @Override
             public void onOpen(WebSocket webSocket) {
@@ -73,16 +73,18 @@ public class Test {
 
                     GatewayPayload payload = GatewayPayload.fromData(data);
 
+                    sequence = payload.getSequence() == null ? 0 : payload.getSequence();
+
                     if((payload.getOpcode() == GatewayOpcode.HELLO && !started)){
                         started = true;
-                        sequence = new AtomicInteger(payload.getSequence());
+
                         Data h = (Data) payload.getPayloadData();
                         long heartBeat = ((Number) h.get("heartbeat_interval")).longValue();
 
                         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
                             System.out.println("sending heartbeat");
                             try{
-                                GatewayPayload send = GatewayPayload.newHeartbeat(sequence.getAndIncrement());
+                                GatewayPayload send = GatewayPayload.newHeartbeat(sequence);
                                 webSocket.sendText(send.getData().getJsonString(), true);
                             }catch (Throwable t){
                                 t.printStackTrace();
@@ -107,7 +109,7 @@ public class Test {
                                                         null, null, null)},
                                                 StatusType.ONLINE, false),
                                         0x200),
-                                sequence.getAndIncrement(),
+                                -1,
                                 null);
 
                         String s = identify.getData().getJsonString().toString();

@@ -45,7 +45,10 @@ public class LogInstance {
     }
 
 
-
+    /**
+     * will log the message and the stacktrace. Will be aligned.
+     * @param throwable to log
+     */
     public void error(Throwable throwable){
         StringBuilder err = new StringBuilder();
         err.append(throwable.getMessage()).append(":\n");

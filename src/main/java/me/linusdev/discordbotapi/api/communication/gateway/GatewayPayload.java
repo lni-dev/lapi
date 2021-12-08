@@ -16,6 +16,7 @@ public class GatewayPayload implements Datable {
     public static final String DATA_KEY = "d";
     public static final String SEQUENCE_KEY = "s";
     public static final String TYPE_KEY = "t";
+    public static final String _TRACE_KEY = "_trace";
 
     private final @NotNull GatewayOpcode opcode;
     private final @Nullable Object data;
@@ -23,7 +24,7 @@ public class GatewayPayload implements Datable {
     /**
      * -1 can be considered {@code null}
      */
-    private final int sequence;
+    private final @Nullable Integer sequence;
     private final @Nullable String type;
 
     /**
@@ -33,7 +34,7 @@ public class GatewayPayload implements Datable {
      * @param sequence sequence number, used for resuming sessions and heartbeats. -1 can be considered null
      * @param type the event name for this payload
      */
-    public GatewayPayload(@NotNull GatewayOpcode opcode, @Nullable Object data, int sequence, @Nullable String type) {
+    public GatewayPayload(@NotNull GatewayOpcode opcode, @Nullable Object data, @Nullable Integer sequence, @Nullable String type) {
         this.opcode = opcode;
         this.data = data;
         this.sequence = sequence;
@@ -69,7 +70,7 @@ public class GatewayPayload implements Datable {
 
         return new GatewayPayload(
                 op == null ? GatewayOpcode.UNKNOWN : GatewayOpcode.fromValue(op.intValue()), d,
-                s == null ? -1 : s.intValue(), t
+                s == null ? null : s.intValue(), t
         );
     }
 
@@ -91,7 +92,7 @@ public class GatewayPayload implements Datable {
      * sequence number, used for resuming sessions and heartbeats
      * @return -1 if no sequence is given
      */
-    public int getSequence() {
+    public @Nullable Integer getSequence() {
         return sequence;
     }
 
@@ -108,7 +109,7 @@ public class GatewayPayload implements Datable {
 
         data.add(OPCODE_KEY, opcode);
         data.add(DATA_KEY, this.data);
-        data.add(SEQUENCE_KEY, sequence == -1 ? null : sequence);
+        data.add(SEQUENCE_KEY, sequence);
         data.add(TYPE_KEY, type);
 
         return data;
