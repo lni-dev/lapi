@@ -514,7 +514,7 @@ public class LApi {
      *     Returns array of thread members objects that are members of the thread.
      * </p>
      * <p>
-     *     This endpoint is restricted according to whether the GUILD_MEMBERS Privileged Intent is enabled for your application.
+     *     This endpoint is restricted according to whether the GUILD_MEMBERS Privileged GatewayIntent is enabled for your application.
      * </p>
      * TODO add @links
      * @param channelId the channel id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread}

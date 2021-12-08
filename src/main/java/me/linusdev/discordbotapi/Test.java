@@ -8,6 +8,8 @@ import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.file.types.FileType;
+import me.linusdev.discordbotapi.api.communication.gateway.GatewayCloseStatusCode;
+import me.linusdev.discordbotapi.api.communication.gateway.GatewayOpcode;
 import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.gateway.activity.Activity;
@@ -71,7 +73,7 @@ public class Test {
 
                     GatewayPayload payload = GatewayPayload.fromData(data);
 
-                    if((payload.getOpcode() == 10 && !started)){
+                    if((payload.getOpcode() == GatewayOpcode.HELLO && !started)){
                         started = true;
                         sequence = new AtomicInteger(payload.getSequence());
                         Data h = (Data) payload.getPayloadData();
@@ -90,7 +92,7 @@ public class Test {
 
 
                         GatewayPayload identify = new GatewayPayload(
-                                2,
+                                GatewayOpcode.IDENTIFY,
                                 new Identify(
                                         Private.TOKEN,
                                         new ConnectionProperties("windows", "LApi", "LApi"),
@@ -113,9 +115,9 @@ public class Test {
                         webSocket.sendText(s, true);
 
 
-                    }else if(payload.getOpcode() == 1){
+                    }else if(payload.getOpcode() == GatewayOpcode.HEARTBEAT){
                         //send heartbeat
-                    }else if(payload.getOpcode() == 11){
+                    }else if(payload.getOpcode() == GatewayOpcode.HEARTBEAT_ACK){
                         System.out.println("Heartbeat ack");
                     }
                 } catch (Exception e) {
@@ -143,6 +145,10 @@ public class Test {
             @Override
             public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
                 System.out.println("close: " + reason);
+
+                GatewayCloseStatusCode code = GatewayCloseStatusCode.fromInt(statusCode);
+                System.out.println(code);
+
                 return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
             }
 

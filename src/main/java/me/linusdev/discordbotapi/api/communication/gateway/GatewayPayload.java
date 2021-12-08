@@ -17,7 +17,7 @@ public class GatewayPayload implements Datable {
     public static final String SEQUENCE_KEY = "s";
     public static final String TYPE_KEY = "t";
 
-    private final int opcode;
+    private final @NotNull GatewayOpcode opcode;
     private final @Nullable Object data;
 
     /**
@@ -33,7 +33,7 @@ public class GatewayPayload implements Datable {
      * @param sequence sequence number, used for resuming sessions and heartbeats. -1 can be considered null
      * @param type the event name for this payload
      */
-    public GatewayPayload(int opcode, @Nullable Object data, int sequence, @Nullable String type) {
+    public GatewayPayload(@NotNull GatewayOpcode opcode, @Nullable Object data, int sequence, @Nullable String type) {
         this.opcode = opcode;
         this.data = data;
         this.sequence = sequence;
@@ -46,7 +46,7 @@ public class GatewayPayload implements Datable {
      * @see <a href="https://discord.com/developers/docs/topics/gateway#heartbeating" target="_top">Heartbeating</a>
      */
     public static @NotNull GatewayPayload newHeartbeat(int sequence){
-        return new GatewayPayload(Gateway.HEARTBEAT_OPCODE, null, sequence, null);
+        return new GatewayPayload(GatewayOpcode.HEARTBEAT, null, sequence, null);
     }
 
     /**
@@ -68,7 +68,7 @@ public class GatewayPayload implements Datable {
         }
 
         return new GatewayPayload(
-                op == null ? -1 : op.intValue(), d,
+                op == null ? GatewayOpcode.UNKNOWN : GatewayOpcode.fromValue(op.intValue()), d,
                 s == null ? -1 : s.intValue(), t
         );
     }
@@ -76,7 +76,7 @@ public class GatewayPayload implements Datable {
     /**
      * opcode for the payload
      */
-    public int getOpcode() {
+    public GatewayOpcode getOpcode() {
         return opcode;
     }
 
