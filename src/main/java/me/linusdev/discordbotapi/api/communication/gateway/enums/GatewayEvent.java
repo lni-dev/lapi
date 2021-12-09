@@ -1,7 +1,8 @@
-package me.linusdev.discordbotapi.api.communication.gateway;
+package me.linusdev.discordbotapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events" target="_top">Gateway Events</a>
@@ -319,9 +320,10 @@ public enum GatewayEvent implements SimpleDatable {
     /**
      *
      * @param value event-string
-     * @return {@link GatewayEvent} matching given string or {@link #UNKNOWN} if none matches
+     * @return {@link GatewayEvent} matching given string or {@link #UNKNOWN} if none matches. Or {@code null} if given value is {@code null}
      */
-    public static @NotNull GatewayEvent fromString(String value){
+    public static @Nullable GatewayEvent fromString(@Nullable String value){
+        if(value == null) return null;
         for(GatewayEvent event : GatewayEvent.values()){
             if(event.value.equalsIgnoreCase(value)){
                 return event;

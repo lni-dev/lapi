@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.communication.gateway;
+package me.linusdev.discordbotapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
 

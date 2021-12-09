@@ -60,8 +60,9 @@ public class LApi {
      */
     public static final String CREATOR_ID = "247421526532554752";
 
-    private static final String LAPI_URL = "https://twitter.com/Linus_Dev";
-    private static final String LAPI_VERSION = "1.0";
+    public static final String LAPI_URL = "https://twitter.com/Linus_Dev";
+    public static final String LAPI_VERSION = "1.0";
+    public static final String LAPI_NAME = "LApi";
 
     private @NotNull final String token;
     private @NotNull final Config config;

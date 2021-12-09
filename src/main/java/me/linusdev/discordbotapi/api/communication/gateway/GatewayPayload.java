@@ -2,15 +2,24 @@ package me.linusdev.discordbotapi.api.communication.gateway;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.converter.Converter;
+import me.linusdev.data.parser.JsonParser;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
+import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
+import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#payloads-gateway-payload-structure" target="_top">Gateway payload strcuture</a>
  */
-public class GatewayPayload implements Datable {
+public class GatewayPayload implements GatewayPayloadAbstract, Datable {
 
     public static final String OPCODE_KEY = "op";
     public static final String DATA_KEY = "d";
@@ -24,30 +33,54 @@ public class GatewayPayload implements Datable {
     /**
      * -1 can be considered {@code null}
      */
-    private final @Nullable Integer sequence;
-    private final @Nullable String type;
+    private final @Nullable Long sequence;
+    private final @Nullable GatewayEvent type;
+    private final @Nullable String[] _trace;
 
     /**
-     *
-     * @param opcode opcode for the payload
+     *  @param opcode opcode for the payload
      * @param data event data
      * @param sequence sequence number, used for resuming sessions and heartbeats. -1 can be considered null
      * @param type the event name for this payload
+     * @param trace
      */
-    public GatewayPayload(@NotNull GatewayOpcode opcode, @Nullable Object data, @Nullable Integer sequence, @Nullable String type) {
+    public GatewayPayload(@NotNull GatewayOpcode opcode, @Nullable Object data, @Nullable Long sequence, @Nullable GatewayEvent type, @Nullable String[] trace) {
         this.opcode = opcode;
         this.data = data;
         this.sequence = sequence;
         this.type = type;
+        _trace = trace;
     }
 
     /**
-     * Creates a Heartbeat GatewayPayload with opcode {@value Gateway#HEARTBEAT_OPCODE} and given sequence.
+     * Creates a Heartbeat GatewayPayload with opcode {@link GatewayOpcode#HEARTBEAT} and given sequence as data.
+     * If we have not received a sequence yet, the sequence should be {@code null}
+     * @param sequence last sequence received from Discord
      * @return {@link GatewayPayload}
      * @see <a href="https://discord.com/developers/docs/topics/gateway#heartbeating" target="_top">Heartbeating</a>
      */
-    public static @NotNull GatewayPayload newHeartbeat(int sequence){
-        return new GatewayPayload(GatewayOpcode.HEARTBEAT, null, sequence, null);
+    public static @NotNull GatewayPayload newHeartbeat(@Nullable Long sequence){
+        return new GatewayPayload(GatewayOpcode.HEARTBEAT, sequence, null, null, null);
+    }
+
+    /**
+     * Creates an Identify GatewayPayload with opcode {@link GatewayOpcode#IDENTIFY} and given {@link Identify} as data.
+     * @param identify the identify data
+     * @return {@link GatewayPayload}
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#identifying" target="_top">Identifying</a>
+     */
+    public static @NotNull GatewayPayload newIdentify(@NotNull Identify identify){
+        return new GatewayPayload(GatewayOpcode.IDENTIFY, identify.getData(), null, null, null);
+    }
+
+    /**
+     * Creates a Resume GatewayPayload with opcode {@link GatewayOpcode#RESUME} and given {@link Resume} as data.
+     * @param resume the resume data
+     * @return {@link GatewayPayload}
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#resume" target="_top">Resume</a>
+     */
+    public static @NotNull GatewayPayload newResume(@NotNull Resume resume){
+        return new GatewayPayload(GatewayOpcode.RESUME, resume.getData(), null, null, null);
     }
 
     /**
@@ -64,20 +97,22 @@ public class GatewayPayload implements Datable {
         Number s = (Number) data.get(SEQUENCE_KEY);
         String t = (String) data.get(TYPE_KEY);
 
+        ArrayList<String> trace = data.getAndConvertArrayList(_TRACE_KEY, (Converter<Object, String>) convertible -> (String) convertible);
+
         if(op == null) {
             InvalidDataException.throwException(data, null, GatewayPayload.class, new Object[]{op}, new String[]{OPCODE_KEY});
         }
 
         return new GatewayPayload(
                 op == null ? GatewayOpcode.UNKNOWN : GatewayOpcode.fromValue(op.intValue()), d,
-                s == null ? null : s.intValue(), t
-        );
+                s == null ? null : s.longValue(), GatewayEvent.fromString(t),
+                trace == null ? null : trace.toArray(new String[0]));
     }
 
     /**
      * opcode for the payload
      */
-    public GatewayOpcode getOpcode() {
+    public @NotNull GatewayOpcode getOpcode() {
         return opcode;
     }
 
@@ -92,15 +127,24 @@ public class GatewayPayload implements Datable {
      * sequence number, used for resuming sessions and heartbeats
      * @return -1 if no sequence is given
      */
-    public @Nullable Integer getSequence() {
+    public @Nullable Long getSequence() {
         return sequence;
     }
 
     /**
      * the event name for this payload
      */
-    public @Nullable String getType() {
+    public @Nullable GatewayEvent getType() {
         return type;
+    }
+
+    @Override
+    public @Nullable String toJsonString() {
+        return new JsonParser().getJsonString(getData()).toString();
+    }
+
+    public String[] get_trace() {
+        return _trace;
     }
 
     @Override
@@ -109,8 +153,8 @@ public class GatewayPayload implements Datable {
 
         data.add(OPCODE_KEY, opcode);
         data.add(DATA_KEY, this.data);
-        data.add(SEQUENCE_KEY, sequence);
-        data.add(TYPE_KEY, type);
+        data.addIfNotNull(SEQUENCE_KEY, sequence);
+        data.addIfNotNull(TYPE_KEY, type);
 
         return data;
     }

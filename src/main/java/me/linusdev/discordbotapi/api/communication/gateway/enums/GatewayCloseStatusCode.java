@@ -1,6 +1,7 @@
-package me.linusdev.discordbotapi.api.communication.gateway;
+package me.linusdev.discordbotapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes" target="_top">Gateway Close Event Codes</a>
@@ -11,6 +12,13 @@ public enum GatewayCloseStatusCode implements SimpleDatable {
      * LApi specific
      */
     UNKNOWN(-4000),
+
+    /**
+     * These can be sent by the client (your bot), to close the connection and let the bot appear offline
+     */
+    SEND_CLOSE(1000),
+    SEND_CLOSE_2(1001),
+
 
     /**
      * We're not sure what went wrong. Try reconnecting?

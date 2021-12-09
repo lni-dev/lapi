@@ -3,13 +3,9 @@ package me.linusdev.discordbotapi;
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
-import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
-import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.file.types.FileType;
-import me.linusdev.discordbotapi.api.communication.gateway.GatewayCloseStatusCode;
-import me.linusdev.discordbotapi.api.communication.gateway.GatewayOpcode;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseStatusCode;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
 import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.gateway.activity.Activity;
@@ -29,14 +25,10 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
-import java.nio.file.Paths;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static me.linusdev.discordbotapi.api.lapiandqueue.LApi.CREATOR_ID;
 
 public class Test {
 
@@ -73,7 +65,7 @@ public class Test {
 
                     GatewayPayload payload = GatewayPayload.fromData(data);
 
-                    sequence = payload.getSequence() == null ? 0 : payload.getSequence();
+                    sequence = payload.getSequence() == null ? 0 : payload.getSequence().intValue();
 
                     if((payload.getOpcode() == GatewayOpcode.HELLO && !started)){
                         started = true;
@@ -84,7 +76,7 @@ public class Test {
                         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
                             System.out.println("sending heartbeat");
                             try{
-                                GatewayPayload send = GatewayPayload.newHeartbeat(sequence);
+                                GatewayPayload send = GatewayPayload.newHeartbeat((long) sequence);
                                 webSocket.sendText(send.getData().getJsonString(), true);
                             }catch (Throwable t){
                                 t.printStackTrace();
@@ -109,8 +101,8 @@ public class Test {
                                                         null, null, null)},
                                                 StatusType.ONLINE, false),
                                         0x200),
-                                -1,
-                                null);
+                                -1L,
+                                null, null);
 
                         String s = identify.getData().getJsonString().toString();
                         System.out.println(s);

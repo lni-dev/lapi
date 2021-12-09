@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/application#application-object" target="_top">Application Object</a>
  */
-public class Application implements Datable, HasLApi {
+public class Application implements ApplicationAbstract, Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -165,15 +165,9 @@ public class Application implements Datable, HasLApi {
     /**
      * 	the id as {@link Snowflake} of the app
      */
+    @Override
     public @NotNull Snowflake getIdAsSnowflake() {
         return id;
-    }
-
-    /**
-     * 	the id as {@link String} of the app
-     */
-    public @NotNull String getId() {
-        return id.asString();
     }
 
     /**
