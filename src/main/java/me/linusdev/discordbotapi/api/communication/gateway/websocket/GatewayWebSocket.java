@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
 
 public class GatewayWebSocket implements WebSocket.Listener, HasLApi {
 
@@ -73,10 +74,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi {
     private long heartbeatInterval;
     private String sessionId;
 
-    private AtomicLong heartbeatsSent;
-    private AtomicLong heartbeatAcknowledgementsReceived;
+    private final AtomicLong heartbeatsSent;
+    private final AtomicLong heartbeatAcknowledgementsReceived;
 
-    private AtomicBoolean canResume;
+    private final AtomicBoolean canResume;
 
     private String currentText = null;
     private ArrayList<ByteBuffer> currentBytes = null;
@@ -100,15 +101,19 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi {
         this.token = token;
         this.properties = new ConnectionProperties(os, LApi.LAPI_NAME, LApi.LAPI_NAME);
         this.largeThreshold = largeThreshold == null ? LARGE_THRESHOLD_STANDARD : largeThreshold;
+
         if (shardId != null && numShards != null) {
             this.usesSharding = true;
             this.shardId = shardId;
             this.numShards = numShards;
+
         } else {
             this.usesSharding = false;
             this.shardId = 0;
             this.numShards = 0;
+
         }
+
         this.presence = presence;
         this.intents = intents;
 
@@ -305,7 +310,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi {
 
         GatewayPayload payload = GatewayPayload.newHeartbeat(sequence);
 
-        sendPayload(payload);
+        sendPayload(payload).whenComplete((webSocket, throwable) -> {
+            if(throwable == null) heartbeatsSent.incrementAndGet();
+        });
     }
 
     /**
@@ -313,14 +320,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi {
      *
      * @param payload payload to send
      */
-    protected void sendPayload(GatewayPayloadAbstract payload) {
+    protected CompletableFuture<WebSocket> sendPayload(GatewayPayloadAbstract payload) {
         if (webSocket == null || webSocket.isOutputClosed())
             throw new UnsupportedOperationException("cannot send a payload, because you are not connected");
 
         CompletableFuture<WebSocket> future = webSocket.sendText(payload.toJsonString(), true);
 
         final GatewayWebSocket _this = this;
-        future.whenComplete((webSocket, error) -> {
+        return future.whenComplete((webSocket, error) -> {
             if (error != null) {
                 logger.error(error);
                 if (errorHandler != null) errorHandler.handle(lApi, _this, error);
