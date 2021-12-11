@@ -3,6 +3,7 @@ package me.linusdev.discordbotapi.api.objects.message.embed;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Embed sent in {@link me.linusdev.discordbotapi.api.objects.message.Message}.
+ * Embed sent in {@link MessageImplementation}.
  * <br> Objects of this class are static and do not change its content. Even if the embed is changed on discords end
  * <br><br>
  *
@@ -107,7 +108,7 @@ public class Embed implements Datable {
             fields = new Field[fieldsData.size()];
             int i = 0;
             for(Data field : fieldsData)
-                fields[i++] = Field.fromData(data);
+                fields[i++] = Field.fromData(field);
 
         }
 
