@@ -295,6 +295,19 @@ public enum GatewayIntent implements SimpleDatable {
 
     /**
      *
+     * @param value string
+     * @return {@link GatewayIntent} matching (ignores case) given value or {@code null} if none matches
+     */
+    public static GatewayIntent fromName(String value){
+        for(GatewayIntent intent : GatewayIntent.values()){
+            if(intent.toString().equalsIgnoreCase(value)) return intent;
+        }
+
+        return null;
+    }
+
+    /**
+     *
      * @param flags int with set bits
      * @return {@link GatewayIntent} array of intents set in given int
      */
@@ -334,6 +347,6 @@ public enum GatewayIntent implements SimpleDatable {
 
     @Override
     public Object simplify() {
-        return value;
+        return toString();
     }
 }

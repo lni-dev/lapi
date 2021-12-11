@@ -109,8 +109,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     private ScheduledFuture<?> heartbeatFuture;
 
     //Converter and handler
-    private @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter = STANDARD_JSON_TO_PAYLOAD_CONVERTER;
-    private ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter = null;
+    private final @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter;
+    private final ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
 
     private UnexpectedEventHandler unexpectedEventHandler = null;
 
@@ -124,7 +124,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
                             @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
                             @NotNull String os, @Nullable Integer largeThreshold, @Nullable Integer shardId,
-                            @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents) {
+                            @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents,
+                            @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
+                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter) {
         this.lApi = lApi;
         this.transmitter = transmitter;
         this.token = token;
@@ -166,6 +168,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         this.heartbeatsSent = new AtomicLong(0);
         this.heartbeatAcknowledgementsReceived = new AtomicLong(0);
         this.pendingConnects = new AtomicInteger(0);
+
+        this.jsonToPayloadConverter = jsonToPayloadConverter;
+        this.etfToPayloadConverter = etfToPayloadConverter;
     }
 
     public void start() {
@@ -825,15 +830,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         logger.error(error);
         if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error);
         WebSocket.Listener.super.onError(webSocket, error);
-    }
-
-
-    public void setJsonToPayloadConverter(@NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter) {
-        this.jsonToPayloadConverter = jsonToPayloadConverter;
-    }
-
-    public void setEtfToPayloadConverter(ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter) {
-        this.etfToPayloadConverter = etfToPayloadConverter;
     }
 
     public void setUnexpectedEventHandler(@Nullable GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {

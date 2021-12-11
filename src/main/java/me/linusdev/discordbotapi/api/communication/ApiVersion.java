@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.communication;
 
 
+import me.linusdev.data.Datable;
+import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * uses for its HttpRequests is always {@link #V9}. So this enum is only useful for the {@link me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket Gateway}
  * @see <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions" target="_top">API Versions</a>
  */
-public enum ApiVersion {
+public enum ApiVersion implements SimpleDatable {
 
     /**
      * LApi specific
@@ -77,5 +79,10 @@ public enum ApiVersion {
 
     public @NotNull String getVersionNumber() {
         return versionNumberString;
+    }
+
+    @Override
+    public Object simplify() {
+        return versionNumber;
     }
 }

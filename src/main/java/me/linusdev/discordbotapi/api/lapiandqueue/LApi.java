@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.VoiceRegions;
+import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
@@ -61,6 +62,8 @@ public class LApi {
     public static final String LAPI_URL = "https://twitter.com/Linus_Dev";
     public static final String LAPI_VERSION = "1.0";
     public static final String LAPI_NAME = "LApi";
+
+    public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V9;
 
     private @NotNull final String token;
     private @NotNull final Config config;
