@@ -85,14 +85,14 @@ public class LApi {
     //Logger
     private final LogInstance log = Logger.getLogger("LApi", Logger.Type.INFO);
 
-    public LApi(@NotNull String token, @NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
-        this.token = token;
+    public LApi(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
+        this.token = config.getToken();
         this.config = config;
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
         this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
         //Queue
-        this.queue = config.getQueue();
+        this.queue = config.getNewQueue();
         this.scheduledExecutor = Executors.newScheduledThreadPool(1);
         this.queueWorker = Executors.newSingleThreadExecutor(new QueueThreadFactory());
         this.queueWorker.submit(new Runnable() {

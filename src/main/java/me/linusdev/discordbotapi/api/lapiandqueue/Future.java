@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 
 /**
  * When {@link Queueable#queue()} is called, the Queueable will call
- * {@link LApi#queue(Queueable) LApi.queue(Queueable)}.
+ * {@link LApi#queue(Queueable, BiConsumer, Consumer, Consumer)}  LApi.queue(Queueable)}.
  * This will create a new {@link Future<Queueable> Future&lt;Queueable&gt;} and add it to the
  * {@link LApi#queue LApi.queue}.
  * The Future will now pass through the queue. If the Future is {@link #cancel(boolean) cancled},

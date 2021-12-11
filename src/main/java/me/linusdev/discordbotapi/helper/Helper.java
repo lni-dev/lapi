@@ -24,4 +24,8 @@ public class Helper {
         }
         return path;
     }
+
+    public static Path getConfigPath() throws URISyntaxException {
+        return getJarPath().getParent().resolve("config.json");
+    }
 }

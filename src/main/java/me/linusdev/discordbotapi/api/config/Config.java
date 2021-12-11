@@ -3,9 +3,13 @@ package me.linusdev.discordbotapi.api.config;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 public class Config {
 
@@ -15,14 +19,14 @@ public class Config {
     public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 0x1L;
 
     private final long flags;
-    private final Queue<Future<?>> queue;
+    private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;
+    private final @NotNull String token;
 
-    public Config(long flags, Queue<Future<?>> queue){
+    public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token){
         this.flags = flags;
+        this.token = token;
 
-        if(queue == null)
-            this.queue = new ConcurrentLinkedQueue<Future<?>>();
-        else this.queue = queue;
+        this.queueSupplier = queueSupplier;
     }
 
     /**
@@ -37,7 +41,11 @@ public class Config {
     /**
      * The Queue used by {@link LApi} to queue any {@link Queueable}
      */
-    public Queue<Future<?>> getQueue() {
-        return queue;
+    public Queue<Future<?>> getNewQueue() {
+        return queueSupplier.get();
+    }
+
+    public @NotNull String getToken() {
+        return token;
     }
 }

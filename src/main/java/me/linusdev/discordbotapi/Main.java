@@ -5,6 +5,7 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.file.types.FileType;
+import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.config.Config;
@@ -29,6 +30,7 @@ import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
 import me.linusdev.discordbotapi.api.templates.message.builder.MentionType;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.discordbotapi.api.templates.message.builder.TimestampStyle;
+import me.linusdev.discordbotapi.helper.Helper;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 
@@ -47,8 +49,7 @@ public class Main {
         Logger.start();
         LogInstance log = Logger.getLogger("main");
 
-        Config config = new Config(0, null);
-        LApi api = new LApi(Private.TOKEN, config);
+        final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLapi();
 
         User currentUser = api.getCurrentUserRetriever().queueAndWait();
 
