@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.lapiandqueue;
 
 import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
+import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,15 +56,17 @@ import java.util.function.Consumer;
  *         {@link #beforeComplete(Consumer)} Listener will not be called
  *     </li>
  * </ul><br>
- * 
+ *
  * <h3 style="margin-bottom:0;padding-bottom:0">If {@link #then(BiConsumer)} or {@link #then(Consumer)} is set after the {@link #result} has already been retrieved:</h3>
  * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     The Listener will be called immediately in the setting thread
  * </p>
- * 
+ *
  * @param <T> the result Class
  */
 public class Future<T> implements java.util.concurrent.Future<T> {
+
+    private final static LogInstance logger = Logger.getLogger(Future.class.getSimpleName());
 
     private final @NotNull Queueable<T> queueable;
     private volatile boolean cancelled = false;
@@ -100,7 +103,14 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      */
     protected void completeHereAndIgnoreQueueThread() {
         final Consumer<Future<T>> beforeComplete = this.beforeComplete;
-        if (!cancelled && beforeComplete != null) beforeComplete.accept(this);
+        if (!cancelled && beforeComplete != null){
+            try{
+                beforeComplete.accept(this);
+            }catch (Throwable t){
+                logger.warning("Unexpected Exception in a Future beforeComplete listener");
+                logger.error(t);
+            }
+        }
 
         if (this.cancelled) {
             synchronized (this) {
@@ -116,9 +126,23 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         }
         //Fire the then listeners
         final BiConsumer<T, Error> then = this.then;
-        if (then != null) then.accept(result.get(), result.getError());
+        if (then != null){
+            try {
+                then.accept(result.get(), result.getError());
+            } catch (Throwable t){
+                logger.warning("Unexpected Exception in a Future then listener");
+                logger.error(t);
+            }
+        }
         final Consumer<T> thenSingle = this.thenSingle;
-        if (thenSingle != null) thenSingle.accept(result.get());
+        if (thenSingle != null){
+            try {
+                thenSingle.accept(result.get());
+            } catch (Throwable t){
+                logger.warning("Unexpected Exception in a Future thenSingle listener");
+                logger.error(t);
+            }
+        }
 
     }
 
@@ -129,7 +153,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * {@link Consumer#accept(Object)} will be called before {@link Queueable#completeHereAndIgnoreQueueThread()}.<br>
      * <br>
      * You can still cancel the {@link Future} in this Listener
-     * 
+     *
      * <p>
      *     If the {@link #result} has already been retrieved, or is currently being retrieved, at the time, this Listener is set,
      *     the Listener will never be called
@@ -151,7 +175,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
      * <br>
      * <p>
-     *     If a {@link #result} has already been retrieved, {@link #then} will be executed immediately in the calling thread 
+     *     If a {@link #result} has already been retrieved, {@link #then} will be executed immediately in the calling thread
      * </p>
      *
      * @param then to consume the result once it has been retrieved
@@ -171,7 +195,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      * <br> T will be {@code null} if an {@link Future#hasError() Error} has occurred
      * <br>
      * <p>
-     *     If a {@link #result} has already been retrieved, {@link #thenSingle} will be executed immediately in the calling thread 
+     *     If a {@link #result} has already been retrieved, {@link #thenSingle} will be executed immediately in the calling thread
      * </p>
      *
      * @param thenSingle to consume the result once it has been retrieved
