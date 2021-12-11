@@ -13,7 +13,7 @@ import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
-import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
@@ -111,7 +111,7 @@ public class Main {
                 return;
             }
 
-            for(Message message : messages){
+            for(MessageImplementation message : messages){
                 System.out.println("Pinned Message: " + message.getContent());
             }
 

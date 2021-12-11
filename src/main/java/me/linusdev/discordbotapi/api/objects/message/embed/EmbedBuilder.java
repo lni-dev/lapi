@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.message.embed;
 
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -494,7 +495,7 @@ public class EmbedBuilder {
 
     /**
      *
-     * This will check ({@link #checkEmbed()}) and build you an {@link Embed}, which you can attach to a {@link me.linusdev.discordbotapi.api.objects.message.Message}
+     * This will check ({@link #checkEmbed()}) and build you an {@link Embed}, which you can attach to a {@link MessageImplementation}
      *
      * @return a build {@link Embed}
      * @throws InvalidEmbedException see {@link #checkEmbed()}
@@ -506,7 +507,7 @@ public class EmbedBuilder {
 
     /**
      *
-     * This will build you an {@link Embed}, which you can attach to a {@link me.linusdev.discordbotapi.api.objects.message.Message}
+     * This will build you an {@link Embed}, which you can attach to a {@link MessageImplementation}
      *
      * @param check whether to check if this would build a valid {@link Embed}.
      * @return a build {@link Embed}

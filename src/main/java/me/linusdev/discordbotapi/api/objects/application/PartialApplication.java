@@ -2,15 +2,16 @@ package me.linusdev.discordbotapi.api.objects.application;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * This is only used in the {@link me.linusdev.discordbotapi.api.communication.gateway.events.ReadyEvent ReadyEvent}
+ * This is only used in the {@link ReadyEvent ReadyEvent}
  *
- * @see me.linusdev.discordbotapi.api.communication.gateway.events.ReadyEvent ReadyEvent
+ * @see ReadyEvent ReadyEvent
  * @see Application
  */
 public class PartialApplication implements ApplicationAbstract {

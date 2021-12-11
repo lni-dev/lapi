@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.communication.retriever.query;
 
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.Method;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK;
@@ -15,7 +16,7 @@ import static me.linusdev.discordbotapi.api.communication.lapihttprequest.Method
 public enum Link implements AbstractLink{
 
     /**
-     * Post a message to a guild text or DM channel. Returns a {@link me.linusdev.discordbotapi.api.objects.message.Message message} object.
+     * Post a message to a guild text or DM channel. Returns a {@link MessageImplementation message} object.
      *
      * @see PlaceHolder#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>

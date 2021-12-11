@@ -8,8 +8,9 @@ import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
-import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.MessageReference;
+import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
 import me.linusdev.discordbotapi.api.objects.message.component.ComponentType;
 import me.linusdev.discordbotapi.api.objects.message.component.actionrow.ActionRow;
@@ -173,7 +174,7 @@ public class MessageBuilder implements HasLApi {
      * @param channelId the id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
-    public Queueable<Message> getQueueable(@NotNull String channelId) throws LimitException {
+    public Queueable<MessageImplementation> getQueueable(@NotNull String channelId) throws LimitException {
         return lApi.createMessage(channelId, build());
     }
 
@@ -501,7 +502,7 @@ public class MessageBuilder implements HasLApi {
      * you will need to add this.
      * @param message the msg to reply to
      * @param mentionUser whether to user the author of the referenced message
-     * @see #setReplyTo(Message, boolean, boolean) 
+     * @see #setReplyTo(Message, boolean, boolean)
      */
     public MessageBuilder setReplyTo(@NotNull Message message, boolean mentionUser){
         return setReplyTo(message, true, mentionUser);

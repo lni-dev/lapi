@@ -10,6 +10,7 @@ import me.linusdev.discordbotapi.api.objects.channel.ChannelMention;
 import me.linusdev.discordbotapi.api.objects.enums.MessageFlag;
 import me.linusdev.discordbotapi.api.objects.enums.MessageType;
 import me.linusdev.discordbotapi.api.objects.guild.member.Member;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.MessageReference;
 import me.linusdev.discordbotapi.api.objects.message.Reaction;
 import me.linusdev.discordbotapi.api.objects.message.component.Component;
@@ -121,15 +122,15 @@ import java.util.List;
 public interface Message extends Datable, SnowflakeAble {
 
     /**
-     * see {@link me.linusdev.discordbotapi.api.objects.message.Message Message implemantion}
+     * see {@link MessageImplementation Message implemantion}
      * @param lApi {@link LApi}
      * @param data {@link Data}
-     * @return {@link me.linusdev.discordbotapi.api.objects.message.Message Message}
+     * @return {@link MessageImplementation Message}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    static @Nullable me.linusdev.discordbotapi.api.objects.message.Message fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    static @Nullable MessageImplementation fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
-        return new me.linusdev.discordbotapi.api.objects.message.Message(lApi, data);
+        return new MessageImplementation(lApi, data);
     }
 
 

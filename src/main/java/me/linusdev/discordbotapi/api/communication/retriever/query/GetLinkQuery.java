@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
@@ -53,7 +54,7 @@ public class GetLinkQuery implements Query{
          * permission to be present on the current user. If the current user is missing the
          * '{@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY}' permission in the channel
          * then this will return no messages (since they cannot read the message history).
-         * Returns an array of {@link me.linusdev.discordbotapi.api.objects.message.Message message objects} on success.
+         * Returns an array of {@link MessageImplementation message objects} on success.
          * </p>
          * <br>
          * <p style="margin-bottom:0;padding-bottom:0;">
@@ -86,7 +87,7 @@ public class GetLinkQuery implements Query{
          * <p>
          *     Returns a specific message in the channel. If operating on a guild channel,
          *     this endpoint requires the '{@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY}'
-         *     permission to be present on the current user. Returns a {@link me.linusdev.discordbotapi.api.objects.message.Message message object} on success.
+         *     permission to be present on the current user. Returns a {@link MessageImplementation message object} on success.
          * </p>
          *
          * @see PlaceHolder#CHANNEL_ID
@@ -140,7 +141,7 @@ public class GetLinkQuery implements Query{
 
         /**
          * <p>
-         *     Returns all pinned messages in the channel as an array of {@link me.linusdev.discordbotapi.api.objects.message.Message message} objects.
+         *     Returns all pinned messages in the channel as an array of {@link MessageImplementation message} objects.
          * </p>
          * @see PlaceHolder#CHANNEL_ID
          * @see <a href="https://discord.com/developers/docs/resources/channel#get-pinned-messages" target="_top">Get Pinned Messages</a>

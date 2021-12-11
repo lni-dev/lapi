@@ -8,6 +8,7 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.guild.member.Member;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -59,7 +60,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @param lApi {@link LApi}
      * @param data {@link Data}
      * @return {@link ResolvedData}
-     * @throws InvalidDataException see {@link User#fromData(LApi, Data)}, {@link Member#fromData(LApi, Data)}, {@link Role#fromData(LApi, Data)}, {@link Channel#fromData(LApi, Data)}, {@link me.linusdev.discordbotapi.api.objects.message.Message#Message(LApi, Data)}
+     * @throws InvalidDataException see {@link User#fromData(LApi, Data)}, {@link Member#fromData(LApi, Data)}, {@link Role#fromData(LApi, Data)}, {@link Channel#fromData(LApi, Data)}, {@link MessageImplementation#MessageImplementation(LApi, Data)}
      */
     public static @Nullable ResolvedData fromData(@NotNull LApi lApi, Data data) throws InvalidDataException {
         if(data == null) return null;
@@ -76,7 +77,7 @@ public class ResolvedData implements Datable, HasLApi {
                 (ExceptionConverter<Data, Channel, InvalidDataException>) convertible -> Channel.fromData(lApi, convertible));
 
         ArrayList<Message> messages = data.getAndConvertArrayList(MESSAGES_KEY,
-                (ExceptionConverter<Data, Message, InvalidDataException>) convertible -> new me.linusdev.discordbotapi.api.objects.message.Message(lApi, convertible));
+                (ExceptionConverter<Data, Message, InvalidDataException>) convertible -> new MessageImplementation(lApi, convertible));
 
 
         return new ResolvedData(lApi, users, members, roles, channels, messages);

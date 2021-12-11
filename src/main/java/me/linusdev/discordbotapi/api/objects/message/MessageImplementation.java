@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @see me.linusdev.discordbotapi.api.objects.message.abstracts.Message Message for more information
  */
-public class Message extends AbstractMessage {
+public class MessageImplementation extends AbstractMessage {
 
 
     private @Nullable Snowflake guildId;
@@ -44,7 +44,7 @@ public class Message extends AbstractMessage {
     private @Nullable MessageReference messageReference;
     private @NotNull List<MessageFlag> flags;
     private @Nullable Long flagsAsLong;
-    private @Nullable Message referencedMessage;
+    private @Nullable MessageImplementation referencedMessage;
     private @Nullable MessageInteraction interaction;
     private @Nullable Thread thread;
     private @Nullable Component[] components;
@@ -57,7 +57,7 @@ public class Message extends AbstractMessage {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    public Message(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public MessageImplementation(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
         super(lApi, data);
 
         String guildId = (String) data.get(GUILD_ID_KEY);
@@ -108,7 +108,7 @@ public class Message extends AbstractMessage {
         this.messageReference = MessageReference.fromData(messageReference);
         this.flagsAsLong = flags == null ? null : flags.longValue();
         this.flags = MessageFlag.getFlagsFromBits(flags == null ? null : flags.longValue());
-        this.referencedMessage = referencedMessage == null ? null : new Message(lApi, referencedMessage);
+        this.referencedMessage = referencedMessage == null ? null : new MessageImplementation(lApi, referencedMessage);
         this.interaction = MessageInteraction.fromData(lApi, interaction);
         this.thread = thread == null ? null : (Thread) Channel.fromData(lApi, thread);
 
@@ -202,7 +202,7 @@ public class Message extends AbstractMessage {
     }
 
     @Override
-    public @Nullable Message getReferencedMessage() {
+    public @Nullable MessageImplementation getReferencedMessage() {
         return referencedMessage;
     }
 
@@ -234,7 +234,7 @@ public class Message extends AbstractMessage {
 
     /**
      *
-     * @return {@link Data} for this {@link Message}
+     * @return {@link Data} for this {@link MessageImplementation}
      */
     @Override
     public @NotNull Data getData() {

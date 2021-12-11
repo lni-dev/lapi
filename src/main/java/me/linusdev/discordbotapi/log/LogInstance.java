@@ -24,6 +24,10 @@ public class LogInstance {
         Logger.log(Logger.Type.INFO, source, null, warningLog, false);
     }
 
+    public void warningAlign(String warningLog){
+        Logger.log(Logger.Type.INFO, source, null, warningLog, true);
+    }
+
     public void error(String errorLog){
         Logger.log(Logger.Type.ERROR, source, null, errorLog, false);
     }

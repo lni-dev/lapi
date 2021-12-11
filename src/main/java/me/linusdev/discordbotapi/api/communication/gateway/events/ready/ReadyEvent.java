@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.communication.gateway.events;
+package me.linusdev.discordbotapi.api.communication.gateway.events.ready;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
@@ -6,6 +6,9 @@ import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.discordbotapi.api.communication.gateway.events.Event;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.application.PartialApplication;
@@ -20,7 +23,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#ready" target="_top">Ready Event</a>
  */
-public class ReadyEvent implements Datable, HasLApi {
+public class ReadyEvent extends Event implements Datable, HasLApi {
 
     public static final String VERSION_KEY = "v";
     public static final String USER_KEY = "user";
@@ -50,7 +53,8 @@ public class ReadyEvent implements Datable, HasLApi {
      * @param numShards the shard information associated with this session, if sent when identifying
      * @param application contains id and flags
      */
-    public ReadyEvent(@NotNull LApi lApi, @NotNull ApiVersion version, @NotNull User user, @NotNull Guild[] guilds, @NotNull String sessionId, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull PartialApplication application) {
+    public ReadyEvent(@NotNull LApi lApi, GatewayPayloadAbstract payload, @NotNull ApiVersion version, @NotNull User user, @NotNull Guild[] guilds, @NotNull String sessionId, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull PartialApplication application) {
+        super(lApi, payload, null);
         this.lApi = lApi;
         this.version = version;
         this.user = user;
@@ -68,8 +72,8 @@ public class ReadyEvent implements Datable, HasLApi {
      * @return {@link ReadyEvent}
      * @throws InvalidDataException if {@link #VERSION_KEY}, {@link #USER_KEY}, {@link #GUILDS_KEY}, {@link #SESSION_ID_KEY} or {@link #APPLICATION_KEY} are missing or {@code null}
      */
-    @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ReadyEvent fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    @Contract("_, _, null -> null; _, _, !null -> !null")
+    public static @Nullable ReadyEvent fromData(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
         Number version = (Number) data.get(VERSION_KEY);
@@ -96,7 +100,7 @@ public class ReadyEvent implements Datable, HasLApi {
         }
 
         //noinspection ConstantConditions
-        return new ReadyEvent(lApi, ApiVersion.fromInt(version.intValue()), user, guilds.toArray(new Guild[0]), sessionId,
+        return new ReadyEvent(lApi, payload, ApiVersion.fromInt(version.intValue()), user, guilds.toArray(new Guild[0]), sessionId,
                 shard == null ? null : shard.get(0), shard == null ? null : shard.get(1), application);
     }
 

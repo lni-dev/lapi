@@ -5,7 +5,6 @@ import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.VoiceRegions;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
-import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
@@ -16,7 +15,6 @@ import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.converter.Converter;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
 import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
@@ -30,7 +28,7 @@ import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
-import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -296,10 +294,10 @@ public class LApi {
     /**
      *
      * @param channelId the id of the {@link Channel}, in which the message was sent
-     * @param messageId the id of the {@link Message}
-     * @return {@link Queueable} which can retrieve the {@link Message}
+     * @param messageId the id of the {@link MessageImplementation}
+     * @return {@link Queueable} which can retrieve the {@link MessageImplementation}
      */
-    public @NotNull Queueable<Message> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId){
+    public @NotNull Queueable<MessageImplementation> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId){
         return new MessageRetriever(this, channelId, messageId);
     }
 
@@ -323,13 +321,13 @@ public class LApi {
 
     /**
      * <p>
-     *     This is used to retrieve a bunch of {@link Message messages} in a {@link Channel channel}.
+     *     This is used to retrieve a bunch of {@link MessageImplementation messages} in a {@link Channel channel}.
      * </p>
      * <p>
      *     If anchorType is {@code null}, it should use {@link AnchorType#AROUND}, but it may result in unexpected behavior.
      * </p>
      * <p>
-     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link Message messages} in the {@link Channel channel}.
+     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link MessageImplementation messages} in the {@link Channel channel}.
      * </p>
      * <p>
      *     If limit is {@code null}, the limit will be 50
@@ -337,14 +335,14 @@ public class LApi {
      *
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
      * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link Message} with this id will most likely be included in the result.
+     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
      *                        If this is {@code null}, it will retrieve the latest messages in the channel<br><br>
      * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50<br><br>
      * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CHANNEL_MESSAGES
      */
-    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
+    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
 
         Data queryStringsData = null;
 
@@ -364,34 +362,34 @@ public class LApi {
 
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_MESSAGES, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, Message>(this, query, Message::new);
+        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
     }
 
     /**
-     * This will retrieve 50 or less {@link Message messages}.<br><br> For more information see
+     * This will retrieve 50 or less {@link MessageImplementation messages}.<br><br> For more information see
      * {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)}<br><br>
      *
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
      * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link Message} with this id will most likely be included in the result.
+     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
      *                       If this is {@code null}, it will retrieve the latest messages in the channel.<br><br>
      * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
      */
-    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
+    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
         return getChannelMessagesRetriever(channelId, anchorMessageId, null, anchorType);
     }
 
     /**
-     * This should retrieve the latest 50 or less {@link Message messages} in given {@link Channel channel}. The newest {@link Message message} will have index 0
+     * This should retrieve the latest 50 or less {@link MessageImplementation messages} in given {@link Channel channel}. The newest {@link MessageImplementation message} will have index 0
      * <br><br>
      * See {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)} for more information<br><br>
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link Message Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
      */
-    public @NotNull Queueable<ArrayList<Message>> getChannelMessagesRetriever(@NotNull String channelId) {
+    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId) {
         return getChannelMessagesRetriever(channelId, null, null, null);
     }
 
@@ -404,7 +402,7 @@ public class LApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}
-     * @param messageId the id of the {@link Message}
+     * @param messageId the id of the {@link MessageImplementation}
      * @param emoji the {@link Emoji}
      * @param afterUserId the {@link User} after which you want to retrieve. This should be {@code null}, if this is your first retrieve
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
@@ -440,7 +438,7 @@ public class LApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}
-     * @param messageId the id of the {@link Message}
+     * @param messageId the id of the {@link MessageImplementation}
      * @param emoji the {@link Emoji}
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
@@ -484,13 +482,13 @@ public class LApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}, you want the pinned messages from
-     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Message pinned messages} for given channel
+     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link MessageImplementation pinned messages} for given channel
      * @see GetLinkQuery.Links#GET_PINNED_MESSAGES
      */
-    public @NotNull Queueable<ArrayList<Message>> getPinnedMessagesRetriever(@NotNull String channelId){
+    public @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_PINNED_MESSAGES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, Message>(this, query, Message::new);
+        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
     }
 
     /**
@@ -777,11 +775,11 @@ public class LApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
+    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
         Query query = new LinkQuery(this, Link.CREATE_MESSAGE, message.getBody(), null,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
 
-        return new ConvertingRetriever<>(this, query, Message::new);
+        return new ConvertingRetriever<>(this, query, MessageImplementation::new);
     }
 
     /**
@@ -801,7 +799,7 @@ public class LApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
+    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
         return createMessage(channelId, new MessageTemplate(
                 content,
                 false, null,
@@ -825,7 +823,7 @@ public class LApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull String content){
+    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content){
         return createMessage(channelId, content,true);
     }
 
@@ -841,7 +839,7 @@ public class LApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
+    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
         return createMessage(channelId,
                 new MessageTemplate(null, false, embeds,
                         allowMentions ? null : AllowedMentions.noneAllowed(),
@@ -861,7 +859,7 @@ public class LApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<Message> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
+    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
         return createMessage(channelId, true, embeds);
     }
 

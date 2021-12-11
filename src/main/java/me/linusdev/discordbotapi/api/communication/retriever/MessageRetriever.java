@@ -5,14 +5,14 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
-import me.linusdev.discordbotapi.api.objects.message.Message;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 /**
- * This class is used to retrieve a {@link Message}.<br>
+ * This class is used to retrieve a {@link MessageImplementation}.<br>
  * <br>
  * Example:<br>
  * <pre>{@code
@@ -31,9 +31,9 @@ import java.io.IOException;
  * </pre>
  *
  *
- * @see Message
+ * @see MessageImplementation
  */
-public class MessageRetriever extends DataRetriever<Message> {
+public class MessageRetriever extends DataRetriever<MessageImplementation> {
 
     public MessageRetriever(@NotNull LApi lApi, @NotNull String channelId, @NotNull String messageId) {
         super(lApi, new GetLinkQuery(lApi, GetLinkQuery.Links.GET_CHANNEL_MESSAGE,
@@ -42,7 +42,7 @@ public class MessageRetriever extends DataRetriever<Message> {
     }
 
     @Override
-    public @Nullable Message retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return new Message(lApi, retrieveData());
+    public @Nullable MessageImplementation retrieve() throws LApiException, IOException, ParseException, InterruptedException {
+        return new MessageImplementation(lApi, retrieveData());
     }
 }

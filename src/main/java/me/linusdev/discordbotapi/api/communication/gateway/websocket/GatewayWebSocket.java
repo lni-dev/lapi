@@ -12,7 +12,10 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseSta
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
-import me.linusdev.discordbotapi.api.communication.gateway.events.ReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
@@ -20,6 +23,8 @@ import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
+import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
+import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +74,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     private final @NotNull LApi lApi;
 
+    private final EventTransmitter transmitter;
+
     private final @NotNull String token;
     private final @NotNull ConnectionProperties properties;
 
@@ -114,11 +121,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     private final LogInstance logger;
 
-    public GatewayWebSocket(@NotNull LApi lApi, @NotNull String token, @Nullable ApiVersion apiVersion,
+    public GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
                             @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
                             @NotNull String os, @Nullable Integer largeThreshold, @Nullable Integer shardId,
                             @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents) {
         this.lApi = lApi;
+        this.transmitter = transmitter;
         this.token = token;
         this.properties = new ConnectionProperties(os, LApi.LAPI_NAME, LApi.LAPI_NAME);
         this.largeThreshold = largeThreshold == null ? LARGE_THRESHOLD_STANDARD : largeThreshold;
@@ -207,7 +215,206 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     }
 
 
+    protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable Data innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(innerPayload == null){
+            //handle events without an inner payload. for example RESUMED
+            return;
+        }
 
+        if(type == null){
+            transmitter.onUnknownEvent(lApi, null, payload);
+            return;
+        }
+
+        switch (type){
+            case HELLO:
+                break;
+
+            case READY:
+                //TODO see handleReceivedPayload
+                break;
+
+            case RESUMED:
+                break;
+
+            case RECONNECT:
+                break;
+
+            case INVALID_SESSION:
+                break;
+
+            case CHANNEL_CREATE:
+                break;
+
+            case CHANNEL_UPDATE:
+                break;
+
+            case CHANNEL_DELETE:
+                break;
+
+            case CHANNEL_PINS_UPDATE:
+                break;
+
+            case THREAD_CREATE:
+                break;
+
+            case THREAD_UPDATE:
+                break;
+
+            case THREAD_DELETE:
+                break;
+
+            case THREAD_LIST_SYNC:
+                break;
+
+            case THREAD_MEMBER_UPDATE:
+                break;
+
+            case THREAD_MEMBERS_UPDATE:
+                break;
+
+            case GUILD_CREATE:
+                break;
+
+            case GUILD_UPDATE:
+                break;
+
+            case GUILD_DELETE:
+                break;
+
+            case GUILD_BAN_ADD:
+                break;
+
+            case GUILD_BAN_REMOVE:
+                break;
+
+            case GUILD_EMOJIS_UPDATE:
+                break;
+
+            case GUILD_STICKERS_UPDATE:
+                break;
+
+            case GUILD_INTEGRATIONS_UPDATE:
+                break;
+
+            case GUILD_MEMBER_ADD:
+                break;
+
+            case GUILD_MEMBER_REMOVE:
+                break;
+
+            case GUILD_MEMBER_UPDATE:
+                break;
+
+            case GUILD_MEMBERS_CHUNK:
+                break;
+
+            case GUILD_ROLE_CREATE:
+                break;
+
+            case GUILD_ROLE_UPDATE:
+                break;
+
+            case GUILD_ROLE_DELETE:
+                break;
+
+            case GUILD_SCHEDULED_EVENT_CREATE:
+                break;
+
+            case GUILD_SCHEDULED_EVENT_UPDATE:
+                break;
+
+            case GUILD_SCHEDULED_EVENT_DELETE:
+                break;
+
+            case GUILD_SCHEDULED_EVENT_USER_ADD:
+                break;
+
+            case GUILD_SCHEDULED_EVENT_USER_REMOVE:
+                break;
+
+            case INTEGRATION_CREATE:
+                break;
+
+            case INTEGRATION_UPDATE:
+                break;
+
+            case INTEGRATION_DELETE:
+                break;
+
+            case INTERACTION_CREATE:
+                break;
+
+            case INVITE_CREATE:
+                break;
+
+            case INVITE_DELETE:
+                break;
+
+            case MESSAGE_CREATE:
+                MessageImplementation msg = Message.fromData(lApi, innerPayload);
+                transmitter.onMessageCreate(new MessageCreateEvent(lApi, payload, msg));
+                break;
+
+            case MESSAGE_UPDATE:
+                break;
+
+            case MESSAGE_DELETE:
+                break;
+
+            case MESSAGE_DELETE_BULK:
+                break;
+
+            case MESSAGE_REACTION_ADD:
+                break;
+
+            case MESSAGE_REACTION_REMOVE:
+                break;
+
+            case MESSAGE_REACTION_REMOVE_ALL:
+                break;
+
+            case MESSAGE_REACTION_REMOVE_EMOJI:
+                break;
+
+            case PRESENCE_UPDATE:
+                break;
+
+            case STAGE_INSTANCE_CREATE:
+                break;
+
+            case STAGE_INSTANCE_DELETE:
+                break;
+
+            case STAGE_INSTANCE_UPDATE:
+                break;
+
+            case TYPING_START:
+                break;
+
+            case USER_UPDATE:
+                break;
+
+            case VOICE_STATE_UPDATE:
+                break;
+
+            case VOICE_SERVER_UPDATE:
+                break;
+
+            case WEBHOOKS_UPDATE:
+                break;
+
+            default:
+                transmitter.onUnknownEvent(lApi, type, payload);
+                break;
+
+        }
+    }
+
+    /**
+     * handles any received payloads and starts heart-beating, sets sessionId, etc.
+     * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayEvent, Data, GatewayPayloadAbstract)}
+     */
     protected void handleReceivedPayload(GatewayPayloadAbstract payload) throws Throwable {
         Long seq = payload.getSequence();
         if (seq != null) this.lastReceivedSequence.set(seq);
@@ -219,18 +426,25 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             if (payload.getType() == GatewayEvent.READY) {
                 logger.debug("Received " + payload.getType() + " event");
                 //ready event. we need to save the session id
-                ReadyEvent event = ReadyEvent.fromData(lApi, (Data) payload.getPayloadData());
+                ReadyEvent event = ReadyEvent.fromData(lApi, payload, (Data) payload.getPayloadData());
 
                 this.sessionId = event.getSessionId();
                 this.canResume.set(true);
                 this.pendingConnects.set(0);
+
+                //TODO cache guilds and stuff
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {
                 //resume successful...
                 logger.debug("successfully resumed");
             }
 
-            //TODO handle event
+            if(payload.getType() == null){
+                logger.warningAlign("Received a payload with opcode "
+                        + GatewayOpcode.DISPATCH + " but without a type... payload:\n" + payload.toJsonString());
+            }
+
+            handleReceivedEvent(payload.getType(), (Data) payload.getPayloadData(), payload);
 
         } else if (opcode == GatewayOpcode.HEARTBEAT) {
             //Discord requested us to send a Heartbeat
@@ -478,6 +692,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         WebSocket.Listener.super.onOpen(webSocket);
     }
 
+    /**
+     *
+     * transmits the raw input to {@link #handleReceivedPayload(GatewayPayloadAbstract)}
+     */
     @Override
     public CompletionStage<?> onText(WebSocket webSocket, CharSequence text, boolean last) {
         try {
@@ -508,6 +726,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         return WebSocket.Listener.super.onText(webSocket, text, false);
     }
 
+    /**
+     *
+     * transmits the raw input to {@link #handleReceivedPayload(GatewayPayloadAbstract)}
+     */
     @Override
     public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer bytes, boolean last) {
         try {
