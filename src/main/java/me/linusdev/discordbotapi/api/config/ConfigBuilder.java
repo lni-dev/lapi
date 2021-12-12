@@ -11,6 +11,7 @@ import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -56,16 +57,25 @@ public class ConfigBuilder implements Datable {
 
     public ConfigBuilder readFromData(@NotNull Data data) throws InvalidDataException {
         String token = (String) data.get(TOKEN_KEY);
-        Number flags = ((Number) data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS));
+        Object flags = data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS);
         Data gateway = (Data) data.get(GATEWAY_CONFIG_KEY);
 
+        if(flags != null) {
+            if (flags instanceof Data) {
+                this.flags = ConfigFlag.fromData((Data) flags);
+            } else if (flags instanceof Number) {
+                this.flags = ((Number) flags).longValue();
+            }
+        }
+
         this.token = token == null ? this.token : token;
-        this.flags = flags == null ? this.flags : flags.longValue();
+
         if(gateway != null) gatewayConfigBuilder.fromData(gateway);
         return this;
     }
 
     public ConfigBuilder readFromFile(@NotNull Path configFile) throws IOException, ParseException, InvalidDataException {
+        if(!Files.exists(configFile)) throw new FileNotFoundException(configFile + " does not exist.");
         Reader reader = Files.newBufferedReader(configFile);
         JsonParser parser = new JsonParser();
         readFromData(parser.readDataFromReader(reader));
@@ -98,10 +108,43 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
+    /**
+     * overwrites the flags long
+     * @param flags new flags long
+     * @see #setFlag(ConfigFlag)
+     * @see #removeFlag(ConfigFlag)
+     */
     public ConfigBuilder setFlags(long flags) {
         this.flags = flags;
         return this;
     }
+
+    /**
+     * Enables given flag
+     * @param flag the flag to enable/set
+     */
+    public ConfigBuilder setFlag(@NotNull ConfigFlag flag){
+        this.flags = flag.set(this.flags);
+        return this;
+    }
+
+    /**
+     * Disables given flag
+     * @param flag the flag to disable/unset
+     */
+    public ConfigBuilder removeFlag(@NotNull ConfigFlag flag){
+        this.flags = flag.remove(this.flags);
+        return this;
+    }
+
+    /**
+     * Disables all flags
+     */
+    public ConfigBuilder clearFlags(){
+        this.flags = 0;
+        return this;
+    }
+
 
     public ConfigBuilder setGatewayConfig(@NotNull GatewayConfigBuilder gatewayConfigBuilder) {
         this.gatewayConfigBuilder = gatewayConfigBuilder;
@@ -147,7 +190,7 @@ public class ConfigBuilder implements Datable {
         Data data = new Data(2);
 
         data.add(TOKEN_KEY, token);
-        data.add(FLAGS_KEY, flags);
+        data.add(FLAGS_KEY, ConfigFlag.toData(flags));
         data.add(GATEWAY_CONFIG_KEY, gatewayConfigBuilder);
 
         return data;

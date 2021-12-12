@@ -13,7 +13,7 @@ public class Config {
     /**
      * retrieves and saves the voice regions on startup
      */
-    public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 0x1L;
+    public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 1 << 0;
 
     private final long flags;
     private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;

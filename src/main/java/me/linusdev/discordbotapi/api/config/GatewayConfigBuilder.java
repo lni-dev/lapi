@@ -83,9 +83,9 @@ public class GatewayConfigBuilder implements Datable {
         this.encoding = encoding == null ? this.encoding : GatewayEncoding.fromValue(encoding);
         this.compression = compression == null ? this.compression : GatewayCompression.fromValue(compression);
         this.os = os == null ? this.os : os;
-        this.largeThreshold = largeThreshold == null ? this.largeThreshold : largeThreshold.intValue();
-        this.shardId = shardId == null ? this.shardId : shardId.intValue();
-        this.numShards = numShards == null ? this.numShards : numShards.intValue();
+        this.largeThreshold = largeThreshold == null ? this.largeThreshold : (Integer) largeThreshold.intValue();
+        this.shardId = shardId == null ? this.shardId : (Integer) shardId.intValue();
+        this.numShards = numShards == null ? this.numShards : (Integer) numShards.intValue();
         this.startupPresence = presence == null ? this.startupPresence : PresenceUpdate.fromData(presence);
         this.intents = intents;
 
