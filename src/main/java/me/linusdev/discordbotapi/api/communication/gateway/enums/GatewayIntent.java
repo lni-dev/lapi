@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * TODO add @links
@@ -298,7 +300,8 @@ public enum GatewayIntent implements SimpleDatable {
      * @param value string
      * @return {@link GatewayIntent} matching (ignores case) given value or {@code null} if none matches
      */
-    public static GatewayIntent fromName(String value){
+    public static @Nullable GatewayIntent fromName(@Nullable String value){
+        if(value == null) return null;
         for(GatewayIntent intent : GatewayIntent.values()){
             if(intent.toString().equalsIgnoreCase(value)) return intent;
         }
@@ -327,7 +330,7 @@ public enum GatewayIntent implements SimpleDatable {
      * @param intents {@link GatewayIntent Intents} to set
      * @return int with all intent flags corresponding to the given array set
      */
-    public static int toInt(GatewayIntent[] intents){
+    public static int toInt(@NotNull GatewayIntent[] intents){
         int flags = 0;
 
         for(GatewayIntent intent : intents)

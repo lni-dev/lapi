@@ -4,11 +4,8 @@ import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 
 public class Config {
@@ -21,12 +18,14 @@ public class Config {
     private final long flags;
     private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;
     private final @NotNull String token;
+    private final @NotNull GatewayConfig gatewayConfig;
 
-    public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token){
+    public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token, @NotNull GatewayConfig gatewayConfig){
         this.flags = flags;
         this.token = token;
 
         this.queueSupplier = queueSupplier;
+        this.gatewayConfig = gatewayConfig;
     }
 
     /**
@@ -47,5 +46,9 @@ public class Config {
 
     public @NotNull String getToken() {
         return token;
+    }
+
+    public @NotNull GatewayConfig getGatewayConfig() {
+        return gatewayConfig;
     }
 }

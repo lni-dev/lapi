@@ -31,6 +31,12 @@ public class Test {
 
         Logger.start();
 
+        new ConfigBuilder(Helper.getConfigPath()).adjustGatewayConfig(gatewayConfigBuilder -> {
+            gatewayConfigBuilder.addIntent(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILDS);
+        }).writeToFile(Helper.getConfigPath(), true);
+
+        System.exit(0);
+
         Config c = new ConfigBuilder(Helper.getConfigPath()).build();
 
         final LApi lApi = new LApi(c);
@@ -57,9 +63,6 @@ public class Test {
             }
         });
 
-        GatewayWebSocket gateway = new GatewayWebSocket(lApi, transmitter, c.getToken(), ApiVersion.V9, null,
-                null, "windows", null, null, null, null,
-                new GatewayIntent[]{GatewayIntent.GUILDS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGES});
 
         //gateway.start();
 

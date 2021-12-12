@@ -62,6 +62,11 @@ public class GatewayConfigBuilder implements Datable {
         return data;
     }
 
+    /**
+     * Adjust this {@link GatewayConfigBuilder} depending on given data
+     * @param data {@link Data}
+     * @return this
+     */
     public GatewayConfigBuilder fromData(@NotNull Data data) throws InvalidDataException {
         Number apiVersion = (Number) data.get(API_VERSION_KEY);
         String encoding = (String) data.get(ENCODING_KEY);
@@ -83,7 +88,6 @@ public class GatewayConfigBuilder implements Datable {
         this.numShards = numShards == null ? this.numShards : numShards.intValue();
         this.startupPresence = presence == null ? this.startupPresence : PresenceUpdate.fromData(presence);
         this.intents = intents;
-        //TODO
 
         return this;
     }
@@ -133,7 +137,10 @@ public class GatewayConfigBuilder implements Datable {
     }
 
     public GatewayConfigBuilder addIntent(@NotNull GatewayIntent... intents){
-        this.intents.addAll(Arrays.asList(intents));
+        for(GatewayIntent intent : intents){
+            if(this.intents.contains(intent)) continue;
+            this.intents.add(intent);
+        }
         return this;
     }
 
@@ -155,7 +162,7 @@ public class GatewayConfigBuilder implements Datable {
         if(largeThreshold == null) largeThreshold = GatewayWebSocket.LARGE_THRESHOLD_STANDARD;
 
         if(jsonToPayloadConverter == null) jsonToPayloadConverter = GatewayWebSocket.STANDARD_JSON_TO_PAYLOAD_CONVERTER;
-        if(etfToPayloadConverter == null && compression == GatewayCompression.ZLIB_STREAM)
+        if(etfToPayloadConverter == null && compression != GatewayCompression.NONE)
             throw new LApiRuntimeException("compression is set to " + compression + ", but no etfToPayloadConverter is given!");
 
 

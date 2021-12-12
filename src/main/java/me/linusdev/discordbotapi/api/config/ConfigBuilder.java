@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
@@ -17,24 +18,29 @@ import java.nio.file.*;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("UnusedReturnValue")
 public class ConfigBuilder implements Datable {
 
     public final static String TOKEN_KEY = "token";
     public final static String FLAGS_KEY = "flags";
+    public final static String GATEWAY_CONFIG_KEY = "gateway_config";
 
     public final static long DEFAULT_FLAGS = 0L;
 
     private String token = null;
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
+    private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
 
     public ConfigBuilder(){
-
+        this.gatewayConfigBuilder = new GatewayConfigBuilder();
     }
 
-    public ConfigBuilder(Path configFile) throws IOException, ParseException {
+    public ConfigBuilder(Path configFile) throws IOException, ParseException, InvalidDataException {
+        this();
         readFromFile(configFile);
     }
 
@@ -48,13 +54,18 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
-    public ConfigBuilder readFromData(@NotNull Data data){
-        token = (String) data.get(TOKEN_KEY);
-        flags = ((Number) data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS)).longValue();
+    public ConfigBuilder readFromData(@NotNull Data data) throws InvalidDataException {
+        String token = (String) data.get(TOKEN_KEY);
+        Number flags = ((Number) data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS));
+        Data gateway = (Data) data.get(GATEWAY_CONFIG_KEY);
+
+        this.token = token == null ? this.token : token;
+        this.flags = flags == null ? this.flags : flags.longValue();
+        if(gateway != null) gatewayConfigBuilder.fromData(gateway);
         return this;
     }
 
-    public ConfigBuilder readFromFile(@NotNull Path configFile) throws IOException, ParseException {
+    public ConfigBuilder readFromFile(@NotNull Path configFile) throws IOException, ParseException, InvalidDataException {
         Reader reader = Files.newBufferedReader(configFile);
         JsonParser parser = new JsonParser();
         readFromData(parser.readDataFromReader(reader));
@@ -92,6 +103,21 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
+    public ConfigBuilder setGatewayConfig(@NotNull GatewayConfigBuilder gatewayConfigBuilder) {
+        this.gatewayConfigBuilder = gatewayConfigBuilder;
+        return this;
+    }
+
+    /**
+     * The consumer lets you adjust the {@link GatewayConfigBuilder} of this {@link GatewayConfig}. This {@link GatewayConfigBuilder}
+     * is already added to this {@link ConfigBuilder}
+     * @param setConfig the consumer, to adjust the {@link GatewayConfigBuilder}
+     */
+    public ConfigBuilder adjustGatewayConfig(@NotNull Consumer<GatewayConfigBuilder> setConfig) {
+        setConfig.accept(gatewayConfigBuilder);
+        return this;
+    }
+
     /**
      * builds a {@link Config}
      * @return {@link Config}
@@ -103,8 +129,8 @@ public class ConfigBuilder implements Datable {
         return new Config(
                 flags,
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
-                token
-        );
+                token,
+                gatewayConfigBuilder.build());
     }
 
     /**
@@ -122,6 +148,7 @@ public class ConfigBuilder implements Datable {
 
         data.add(TOKEN_KEY, token);
         data.add(FLAGS_KEY, flags);
+        data.add(GATEWAY_CONFIG_KEY, gatewayConfigBuilder);
 
         return data;
     }
