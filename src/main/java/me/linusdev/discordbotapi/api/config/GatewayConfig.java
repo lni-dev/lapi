@@ -7,6 +7,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +27,9 @@ public class GatewayConfig {
     private final @NotNull GatewayIntent[] intents;
     private final @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter;
     private final @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
+    private final @NotNull GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler;
 
-    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, int shardId, int numShards, @Nullable PresenceUpdate startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter) {
+    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, int shardId, int numShards, @Nullable PresenceUpdate startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
         this.apiVersion = ApiVersion;
         this.encoding = encoding;
         this.compression = compression;
@@ -39,6 +41,7 @@ public class GatewayConfig {
         this.intents = intents;
         this.jsonToPayloadConverter = jsonToPayloadConverter;
         this.etfToPayloadConverter = etfToPayloadConverter;
+        this.unexpectedEventHandler = unexpectedEventHandler;
     }
 
     public @NotNull ApiVersion getApiVersion() {
@@ -83,5 +86,9 @@ public class GatewayConfig {
 
     public @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> getJsonToPayloadConverter() {
         return jsonToPayloadConverter;
+    }
+
+    public @NotNull GatewayWebSocket.UnexpectedEventHandler getUnexpectedEventHandler() {
+        return unexpectedEventHandler;
     }
 }

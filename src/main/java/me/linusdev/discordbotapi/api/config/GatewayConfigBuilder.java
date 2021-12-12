@@ -19,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class GatewayConfigBuilder implements Datable {
 
@@ -44,6 +43,7 @@ public class GatewayConfigBuilder implements Datable {
     private ArrayList<GatewayIntent> intents = new ArrayList<>();
     private ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter = null;
     private ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter = null;
+    private GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler = null;
 
     @Override
     public Data getData() {
@@ -154,6 +154,11 @@ public class GatewayConfigBuilder implements Datable {
         return this;
     }
 
+    public GatewayConfigBuilder setUnexpectedEventHandler(GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
+        this.unexpectedEventHandler = unexpectedEventHandler;
+        return this;
+    }
+
     public GatewayConfig build(){
         if(apiVersion == null) apiVersion = LApi.NEWEST_API_VERSION;
         if(encoding == null) encoding = GatewayEncoding.JSON;
@@ -165,9 +170,10 @@ public class GatewayConfigBuilder implements Datable {
         if(etfToPayloadConverter == null && compression != GatewayCompression.NONE)
             throw new LApiRuntimeException("compression is set to " + compression + ", but no etfToPayloadConverter is given!");
 
+        if(unexpectedEventHandler == null) unexpectedEventHandler = GatewayWebSocket.STANDARD_UNEXPECTED_EVENT_HANDLER;
 
         return new GatewayConfig(apiVersion, encoding, compression, os, largeThreshold, shardId,
-                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter, etfToPayloadConverter);
+                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter, etfToPayloadConverter, unexpectedEventHandler);
     }
 
 

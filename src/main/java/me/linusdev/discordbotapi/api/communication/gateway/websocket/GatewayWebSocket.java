@@ -6,6 +6,7 @@ import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.*;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseStatusCode;
@@ -21,12 +22,15 @@ import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
 import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
+import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.config.GatewayConfig;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +65,24 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         StringReader reader = new StringReader(convertible);
         Data data = new JsonParser().readDataFromReader(reader);
         return GatewayPayload.fromData(data);
+    };
+
+    public static final UnexpectedEventHandler STANDARD_UNEXPECTED_EVENT_HANDLER = new UnexpectedEventHandler() {
+        @Override
+        public void handleError(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull Throwable error) {
+            error.printStackTrace();
+        }
+
+        @Override
+        public boolean handleUnexpectedClose(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull GatewayCloseStatusCode closeStatusCode, String reason) {
+            new LApiException("Discord closed its output. Status-code: " + closeStatusCode + ", reason: " + reason + ". Gateway will try to reconnect").printStackTrace();
+            return true;
+        }
+
+        @Override
+        public void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information) {
+            new LApiException("Fatal Error in the GatewayWebSocket! Gateway is now closed! " + information).printStackTrace();
+        }
     };
 
     //Generate Data keys
@@ -120,14 +142,40 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     private final AtomicInteger pendingConnects;
 
     private final LogInstance logger;
+    
+    public GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull Config config){
+        this(lApi, transmitter, config.getToken(),
+                config.getGatewayConfig().getApiVersion(),
+                config.getGatewayConfig().getEncoding(),
+                config.getGatewayConfig().getCompression(),
+                config.getGatewayConfig().getOs(),
+                config.getGatewayConfig().getLargeThreshold(),
+                config.getGatewayConfig().getShardId(),
+                config.getGatewayConfig().getNumShards(),
+                config.getGatewayConfig().getStartupPresence(),
+                config.getGatewayConfig().getIntents(),
+                config.getGatewayConfig().getJsonToPayloadConverter(),
+                config.getGatewayConfig().getEtfToPayloadConverter(),
+                config.getGatewayConfig().getUnexpectedEventHandler()
+        );
+    }
 
-    public GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
+    /**
+     * You should not use this, as the @Nullable annotations are possibly wrong. That is because the checking of Nullability was
+     * moved to {@link me.linusdev.discordbotapi.api.config.ConfigBuilder ConfigBuilder} and
+     * {@link me.linusdev.discordbotapi.api.config.GatewayConfigBuilder GatewayConfigBuilder}.<br>
+     * Use {@link GatewayWebSocket#GatewayWebSocket(LApi, EventTransmitter, Config)} instead.
+     */
+    @ApiStatus.Internal
+    private GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
                             @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
                             @NotNull String os, @Nullable Integer largeThreshold, @Nullable Integer shardId,
                             @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents,
                             @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
-                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter) {
+                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter,
+                            @NotNull UnexpectedEventHandler unexpectedEventHandler) {
         this.lApi = lApi;
+        this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
         this.token = token;
         this.properties = new ConnectionProperties(os, LApi.LAPI_NAME, LApi.LAPI_NAME);
@@ -797,13 +845,15 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             if(pendingConnects.get() > 3){
                 logger.warning("we have already tried to connect 3 times in a row without success. We wont try again");
-                if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this);
+                if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this, "Gateway tried to connect 3 times in a row without success");
                 return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
             }
 
             if(unexpectedEventHandler != null){
                 if(unexpectedEventHandler.handleUnexpectedClose(lApi, this, closeCode, reason)){
                     reconnect(true);
+                }else{
+                    logger.error("Gateway Closed! Discord closed its output. Status-code: " + closeCode + "(" + statusCode + "), reason: " + reason);
                 }
             }else{
                 logger.warning("No errorHandler set! will do standard action.");
@@ -813,7 +863,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         closeCode == GatewayCloseStatusCode.INVALID_SEQUENCE) {
                     reconnect(true);
                 }else{
-                    logger.error("Gateway closed");
+                    logger.error("Gateway Closed! Discord closed its output. Status-code: " + closeCode + "(" + statusCode + "), reason: " + reason);
                 }
             }
 
@@ -862,7 +912,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static interface UnexpectedEventHandler {
 
         /**
-         *
+         * Most of the time, the Gateway will continue working, but you should at least notify yourself somehow (like printing, etc.).
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket} in which this error occurred
          * @param error the error
@@ -892,7 +942,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket}
          */
-        void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket);
+        void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information);
 
         /**
          * The {@link GatewayWebSocket} received an {@link GatewayOpcode#INVALID_SESSION} from discord.
@@ -903,7 +953,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          * @param canResume {@code true} means the {@link GatewayWebSocket} will try to {@link #resume() resume}.
          * {@code false} means the {@link GatewayWebSocket} will try to {@link #reconnect(boolean) reconnect}
          */
-        void onInvalidSession(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, boolean canResume);
+        default void onInvalidSession(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, boolean canResume){}
 
     }
 }
