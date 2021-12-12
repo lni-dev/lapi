@@ -29,7 +29,7 @@ public class GatewayConfig {
     private final @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
     private final @NotNull GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler;
 
-    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, int shardId, int numShards, @Nullable PresenceUpdate startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
+    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, @Nullable Integer shardId, @Nullable Integer numShards, @Nullable PresenceUpdate startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
         this.apiVersion = ApiVersion;
         this.encoding = encoding;
         this.compression = compression;

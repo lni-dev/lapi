@@ -9,6 +9,9 @@ import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
@@ -22,6 +25,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
@@ -80,6 +84,11 @@ public class LApi {
     private final ExecutorService queueWorker;
     private volatile QueueThread queueThread;
 
+    //Gateway
+    private final EventTransmitter eventTransmitter;
+    private final GatewayWebSocket gateway;
+
+    //executor
     private final ThreadPoolExecutor executor;
 
     //stores and manages the voice regions
@@ -137,8 +146,19 @@ public class LApi {
             }
         });
 
+        //Gateway
+        if(this.config.isFlagSet(ConfigFlag.ENABLE_GATEWAY)){
+            this.eventTransmitter = new EventTransmitter(this);
+            this.gateway = new GatewayWebSocket(this, eventTransmitter, config);
+            gateway.start();
+        }else{
+            this.eventTransmitter = null;
+            this.gateway = null;
+        }
+
+        //VoiceRegions
         this.voiceRegions = new VoiceRegions();
-        if(this.config.isFlagSet(Config.LOAD_VOICE_REGIONS_ON_STARTUP))
+        if(this.config.isFlagSet(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP))
             this.voiceRegions.init(this); //Todo add callback
 
 
@@ -884,6 +904,14 @@ public class LApi {
     }
 
     //Getter
+
+    /**
+     * TODO add docs on how to add a listener / specified listener
+     * @return {@link AbstractEventTransmitter}
+     */
+    public AbstractEventTransmitter getEventTransmitter() {
+        return eventTransmitter;
+    }
 
     public LApiHttpHeader getAuthorizationHeader() {
         return authorizationHeader;

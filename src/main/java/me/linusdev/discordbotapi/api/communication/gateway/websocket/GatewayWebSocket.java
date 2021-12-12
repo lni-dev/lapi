@@ -13,7 +13,6 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseSta
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
-import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -23,7 +22,6 @@ import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpda
 import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.config.Config;
-import me.linusdev.discordbotapi.api.config.GatewayConfig;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;

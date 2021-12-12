@@ -2,7 +2,6 @@ package me.linusdev.discordbotapi.api.communication.gateway.events;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;

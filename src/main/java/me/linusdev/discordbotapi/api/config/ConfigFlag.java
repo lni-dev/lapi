@@ -14,6 +14,8 @@ public enum ConfigFlag implements SimpleDatable {
 
     LOAD_VOICE_REGIONS_ON_STARTUP(1 << 0),
 
+    ENABLE_GATEWAY(1 << 1),
+
     ;
 
     private final long value;

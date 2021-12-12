@@ -10,11 +10,6 @@ import java.util.function.Supplier;
 
 public class Config {
 
-    /**
-     * retrieves and saves the voice regions on startup
-     */
-    public final static long LOAD_VOICE_REGIONS_ON_STARTUP = 1 << 0;
-
     private final long flags;
     private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;
     private final @NotNull String token;
@@ -33,8 +28,8 @@ public class Config {
      * @param flag to check, can also be more than one flag
      * @return true if all bits in flag are also set int {@link #flags}
      */
-    public boolean isFlagSet(long flag){
-        return (flags & flag) == flag;
+    public boolean isFlagSet(ConfigFlag flag){
+        return flag.isSet(flags);
     }
 
     /**

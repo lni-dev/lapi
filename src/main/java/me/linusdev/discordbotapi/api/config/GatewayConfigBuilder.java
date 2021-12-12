@@ -159,7 +159,7 @@ public class GatewayConfigBuilder implements Datable {
         return this;
     }
 
-    public GatewayConfig build(){
+    GatewayConfig build(){
         if(apiVersion == null) apiVersion = LApi.NEWEST_API_VERSION;
         if(encoding == null) encoding = GatewayEncoding.JSON;
         if(compression == null) compression = GatewayCompression.NONE;

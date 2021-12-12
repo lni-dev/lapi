@@ -3,16 +3,18 @@ package me.linusdev.discordbotapi;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.exceptions.LimitException;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
-import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
-import me.linusdev.discordbotapi.api.config.Config;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
+import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.objects.emoji.StandardEmoji;
+import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
+import me.linusdev.discordbotapi.api.objects.message.embed.Author;
+import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.discordbotapi.helper.Helper;
 import me.linusdev.discordbotapi.log.Logger;
@@ -20,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 public class Test {
@@ -31,42 +31,38 @@ public class Test {
 
         Logger.start();
 
-        new ConfigBuilder(Helper.getConfigPath()).adjustGatewayConfig(gatewayConfigBuilder -> {
-            gatewayConfigBuilder.addIntent(GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILDS);
-        }).writeToFile(Helper.getConfigPath(), true);
+        LApi lApi = new ConfigBuilder(Helper.getConfigPath())
+                .enable(ConfigFlag.ENABLE_GATEWAY)
+                .disable(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP)
+                .adjustGatewayConfig(gatewayConfigBuilder -> {
+                    gatewayConfigBuilder
+                            .setApiVersion(ApiVersion.V9)
+                            .setCompression(GatewayCompression.NONE)
+                            .setEncoding(GatewayEncoding.JSON)
+                            .setOs("Windows 10")
+                            .addIntent(GatewayIntent.GUILD_MESSAGES);
+                }).buildLapi();
 
-        System.exit(0);
-
-        Config c = new ConfigBuilder(Helper.getConfigPath()).build();
-
-        final LApi lApi = new LApi(c);
-
-        EventTransmitter transmitter = new EventTransmitter(lApi);
-
-        transmitter.addListener(new EventListener() {
+        lApi.getEventTransmitter().addSpecifiedListener(new EventListener() {
             @Override
-            public void onMessageCreate(@NotNull MessageCreateEvent event) {
-                if(event.getMessage().getContent().equalsIgnoreCase("hi")){
+            public void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {
+                Message msg = event.getMessage();
+                String content = msg.getContent();
+                String channelId = msg.getChannelId();
+                User author = msg.getAuthor();
 
-                    try {
-                        new MessageBuilder(event.getLApi()).setReplyTo(event.getMessage(), true)
-                                .appendContent("Hi ").appendEmoji(StandardEmoji.values()[new Random().nextInt(StandardEmoji.values().length)])
-                                .getQueueable(event.getChannelId()).queue((messageImplementation, error) -> {
-                                    if(error != null){
-                                        error.getThrowable().printStackTrace();
-                                    }
-                                });
-                    } catch (LimitException e) {
-                        e.printStackTrace();
-                    }
+                if(!author.isBot() && content.toLowerCase().startsWith("hi")) {
+
+                    new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
+                            .setReplyTo(msg, true)
+                            .getQueueable(channelId)
+                            .queue();
                 }
             }
-        });
-
-
-        //gateway.start();
+        }, EventIdentifier.GUILD_MESSAGE_CREATE);
 
     }
+
 
 
 }

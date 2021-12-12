@@ -45,13 +45,22 @@ public class ConfigBuilder implements Datable {
         readFromFile(configFile);
     }
 
-    public ConfigBuilder enableLoadVoiceRegionsOnStartup(){
-        flags = flags | Config.LOAD_VOICE_REGIONS_ON_STARTUP;
+    /**
+     * Enables given flag
+     * @param flag the flag to enable/set
+     */
+    public ConfigBuilder enable(@NotNull ConfigFlag flag){
+        this.flags = flag.set(flags);
         return this;
     }
 
-    public ConfigBuilder disableLoadVoiceRegionsOnStartup(){
-        flags = flags & ~Config.LOAD_VOICE_REGIONS_ON_STARTUP;
+    /**
+     * Disables given flag
+     * @param flag the flag to disable/unset
+     * @see #disable(ConfigFlag)
+     */
+    public ConfigBuilder disable(@NotNull ConfigFlag flag){
+        this.flags = flag.remove(flags);
         return this;
     }
 
@@ -122,6 +131,7 @@ public class ConfigBuilder implements Datable {
     /**
      * Enables given flag
      * @param flag the flag to enable/set
+     * @see #enable(ConfigFlag)
      */
     public ConfigBuilder setFlag(@NotNull ConfigFlag flag){
         this.flags = flag.set(this.flags);
@@ -131,6 +141,7 @@ public class ConfigBuilder implements Datable {
     /**
      * Disables given flag
      * @param flag the flag to disable/unset
+     * @see #disable(ConfigFlag)
      */
     public ConfigBuilder removeFlag(@NotNull ConfigFlag flag){
         this.flags = flag.remove(this.flags);

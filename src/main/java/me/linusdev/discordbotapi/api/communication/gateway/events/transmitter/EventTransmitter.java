@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 
 import static me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier.*;
 
-public class EventTransmitter implements HasLApi, EventListener {
+public class EventTransmitter implements HasLApi, EventListener, AbstractEventTransmitter {
 
     private final @NotNull LApi lApi;
 
@@ -33,16 +33,18 @@ public class EventTransmitter implements HasLApi, EventListener {
      * @param listener the {@link EventListener} to add
      * @return {@link ArrayList#add(Object)}
      */
-    public boolean addListener(EventListener listener){
+    @Override
+    public boolean addListener(@NotNull EventListener listener){
         return listeners.add(listener);
     }
 
     /**
-     *
+     * This will not remove {@link #addSpecifiedListener(EventListener, EventIdentifier...) specified listener}!
      * @param listener the {@link EventListener} to remove
      * @return {@link ArrayList#remove(Object)}
      */
-    public boolean removeListener(EventListener listener){
+    @Override
+    public boolean removeListener(@NotNull EventListener listener){
         return listeners.remove(listener);
     }
 
@@ -67,13 +69,36 @@ public class EventTransmitter implements HasLApi, EventListener {
      * @param specifications to which Events the listener shall listen to
      * @return true if all {@link ArrayList#add(Object)} calls returned true
      */
-    public boolean addSpecifiedListener(EventListener listener, EventIdentifier... specifications){
+    @Override
+    public boolean addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
 
         boolean r = true;
 
         for(EventIdentifier spec : specifications){
             ArrayList<EventListener> listeners = specifiedListeners.computeIfAbsent(spec, k -> new ArrayList<>());
             r = r && listeners.add(listener);
+        }
+
+        return r;
+    }
+
+    /**
+     *
+     * @param listener the listener to remove
+     * @param specifications to which Events the listener shall not listen to anymore
+     * @return true if all {@link ArrayList#remove(Object)} calls returned true
+     */
+    @Override
+    public boolean removeSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
+        boolean r = true;
+
+        for(EventIdentifier spec : specifications){
+            ArrayList<EventListener> listeners = specifiedListeners.get(spec);
+            if(listeners == null){
+                r = false;
+                continue;
+            }
+            r = r && listeners.remove(listener);
         }
 
         return r;
