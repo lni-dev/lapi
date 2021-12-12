@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.log;
 
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.body.FilePart;
+import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.helper.Helper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Logger {
@@ -21,6 +23,15 @@ public class Logger {
     public static final boolean ENABLE_LOG = true;
     public static final boolean DEBUG_LOG = true && ENABLE_LOG;
     public static final boolean SOUT_LOG =             true && ENABLE_LOG;
+
+    public static ArrayList<String> allowedSources = new ArrayList<>();
+    static {
+        allowedSources.add(GatewayWebSocket.class.getSimpleName());
+        /**
+         * @see GatewayWebSocket#handleReceivedPayload(GatewayPayloadAbstract)
+         */
+        //allowedSources.add(GatewayWebSocket.class.getSimpleName() + "-payloads");
+    }
 
     public static Path logFolder;
 
@@ -85,6 +96,8 @@ public class Logger {
 
     public static void log(Type type, String source, @Nullable String name, String toLog, boolean autoAlign){
         if(!ENABLE_LOG) return;
+        if(type == Type.DEBUG && !DEBUG_LOG) return;
+        if(allowedSources != null && !allowedSources.contains(source)) return;
         try {
             if(autoAlign){
                 String pre;

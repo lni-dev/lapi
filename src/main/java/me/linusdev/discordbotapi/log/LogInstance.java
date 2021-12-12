@@ -44,6 +44,10 @@ public class LogInstance {
         Logger.log(Logger.Type.DEBUG, source, null, debugLog, true);
     }
 
+    public void debugAlignSubSource(String debugLog, String subSource){
+        Logger.log(Logger.Type.DEBUG, source + "-" + subSource, null, debugLog, true);
+    }
+
     public void debugAlign(String debugLog, String name){
         Logger.log(Logger.Type.DEBUG, source, name, debugLog, true);
     }

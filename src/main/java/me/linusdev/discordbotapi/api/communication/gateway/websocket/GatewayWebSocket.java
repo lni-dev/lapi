@@ -466,16 +466,16 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * handles any received payloads and starts heart-beating, sets sessionId, etc.
      * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayEvent, Data, GatewayPayloadAbstract)}
      */
-    protected void handleReceivedPayload(GatewayPayloadAbstract payload) throws Throwable {
+    protected void handleReceivedPayload(@NotNull GatewayPayloadAbstract payload) throws Throwable {
         Long seq = payload.getSequence();
         if (seq != null) this.lastReceivedSequence.set(seq);
         GatewayOpcode opcode = payload.getOpcode();
 
-        logger.debugAlign("received payload: " + payload.toJsonString());
+        if(Logger.DEBUG_LOG) logger.debugAlignSubSource("received payload: " + payload.toJsonString(), "payloads");
 
         if (opcode == GatewayOpcode.DISPATCH) {
             if (payload.getType() == GatewayEvent.READY) {
-                logger.debug("Received " + payload.getType() + " event");
+                if(Logger.DEBUG_LOG) logger.debug("Received " + payload.getType() + " event");
                 //ready event. we need to save the session id
                 ReadyEvent event = ReadyEvent.fromData(lApi, payload, (Data) payload.getPayloadData());
 
@@ -487,7 +487,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {
                 //resume successful...
-                logger.debug("successfully resumed");
+                if(Logger.DEBUG_LOG) logger.debug("successfully resumed");
             }
 
             if(payload.getType() == null){
