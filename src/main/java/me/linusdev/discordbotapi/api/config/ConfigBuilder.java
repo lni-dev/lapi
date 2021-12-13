@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
@@ -40,9 +41,25 @@ public class ConfigBuilder implements Datable {
         this.gatewayConfigBuilder = new GatewayConfigBuilder();
     }
 
+    public ConfigBuilder(String token){
+        this();
+        this.token = token;
+    }
+
     public ConfigBuilder(Path configFile) throws IOException, ParseException, InvalidDataException {
         this();
         readFromFile(configFile);
+    }
+
+    @Contract(value = "_ -> new", pure = true)
+    public static @NotNull ConfigBuilder getDefault(@NotNull String token){
+
+        return new ConfigBuilder(token)
+                .enable(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP)
+                .enable(ConfigFlag.ENABLE_GATEWAY)
+                .adjustGatewayConfig(gb -> {
+
+                });
     }
 
     /**

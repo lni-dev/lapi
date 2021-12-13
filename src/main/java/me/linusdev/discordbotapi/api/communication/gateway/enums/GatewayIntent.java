@@ -6,12 +6,64 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * TODO add @links
- *
+ * <br>
  * * Thread Members Update contains different data depending on which intents are used.<br>
  * ** Guild Scheduled Event User Add and Guild Scheduled Event User Remove are currently experimental and not officially supported.
  *
+ * <br>
+ * <br>
+ * <h2 style="padding:0;margin:0;">What are Intents?</h2>
+ * <p style="padding:0;margin:0;">
+ *     Intents are group of events pre-defined by Discord. If you don't specify any intents, you wont receive any events
+ *     (If you use {@link me.linusdev.discordbotapi.api.communication.ApiVersion#V8 apiversion 8} or above). Specifying a
+ *     certain intent will let you receive the events that are batched into that group (with some exceptions, see privileged
+ *     intents below). This class represents a list of all intents as of 13.12.2021.
+ * </p>
+ *
+ *  <br>
+ *  <h2 style="padding:0;margin:0;">Caveats</h2>
+ *  <p style="padding:0;margin:0;">
+ *      Any {@link GatewayEvent events} not defined in an intent will always be sent to you.
+ *      <ul style="padding-top:0;margin-top:0;padding-bottom:0;margin-bottom:0;">
+ *          <li>
+ *              {@link GatewayEvent#GUILD_MEMBER_UPDATE GUILD_MEMBER_UPDATE} is always sent for the current-user
+ *          </li>
+ *          <li>
+ *              {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} and
+ *              {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS} are uniquely affected by intents.
+ *          </li>
+ *          <li>
+ *              {@link GatewayEvent#THREAD_MEMBER_UPDATE THREAD_MEMBER_UPDATE} by default only includes if the current
+ *              user was added to or removed from a thread.
+ *          </li>
+ *      </ul>
+ *      You can read more about these <a href="https://discord.com/developers/docs/topics/gateway#caveats" target="_top">here</a>
+ *  </p>
+ *
+ *
+ * <br><br>
+ * <h2 style="padding:0;margin:0;">Privileged Intents</h2>
+ * <p style="padding:0;margin:0;">
+ *     Some intents are defined as "Privileged" due to the sensitive nature of the data. Those intents are:
+ *     <ul style="padding-top:0;margin-top:0;padding-bottom:0;margin-bottom:0;">
+ *         <li>
+ *             {@link #GUILD_PRESENCES}
+ *         </li>
+ *         <li>
+ *             {@link #GUILD_MEMBERS}
+ *         </li>
+ *         <li>
+ *             Message content will become a privileged intent in 2022 (for large bots).
+ *             <a href="https://support-dev.discord.com/hc/en-us/articles/4404772028055" target="_top">Learn more here</a>.
+ *         </li>
+ *     </ul>
+ *     To specify these intents, you need to activate them on the Discord website. Best you read it yourself
+ *     <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents" target="_top">here</a>
+ * </p>
+ *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateway-intents" target="_top">Gateway Intents</a>
  */
+@SuppressWarnings("PointlessBitwiseExpression")
 public enum GatewayIntent implements SimpleDatable {
 
     /**
@@ -288,6 +340,8 @@ public enum GatewayIntent implements SimpleDatable {
      */
     GUILD_SCHEDULED_EVENTS (1 << 16),
     ;
+
+    public static final GatewayIntent[] ALL = values();
 
     private final int value;
 

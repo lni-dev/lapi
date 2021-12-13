@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+@SuppressWarnings("UnusedReturnValue")
 public class GatewayConfigBuilder implements Datable {
 
     public static final String API_VERSION_KEY = "api_version";
@@ -136,10 +137,25 @@ public class GatewayConfigBuilder implements Datable {
         return this;
     }
 
+    /**
+     * Adds given intents to this config.
+     * @param intents {@link GatewayIntent intents} to add
+     */
     public GatewayConfigBuilder addIntent(@NotNull GatewayIntent... intents){
         for(GatewayIntent intent : intents){
             if(this.intents.contains(intent)) continue;
             this.intents.add(intent);
+        }
+        return this;
+    }
+
+    /**
+     * Removes given intents from this config
+     * @param intents {@link GatewayIntent intents} to remove
+     */
+    public GatewayConfigBuilder removeIntent(@NotNull GatewayIntent... intents){
+        for(GatewayIntent intent : intents){
+            this.intents.remove(intent);
         }
         return this;
     }
