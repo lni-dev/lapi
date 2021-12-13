@@ -1,12 +1,9 @@
 package me.linusdev.discordbotapi.api.communication.cdn.image;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.discordbotapi.api.communication.retriever.Retriever;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +41,7 @@ public class CDNImageRetriever extends Retriever<InputStream>  {
 
     @Override
     protected @Nullable InputStream retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.getResponseAtInputStream(query.getLApiRequest());
+        return lApi.getResponseAsInputStream(query.getLApiRequest());
     }
 
     /**

@@ -9,11 +9,12 @@ import java.time.Duration;
  */
 public class DiscordApiCommunicationHelper {
 
-    public static Duration DEFAULT_TIMEOUT_DURATION = Duration.ofSeconds(30L);
+    public static Duration DEFAULT_TIMEOUT_DURATION = Duration.ofSeconds(10L);
 
 
 
     //https://discord.com/developers/docs/resources/user
+    public static final String DISCORD_COM = "https://discord.com";
 
     /**
      * <a href="https://discord.com/developers/docs/reference#api-versioning" target="_top">

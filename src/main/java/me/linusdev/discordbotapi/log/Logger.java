@@ -22,6 +22,7 @@ public class Logger {
 
     public static final boolean ENABLE_LOG = true;
     public static final boolean DEBUG_LOG = true && ENABLE_LOG;
+    public static final boolean DEBUG_DATA_LOG = false && ENABLE_LOG && DEBUG_LOG;
     public static final boolean SOUT_LOG =             true && ENABLE_LOG;
 
     public static ArrayList<String> allowedSources = new ArrayList<>();
@@ -31,6 +32,8 @@ public class Logger {
          * @see GatewayWebSocket#handleReceivedPayload(GatewayPayloadAbstract)
          */
         //allowedSources.add(GatewayWebSocket.class.getSimpleName() + "-payloads");
+
+        allowedSources = null;
     }
 
     public static Path logFolder;
@@ -79,6 +82,7 @@ public class Logger {
 
     public static enum Type{
         DEBUG("DEBUG"),
+        DEBUG_DATA("DEBUG-DATA"),
         INFO("INFO"),
         WARNING("WARNING"),
         ERROR("ERROR"),
@@ -97,6 +101,7 @@ public class Logger {
     public static void log(Type type, String source, @Nullable String name, String toLog, boolean autoAlign){
         if(!ENABLE_LOG) return;
         if(type == Type.DEBUG && !DEBUG_LOG) return;
+        if(type == Type.DEBUG_DATA && !DEBUG_DATA_LOG) return;
         if(allowedSources != null && !allowedSources.contains(source)) return;
         try {
             if(autoAlign){

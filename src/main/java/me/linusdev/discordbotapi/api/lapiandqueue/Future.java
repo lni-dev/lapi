@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.lapiandqueue;
 
+import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.log.LogInstance;
@@ -71,6 +72,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     private final @NotNull Queueable<T> queueable;
     private volatile boolean cancelled = false;
     private volatile @Nullable Container<T> result = null;
+    private volatile boolean executedBeforeComplete = false;
 
     private volatile @Nullable BiConsumer<T, Error> then;
     private volatile @Nullable Consumer<T> thenSingle;
@@ -103,9 +105,10 @@ public class Future<T> implements java.util.concurrent.Future<T> {
      */
     protected void completeHereAndIgnoreQueueThread() {
         final Consumer<Future<T>> beforeComplete = this.beforeComplete;
-        if (!cancelled && beforeComplete != null){
+        if (!cancelled && beforeComplete != null && !executedBeforeComplete){
             try{
                 beforeComplete.accept(this);
+                executedBeforeComplete = true;
             }catch (Throwable t){
                 logger.warning("Unexpected Exception in a Future beforeComplete listener");
                 logger.error(t);
@@ -119,7 +122,12 @@ public class Future<T> implements java.util.concurrent.Future<T> {
             return;
         }
 
-        this.result = queueable.completeHereAndIgnoreQueueThread();
+        try {
+            this.result = queueable.completeHereAndIgnoreQueueThread();
+        }catch (NoInternetException noInternetException){
+            queueable.getLApi().queue(this);
+            return;
+        }
 
         synchronized (this) {
             this.notifyAll();

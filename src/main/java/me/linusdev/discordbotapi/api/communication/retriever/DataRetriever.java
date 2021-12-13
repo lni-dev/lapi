@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
+import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;

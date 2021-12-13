@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.StringReader;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
@@ -78,7 +79,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         }
 
         @Override
-        public void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information) {
+        public void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information, @Nullable Throwable cause) {
             new LApiException("Fatal Error in the GatewayWebSocket! Gateway is now closed! " + information).printStackTrace();
         }
     };
@@ -230,6 +231,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     .header(authenticationHeader.getName(), authenticationHeader.getValue())
                     .header(userAgentHeader.getName(), userAgentHeader.getValue());
 
+            // If we have no internet connection, LApi will automatically delay this request
+            // until we have internet connection again
             lApi.getGatewayBot().queue((getGatewayResponse, error) -> {
                 try {
                     if (error != null) {
@@ -245,8 +248,25 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     logger.debug("Gateway connecting to " + uri.toString());
 
+                    final GatewayWebSocket _this = this;
                     pendingConnects.incrementAndGet();
                     builder.buildAsync(uri, this).whenComplete((webSocket, throwable) -> {
+
+                        if(throwable != null){
+                            logger.error("Could not build web socket! We will try again");
+                            logger.error(throwable);
+                            // if this happens, we should have a internet connection, because getGatewayBot worked...
+                            // so let's try again
+                            if(pendingConnects.get() < 4){
+                                start();
+                                return;
+                            }
+
+                            // we already tried 3+ times
+                            if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, _this, "The web socket could not be build several times in a row", throwable);
+                            return;
+                        }
+
                         this.webSocket = webSocket;
                         logger.debug("build async finished");
                     });
@@ -471,7 +491,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         if (seq != null) this.lastReceivedSequence.set(seq);
         GatewayOpcode opcode = payload.getOpcode();
 
-        if(Logger.DEBUG_LOG) logger.debugAlignSubSource("received payload: " + payload.toJsonString(), "payloads");
+        if(Logger.DEBUG_LOG) logger.debug(String.format("Received Payload. Opcode: %s, Sequence: %d, Event: %s", opcode, seq, payload.getType()));
+        if(Logger.DEBUG_LOG) logger.debugData("received payload: " + payload.toJsonString(), "payloads");
 
         if (opcode == GatewayOpcode.DISPATCH) {
             if (payload.getType() == GatewayEvent.READY) {
@@ -512,9 +533,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             unexpectedEventHandler.onInvalidSession(lApi, this, canResume != null && canResume);
 
             if(canResume == null || !canResume){
-                resume();
-            }else {
                 reconnect(true);
+            }else {
+                resume();
             }
 
         } else if (opcode == GatewayOpcode.HELLO) {
@@ -554,7 +575,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         } else if (opcode == GatewayOpcode.HEARTBEAT_ACK) {
             //our heartbeat was acknowledged
             heartbeatAcknowledgementsReceived.incrementAndGet();
-            logger.debug("Heartbeat ack received");
+            if(Logger.DEBUG_LOG) logger.debug(String.format("Heartbeat ack received. Heartbeats sent: %d, acks received: %d"
+                    , heartbeatsSent.get(), heartbeatAcknowledgementsReceived.get()));
 
         } else {
             //This should never be sent to us... something might have gone wrong
@@ -843,7 +865,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             if(pendingConnects.get() > 3){
                 logger.warning("we have already tried to connect 3 times in a row without success. We wont try again");
-                if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this, "Gateway tried to connect 3 times in a row without success");
+                if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this, "Gateway tried to connect 3 times in a row without success", null);
                 return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
             }
 
@@ -875,8 +897,28 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
         if (webSocket != this.webSocket) return;
+
+        if(error instanceof SocketException){
+            if(error.getMessage().equals("Connection reset")){
+                logger.debug("SocketException: Connection reset.");
+                //we probably lost internet connection
+                if(pendingConnects.get() < 4){
+                    logger.debug("Trying to resume");
+                    resume();
+                    //reconnect(false);
+                    return;
+                }
+                // we already tried 3+ times
+                if(unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this,
+                        "The web socket had a SocketException with message=\"Connection reset\"" +
+                                " and we have already tried connection at least 3 times in a row.", null);
+                return;
+
+            }
+        }
+
         logger.error(error);
-        if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error);
+        if (unexpectedEventHandler != null) unexpectedEventHandler.onFatal(lApi, this, "Unknown error", error);
         WebSocket.Listener.super.onError(webSocket, error);
     }
 
@@ -940,7 +982,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket}
          */
-        void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information);
+        void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information, @Nullable Throwable cause);
 
         /**
          * The {@link GatewayWebSocket} received an {@link GatewayOpcode#INVALID_SESSION} from discord.

@@ -147,7 +147,7 @@ public class LApiHttpRequest {
             if(string.length() == 0) string.append("None\n"); // if we have no headers, add "None\n"
 
             //remove last \n
-            log.debugAlign(string.substring(0, string.length()-1), "Headers");
+            log.debugData(string.substring(0, string.length()-1), "Headers");
             StringBuilder string2 = new StringBuilder();
 
             Optional<HttpRequest.BodyPublisher> body = request.bodyPublisher();
@@ -178,7 +178,7 @@ public class LApiHttpRequest {
                 });
             }
 
-            log.debugAlign(string2.toString(), "Body");
+            log.debugData(string2.toString(), "Body");
 
             return request;
         }

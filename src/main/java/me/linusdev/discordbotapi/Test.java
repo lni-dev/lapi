@@ -21,8 +21,14 @@ import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.net.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+
+import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.DISCORD_COM;
 
 public class Test {
 

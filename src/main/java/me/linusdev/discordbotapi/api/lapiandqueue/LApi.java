@@ -8,6 +8,7 @@ import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.communication.gateway.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -46,9 +47,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpResponse;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.http.*;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -69,6 +76,10 @@ public class LApi {
 
     public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V9;
 
+    public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
+    public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
+    public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
+
     private @NotNull final String token;
     private @NotNull final Config config;
 
@@ -83,6 +94,7 @@ public class LApi {
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService queueWorker;
     private volatile QueueThread queueThread;
+    private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
     //Gateway
     private final EventTransmitter eventTransmitter;
@@ -120,7 +132,8 @@ public class LApi {
                                 try {
                                     queueThread.wait(queue, 10000L);
                                 } catch (InterruptedException ignored) {
-                                    ignored.printStackTrace();
+                                    log.error("Queue thread interrupted");
+                                    log.error(ignored);
                                 }
                             }
 
@@ -129,6 +142,7 @@ public class LApi {
                             if(Logger.DEBUG_LOG){
                                 log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
                                 long millis = System.currentTimeMillis();
+                                //noinspection ConstantConditions
                                 queue.poll().completeHereAndIgnoreQueueThread();
                                 long finishMillis = System.currentTimeMillis() - millis;
                                 log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
@@ -225,7 +239,7 @@ public class LApi {
     /**
      * Queues given {@link Future} and notifies the {@link #queueWorker} Thread
      */
-    private void queue(@NotNull final Future<?> future){
+    void queue(@NotNull final Future<?> future){
         queue.offer(future);
         if(queueThread.isWaiting()){
             //If the queue is waiting, notify it.
@@ -248,7 +262,7 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
+    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
         return getResponseAsData(request, null);
     }
 
@@ -264,16 +278,78 @@ public class LApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException {
-        Reader reader = new InputStreamReader(getResponseAtInputStream(request));
+    public Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
+        Reader reader = new InputStreamReader(getResponseAsInputStream(request));
 
         if(arrayKey != null)
             return new JsonParser().readDataFromReader(reader, true, arrayKey);
         return new JsonParser().readDataFromReader(reader);
     }
 
-    public InputStream getResponseAtInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException {
-        HttpResponse<InputStream> response = client.send(request.getHttpRequest(), HttpResponse.BodyHandlers.ofInputStream());
+    public InputStream getResponseAsInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException {
+        Throwable throwThrough = null;
+
+        try {
+            HttpRequest builtRequest = request.getHttpRequest();
+
+            try {
+                return sendRequest(builtRequest);
+            } catch (ConnectException | HttpTimeoutException exception) {
+                Throwable cause = null;
+                if (exception instanceof ConnectException) {
+                    log.debug("ConnectException while sending request...");
+                    cause = exception.getCause();
+                    while (cause instanceof ConnectException) cause = cause.getCause();
+                }
+
+                if (cause instanceof ClosedChannelException || exception instanceof HttpTimeoutException) {
+                    // probably no internet connection
+                    try {
+                        URL url = new URL(DISCORD_COM);
+                        URLConnection connection = url.openConnection();
+                        connection.connect();
+                        //if we reach this, internet is connected
+                        //let's try again
+                        try {
+                            return sendRequest(builtRequest);
+                        } catch (Throwable t) {
+                            log.error("Cannot send Request even though internet is connected. Uri:" + request.getHttpRequest().uri());
+                            throw exception;
+                        }
+                    } catch (Throwable e) {
+                        log.debug("Internet is most likely not connected");
+                        java.lang.Thread.sleep(notConnectedWaitMillis);
+                        notConnectedWaitMillis = Math.min(NOT_CONNECTED_WAIT_MILLIS_MAX, notConnectedWaitMillis + NOT_CONNECTED_WAIT_MILLIS_INCREASE);
+                        throwThrough = new NoInternetException();
+                        throw (NoInternetException) throwThrough;
+                    }
+
+                } else if (cause instanceof UnresolvedAddressException) {
+                    throwThrough = exception;
+                    throw exception;
+                }
+
+
+                log.error(exception);
+                throwThrough = exception;
+                throw exception;
+            } catch (Throwable e) {
+
+                log.error(e);
+                throwThrough = e;
+                throw e;
+            }
+        }catch (Throwable tt) {
+            if(tt == throwThrough) throw tt; //ignore this one
+            log.error("Error while building request");
+            log.error(tt);
+            throw tt;
+        }
+    }
+
+    private InputStream sendRequest(@NotNull HttpRequest request) throws IOException, InterruptedException {
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
         return response.body();
     }
 

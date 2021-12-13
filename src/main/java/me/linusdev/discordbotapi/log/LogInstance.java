@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.log;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class LogInstance {
 
@@ -36,6 +37,10 @@ public class LogInstance {
         Logger.log(Logger.Type.ERROR, source, null, errorLog, true);
     }
 
+    public void errorAlign(String errorLog, @Nullable String name){
+        Logger.log(Logger.Type.ERROR, source, name, errorLog, true);
+    }
+
     public void debug(String debugLog){
         Logger.log(Logger.Type.DEBUG, source, null, debugLog, false);
     }
@@ -44,8 +49,12 @@ public class LogInstance {
         Logger.log(Logger.Type.DEBUG, source, null, debugLog, true);
     }
 
-    public void debugAlignSubSource(String debugLog, String subSource){
-        Logger.log(Logger.Type.DEBUG, source + "-" + subSource, null, debugLog, true);
+    public void debugData(String debugLog, String subSource){
+        Logger.log(Logger.Type.DEBUG_DATA, source + "-" + subSource, null, debugLog, true);
+    }
+
+    public void debugData(String debugLog){
+        Logger.log(Logger.Type.DEBUG_DATA, source, null, debugLog, true);
     }
 
     public void debugAlign(String debugLog, String name){
@@ -64,6 +73,6 @@ public class LogInstance {
         for(StackTraceElement e : throwable.getStackTrace())
             err.append(e.toString()).append("\n");
 
-        errorAlign(err.toString());
+        errorAlign(err.toString(), throwable.toString());
     }
 }

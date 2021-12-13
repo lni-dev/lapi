@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.lapiandqueue;
 
+import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.other.Container;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
@@ -155,7 +156,7 @@ public abstract class Queueable<T> implements HasLApi {
      */
     public abstract @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after);
 
-    public @NotNull Container<T> completeHere(){
+    public @NotNull Container<T> completeHere() throws NoInternetException {
         getLApi().checkQueueThread();
         return completeHereAndIgnoreQueueThread();
     }
@@ -163,6 +164,6 @@ public abstract class Queueable<T> implements HasLApi {
     /**
      * Complete this {@link Queueable<T>} in this Thread.
      */
-    protected abstract @NotNull Container<T> completeHereAndIgnoreQueueThread();
+    protected abstract @NotNull Container<T> completeHereAndIgnoreQueueThread() throws NoInternetException;
 
 }

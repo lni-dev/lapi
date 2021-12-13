@@ -2,6 +2,8 @@ package me.linusdev.discordbotapi.api.communication.retriever;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.other.Container;
@@ -47,16 +49,29 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
     protected @Nullable abstract T retrieve() throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
-    protected @NotNull Container<T> completeHereAndIgnoreQueueThread() {
+    protected @NotNull Container<T> completeHereAndIgnoreQueueThread() throws NoInternetException {
         Container<T> container;
         try {
             container = new Container<T>(retrieve(), null);
+
+        } catch (NoInternetException noInternetException){
+            throw noInternetException; // future will catch this and queue again...
+
+        } catch (InvalidDataException invalidDataException){
+            LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
+            log.error("InvalidDataException while trying to retrieve " + query.toString());
+            log.error(invalidDataException);
+            log.errorAlign(invalidDataException.getData().getJsonString().toString(), "Data: ");
+            container = new Container<T>(null, new Error(invalidDataException));
+
         } catch (Throwable t) {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("Exception while trying to retrieve " + query.toString());
             log.error(t);
             container = new Container<T>(null, new Error(t));
+
         }
+
         return container;
     }
 
