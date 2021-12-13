@@ -46,7 +46,7 @@ public class Test {
                             .setCompression(GatewayCompression.NONE)
                             .setEncoding(GatewayEncoding.JSON)
                             .setOs("Windows 10")
-                            .addIntent(GatewayIntent.GUILD_MESSAGES);
+                            .addIntent(GatewayIntent.values());
                 }).buildLapi();
 
         lApi.getEventTransmitter().addSpecifiedListener(new EventListener() {
