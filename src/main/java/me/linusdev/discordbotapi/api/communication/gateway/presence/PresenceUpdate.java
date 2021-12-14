@@ -25,7 +25,7 @@ public class PresenceUpdate implements Datable {
     public static final String STATUS_KEY = "status";
     public static final String AFK_KEY = "afk";
 
-    private final @Nullable Integer since;
+    private final @Nullable Long since;
     private final @NotNull Activity[] activities;
     private final @NotNull StatusType status;
     private final @NotNull Boolean afk;
@@ -37,7 +37,7 @@ public class PresenceUpdate implements Datable {
      * @param status the user's new {@link StatusType status}
      * @param afk whether or not the client is afk
      */
-    public PresenceUpdate(@Nullable Integer since, @NotNull Activity[] activities, @NotNull StatusType status, @NotNull Boolean afk) {
+    public PresenceUpdate(@Nullable Long since, @NotNull Activity[] activities, @NotNull StatusType status, @NotNull Boolean afk) {
         this.since = since;
         this.activities = activities;
         this.status = status;
@@ -67,7 +67,7 @@ public class PresenceUpdate implements Datable {
         }
 
         //noinspection ConstantConditions
-        return new PresenceUpdate(since == null ? null : since.intValue(),
+        return new PresenceUpdate(since == null ? null : since.longValue(),
                 activities.toArray(new Activity[0]),
                 StatusType.fromValue(status),
                 afk);
