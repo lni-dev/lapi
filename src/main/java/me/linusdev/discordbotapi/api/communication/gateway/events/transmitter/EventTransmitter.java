@@ -59,7 +59,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
      * {@link EventListener#onMessageCreate(MessageCreateEvent) onMessageCreate(MessageCreateEvent)} method of your listener will be called, when a new message
      * was created.<br><br>
      *
-     * Note that sub-event-methods of an event are not called if you add the {@link EventIdentifier} for the event. For Example:<br>
+     * Note that sub-event-methods of an event are not called if you add the {@link EventIdentifier} for the (super-)event. For Example:<br>
      * If you add a listener with the specification {@link EventIdentifier#MESSAGE_CREATE MESSAGE_CREATE},
      * the {@link EventListener#onGuildMessageCreate(GuildMessageCreateEvent) onGuildMessageCreate(GuildMessageCreateEvent)}
      * method of your listener will never be called. If you want that method to be called, you will have to add

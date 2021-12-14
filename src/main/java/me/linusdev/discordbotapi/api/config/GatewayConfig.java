@@ -8,12 +8,18 @@ import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpda
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
+/**
+ * This config is used to set up a {@link GatewayWebSocket}.<br>
+ * You should use a {@link ConfigBuilder}.
+ */
+@ApiStatus.Internal
 public class GatewayConfig {
 
     private final @NotNull ApiVersion apiVersion;

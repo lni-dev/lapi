@@ -17,6 +17,10 @@ import java.util.ArrayList;
  */
 public class Identify implements Datable {
 
+    public static final int LARGE_THRESHOLD_MIN = 50;
+    public static final int LARGE_THRESHOLD_MAX = 250;
+    public static final int LARGE_THRESHOLD_STANDARD = 50;
+
     public static final String TOKEN_KEY = "token";
     public static final String PROPERTIES_KEY = "properties";
     public static final String COMPRESS_KEY = "compress";

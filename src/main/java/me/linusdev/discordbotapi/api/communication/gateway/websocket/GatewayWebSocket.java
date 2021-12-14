@@ -46,13 +46,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
- * TODO what to do if internet goes inaccessible
  *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateways" target="_top">Gateways</a>
  */
 public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
-    public static final int LARGE_THRESHOLD_STANDARD = 50;
 
     public static final String QUERY_STRING_API_VERSION_KEY = "v";
     public static final String QUERY_STRING_ENCODING_KEY = "encoding";
@@ -131,7 +129,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     //Converter and handler
     private final @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter;
-    private final ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
+    private final ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter;
 
     private UnexpectedEventHandler unexpectedEventHandler = null;
 
@@ -168,17 +166,17 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     @ApiStatus.Internal
     private GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
                             @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
-                            @NotNull String os, @Nullable Integer largeThreshold, @Nullable Integer shardId,
+                            @NotNull String os, @NotNull Integer largeThreshold, @Nullable Integer shardId,
                             @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents,
                             @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
-                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter,
+                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
                             @NotNull UnexpectedEventHandler unexpectedEventHandler) {
         this.lApi = lApi;
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
         this.token = token;
         this.properties = new ConnectionProperties(os, LApi.LAPI_NAME, LApi.LAPI_NAME);
-        this.largeThreshold = largeThreshold == null ? LARGE_THRESHOLD_STANDARD : largeThreshold;
+        this.largeThreshold = largeThreshold;
 
         if (shardId != null && numShards != null) {
             this.usesSharding = true;
@@ -217,7 +215,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         this.pendingConnects = new AtomicInteger(0);
 
         this.jsonToPayloadConverter = jsonToPayloadConverter;
-        this.etfToPayloadConverter = etfToPayloadConverter;
+        this.bytesToPayloadConverter = bytesToPayloadConverter;
     }
 
     public void start() {
@@ -244,7 +242,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     URI uri = new URI(getGatewayResponse.getUrl()
                             + "?" + QUERY_STRING_API_VERSION_KEY + "=" + apiVersion.getVersionNumber()
                             + "&" + QUERY_STRING_ENCODING_KEY + "=" + encoding.getValue()
-                            + (compression != GatewayCompression.NONE ? "&" + QUERY_STRING_COMPRESS_KEY + "=" + compression.getValue() : ""));
+                            + (compression.getValue() != null ? "&" + QUERY_STRING_COMPRESS_KEY + "=" + compression.getValue() : ""));
 
                     logger.debug("Gateway connecting to " + uri.toString());
 
@@ -564,7 +562,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 sendPayload(resumePayload);
 
             }else{
-                Identify identify = new Identify(token, properties, compression != GatewayCompression.NONE,
+                Identify identify = new Identify(token, properties, compression == GatewayCompression.PAYLOAD_COMPRESSION,
                         largeThreshold, usesSharding ? shardId : null, usesSharding ? numShards : null, presence,
                         GatewayIntent.toInt(intents));
 
@@ -824,7 +822,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             currentBytes.add(bytes);
 
             try {
-                GatewayPayloadAbstract payload = etfToPayloadConverter.convert(currentBytes);
+                GatewayPayloadAbstract payload = bytesToPayloadConverter.convert(currentBytes);
                 handleReceivedPayload(payload);
             } catch (Exception e) {
                 logger.error(e);
@@ -947,9 +945,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
 
     /**
-     * will handle errors occurring inside the web socket
+     * This will handle unexpected events occurring in the gateway. The most important method is
+     * {@link #onFatal(LApi, GatewayWebSocket, String, Throwable) onFatal(...)}, you should definitely notify yourself
+     * if this happens because your bot might remain offline.
      */
-    public static interface UnexpectedEventHandler {
+    public interface UnexpectedEventHandler {
 
         /**
          * Most of the time, the Gateway will continue working, but you should at least notify yourself somehow (like printing, etc.).
@@ -960,7 +960,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         void handleError(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull Throwable error);
 
         /**
-         *
+         * You can just return {@link true} if you wish.
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket} connection was closed
          * @param closeStatusCode {@link GatewayCloseStatusCode}
@@ -981,6 +981,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          *
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket}
+         * @param information some information from LApi
+         * @param cause the {@link Throwable} which caused this or {@code null}
          */
         void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information, @Nullable Throwable cause);
 

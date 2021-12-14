@@ -5,19 +5,25 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * TODO add @links
- * <br>
- * * Thread Members Update contains different data depending on which intents are used.<br>
- * ** Guild Scheduled Event User Add and Guild Scheduled Event User Remove are currently experimental and not officially supported.
+ * * {@link GatewayEvent#THREAD_MEMBERS_UPDATE THREAD_MEMBERS_UPDATE} contains different data depending on which intents are used.<br>
+ * ** {@link GatewayEvent#GUILD_SCHEDULED_EVENT_USER_ADD GUILD_SCHEDULED_EVENT_USER_ADD} and
+ *    {@link GatewayEvent#GUILD_SCHEDULED_EVENT_USER_REMOVE GUILD_SCHEDULED_EVENT_USER_REMOVE} are currently experimental
+ *     and not officially supported.
  *
  * <br>
  * <br>
  * <h2 style="padding:0;margin:0;">What are Intents?</h2>
  * <p style="padding:0;margin:0;">
  *     Intents are group of events pre-defined by Discord. If you don't specify any intents, you wont receive any events
- *     (If you use {@link me.linusdev.discordbotapi.api.communication.ApiVersion#V8 apiversion 8} or above). Specifying a
+ *     (there are a few exceptions, see caveats below). Specifying a
  *     certain intent will let you receive the events that are batched into that group (with some exceptions, see privileged
  *     intents below). This class represents a list of all intents as of 13.12.2021.
+ * </p>
+ * <p>
+ *     In this enum you can also see which events are enabled by which intents (see docs for each intent)
+ * </p>
+ * <p>
+ *     Intents are available since {@link me.linusdev.discordbotapi.api.communication.ApiVersion#V6 api version 6}
  * </p>
  *
  *  <br>
@@ -61,6 +67,7 @@ import org.jetbrains.annotations.Nullable;
  *     <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents" target="_top">here</a>
  * </p>
  *
+ * @see GatewayEvent
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateway-intents" target="_top">Gateway Intents</a>
  */
 @SuppressWarnings("PointlessBitwiseExpression")
@@ -69,61 +76,61 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         GUILD_CREATE
+     *         {@link GatewayEvent#GUILD_CREATE GUILD_CREATE}
      *     </li>
      *     <li>
-     *         GUILD_UPDATE
+     *         {@link GatewayEvent#GUILD_UPDATE GUILD_UPDATE}
      *     </li>
      *     <li>
-     *         GUILD_DELETE
+     *         {@link GatewayEvent#GUILD_DELETE GUILD_DELETE}
      *     </li>
      *     <li>
-     *         GUILD_ROLE_CREATE
+     *         {@link GatewayEvent#GUILD_ROLE_CREATE GUILD_ROLE_CREATE}
      *     </li>
      *     <li>
-     *         GUILD_ROLE_UPDATE
+     *         {@link GatewayEvent#GUILD_ROLE_CREATE GUILD_ROLE_CREATE}
      *     </li>
      *     <li>
-     *         GUILD_ROLE_DELETE
+     *         {@link GatewayEvent#GUILD_ROLE_DELETE GUILD_ROLE_DELETE}
      *     </li>
      *     <li>
-     *         CHANNEL_CREATE
+     *         {@link GatewayEvent#CHANNEL_CREATE CHANNEL_CREATE}
      *     </li>
      *     <li>
-     *         CHANNEL_UPDATE
+     *         {@link GatewayEvent#CHANNEL_UPDATE CHANNEL_UPDATE}
      *     </li>
      *     <li>
-     *         CHANNEL_DELETE
+     *         {@link GatewayEvent#CHANNEL_DELETE CHANNEL_DELETE}
      *     </li>
      *     <li>
-     *         CHANNEL_PINS_UPDATE
+     *         {@link GatewayEvent#CHANNEL_PINS_UPDATE CHANNEL_PINS_UPDATE}
      *     </li>
      *     <li>
-     *         THREAD_CREATE
+     *         {@link GatewayEvent#THREAD_CREATE THREAD_CREATE}
      *     </li>
      *     <li>
-     *         THREAD_UPDATE
+     *         {@link GatewayEvent#THREAD_UPDATE THREAD_UPDATE}
      *     </li>
      *     <li>
-     *         THREAD_DELETE
+     *         {@link GatewayEvent#THREAD_DELETE THREAD_DELETE}
      *     </li>
      *     <li>
-     *         THREAD_LIST_SYNC
+     *         {@link GatewayEvent#THREAD_LIST_SYNC THREAD_LIST_SYNC}
      *     </li>
      *     <li>
-     *         THREAD_MEMBER_UPDATE
+     *         {@link GatewayEvent#THREAD_MEMBER_UPDATE THREAD_MEMBER_UPDATE}
      *     </li>
      *     <li>
-     *         THREAD_MEMBERS_UPDATE {@link GatewayIntent *}
+     *         {@link GatewayEvent#THREAD_MEMBERS_UPDATE THREAD_MEMBERS_UPDATE} {@link GatewayIntent *}
      *     </li>
      *     <li>
-     *         STAGE_INSTANCE_CREATE
+     *         {@link GatewayEvent#STAGE_INSTANCE_CREATE STAGE_INSTANCE_CREATE}
      *     </li>
      *     <li>
-     *         STAGE_INSTANCE_UPDATE
+     *         {@link GatewayEvent#STAGE_INSTANCE_UPDATE STAGE_INSTANCE_UPDATE}
      *     </li>
      *     <li>
-     *         STAGE_INSTANCE_DELETE
+     *         {@link GatewayEvent#STAGE_INSTANCE_DELETE STAGE_INSTANCE_DELETE}
      *     </li>
      * </ul>
      */
@@ -132,16 +139,16 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      *   <ul>
      *       <li>
-     *           GUILD_MEMBER_ADD
+     *           {@link GatewayEvent#GUILD_MEMBER_ADD GUILD_MEMBER_ADD}
      *       </li>
      *       <li>
-     *           GUILD_MEMBER_UPDATE
+     *           {@link GatewayEvent#GUILD_MEMBER_UPDATE GUILD_MEMBER_UPDATE}
      *       </li>
      *       <li>
-     *           GUILD_MEMBER_REMOVE
+     *           {@link GatewayEvent#GUILD_MEMBER_REMOVE GUILD_MEMBER_REMOVE}
      *       </li>
      *       <li>
-     *           THREAD_MEMBERS_UPDATE {@link GatewayIntent *}
+     *           {@link GatewayEvent#THREAD_MEMBERS_UPDATE THREAD_MEMBERS_UPDATE} {@link GatewayIntent *}
      *       </li>
      *   </ul>
      */
@@ -150,10 +157,10 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *          GUILD_BAN_ADD
+     *          {@link GatewayEvent#GUILD_BAN_ADD GUILD_BAN_ADD}
      *     </li>
      *     <li>
-     *          GUILD_BAN_REMOVE
+     *          {@link GatewayEvent#GUILD_BAN_REMOVE GUILD_BAN_REMOVE}
      *     </li>
      * </ul>
      */
@@ -162,10 +169,10 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         GUILD_EMOJIS_UPDATE
+     *         {@link GatewayEvent#GUILD_EMOJIS_UPDATE GUILD_EMOJIS_UPDATE}
      *     </li>
      *     <li>
-     *         GUILD_STICKERS_UPDATE
+     *         {@link GatewayEvent#GUILD_STICKERS_UPDATE GUILD_STICKERS_UPDATE}
      *     </li>
      * </ul>
      */
@@ -174,16 +181,16 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         GUILD_INTEGRATIONS_UPDATE
+     *         {@link GatewayEvent#GUILD_INTEGRATIONS_UPDATE GUILD_INTEGRATIONS_UPDATE}
      *     </li>
      *     <li>
-     *         INTEGRATION_CREATE
+     *        {@link GatewayEvent#INTEGRATION_CREATE INTEGRATION_CREATE}
      *     </li>
      *     <li>
-     *         INTEGRATION_UPDATE
+     *         {@link GatewayEvent#INTEGRATION_UPDATE INTEGRATION_UPDATE}
      *     </li>
      *     <li>
-     *         INTEGRATION_DELETE
+     *         {@link GatewayEvent#INTEGRATION_DELETE INTEGRATION_DELETE}
      *     </li>
      * </ul>
      */
@@ -192,7 +199,7 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         WEBHOOKS_UPDATE
+     *         {@link GatewayEvent#WEBHOOKS_UPDATE WEBHOOKS_UPDATE}
      *     </li>
      * </ul>
      */
@@ -201,10 +208,10 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         INVITE_CREATE
+     *         {@link GatewayEvent#INVITE_CREATE INVITE_CREATE}
      *     </li>
      *     <li>
-     *         INVITE_DELETE
+     *         {@link GatewayEvent#INVITE_DELETE INVITE_DELETE}
      *     </li>
      * </ul>
      */
@@ -213,7 +220,7 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         VOICE_STATE_UPDATE
+     *         {@link GatewayEvent#VOICE_STATE_UPDATE VOICE_STATE_UPDATE}
      *     </li>
      * </ul>
      */
@@ -222,7 +229,7 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         PRESENCE_UPDATE
+     *        {@link GatewayEvent#PRESENCE_UPDATE PRESENCE_UPDATE}
      *     </li>
      * </ul>
      */
@@ -231,16 +238,16 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *          MESSAGE_CREATE
+     *          {@link GatewayEvent#MESSAGE_CREATE MESSAGE_CREATE}
      *     </li>
      *     <li>
-     *          MESSAGE_UPDATE
+     *          {@link GatewayEvent#MESSAGE_CREATE MESSAGE_CREATE}
      *     </li>
      *     <li>
-     *          MESSAGE_DELETE
+     *          {@link GatewayEvent#MESSAGE_DELETE MESSAGE_DELETE}
      *     </li>
      *     <li>
-     *          MESSAGE_DELETE_BULK
+     *          {@link GatewayEvent#MESSAGE_DELETE_BULK MESSAGE_DELETE_BULK}
      *     </li>
      * </ul>
      */
@@ -249,16 +256,16 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         MESSAGE_REACTION_ADD
+     *         {@link GatewayEvent#MESSAGE_REACTION_ADD MESSAGE_REACTION_ADD}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE MESSAGE_REACTION_REMOVE}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE_ALL
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE_ALL MESSAGE_REACTION_REMOVE_ALL}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE_EMOJI
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE_EMOJI MESSAGE_REACTION_REMOVE_EMOJI}
      *     </li>
      * </ul>
      */
@@ -267,7 +274,7 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         TYPING_START
+     *         {@link GatewayEvent#TYPING_START TYPING_START}
      *     </li>
      * </ul>
      */
@@ -276,16 +283,16 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         MESSAGE_CREATE
+     *         {@link GatewayEvent#MESSAGE_CREATE MESSAGE_CREATE}
      *     </li>
      *     <li>
-     *         MESSAGE_UPDATE
+     *         {@link GatewayEvent#MESSAGE_UPDATE MESSAGE_UPDATE}
      *     </li>
      *     <li>
-     *         MESSAGE_DELETE
+     *         {@link GatewayEvent#MESSAGE_DELETE MESSAGE_DELETE}
      *     </li>
      *     <li>
-     *         CHANNEL_PINS_UPDATE
+     *         {@link GatewayEvent#CHANNEL_PINS_UPDATE CHANNEL_PINS_UPDATE}
      *     </li>
      * </ul>
      */
@@ -295,16 +302,16 @@ public enum GatewayIntent implements SimpleDatable {
      *
      * <ul>
      *     <li>
-     *         MESSAGE_REACTION_ADD
+     *         {@link GatewayEvent#MESSAGE_REACTION_ADD MESSAGE_REACTION_ADD}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE MESSAGE_REACTION_REMOVE}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE_ALL
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE_ALL MESSAGE_REACTION_REMOVE_ALL}
      *     </li>
      *     <li>
-     *         MESSAGE_REACTION_REMOVE_EMOJI
+     *         {@link GatewayEvent#MESSAGE_REACTION_REMOVE_EMOJI MESSAGE_REACTION_REMOVE_EMOJI}
      *     </li>
      * </ul>
      */
@@ -313,7 +320,7 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *         TYPING_START
+     *         {@link GatewayEvent#TYPING_START TYPING_START}
      *     </li>
      * </ul>
      */
@@ -322,19 +329,19 @@ public enum GatewayIntent implements SimpleDatable {
     /**
      * <ul>
      *     <li>
-     *          GUILD_SCHEDULED_EVENT_CREATE
+     *          {@link GatewayEvent#GUILD_SCHEDULED_EVENT_CREATE GUILD_SCHEDULED_EVENT_CREATE}
      *     </li>
      *     <li>
-     *          GUILD_SCHEDULED_EVENT_UPDATE
+     *          {@link GatewayEvent#GUILD_SCHEDULED_EVENT_UPDATE GUILD_SCHEDULED_EVENT_UPDATE}
      *     </li>
      *     <li>
-     *          GUILD_SCHEDULED_EVENT_UPDATE
+     *          {@link GatewayEvent#GUILD_SCHEDULED_EVENT_UPDATE GUILD_SCHEDULED_EVENT_UPDATE}
      *     </li>
      *     <li>
-     *          GUILD_SCHEDULED_EVENT_USER_ADD {@link GatewayIntent **}
+     *          {@link GatewayEvent#GUILD_SCHEDULED_EVENT_USER_ADD GUILD_SCHEDULED_EVENT_USER_ADD} {@link GatewayIntent **}
      *     </li>
      *     <li>
-     *          GUILD_SCHEDULED_EVENT_USER_REMOVE {@link GatewayIntent **}
+     *          {@link GatewayEvent#GUILD_SCHEDULED_EVENT_USER_REMOVE GUILD_SCHEDULED_EVENT_USER_REMOVE} {@link GatewayIntent **}
      *     </li>
      * </ul>
      */

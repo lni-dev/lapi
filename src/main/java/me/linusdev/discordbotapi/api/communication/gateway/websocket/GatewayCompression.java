@@ -5,12 +5,20 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * The Compression Discord should use, when sending us {@link me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract payloads}.<br>
- * This is not support by LApi as standard. You will have to implement your own converter.
+ * This is not supported by LApi as standard. You will have to implement your own converter.
  */
 public enum GatewayCompression implements SimpleDatable {
 
     NONE(null),
 
+    /**
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#payload-compression" target="_top">Payload Compression</a>
+     */
+    PAYLOAD_COMPRESSION(null),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#transport-compression" target="_top">Transport Compression</a>
+     */
     ZLIB_STREAM("zlib-stream"),
 
     ;

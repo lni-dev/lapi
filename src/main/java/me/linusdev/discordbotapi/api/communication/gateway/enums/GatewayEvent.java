@@ -3,8 +3,23 @@ package me.linusdev.discordbotapi.api.communication.gateway.enums;
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier;
 
 /**
+ * <h2 style="padding:0;margin:0;">Gateway Events</h2>
+ * <p style="padding:0;margin:0;">
+ *     Gateway events are events received from Discord. You can add a {@link EventListener} to listen to these events.
+ *     Some events are also split into sub-events by LApi. You can find a list of all events {@link EventIdentifier here}.<br>
+ *     For more information on how to listen to events see {@link EventListener}.
+ * </p>
+ * <p>
+ *     {@link #HELLO}, {@link #READY}, {@link #RESUMED}, {@link #RECONNECT} and {@link #INVALID_SESSION} are not
+ *     important for you and are already handled by the {@link GatewayWebSocket}.
+ * </p>
+ *
+ *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-events" target="_top">Gateway Events</a>
  */
 public enum GatewayEvent implements SimpleDatable {

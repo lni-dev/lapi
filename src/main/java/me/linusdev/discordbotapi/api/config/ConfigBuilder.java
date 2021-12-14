@@ -7,6 +7,7 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.Contract;
@@ -23,6 +24,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * This class can build a {@link Config} or a {@link LApi}
+ * @see #build()
+ * @see #buildLapi()
+ * @see #getDefault(String)
+ */
 @SuppressWarnings("UnusedReturnValue")
 public class ConfigBuilder implements Datable {
 
@@ -37,20 +44,50 @@ public class ConfigBuilder implements Datable {
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
 
+    /**
+     * Creates a new {@link ConfigBuilder}
+     */
     public ConfigBuilder(){
         this.gatewayConfigBuilder = new GatewayConfigBuilder();
     }
 
+    /**
+     * <p>
+     *     Creates a new {@link ConfigBuilder} and sets the token to given token
+     * </p>
+     * @param token string token
+     */
     public ConfigBuilder(String token){
         this();
         this.token = token;
     }
 
+    /**
+     * <p>
+     *     Creates a new {@link ConfigBuilder} and calls {@link #readFromFile(Path)}
+     * </p>
+     * @param configFile the path to the file to read the config from. This file must exist.
+     */
     public ConfigBuilder(Path configFile) throws IOException, ParseException, InvalidDataException {
         this();
         readFromFile(configFile);
     }
 
+    /**
+     * <p>
+     *     Creates a new {@link ConfigBuilder} with all commonly required stuff enabled.
+     *     The {@link me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket gateway} has
+     *     all intents enabled and will receive all events.
+     * </p>
+     * <p>
+     *    You can directly {@link #buildLapi() build a LApi} with the returned config builder
+     * </p>
+     * <p>
+     *     See method source code for all details.
+     * </p>
+     * @param token string token
+     * @return new {@link ConfigBuilder}
+     */
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull ConfigBuilder getDefault(@NotNull String token){
 
@@ -58,12 +95,15 @@ public class ConfigBuilder implements Datable {
                 .enable(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP)
                 .enable(ConfigFlag.ENABLE_GATEWAY)
                 .adjustGatewayConfig(gb -> {
-
+                    gb.addIntent(GatewayIntent.ALL);
                 });
     }
 
     /**
-     * Enables given flag
+     * <em>Optional / Recommended</em>
+     * <p>
+     *     Enables given flag
+     * </p>
      * @param flag the flag to enable/set
      */
     public ConfigBuilder enable(@NotNull ConfigFlag flag){
@@ -72,7 +112,10 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
-     * Disables given flag
+     * <em>Optional / Recommended</em>
+     * <p>
+     *     Disables given flag
+     * </p>
      * @param flag the flag to disable/unset
      * @see #disable(ConfigFlag)
      */
@@ -81,7 +124,102 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
-    public ConfigBuilder readFromData(@NotNull Data data) throws InvalidDataException {
+
+    /**
+     * <em>Optional / Not Recommended</em>
+     * <p>
+     *     overwrites the flags long
+     * </p>
+     *
+     * @param flags new flags long
+     * @see #enable(ConfigFlag)
+     * @see #disable(ConfigFlag)
+     */
+    public ConfigBuilder setFlags(long flags) {
+        this.flags = flags;
+        return this;
+    }
+
+    /**
+     * <em>Optional / Not Recommended</em>
+     * <p>
+     *     Disables all flags
+     * </p>
+     */
+    public ConfigBuilder clearFlags(){
+        this.flags = 0;
+        return this;
+    }
+
+    /**
+     * <em>Required</em>
+     * <p>
+     *     The token, to authenticate.<br>
+     *     go to the Discord <a href="https://discord.com/developers/applications" target="_top">Developer Portal</a> and
+     *     select your application (or create one if you haven't already). Then go to <b>Bot</b> and copy your Token.
+     * </p>
+     * @param token your bot token
+     */
+    public ConfigBuilder setToken(@NotNull String token){
+        this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: () -> ConcurrentLinkedQueue::new
+     * <p>
+     *     Supplier for the queue used by {@link LApi} for queued HttpRequests
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default
+     * </p>
+     * @param queueSupplier queue supplier
+     */
+    public ConfigBuilder setQueueSupplier(Supplier<Queue<Future<?>>> queueSupplier) {
+        this.queueSupplier = queueSupplier;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code new GatewayConfigBuilder()}
+     * <p>
+     *     It's much easier if you use {@link #adjustGatewayConfig(Consumer)}
+     * </p>
+     * @param gatewayConfigBuilder gateway config
+     * @see #adjustGatewayConfig(Consumer)
+     */
+    public ConfigBuilder setGatewayConfig(@NotNull GatewayConfigBuilder gatewayConfigBuilder) {
+        this.gatewayConfigBuilder = gatewayConfigBuilder;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em>
+     * <p>
+     *      The consumer lets you adjust the {@link GatewayConfigBuilder} of this {@link GatewayConfig}. You do <b>not</b> need to
+     *      call {@link #setGatewayConfig(GatewayConfigBuilder) setGatewayConfig(...)}.
+     * </p>
+     *
+     * @param setConfig the consumer, to adjust the {@link GatewayConfigBuilder}
+     */
+    public ConfigBuilder adjustGatewayConfig(@NotNull Consumer<GatewayConfigBuilder> setConfig) {
+        setConfig.accept(gatewayConfigBuilder);
+        return this;
+    }
+
+    /**
+     * <p>
+     *     Adjusts this {@link ConfigBuilder} depending on given data.
+     * </p>
+     *
+     * @param data {@link Data}
+     * @return this
+     * @see #getData()
+     */
+    @Contract("_ -> this")
+    public ConfigBuilder fromData(@NotNull Data data) throws InvalidDataException {
         String token = (String) data.get(TOKEN_KEY);
         Object flags = data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS);
         Data gateway = (Data) data.get(GATEWAY_CONFIG_KEY);
@@ -100,18 +238,33 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
+    /**
+     * <p>
+     *     Will read the {@link ConfigBuilder} saved to this file and adjust this {@link ConfigBuilder} accordingly.
+     * </p>
+     * @param configFile the path to the file to read the config from. This file must exist.
+     * @return this
+     * @see #writeToFile(Path, boolean)
+     */
+    @Contract("_ -> this")
     public ConfigBuilder readFromFile(@NotNull Path configFile) throws IOException, ParseException, InvalidDataException {
         if(!Files.exists(configFile)) throw new FileNotFoundException(configFile + " does not exist.");
         Reader reader = Files.newBufferedReader(configFile);
         JsonParser parser = new JsonParser();
-        readFromData(parser.readDataFromReader(reader));
+        fromData(parser.readDataFromReader(reader));
         return this;
     }
 
     /**
+     * <p>
      * Will write the current {@link ConfigBuilder} to a file, so it could be read later. Useful to create your own config file.
-     * The Config builder does not have to be able to build an actual {@link Config}.
-     * @param configFile the Path to the file to write the config to. This file may not exist
+     * </p>
+     * <p>
+     *     The Config builder does not have to be able to build an actual {@link Config}. For example a token can still be missing.
+     * </p>
+     *
+     * @param configFile the Path to the file to write the config to. This file does not have to exist, but the folder containing the file must exist.
+     * @see #readFromFile(Path)
      */
     public ConfigBuilder writeToFile(@NotNull Path configFile, boolean overwriteIfExists) throws IOException {
         if(!overwriteIfExists && Files.exists(configFile)) throw new FileAlreadyExistsException(configFile + " already exists");
@@ -124,73 +277,13 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
-    public ConfigBuilder setToken(@NotNull String token){
-        this.token = token;
-        return this;
-    }
-
-    public ConfigBuilder setQueueSupplier(Supplier<Queue<Future<?>>> queueSupplier) {
-        this.queueSupplier = queueSupplier;
-        return this;
-    }
-
     /**
-     * overwrites the flags long
-     * @param flags new flags long
-     * @see #setFlag(ConfigFlag)
-     * @see #removeFlag(ConfigFlag)
-     */
-    public ConfigBuilder setFlags(long flags) {
-        this.flags = flags;
-        return this;
-    }
-
-    /**
-     * Enables given flag
-     * @param flag the flag to enable/set
-     * @see #enable(ConfigFlag)
-     */
-    public ConfigBuilder setFlag(@NotNull ConfigFlag flag){
-        this.flags = flag.set(this.flags);
-        return this;
-    }
-
-    /**
-     * Disables given flag
-     * @param flag the flag to disable/unset
-     * @see #disable(ConfigFlag)
-     */
-    public ConfigBuilder removeFlag(@NotNull ConfigFlag flag){
-        this.flags = flag.remove(this.flags);
-        return this;
-    }
-
-    /**
-     * Disables all flags
-     */
-    public ConfigBuilder clearFlags(){
-        this.flags = 0;
-        return this;
-    }
-
-
-    public ConfigBuilder setGatewayConfig(@NotNull GatewayConfigBuilder gatewayConfigBuilder) {
-        this.gatewayConfigBuilder = gatewayConfigBuilder;
-        return this;
-    }
-
-    /**
-     * The consumer lets you adjust the {@link GatewayConfigBuilder} of this {@link GatewayConfig}. This {@link GatewayConfigBuilder}
-     * is already added to this {@link ConfigBuilder}
-     * @param setConfig the consumer, to adjust the {@link GatewayConfigBuilder}
-     */
-    public ConfigBuilder adjustGatewayConfig(@NotNull Consumer<GatewayConfigBuilder> setConfig) {
-        setConfig.accept(gatewayConfigBuilder);
-        return this;
-    }
-
-    /**
-     * builds a {@link Config}
+     * <p>
+     *     builds a {@link Config}
+     * </p>
+     * <p>
+     *     It's much easier to use {@link #buildLapi()}
+     * </p>
      * @return {@link Config}
      */
     public @NotNull Config build(){
@@ -205,13 +298,20 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
-     * builds a {@link Config} and then a {@link LApi} with this config
+     * <p>
+     *     builds a {@link Config} and then a {@link LApi} with this config
+     * </p>
      * @return {@link LApi}
      */
     public @NotNull LApi buildLapi() throws LApiException, IOException, ParseException, InterruptedException {
         return new LApi(build());
     }
 
+    /**
+     *
+     * @return {@link Data} corresponding to this {@link ConfigBuilder}
+     * @see #fromData(Data)
+     */
     @Override
     public Data getData() {
 
