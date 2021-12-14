@@ -25,6 +25,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
 import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
+import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
@@ -63,6 +64,44 @@ import java.util.function.Consumer;
 
 import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 
+/**
+ * <h2 style="margin:0;padding:0;">What is LApi?</h2>
+ * <p style="margin:0;padding:0;">
+ *     LApi is the facade, that handles all communications with Discord's api
+ * </p>
+ *
+ * <br>
+ * <h2 style="margin:0;padding:0;">How to get an Instance?</h2>
+ * <p style="margin:0;padding:0;">
+ *     The easiest way to get an instance is:<br>
+ *     {@code LApi lApi = ConfigBuilder.getDefault(TOKEN).buildLapi()}.<br>
+ *     {@code TOKEN} must be replaced with {@link ConfigBuilder#setToken(String) your bot token}
+ * </p>
+ * <br>
+ * <p>
+ *     Alternatively you can also make your own Config. For example:<br>
+ *     <pre>
+ *         {@code
+ *  LApi lApi = new ConfigBuilder(TOKEN)
+ *          .enable(ConfigFlag.ENABLE_GATEWAY)
+ *          .adjustGatewayConfig(gatewayConfigBuilder -> {
+ *              gatewayConfigBuilder
+ *                      .addIntent(GatewayIntent.GUILD_MESSAGES,
+ *                                 GatewayIntent.DIRECT_MESSAGES);
+ *          }).buildLapi();
+ *  }
+ *     </pre>
+ *     {@code TOKEN} must be replaced with {@link ConfigBuilder#setToken(String) your bot token}
+ * </p>
+ * <br>
+ * <br>
+ * <h2 style="margin:0;padding:0;">How to listen to events?</h2>
+ * <p style="margin:0;padding:0;">
+ *     You can listen to events by adding a listener to the {@link AbstractEventTransmitter event transmitter}:
+ *     <pre>{@code lApi.getEventTransmitter().addListener(yourListener)}</pre>
+ *     for more information see {@link me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener EventListener}
+ * </p>
+ */
 public class LApi {
 
     /**
@@ -83,6 +122,7 @@ public class LApi {
     private @NotNull final String token;
     private @NotNull final Config config;
 
+    //Http
     private final LApiHttpHeader authorizationHeader;
     private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
             ATTRIBUTE_USER_AGENT_VALUE.replace(PlaceHolder.LAPI_URL, LAPI_URL).replace(PlaceHolder.LAPI_VERSION, LAPI_VERSION));
@@ -107,7 +147,7 @@ public class LApi {
     private final VoiceRegions voiceRegions;
 
     //Logger
-    private final LogInstance log = Logger.getLogger("LApi", Logger.Type.INFO);
+    private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
     public LApi(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
         this.token = config.getToken();

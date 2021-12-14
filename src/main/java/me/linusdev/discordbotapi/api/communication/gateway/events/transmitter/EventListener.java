@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- *     This listener can listen to events if added to the {@link EventTransmitter}.
+ *     This listener can listen to events if added to the {@link AbstractEventTransmitter EventTransmitter}.
  * </p>
  * <p>
  *     Even though all methods are {@code default} they do not have any code in them, and you should not call any
@@ -21,11 +21,11 @@ import org.jetbrains.annotations.Nullable;
  * <h2 style="padding:0;margin:0;">How to add a listener to the event transmitter?</h2>
  * <p style="padding:0;margin:0;padding-top:3px">
  *      After you {@link LApi have created your LApi instance}, you can use {@link LApi#getEventTransmitter()} to get
- *      the event transmitter. Then you can simply add a listener by calling {@link EventTransmitter#addListener(EventListener)}.
+ *      the event transmitter. Then you can simply add a listener by calling {@link AbstractEventTransmitter#addListener(EventListener)}.
  * </p>
  * <p>
  *     If you want to know more about how to add specified listeners, see
- *     {@link EventTransmitter#addSpecifiedListener(EventListener, EventIdentifier...) here}. Specified listeners will
+ *     {@link AbstractEventTransmitter#addSpecifiedListener(EventListener, EventIdentifier...) here}. Specified listeners will
        only listen to specified events or sub-events
  * </p>
  *

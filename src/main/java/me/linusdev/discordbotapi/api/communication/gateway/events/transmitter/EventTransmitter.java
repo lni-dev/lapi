@@ -28,10 +28,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     /**
-     * Adds a listener, which will listen to all events.
-     *
-     * @param listener the {@link EventListener} to add
-     * @return {@link ArrayList#add(Object)}
+     * @see AbstractEventTransmitter#addListener(EventListener)
      */
     @Override
     public boolean addListener(@NotNull EventListener listener){
@@ -39,9 +36,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     /**
-     * This will not remove {@link #addSpecifiedListener(EventListener, EventIdentifier...) specified listener}!
-     * @param listener the {@link EventListener} to remove
-     * @return {@link ArrayList#remove(Object)}
+     * @see AbstractEventTransmitter#removeListener(EventListener)
      */
     @Override
     public boolean removeListener(@NotNull EventListener listener){
@@ -49,25 +44,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     /**
-     *
-     * Adding a {@link EventListener} as specified listener means, that the listener's methods will only listen to
-     * events with the specified {@link EventIdentifier}.<br><br>
-     *
-     * For Example if you add a listener, which overwrites {@link EventListener#onMessageCreate(MessageCreateEvent)} and
-     * add it with the specification {@link EventIdentifier#READY READY}, your listener will have no effect.<br>
-     * But if you add this listener with the specification {@link EventIdentifier#MESSAGE_CREATE MESSAGE_CREATE}, the
-     * {@link EventListener#onMessageCreate(MessageCreateEvent) onMessageCreate(MessageCreateEvent)} method of your listener will be called, when a new message
-     * was created.<br><br>
-     *
-     * Note that sub-event-methods of an event are not called if you add the {@link EventIdentifier} for the (super-)event. For Example:<br>
-     * If you add a listener with the specification {@link EventIdentifier#MESSAGE_CREATE MESSAGE_CREATE},
-     * the {@link EventListener#onGuildMessageCreate(GuildMessageCreateEvent) onGuildMessageCreate(GuildMessageCreateEvent)}
-     * method of your listener will never be called. If you want that method to be called, you will have to add
-     * {@link EventIdentifier#GUILD_MESSAGE_CREATE GUILD_MESSAGE_CREATE} instead. You can also add both if you wish.
-     *
-     * @param listener the listener
-     * @param specifications to which Events the listener shall listen to
-     * @return true if all {@link ArrayList#add(Object)} calls returned true
+     * @see AbstractEventTransmitter#addSpecifiedListener(EventListener, EventIdentifier...)
      */
     @Override
     public boolean addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
@@ -82,11 +59,9 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         return r;
     }
 
+
     /**
-     *
-     * @param listener the listener to remove
-     * @param specifications to which Events the listener shall not listen to anymore
-     * @return true if all {@link ArrayList#remove(Object)} calls returned true
+     * @see AbstractEventTransmitter#removeSpecifiedListener(EventListener, EventIdentifier...)
      */
     @Override
     public boolean removeSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
