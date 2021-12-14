@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ public class Activity implements Datable {
      *
      * @param name the activity's name
      * @param type {@link ActivityType activity type}
-     * @param url stream url, is validated when type is 1
+     * @param url stream url, is validated when type is {@link ActivityType#STREAMING}
      * @param createdAt unix timestamp (in milliseconds) of when the activity was added to the user's session
      * @param timestamps unix timestamps for start and/or end of the game
      * @param applicationId application id for the game
@@ -277,5 +278,18 @@ public class Activity implements Datable {
         data.addIfNotNull(BUTTONS_KEY, buttons);
 
         return data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Activity activity = (Activity) o;
+        return name.equals(activity.name) && type == activity.type && Objects.equals(url, activity.url) && Objects.equals(createdAt, activity.createdAt) && Objects.equals(timestamps, activity.timestamps) && Objects.equals(applicationId, activity.applicationId) && Objects.equals(details, activity.details) && Objects.equals(state, activity.state) && Objects.equals(emoji, activity.emoji) && Objects.equals(party, activity.party) && Objects.equals(assets, activity.assets) && Objects.equals(secrets, activity.secrets) && Objects.equals(instance, activity.instance) && Objects.equals(flags, activity.flags) && Objects.equals(buttons, activity.buttons);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, url, createdAt, timestamps, applicationId, details, state, emoji, party, assets, secrets, instance, flags, buttons);
     }
 }
