@@ -76,7 +76,7 @@ public class PresenceUpdate implements Datable {
     /**
      * unix time (in milliseconds) of when the client went idle, or null if the client is not idle
      */
-    public @Nullable Integer getSince() {
+    public @Nullable Long getSince() {
         return since;
     }
 
