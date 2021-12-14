@@ -2,11 +2,12 @@ package me.linusdev.discordbotapi.api.communication.gateway.abstracts;
 
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
+import me.linusdev.discordbotapi.api.communication.gateway.other.GatewayPayload;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @see me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload GatewayPayload Implementation
+ * @see GatewayPayload GatewayPayload Implementation
  */
 public interface GatewayPayloadAbstract {
 

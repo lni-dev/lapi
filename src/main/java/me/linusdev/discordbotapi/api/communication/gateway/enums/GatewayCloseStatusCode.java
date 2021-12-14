@@ -1,7 +1,7 @@
 package me.linusdev.discordbotapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
-import me.linusdev.discordbotapi.api.communication.gateway.GatewayPayload;
+import me.linusdev.discordbotapi.api.communication.gateway.other.GatewayPayload;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/opcodes-and-status-codes#gateway-gateway-close-event-codes" target="_top">Gateway Close Event Codes</a>

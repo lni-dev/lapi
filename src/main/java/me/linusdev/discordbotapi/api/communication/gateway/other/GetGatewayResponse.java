@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.communication.gateway;
+package me.linusdev.discordbotapi.api.communication.gateway.other;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;

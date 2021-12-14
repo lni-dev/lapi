@@ -7,7 +7,6 @@ import me.linusdev.data.parser.JsonParser;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
-import me.linusdev.discordbotapi.api.communication.gateway.*;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseStatusCode;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
@@ -18,6 +17,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEve
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
+import me.linusdev.discordbotapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
 import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
@@ -238,6 +238,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error.getThrowable());
                         return;
                     }
+
+                    //TODO check session start limit
 
                     URI uri = new URI(getGatewayResponse.getUrl()
                             + "?" + QUERY_STRING_API_VERSION_KEY + "=" + apiVersion.getVersionNumber()
