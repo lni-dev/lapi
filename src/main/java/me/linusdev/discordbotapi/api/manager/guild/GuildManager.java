@@ -24,6 +24,7 @@ public class GuildManager implements GuildManagerAbstract{
 
     @Override
     public @Nullable Guild getGuildById(@Nullable String guildId) {
+        if(guildId == null) return null;
         return guilds.get(guildId);
     }
 
