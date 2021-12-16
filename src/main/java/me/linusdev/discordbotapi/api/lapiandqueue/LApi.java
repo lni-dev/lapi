@@ -29,6 +29,8 @@ import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListT
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
+import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
+import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
@@ -148,6 +150,9 @@ public class LApi {
     //stores and manages the voice regions
     private final VoiceRegions voiceRegions;
 
+    //guild manager
+    private final GuildManager guildManager;
+
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
@@ -217,7 +222,8 @@ public class LApi {
         if(this.config.isFlagSet(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP))
             this.voiceRegions.init(this); //Todo add callback
 
-
+        //Guild Manager
+        this.guildManager = new LApiGuildManager(this);
     }
 
     /**
