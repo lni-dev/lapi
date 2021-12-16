@@ -7,6 +7,8 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
@@ -46,7 +48,10 @@ public class Test {
                             .setCompression(GatewayCompression.NONE)
                             .setEncoding(GatewayEncoding.JSON)
                             .setOs("Windows 10")
-                            .addIntent(GatewayIntent.ALL);
+                            .addIntent(GatewayIntent.ALL)
+                            .adjustStartupPresence(presence -> {
+                                presence.setStatus(StatusType.ONLINE);
+                            });
                 }).buildLapi();
 
         lApi.getEventTransmitter().addSpecifiedListener(new EventListener() {
@@ -66,6 +71,23 @@ public class Test {
                 }
             }
         }, EventIdentifier.GUILD_MESSAGE_CREATE);
+
+        Thread.sleep(10000);
+        System.out.println("DND");
+        SelfUserPresenceUpdater updater = lApi.getSelfPresenceUpdater();
+        updater.setStatus(StatusType.DND).updateNow();
+
+        Thread.sleep(13000);
+        System.out.println("IDLE");
+        updater.setStatus(StatusType.IDLE).updateNow();
+
+        Thread.sleep(8050);
+        System.out.println("ONLINE");
+        updater.setStatus(StatusType.ONLINE).updateNow();
+
+        Thread.sleep(10506);
+        System.out.println("OFFLINE");
+        updater.setStatus(StatusType.INVISIBLE).updateNow();
 
     }
 

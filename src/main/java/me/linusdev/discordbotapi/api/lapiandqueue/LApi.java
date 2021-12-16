@@ -12,6 +12,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetExceptio
 import me.linusdev.discordbotapi.api.communication.gateway.other.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
@@ -86,6 +87,9 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
  *              gatewayConfigBuilder
  *                      .addIntent(GatewayIntent.GUILD_MESSAGES,
  *                                 GatewayIntent.DIRECT_MESSAGES);
+ *                      .adjustStartupPresence(presence -> {
+ *                                 presence.setStatus(StatusType.ONLINE);
+ *                             });
  *          }).buildLapi();
  *  }
  *     </pre>
@@ -1020,11 +1024,27 @@ public class LApi {
     //Getter
 
     /**
-     * TODO add docs on how to add a listener / specified listener
+     * <p>
+     *     The event transmitter is used to listen to events from Discord. For more information on
+     *     how to add a listener, see {@link me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener EventListener}
+     * </p>
      * @return {@link AbstractEventTransmitter}
      */
     public AbstractEventTransmitter getEventTransmitter() {
         return eventTransmitter;
+    }
+
+    /**
+     * <p>
+     *     let's you update the presence of the current self user (your bot).
+     * </p>
+     * <p>
+     *     <b>After you finished adjusting your presence, you will have to call {@link SelfUserPresenceUpdater#updateNow()}!</b>
+     * </p>
+     * @return {@link SelfUserPresenceUpdater}
+     */
+    public SelfUserPresenceUpdater getSelfPresenceUpdater(){
+        return gateway.getSelfUserPresenceUpdater();
     }
 
     public LApiHttpHeader getAuthorizationHeader() {

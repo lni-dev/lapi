@@ -11,6 +11,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayl
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
@@ -19,6 +20,8 @@ import org.jetbrains.annotations.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * This class can build a {@link GatewayConfig}
@@ -43,11 +46,15 @@ public class GatewayConfigBuilder implements Datable {
     private Integer largeThreshold = null;
     private Integer shardId = null;
     private Integer numShards = null;
-    private PresenceUpdate startupPresence = null;
+    private SelfUserPresenceUpdater startupPresence = null;
     private ArrayList<GatewayIntent> intents = new ArrayList<>();
     private ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter = null;
     private ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter = null;
     private GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler = null;
+
+    public GatewayConfigBuilder() {
+        this.startupPresence = new SelfUserPresenceUpdater(false);
+    }
 
     /**
      *
@@ -97,14 +104,10 @@ public class GatewayConfigBuilder implements Datable {
         this.largeThreshold = largeThreshold == null ? this.largeThreshold : (Integer) largeThreshold.intValue();
         this.shardId = shardId == null ? this.shardId : (Integer) shardId.intValue();
         this.numShards = numShards == null ? this.numShards : (Integer) numShards.intValue();
-        this.startupPresence = presence == null ? this.startupPresence : PresenceUpdate.fromData(presence);
+        this.startupPresence = presence == null ? this.startupPresence : SelfUserPresenceUpdater.fromPresenceUpdateData(presence);
         this.intents = intents;
 
         return this;
-    }
-
-    public GatewayConfigBuilder() {
-
     }
 
     /**
@@ -239,10 +242,10 @@ public class GatewayConfigBuilder implements Datable {
     }
 
     /**
-     * <em>Optional</em><br>
+     * <em>Optional / Not Recommended</em><br>
      * Default: {@code null}
      * <p>
-     *    TODO YourPresenceManager
+     *    sets the {@link SelfUserPresenceUpdater} for the gateway.
      * </p>
      * <p>
      *     Set to {@code null} to use default
@@ -250,8 +253,25 @@ public class GatewayConfigBuilder implements Datable {
      *
      * @param startupPresence startup presence
      */
-    public GatewayConfigBuilder setStartupPresence(@Nullable PresenceUpdate startupPresence) {
-        this.startupPresence = startupPresence;
+    public GatewayConfigBuilder setSelfUserPresenceUpdater(@Nullable SelfUserPresenceUpdater startupPresence) {
+        this.startupPresence = Objects.requireNonNullElseGet(startupPresence, () -> new SelfUserPresenceUpdater(false));
+        return this;
+    }
+
+    /**
+     * <em>Optional / Not Recommended</em><br>
+     * Default: {@code null}
+     * <p>
+     *    Adjusts the presence, when your bot connects to the gateway (goes online)
+     * </p>
+     * <p>
+     *     You may not call {@link SelfUserPresenceUpdater#updateNow()}!
+     * </p>
+     *
+     * @param consumer consumer to adjust the presence sent at the startup
+     */
+    public GatewayConfigBuilder adjustStartupPresence(@NotNull Consumer<SelfUserPresenceUpdater> consumer){
+        consumer.accept(startupPresence.setUpdatePresence(true));
         return this;
     }
 

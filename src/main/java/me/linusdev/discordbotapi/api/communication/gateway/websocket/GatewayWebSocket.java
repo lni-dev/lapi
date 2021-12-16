@@ -8,17 +8,14 @@ import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
-import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayCloseStatusCode;
-import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayOpcode;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
 import me.linusdev.discordbotapi.api.communication.gateway.other.GatewayPayload;
-import me.linusdev.discordbotapi.api.communication.gateway.presence.PresenceUpdate;
+import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.config.Config;
@@ -105,7 +102,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     private final boolean usesSharding;
     private final int shardId;
     private final int numShards;
-    private @Nullable PresenceUpdate presence;
+    private final @NotNull SelfUserPresenceUpdater selfPresence;
     private final @NotNull GatewayIntent[] intents;
 
     private WebSocket webSocket = null;
@@ -165,12 +162,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      */
     @ApiStatus.Internal
     private GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
-                            @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
-                            @NotNull String os, @NotNull Integer largeThreshold, @Nullable Integer shardId,
-                            @Nullable Integer numShards, @Nullable PresenceUpdate presence, @NotNull GatewayIntent[] intents,
-                            @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
-                            ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
-                            @NotNull UnexpectedEventHandler unexpectedEventHandler) {
+                             @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
+                             @NotNull String os, @NotNull Integer largeThreshold, @Nullable Integer shardId,
+                             @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater selfPresence, @NotNull GatewayIntent[] intents,
+                             @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
+                             ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
+                             @NotNull UnexpectedEventHandler unexpectedEventHandler) {
         this.lApi = lApi;
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
@@ -190,7 +187,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         }
 
-        this.presence = presence;
+        this.selfPresence = selfPresence.setGateway(this);
         this.intents = intents;
 
 
@@ -565,7 +562,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             }else{
                 Identify identify = new Identify(token, properties, compression == GatewayCompression.PAYLOAD_COMPRESSION,
-                        largeThreshold, usesSharding ? shardId : null, usesSharding ? numShards : null, presence,
+                        largeThreshold, usesSharding ? shardId : null, usesSharding ? numShards : null, selfPresence.getPresenceUpdate(),
                         GatewayIntent.toInt(intents));
 
                 GatewayPayload identifyPayload = GatewayPayload.newIdentify(identify);
@@ -746,6 +743,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         if (webSocket == null || webSocket.isOutputClosed())
             throw new UnsupportedOperationException("cannot send a payload, because you are not connected");
 
+        if(Logger.DEBUG_LOG) logger.debug(String.format("Sending Payload. Opcode: %s", payload.getOpcode()));
+        if(Logger.DEBUG_LOG) logger.debugData("Sending payload data: " + payload.toJsonString(), "payloads");
         CompletableFuture<WebSocket> future = webSocket.sendText(payload.toJsonString(), true);
 
         final GatewayWebSocket _this = this;
@@ -755,6 +754,25 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, _this, error);
             }
         });
+    }
+
+    /**
+     * Sends given command to Discord
+     * @param command the command to send
+     * @param data the data of the command, most like to be a {@link Data}
+     */
+    @ApiStatus.Internal
+    public CompletableFuture<WebSocket> sendCommand(GatewayCommand command, Object data){
+
+        GatewayPayload payload = new GatewayPayload(command.getOpcode(), data, null, null, null);
+
+        if(command == GatewayCommand.IDENTIFY || command == GatewayCommand.RESUME || command == GatewayCommand.HEARTBEAT){
+            logger.warning("Sending a " + command + " command using method sendCommand(). This should never be done! " +
+                    "The GatewayWebSocket will send these commands automatically when required.");
+            return sendPayload(payload);
+        }
+
+        return sendPayload(payload);
     }
 
 
@@ -924,6 +942,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     public void setUnexpectedEventHandler(@Nullable GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
         this.unexpectedEventHandler = unexpectedEventHandler;
+    }
+
+    /**
+     *
+     * @return the {@link SelfUserPresenceUpdater} bound to this Gateway
+     */
+    public @NotNull SelfUserPresenceUpdater getSelfUserPresenceUpdater() {
+        return selfPresence;
     }
 
     @Override
