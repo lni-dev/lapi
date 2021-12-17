@@ -31,6 +31,7 @@ import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
+import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
@@ -106,7 +107,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
  *     for more information see {@link me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener EventListener}
  * </p>
  */
-public class LApi {
+public class LApi implements HasLApi {
 
     /**
      * The Discord id of the creator of this api UwU
@@ -141,17 +142,17 @@ public class LApi {
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
     //Gateway
-    private final EventTransmitter eventTransmitter;
-    private final GatewayWebSocket gateway;
+    final EventTransmitter eventTransmitter;
+    final GatewayWebSocket gateway;
 
     //executor
     private final ThreadPoolExecutor executor;
 
     //stores and manages the voice regions
-    private final VoiceRegions voiceRegions;
+    final VoiceRegions voiceRegions;
 
     //guild manager
-    private final GuildManager guildManager;
+    final GuildManager guildManager;
 
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
@@ -1063,5 +1064,10 @@ public class LApi {
 
     public HttpClient getClient() {
         return client;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return this;
     }
 }

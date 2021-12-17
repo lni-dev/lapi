@@ -22,7 +22,7 @@ public class Logger {
 
     public static final boolean ENABLE_LOG = true;
     public static final boolean DEBUG_LOG = true && ENABLE_LOG;
-    public static final boolean DEBUG_DATA_LOG = true && ENABLE_LOG && DEBUG_LOG;
+    public static final boolean DEBUG_DATA_LOG = false && ENABLE_LOG && DEBUG_LOG;
     public static final boolean SOUT_LOG =             true && ENABLE_LOG;
 
     public static ArrayList<String> allowedSources = new ArrayList<>();

@@ -2,8 +2,12 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +39,19 @@ public interface EventListener {
 
     default void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload){}
 
+
+
     default void onReady(@NotNull ReadyEvent event) {}
+
+    default void onGuildsReady(@NotNull GuildsReadyEvent event) {}
+
+
+    default void onGuildCreate(@NotNull GuildCreateEvent event) {}
+
+    default void onGuildDelete(@NotNull GuildDeleteEvent event) {}
+
+    default void onGuildUpdate(@NotNull GuildUpdateEvent event) {}
+
 
     default void onMessageCreate(@NotNull MessageCreateEvent event) {}
 

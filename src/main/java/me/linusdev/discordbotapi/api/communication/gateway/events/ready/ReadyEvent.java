@@ -11,7 +11,8 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.Event;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.application.PartialApplication;
-import me.linusdev.discordbotapi.api.objects.guild.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
+import me.linusdev.discordbotapi.api.objects.guild.UnavailableGuild;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +36,7 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
 
     private final @NotNull ApiVersion version;
     private final @NotNull User user;
-    private final @NotNull Guild[] guilds;
+    private final @NotNull UnavailableGuild[] guilds;
     private final @NotNull String  sessionId;
     private final @Nullable Integer shardId;
     private final @Nullable Integer numShards;
@@ -46,13 +47,13 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
      * @param lApi {@link LApi}
      * @param version gateway version
      * @param user information about the user including email
-     * @param guilds the guilds the user is in
+     * @param guildsData the guilds the user is in
      * @param sessionId used for resuming connections
      * @param shardId the shard information associated with this session, if sent when identifying
      * @param numShards the shard information associated with this session, if sent when identifying
      * @param application contains id and flags
      */
-    public ReadyEvent(@NotNull LApi lApi, GatewayPayloadAbstract payload, @NotNull ApiVersion version, @NotNull User user, @NotNull Guild[] guilds, @NotNull String sessionId, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull PartialApplication application) {
+    public ReadyEvent(@NotNull LApi lApi, GatewayPayloadAbstract payload, @NotNull ApiVersion version, @NotNull User user, @NotNull UnavailableGuild[] guilds, @NotNull String sessionId, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull PartialApplication application) {
         super(lApi, payload, null);
         this.lApi = lApi;
         this.version = version;
@@ -79,8 +80,8 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
         User user = data.getAndConvert(USER_KEY,
                 (ExceptionConverter<Data, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible));
 
-        ArrayList<Guild> guilds = data.getAndConvertArrayList(GUILDS_KEY,
-                (ExceptionConverter<Data, Guild, InvalidDataException>) convertible -> Guild.fromData(lApi, convertible));
+        ArrayList<UnavailableGuild> guilds = data.getAndConvertArrayList(GUILDS_KEY,
+                (ExceptionConverter<Data, UnavailableGuild, InvalidDataException>) UnavailableGuild::fromData);
 
         String sessionId = (String) data.get(SESSION_ID_KEY);
 
@@ -99,7 +100,7 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
         }
 
         //noinspection ConstantConditions
-        return new ReadyEvent(lApi, payload, ApiVersion.fromInt(version.intValue()), user, guilds.toArray(new Guild[0]), sessionId,
+        return new ReadyEvent(lApi, payload, ApiVersion.fromInt(version.intValue()), user, guilds.toArray(new UnavailableGuild[0]), sessionId,
                 shard == null ? null : shard.get(0), shard == null ? null : shard.get(1), application);
     }
 
@@ -120,7 +121,7 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
     /**
      * 	the guilds the user is in
      */
-    public @NotNull Guild[] getGuilds() {
+    public UnavailableGuild[] getGuilds() {
         return guilds;
     }
 

@@ -2,10 +2,16 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiPrivateAccess;
+import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -19,12 +25,14 @@ import static me.linusdev.discordbotapi.api.communication.gateway.events.transmi
 public class EventTransmitter implements HasLApi, EventListener, AbstractEventTransmitter {
 
     private final @NotNull LApi lApi;
+    private final @NotNull LApiPrivateAccess lApiPrivateAccess;
 
     private final ArrayList<EventListener> listeners = new ArrayList<>(1);
     private final LinkedHashMap<EventIdentifier, ArrayList<EventListener>> specifiedListeners = new LinkedHashMap<>();
 
     public EventTransmitter(@NotNull LApi lApi){
         this.lApi = lApi;
+        this.lApiPrivateAccess = new LApiPrivateAccess(lApi);
     }
 
     /**
@@ -119,6 +127,72 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
+    @Override
+    public void onGuildsReady(@NotNull GuildsReadyEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildsReady(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildsReady(event);
+            }
+        }
+    }
+
+    @Override
+    public void onGuildCreate(@NotNull GuildCreateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildCreate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildCreate(event);
+            }
+        }
+
+        //Sub-events
+        if(lApiPrivateAccess.getGuildManager().allGuildsReceivedEvent()){
+            onGuildsReady(new GuildsReadyEvent(lApi, lApiPrivateAccess.getGuildManager()));
+        }
+    }
+
+    @Override
+    public void onGuildDelete(@NotNull GuildDeleteEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildDelete(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildDelete(event);
+            }
+        }
+
+        //Sub-events
+        if(lApiPrivateAccess.getGuildManager().allGuildsReceivedEvent()){
+            onGuildsReady(new GuildsReadyEvent(lApi, lApiPrivateAccess.getGuildManager()));
+        }
+    }
+
+    @Override
+    public void onGuildUpdate(@NotNull GuildUpdateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildUpdate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildUpdate(event);
+            }
+        }
+    }
+
     @ApiStatus.Internal
     @Override
     public void onMessageCreate(@NotNull MessageCreateEvent event) {
@@ -133,6 +207,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
+        //Sub-events
         if(event.isGuildEvent()) onGuildMessageCreate(new GuildMessageCreateEvent(event));
         else onNonGuildMessageCreate(event);
     }

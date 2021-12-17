@@ -8,7 +8,7 @@ import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.application.Application;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
-import me.linusdev.discordbotapi.api.objects.guild.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class Invite implements Datable, HasLApi {
     private final @NotNull LApi lApi;
 
     private final @NotNull String code;
-    private final @Nullable Guild guild;
+    private final @Nullable GuildAbstract guild;
     private final @NotNull Channel channel;
     private final @Nullable User inviter;
     private final @Nullable TargetType targetType;
@@ -71,7 +71,7 @@ public class Invite implements Datable, HasLApi {
      * @param guildScheduledEvent guild scheduled event data, only included if guild_scheduled_event_id contains a valid guild scheduled event id
      * @param inviteMetadata Extra information about an invite, will extend the invite object.
      */
-    public Invite(@NotNull LApi lApi, @NotNull String code, @Nullable Guild guild, @NotNull Channel channel, @Nullable User inviter, @Nullable TargetType targetType, @Nullable User targetUser, @Nullable Application targetApplication, @Nullable Integer approximatePresenceCount, @Nullable Integer approximateMemberCount, @Nullable ISO8601Timestamp expiresAt, @Nullable InviteStageInstance stageInstance, @Nullable GuildScheduledEvent guildScheduledEvent, @Nullable InviteMetadata inviteMetadata) {
+    public Invite(@NotNull LApi lApi, @NotNull String code, @Nullable GuildAbstract guild, @NotNull Channel channel, @Nullable User inviter, @Nullable TargetType targetType, @Nullable User targetUser, @Nullable Application targetApplication, @Nullable Integer approximatePresenceCount, @Nullable Integer approximateMemberCount, @Nullable ISO8601Timestamp expiresAt, @Nullable InviteStageInstance stageInstance, @Nullable GuildScheduledEvent guildScheduledEvent, @Nullable InviteMetadata inviteMetadata) {
         this.lApi = lApi;
         this.code = code;
         this.guild = guild;
@@ -122,7 +122,7 @@ public class Invite implements Datable, HasLApi {
         }
 
         //noinspection ConstantConditions: assured by above if
-        return new Invite(lApi, code, Guild.fromData(lApi, guildData), Channel.fromData(lApi, channelData),
+        return new Invite(lApi, code, GuildAbstract.fromData(lApi, guildData), Channel.fromData(lApi, channelData),
                 inviterData == null ? null : User.fromData(lApi, inviterData),
                 targetType == null ? null : TargetType.fromValue(targetType.intValue()),
                 targetUserData == null ? null : User.fromData(lApi, targetUserData), Application.fromData(lApi, targetApplication),
@@ -141,9 +141,9 @@ public class Invite implements Datable, HasLApi {
 
     /**
      * the guild this invite is for
-     * @return partial {@link Guild guild} object
+     * @return partial {@link GuildAbstract guild} object
      */
-    public @Nullable Guild getGuild() {
+    public @Nullable GuildAbstract getGuild() {
         return guild;
     }
 

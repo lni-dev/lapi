@@ -9,6 +9,9 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -20,7 +23,10 @@ import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiPrivateAccess;
+import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
+import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.log.LogInstance;
@@ -89,6 +95,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
 
     private final @NotNull LApi lApi;
+    private final @NotNull LApiPrivateAccess lApiPrivateAccess;
 
     private final EventTransmitter transmitter;
 
@@ -169,6 +176,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                              ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
                              @NotNull UnexpectedEventHandler unexpectedEventHandler) {
         this.lApi = lApi;
+        this.lApiPrivateAccess = new LApiPrivateAccess(lApi);
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
         this.token = token;
@@ -294,12 +302,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             return;
         }
 
+        GuildManager guildManager = lApiPrivateAccess.getGuildManager();
+
         switch (type){
             case HELLO:
                 break;
 
             case READY:
-                //TODO see handleReceivedPayload
+                //see handleReceivedPayload
                 break;
 
             case RESUMED:
@@ -342,12 +352,24 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 break;
 
             case GUILD_CREATE:
+                {
+                    UpdatableGuild guild = guildManager.onGuildCreate(payload);
+                    transmitter.onGuildCreate(new GuildCreateEvent(lApi, payload, guild));
+                }
                 break;
 
             case GUILD_UPDATE:
+                {
+                    UpdatableGuild guild = guildManager.onGuildUpdate(payload);
+                    transmitter.onGuildUpdate(new GuildUpdateEvent(lApi, payload, guild));
+                }
                 break;
 
             case GUILD_DELETE:
+                {
+                    UpdatableGuild guild = guildManager.onGuildDelete(payload);
+                    transmitter.onGuildDelete(new GuildDeleteEvent(lApi, payload, guild));
+                }
                 break;
 
             case GUILD_BAN_ADD:
@@ -501,7 +523,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 this.canResume.set(true);
                 this.pendingConnects.set(0);
 
-                //TODO cache guilds and stuff
+                lApiPrivateAccess.getGuildManager().onReady(event);
+                transmitter.onReady(event);
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {
                 //resume successful...

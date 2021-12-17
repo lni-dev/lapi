@@ -5,7 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.guild.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  *
  * <p>
- *     A representation of a scheduled event in a {@link Guild guild}.
+ *     A representation of a scheduled event in a {@link GuildAbstract guild}.
  * </p>
  *
  * <p>

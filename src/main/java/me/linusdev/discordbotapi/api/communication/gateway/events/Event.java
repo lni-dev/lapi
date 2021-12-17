@@ -13,9 +13,9 @@ public abstract class Event implements HasLApi {
     protected final @NotNull LApi lApi;
 
     protected final @Nullable Snowflake guildId;
-    protected final @NotNull GatewayPayloadAbstract payload;
+    protected final @Nullable GatewayPayloadAbstract payload;
 
-    public Event(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
+    public Event(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
         this.lApi = lApi;
         this.guildId = guildId;
         this.payload = payload;
@@ -44,7 +44,7 @@ public abstract class Event implements HasLApi {
 
     /**
      *
-     * @return {@link true} if this event is associated with a guild (server), {@link false} otherwise
+     * @return {@code true} if this event is associated with a guild (server), {@code false} otherwise
      */
     public boolean isGuildEvent(){
         return getGuildIdAsSnowflake() != null;
@@ -55,7 +55,7 @@ public abstract class Event implements HasLApi {
      * This is the {@link GatewayPayloadAbstract payload} received from Discord. You usually do not need this.
      * @return {@link GatewayPayloadAbstract}
      */
-    public @NotNull GatewayPayloadAbstract getPayload() {
+    public @Nullable GatewayPayloadAbstract getPayload() {
         return payload;
     }
 

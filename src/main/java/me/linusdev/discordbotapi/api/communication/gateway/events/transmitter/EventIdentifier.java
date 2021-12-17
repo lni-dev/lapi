@@ -1,7 +1,11 @@
 package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 
 /**
@@ -35,6 +39,27 @@ public enum EventIdentifier{
      * identifier for {@link EventListener#onReady(ReadyEvent)}.
      */
     READY,
+
+    /**
+     * identifier for {@link EventListener#onGuildsReady(GuildsReadyEvent)}.
+     */
+    GUILDS_READY,
+
+
+    /**
+     * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}
+     */
+    GUILD_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildDelete(GuildDeleteEvent)}
+     */
+    GUILD_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onGuildUpdate(GuildUpdateEvent)}
+     */
+    GUILD_UPDATE,
 
 
 
