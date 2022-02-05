@@ -55,8 +55,8 @@ public interface EventListener {
 
     default void onMessageCreate(@NotNull MessageCreateEvent event) {}
 
-    default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event){}
+    default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {}
 
-    default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event){}
+    default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {}
 }
 
