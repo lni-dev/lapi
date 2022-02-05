@@ -383,9 +383,9 @@ public interface LApi extends HasLApi {
      *     Returns array of thread members objects that are members of the thread.
      * </p>
      * <p>
-     *     This endpoint is restricted according to whether the GUILD_MEMBERS Privileged GatewayIntent is enabled for your application.
+     *     This endpoint is restricted according to whether the {@link me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent#GUILD_MEMBERS GUILD_MEMBERS} Privileged GatewayIntent is enabled for your application.
      * </p>
-     * TODO add @links
+     *
      * @param channelId the channel id of the {@link me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread thread}
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
