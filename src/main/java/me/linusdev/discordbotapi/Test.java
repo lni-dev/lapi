@@ -6,12 +6,11 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener;
@@ -72,17 +71,22 @@ public class Test implements EventListener{
 
     @Override
     public void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload) {
-        EventListener.super.onUnknownEvent(lApi, type, payload);
+        System.out.println("onUnknownEvent");
     }
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        EventListener.super.onReady(event);
+        System.out.println("onReady");
     }
 
     @Override
     public void onGuildsReady(@NotNull GuildsReadyEvent event) {
-        System.out.println("Guilds Ready");
+        System.out.println("onGuildsReady");
+    }
+
+    @Override
+    public void onLApiReady(@NotNull LApiReadyEvent event) {
+        System.out.println("onLApiReady");
     }
 
     @Override
@@ -92,20 +96,42 @@ public class Test implements EventListener{
 
     @Override
     public void onGuildDelete(@NotNull GuildDeleteEvent event) {
-        EventListener.super.onGuildDelete(event);
+        System.out.println("onGuildDelete");
     }
 
     @Override
     public void onGuildUpdate(@NotNull GuildUpdateEvent event) {
-        EventListener.super.onGuildUpdate(event);
+        System.out.println("onGuildUpdate");
+    }
+
+    @Override
+    public void onGuildJoined(@NotNull GuildJoinedEvent event) {
+        System.out.println("onGuildJoined");
+    }
+
+    @Override
+    public void onGuildLeft(@NotNull GuildLeftEvent event) {
+        System.out.println("onGuildLeft");
+    }
+
+    @Override
+    public void onGuildUnavailable(@NotNull GuildUnavailableEvent event) {
+        System.out.println("onGuildUnavailable");
+    }
+
+    @Override
+    public void onGuildAvailable(@NotNull GuildAvailableEvent event) {
+        System.out.println("onGuildAvailable");
     }
 
     @Override
     public void onMessageCreate(@NotNull MessageCreateEvent event) {
+        System.out.println("onMessageCreate");
     }
 
     @Override
     public void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {
+        System.out.println("onNonGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
         String channelId = msg.getChannelId();
@@ -122,6 +148,7 @@ public class Test implements EventListener{
 
     @Override
     public void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {
+        System.out.println("onGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
         String channelId = msg.getChannelId();

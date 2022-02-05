@@ -9,9 +9,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.*;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -351,8 +349,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             case GUILD_CREATE:
                 {
-                    UpdatableGuild guild = guildManager.onGuildCreate(payload);
-                    transmitter.onGuildCreate(new GuildCreateEvent(lApi, payload, guild));
+                    OnGuildCreateReturn ret = guildManager.onGuildCreate(payload);
+                    transmitter.onGuildCreate(new GuildCreateEvent(lApi, payload, ret.guild));
+
+                    if(ret.isNew){
+                        transmitter.onGuildJoined(new GuildJoinedEvent(lApi, ret.guild));
+                    } else if(ret.becameAvailable) {
+                        transmitter.onGuildAvailable(new GuildAvailableEvent(lApi, ret.guild));
+                    }
                 }
                 break;
 
@@ -367,6 +371,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 {
                     UpdatableGuild guild = guildManager.onGuildDelete(payload);
                     transmitter.onGuildDelete(new GuildDeleteEvent(lApi, payload, guild));
+
+                    if(guild.isRemoved()){
+                        //If this is set by the GuildManager, it means, the current user left the guild
+                        transmitter.onGuildLeft(new GuildLeftEvent(lApi, guild));
+                    } else {
+                        //The Guild became unavailable
+                        transmitter.onGuildUnavailable(new GuildUnavailableEvent(lApi, guild));
+                    }
                 }
                 break;
 
@@ -1045,6 +1057,29 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          * {@code false} means the {@link GatewayWebSocket} will try to {@link #reconnect(boolean) reconnect}
          */
         default void onInvalidSession(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, boolean canResume){}
+
+    }
+
+    /**
+     * Return value for {@link GuildManager#onGuildCreate(GatewayPayloadAbstract)}
+     */
+    public static class OnGuildCreateReturn{
+
+        public final UpdatableGuild guild;
+        public final boolean isNew;
+        public final boolean becameAvailable;
+
+        /**
+         *
+         * @param guild the {@link UpdatableGuild} object
+         * @param isNew true if the current user just joined this guild
+         * @param becameAvailable true if this guild was unavailable and is available again
+         */
+        public OnGuildCreateReturn(UpdatableGuild guild, boolean isNew, boolean becameAvailable){
+            this.guild = guild;
+            this.isNew = isNew;
+            this.becameAvailable = becameAvailable;
+        }
 
     }
 }

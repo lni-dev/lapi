@@ -2,12 +2,11 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
@@ -43,8 +42,19 @@ public interface EventListener {
 
     default void onReady(@NotNull ReadyEvent event) {}
 
+    /**
+     * This event will be triggered, when data for all guilds, the current user is a member of,
+     * has been retrieved.<br>
+     * This can also happen randomly, if the gateway
+     * {@link me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket#reconnect(boolean) reconnects}.
+     */
     default void onGuildsReady(@NotNull GuildsReadyEvent event) {}
 
+    /**
+     * TODO: when does it happen / make it happen<br>
+     * This event will only happen once.
+     */
+    default void onLApiReady(@NotNull LApiReadyEvent event) {}
 
     default void onGuildCreate(@NotNull GuildCreateEvent event) {}
 
@@ -52,11 +62,31 @@ public interface EventListener {
 
     default void onGuildUpdate(@NotNull GuildUpdateEvent event) {}
 
+    /**
+     * Triggered, when the current user joined a guild
+     */
+    default void onGuildJoined(@NotNull GuildJoinedEvent event) {}
+
+    /**
+     * Triggered, when the current user left a guild
+     */
+    default void onGuildLeft(@NotNull GuildLeftEvent event) {}
+
+    /**
+     * If a guild becomes unavailable (or is already unavailable when the gateway initializes) this event will trigger.
+     */
+    default void onGuildUnavailable(@NotNull GuildUnavailableEvent event) {}
+
+    /**
+     * Triggered when an unavailable guild (due to an outage) becomes available again
+     */
+    default void onGuildAvailable(@NotNull GuildAvailableEvent event) {}
 
     default void onMessageCreate(@NotNull MessageCreateEvent event) {}
 
     default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {}
 
     default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {}
+
 }
 

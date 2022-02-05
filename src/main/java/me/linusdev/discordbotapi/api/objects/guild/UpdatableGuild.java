@@ -99,6 +99,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         return guild;
     }
 
+
     public static @NotNull UpdatableGuild fromUnavailableGuild(@NotNull LApi lApi, @NotNull UnavailableGuild guild){
         return new UpdatableGuild(lApi, guild.getIdAsSnowflake(), guild.getUnavailable(), true);
     }
@@ -118,10 +119,16 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         return awaitingEvent;
     }
 
+    /**
+     * {@code true} if the current user left (or was removed from) this guild
+     */
     public boolean isRemoved() {
         return removed;
     }
 
+    /**
+     * set by {@link me.linusdev.discordbotapi.api.manager.guild.GuildManager}, when the current user left (or was removed from) this guild
+     */
     public void setRemoved(boolean removed) {
         this.removed = removed;
     }
@@ -136,8 +143,17 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     public void updateSelfByData(@Nullable Data data) {
         if(data == null) return;
         this.awaitingEvent = false;
-        data.processIfContained(NAME_KEY, (String name) -> this.name = name);
         this.unavailable = (Boolean) data.getOrDefault(UNAVAILABLE_KEY, false);
-        //data.processIfContained(UNAVAILABLE_KEY, (Boolean unavailable) -> this.unavailable = unavailable);
+
+        data.processIfContained(NAME_KEY, (String name) -> this.name = name);
+
+        //TODO
+
+        //Guild Create
+        data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));
+        data.processIfContained(LARGE_KEY, (Boolean large) -> this.large = large);
+        data.processIfContained(MEMBER_COUNT_KEY, (Integer memberCount) -> this.memberCount = memberCount);
+
+        //TODO voice states, members, ...
     }
 }

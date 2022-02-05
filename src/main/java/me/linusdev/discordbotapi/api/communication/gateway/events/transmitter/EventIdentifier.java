@@ -1,11 +1,10 @@
 package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildCreateEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildDeleteEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.guild.GuildUpdateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 
 /**
@@ -45,22 +44,46 @@ public enum EventIdentifier{
      */
     GUILDS_READY,
 
+    /**
+     * identifier for {@link EventListener#onLApiReady(LApiReadyEvent)}.
+     */
+    LAPI_READY,
+
 
     /**
-     * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}
+     * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}.
      */
     GUILD_CREATE,
 
     /**
-     * identifier for {@link EventListener#onGuildDelete(GuildDeleteEvent)}
+     * identifier for {@link EventListener#onGuildDelete(GuildDeleteEvent)}.
      */
     GUILD_DELETE,
 
     /**
-     * identifier for {@link EventListener#onGuildUpdate(GuildUpdateEvent)}
+     * identifier for {@link EventListener#onGuildUpdate(GuildUpdateEvent)}.
      */
     GUILD_UPDATE,
 
+    /**
+     * identifier for {@link EventListener#onGuildJoined(GuildJoinedEvent)}.
+     */
+    GUILD_JOINED,
+
+    /**
+     * identifier for {@link EventListener#onGuildLeft(GuildLeftEvent)}.
+     */
+    GUILD_LEFT,
+
+    /**
+     * identifier for {@link EventListener#onGuildUnavailable(GuildUnavailableEvent)}.
+     */
+    GUILD_UNAVAILABLE,
+
+    /**
+     * identifier for {@link EventListener#onGuildAvailable(GuildAvailableEvent)}.
+     */
+    GUILD_AVAILABLE,
 
 
     /**

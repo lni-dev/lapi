@@ -23,8 +23,7 @@ public class Guild implements GuildAbstract{
     protected @Nullable Boolean owner;
     protected @NotNull Snowflake ownerId;
     protected @Nullable String permissions; //TODO PermissionsList
-    protected @Nullable @Deprecated
-    VoiceRegion region;
+    protected @Nullable @Deprecated VoiceRegion region;
     protected @Nullable Snowflake afkChannelId;
     protected int afkTimeout;
     protected @Nullable Boolean widgetEnabled;
