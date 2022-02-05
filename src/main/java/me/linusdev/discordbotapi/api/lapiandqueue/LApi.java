@@ -48,6 +48,7 @@ import me.linusdev.discordbotapi.api.templates.message.AllowedMentions;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,7 +108,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
  *     for more information see {@link me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener EventListener}
  * </p>
  */
-public class LApi implements HasLApi {
+public interface LApi extends HasLApi {
 
     /**
      * The Discord id of the creator of this api UwU
@@ -124,112 +125,9 @@ public class LApi implements HasLApi {
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
 
-    private @NotNull final String token;
-    private @NotNull final Config config;
-
-    //Http
-    private final LApiHttpHeader authorizationHeader;
-    private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
-            ATTRIBUTE_USER_AGENT_VALUE.replace(PlaceHolder.LAPI_URL, LAPI_URL).replace(PlaceHolder.LAPI_VERSION, LAPI_VERSION));
-
-    private final HttpClient client = HttpClient.newHttpClient();
-
-    //Queue
-    private final Queue<Future<?>> queue;
-    private final ScheduledExecutorService scheduledExecutor;
-    private final ExecutorService queueWorker;
-    private volatile QueueThread queueThread;
-    private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
-
-    //Gateway
-    final EventTransmitter eventTransmitter;
-    final GatewayWebSocket gateway;
-
-    //executor
-    private final ThreadPoolExecutor executor;
-
-    //stores and manages the voice regions
-    final VoiceRegions voiceRegions;
-
-    //guild manager
-    final GuildManager guildManager;
-
-    //Logger
-    private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
-
-    public LApi(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
-        this.token = config.getToken();
-        this.config = config;
-        this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
-        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-
-        //Queue
-        this.queue = config.getNewQueue();
-        this.scheduledExecutor = Executors.newScheduledThreadPool(1);
-        this.queueWorker = Executors.newSingleThreadExecutor(new QueueThreadFactory());
-        this.queueWorker.submit(new Runnable() {
-            @Override
-            @SuppressWarnings({"InfiniteLoopStatement"})
-            public void run() {
-                queueThread = (QueueThread) java.lang.Thread.currentThread();
-                log.log("Started queue thread: " + queueThread.getName());
-                try {
-                    while (true) {
-                        synchronized (queue) {
-                            if (queue.peek() == null) {
-                                try {
-                                    queueThread.wait(queue, 10000L);
-                                } catch (InterruptedException ignored) {
-                                    log.error("Queue thread interrupted");
-                                    log.error(ignored);
-                                }
-                            }
-
-                            if (queue.peek() == null) continue;
-
-                            if(Logger.DEBUG_LOG){
-                                log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
-                                long millis = System.currentTimeMillis();
-                                //noinspection ConstantConditions
-                                queue.poll().completeHereAndIgnoreQueueThread();
-                                long finishMillis = System.currentTimeMillis() - millis;
-                                log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
-                            }else{
-                                queue.poll().completeHereAndIgnoreQueueThread();
-                            }
-
-                        }
-                    }
-                }catch (Throwable t){
-                    //This is so any exceptions in this Thread are caught and printed.
-                    //Otherwise, they would just vanish and no one would know what happened
-                    log.error(t);
-                }
-            }
-        });
-
-        //Gateway
-        if(this.config.isFlagSet(ConfigFlag.ENABLE_GATEWAY)){
-            this.eventTransmitter = new EventTransmitter(this);
-            this.gateway = new GatewayWebSocket(this, eventTransmitter, config);
-            gateway.start();
-        }else{
-            this.eventTransmitter = null;
-            this.gateway = null;
-        }
-
-        //VoiceRegions
-        this.voiceRegions = new VoiceRegions();
-        if(this.config.isFlagSet(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP))
-            this.voiceRegions.init(this); //Todo add callback
-
-        //Guild Manager
-        this.guildManager = new LApiGuildManager(this);
-    }
-
     /**
      *
-     * This queues a {@link Queueable} in {@link #queue}.<br>
+     * This queues a {@link Queueable} in the {@link LApiImpl#queue Queue}.<br>
      * This is used for sending a lot of {@link LApiHttpRequest} after each is other and not at the same time.
      * This will NOT wait the Thread until the {@link Queueable} has been completed.
      * <br><br>
@@ -239,7 +137,7 @@ public class LApi implements HasLApi {
      *         {@link Future#get()}, to wait until the {@link Queueable} has been gone through the {@link #queue} and {@link Queueable#completeHereAndIgnoreQueueThread() completed}
      *     </li>
      *     <li>
-     *          {@link Queueable#completeHereAndIgnoreQueueThread()}, to wait until the {@link Queueable} has been {@link Queueable#completeHereAndIgnoreQueueThread() completed}.
+     *          {@link Queueable#completeHere()}, to wait until the {@link Queueable} has been {@link Queueable#completeHereAndIgnoreQueueThread() completed}.
      *          This wont assure, that several {@link LApiHttpRequest LApiHttpRequests} are sent at the same time
      *     </li>
      * </ul>
@@ -252,14 +150,8 @@ public class LApi implements HasLApi {
      * @param <T> Return Type of {@link Queueable}
      * @return {@link Future<T>}
      */
-    protected <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete){
-        final Future<T> future = new Future<T>(queueable);
-        if(beforeComplete != null) future.beforeComplete(beforeComplete);
-        if(then != null) future.then(then);
-        if(thenSingle != null) future.then(thenSingle);
-        this.queue(future);
-        return future;
-    }
+    @ApiStatus.Internal
+    <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete);
 
     /**
      * Queues given {@link Queueable} after a given amount of time. see {@link #queue(Queueable)}
@@ -269,36 +161,11 @@ public class LApi implements HasLApi {
      * @param timeUnit the {@link TimeUnit} for the delay
      * @param <T> Return Type of {@link Queueable}
      * @return {@link Future<T>}
-     * @see #queue(Queueable)
+     * @see #queue(Queueable, BiConsumer, Consumer, Consumer)
+     * @see Queueable#queueAfter(long, TimeUnit)
      */
-    public <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit){
-        final Future<T> future = new Future<T>(queueable);
-        scheduledExecutor.schedule(() -> {
-            try {
-                this.queue(future);
-            }catch (Throwable t){
-                //This is so any exceptions in this Thread are caught and printed.
-                //Otherwise, they would just vanish and no one would know what happened
-                log.error(t);
-            }
-        }, delay, timeUnit);
-        return future;
-    }
-
-    /**
-     * Queues given {@link Future} and notifies the {@link #queueWorker} Thread
-     */
-    void queue(@NotNull final Future<?> future){
-        queue.offer(future);
-        if(queueThread.isWaiting()){
-            //If the queue is waiting, notify it.
-            //If it is not waiting, it is currently working on something and will
-            //automatically move to the next entry ones it is free again
-            synchronized (queue){
-                queue.notifyAll();
-            }
-        }
-    }
+    @ApiStatus.Internal
+    <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit);
 
     /**
      * @see #getResponseAsData(LApiHttpRequest, String)
@@ -311,9 +178,7 @@ public class LApi implements HasLApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
-        return getResponseAsData(request, null);
-    }
+    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException;
 
     /**
      *
@@ -327,80 +192,9 @@ public class LApi implements HasLApi {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
-        Reader reader = new InputStreamReader(getResponseAsInputStream(request));
+    Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException;
 
-        if(arrayKey != null)
-            return new JsonParser().readDataFromReader(reader, true, arrayKey);
-        return new JsonParser().readDataFromReader(reader);
-    }
-
-    public InputStream getResponseAsInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException {
-        Throwable throwThrough = null;
-
-        try {
-            HttpRequest builtRequest = request.getHttpRequest();
-
-            try {
-                return sendRequest(builtRequest);
-            } catch (ConnectException | HttpTimeoutException exception) {
-                Throwable cause = null;
-                if (exception instanceof ConnectException) {
-                    log.debug("ConnectException while sending request...");
-                    cause = exception.getCause();
-                    while (cause instanceof ConnectException) cause = cause.getCause();
-                }
-
-                if (cause instanceof ClosedChannelException || exception instanceof HttpTimeoutException) {
-                    // probably no internet connection
-                    try {
-                        URL url = new URL(DISCORD_COM);
-                        URLConnection connection = url.openConnection();
-                        connection.connect();
-                        //if we reach this, internet is connected
-                        //let's try again
-                        try {
-                            return sendRequest(builtRequest);
-                        } catch (Throwable t) {
-                            log.error("Cannot send Request even though internet is connected. Uri:" + request.getHttpRequest().uri());
-                            throw exception;
-                        }
-                    } catch (Throwable e) {
-                        log.debug("Internet is most likely not connected");
-                        java.lang.Thread.sleep(notConnectedWaitMillis);
-                        notConnectedWaitMillis = Math.min(NOT_CONNECTED_WAIT_MILLIS_MAX, notConnectedWaitMillis + NOT_CONNECTED_WAIT_MILLIS_INCREASE);
-                        throwThrough = new NoInternetException();
-                        throw (NoInternetException) throwThrough;
-                    }
-
-                } else if (cause instanceof UnresolvedAddressException) {
-                    throwThrough = exception;
-                    throw exception;
-                }
-
-
-                log.error(exception);
-                throwThrough = exception;
-                throw exception;
-            } catch (Throwable e) {
-
-                log.error(e);
-                throwThrough = e;
-                throw e;
-            }
-        }catch (Throwable tt) {
-            if(tt == throwThrough) throw tt; //ignore this one
-            log.error("Error while building request");
-            log.error(tt);
-            throw tt;
-        }
-    }
-
-    private InputStream sendRequest(@NotNull HttpRequest request) throws IOException, InterruptedException {
-        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-        notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
-        return response.body();
-    }
+    InputStream getResponseAsInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException;
 
     /**
      * Appends the required headers to the {@link LApiHttpRequest}.<br>
@@ -408,23 +202,13 @@ public class LApi implements HasLApi {
      * @param request the {@link LApiHttpRequest} to append the headers to
      * @return the {@link LApiHttpRequest} with the appended headers
      */
-    public LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request){
-        request.header(getAuthorizationHeader());
-        request.header(getUserAgentHeader());
-        return request;
-    }
+    LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request);
 
     /**
      * This checks whether the currentThread is the queue-thread and throws an {@link LApiRuntimeException} if that is the case
      * @throws LApiRuntimeException if the currentThread is the queue Thread
      */
-    public void checkQueueThread() throws LApiRuntimeException {
-        if(java.lang.Thread.currentThread().equals(queueThread)){
-            throw new LApiRuntimeException("You cannot invoke Future.get() or Queueable.completeHere() on the queue-thread" +
-                    ", because this could lead to an infinite wait loop. You should also not wait or sleep the " +
-                    "queue-thread, because this will delay all other queued Futures");
-        }
-    }
+    void checkQueueThread() throws LApiRuntimeException;
 
     //Retriever
 
@@ -435,9 +219,7 @@ public class LApi implements HasLApi {
      * @see Queueable#queue()
      * @see Queueable#completeHereAndIgnoreQueueThread()
      */
-    public @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId){
-        return new ChannelRetriever(this, channelId);
-    }
+    @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId);
 
     /**
      *
@@ -445,11 +227,9 @@ public class LApi implements HasLApi {
      * @param messageId the id of the {@link MessageImplementation}
      * @return {@link Queueable} which can retrieve the {@link MessageImplementation}
      */
-    public @NotNull Queueable<MessageImplementation> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId){
-        return new MessageRetriever(this, channelId, messageId);
-    }
+    @NotNull Queueable<MessageImplementation> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId);
 
-    public enum AnchorType {
+    enum AnchorType {
         /**
          * Retrieve objects around the given object
          */
@@ -490,28 +270,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CHANNEL_MESSAGES
      */
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
-
-        Data queryStringsData = null;
-
-        if(anchorMessageId != null || limit != null){
-            queryStringsData = new Data(2);
-
-            if(anchorMessageId != null) {
-                if (anchorType == AnchorType.AROUND) queryStringsData.add(GetLinkQuery.AROUND_KEY, anchorMessageId);
-                else if (anchorType == AnchorType.BEFORE)
-                    queryStringsData.add(GetLinkQuery.BEFORE_KEY, anchorMessageId);
-                else if (anchorType == AnchorType.AFTER) queryStringsData.add(GetLinkQuery.AFTER_KEY, anchorMessageId);
-            }
-
-            if(limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_MESSAGES, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
-    }
+    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType);
 
     /**
      * This will retrieve 50 or less {@link MessageImplementation messages}.<br><br> For more information see
@@ -525,9 +284,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
      */
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
-        return getChannelMessagesRetriever(channelId, anchorMessageId, null, anchorType);
-    }
+    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType);
 
     /**
      * This should retrieve the latest 50 or less {@link MessageImplementation messages} in given {@link Channel channel}. The newest {@link MessageImplementation message} will have index 0
@@ -537,9 +294,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
      */
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId) {
-        return getChannelMessagesRetriever(channelId, null, null, null);
-    }
+    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId);
 
     /**
      *
@@ -556,26 +311,7 @@ public class LApi implements HasLApi {
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
      */
-    public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable String afterUserId, @Nullable Integer limit){
-        Data queryStringsData = null;
-
-        if(afterUserId != null || limit != null) {
-            queryStringsData = new Data(2);
-            if (afterUserId != null) queryStringsData.add(GetLinkQuery.AFTER_KEY, afterUserId);
-            if (limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-        String emojiString;
-        if(emoji.isStandardEmoji()){
-            emojiString = emoji.getName();
-        }else{
-            emojiString = emoji.getName() + ":" + emoji.getId();
-        }
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_REACTIONS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId), new PlaceHolder(PlaceHolder.EMOJI, emojiString));
-        return new ArrayRetriever<>(this, query, User::fromData);
-    }
+    @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable String afterUserId, @Nullable Integer limit);
 
     /**
      *
@@ -591,9 +327,7 @@ public class LApi implements HasLApi {
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
      */
-    public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable Integer limit){
-        return getReactionsRetriever(channelId, messageId, emoji, null, limit);
-    }
+    @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable Integer limit);
 
     /**
      * <p>
@@ -610,11 +344,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Invite invites} for given channel
      * @see GetLinkQuery.Links#GET_CHANNEL_INVITES
      */
-    public @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_INVITES,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, Invite>(this, query, Invite::fromData);
-    }
+    @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -633,11 +363,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link MessageImplementation pinned messages} for given channel
      * @see GetLinkQuery.Links#GET_PINNED_MESSAGES
      */
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_PINNED_MESSAGES,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
-    }
+    @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -650,11 +376,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to retrieve the {@link ThreadMember} matching given user in given thread
      * @see GetLinkQuery.Links#GET_THREAD_MEMBER
      */
-    public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_THREAD_MEMBER,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
-        return new ConvertingRetriever<ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
-    }
+    @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId);
 
     /**
      * <p>
@@ -668,11 +390,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
      * @see me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
      */
-    public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
-    }
+    @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -689,11 +407,7 @@ public class LApi implements HasLApi {
      */
     @SuppressWarnings("removal")
     @Deprecated(since = "api v10", forRemoval = true)
-    public @NotNull Queueable<ListThreadsResponseBody> getActiveThreadsRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_ACTIVE_THREADS,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getActiveThreadsRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -718,19 +432,7 @@ public class LApi implements HasLApi {
      * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
-
-        Data queryStringsData = null;
-        if(before != null || limit != null) {
-            queryStringsData = new Data(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
 
     /**
      * <p>
@@ -752,9 +454,7 @@ public class LApi implements HasLApi {
      * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId) {
-        return getPublicArchivedThreadsRetriever(channelId, null, null);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId);
 
     /**
      *
@@ -778,18 +478,7 @@ public class LApi implements HasLApi {
      * @see GetLinkQuery.Links#LIST_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
-        Data queryStringsData = null;
-        if(before != null || limit != null) {
-            queryStringsData = new Data(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
 
     /**
      *
@@ -812,9 +501,7 @@ public class LApi implements HasLApi {
      * @see ListThreadsResponseBody
      * @see #getPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId){
-        return getPrivateArchivedThreadsRetriever(channelId, null, null);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -836,18 +523,7 @@ public class LApi implements HasLApi {
      * @see GetLinkQuery.Links#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
-        Data queryStringsData = null;
-        if(before != null || limit != null) {
-            queryStringsData = new Data(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
 
     /**
      * <p>
@@ -868,9 +544,7 @@ public class LApi implements HasLApi {
      * @see ListThreadsResponseBody
      * @see #getJoinedPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
      */
-    public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId) {
-        return getJoinedPrivateArchivedThreadsRetriever(channelId, null, null);
-    }
+    @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId);
 
     /**
      * <p>
@@ -882,10 +556,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to retrieve the current {@link User user} (your bot)
      * @see GetLinkQuery.Links#GET_CURRENT_USER
      */
-    public @NotNull Queueable<User> getCurrentUserRetriever(){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CURRENT_USER);
-        return new ConvertingRetriever<>(this, query, User::fromData);
-    }
+    @NotNull Queueable<User> getCurrentUserRetriever();
 
     /**
      *
@@ -901,11 +572,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to retrieve {@link User user} with given id
      * @see GetLinkQuery.Links#GET_USER
      */
-    public @NotNull Queueable<User> getUserRetriever(@NotNull String userId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_USER,
-                new PlaceHolder(PlaceHolder.USER_ID, userId));
-        return new ConvertingRetriever<>(this, query, User::fromData);
-    }
+    @NotNull Queueable<User> getUserRetriever(@NotNull String userId);
 
     /**
      * <p>
@@ -923,12 +590,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
-        Query query = new LinkQuery(this, Link.CREATE_MESSAGE, message.getBody(), null,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-
-        return new ConvertingRetriever<>(this, query, MessageImplementation::new);
-    }
+    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message);
 
     /**
      * <p>
@@ -947,14 +609,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
-        return createMessage(channelId, new MessageTemplate(
-                content,
-                false, null,
-                allowMentions ? null : AllowedMentions.noneAllowed(),
-                null, null, null, null
-                ));
-    }
+    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions);
 
     /**
      * <p>
@@ -971,9 +626,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content){
-        return createMessage(channelId, content,true);
-    }
+    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content);
 
     /**
      * <p>
@@ -987,13 +640,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
-        return createMessage(channelId,
-                new MessageTemplate(null, false, embeds,
-                        allowMentions ? null : AllowedMentions.noneAllowed(),
-                        null, null, null, null
-                ));
-    }
+    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds);
 
     /**
      * <p>
@@ -1007,9 +654,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
-        return createMessage(channelId, true, embeds);
-    }
+    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds);
 
     //Gateway
 
@@ -1023,10 +668,7 @@ public class LApi implements HasLApi {
      * @return {@link Queueable} to get a {@link GetGatewayResponse}
      * @see Link#GET_GATEWAY_BOT
      */
-    public @NotNull Queueable<GetGatewayResponse> getGatewayBot(){
-        Query query = new LinkQuery(this, Link.GET_GATEWAY_BOT, null, null);
-        return new ConvertingRetriever<>(this, query, (lApi, data) -> GetGatewayResponse.fromData(data));
-    }
+    @NotNull Queueable<GetGatewayResponse> getGatewayBot();
 
     //Getter
 
@@ -1037,9 +679,7 @@ public class LApi implements HasLApi {
      * </p>
      * @return {@link AbstractEventTransmitter}
      */
-    public AbstractEventTransmitter getEventTransmitter() {
-        return eventTransmitter;
-    }
+    AbstractEventTransmitter getEventTransmitter();
 
     /**
      * <p>
@@ -1050,24 +690,5 @@ public class LApi implements HasLApi {
      * </p>
      * @return {@link SelfUserPresenceUpdater}
      */
-    public SelfUserPresenceUpdater getSelfPresenceUpdater(){
-        return gateway.getSelfUserPresenceUpdater();
-    }
-
-    public LApiHttpHeader getAuthorizationHeader() {
-        return authorizationHeader;
-    }
-
-    public LApiHttpHeader getUserAgentHeader() {
-        return userAgentHeader;
-    }
-
-    public HttpClient getClient() {
-        return client;
-    }
-
-    @Override
-    public @NotNull LApi getLApi() {
-        return this;
-    }
+    SelfUserPresenceUpdater getSelfPresenceUpdater();
 }

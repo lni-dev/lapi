@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * <p>
  *     A {@link Queueable} is an Object, that can be queued and execute a Task (mostly retrieving an Object).<br>
- *     By invoking {@link #queue()}, a {@link Future} will be created and {@link LApi#queue(Future) queued}.
+ *     By invoking {@link #queue()}, a {@link Future} will be created and {@link LApiImpl#queue(Future) queued}.
  *     All Objects in the {@link LApi#queue queue} will be completed in the queued order. Two Tasks may never
  *     run at the same time. For more information about the process, see {@link Future}.
  * </p>

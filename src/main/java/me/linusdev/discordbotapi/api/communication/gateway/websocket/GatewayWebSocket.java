@@ -23,7 +23,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApiPrivateAccess;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
@@ -94,8 +94,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String DATA_GENERATED_TIME_MILLIS_KEY = "generated_at";
 
 
-    private final @NotNull LApi lApi;
-    private final @NotNull LApiPrivateAccess lApiPrivateAccess;
+    private final @NotNull LApiImpl lApi;
 
     private final EventTransmitter transmitter;
 
@@ -144,7 +143,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     private final LogInstance logger;
     
-    public GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull Config config){
+    public GatewayWebSocket(@NotNull LApiImpl lApi, @NotNull EventTransmitter transmitter, @NotNull Config config){
         this(lApi, transmitter, config.getToken(),
                 config.getGatewayConfig().getApiVersion(),
                 config.getGatewayConfig().getEncoding(),
@@ -168,7 +167,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * Use {@link GatewayWebSocket#GatewayWebSocket(LApi, EventTransmitter, Config)} instead.
      */
     @ApiStatus.Internal
-    private GatewayWebSocket(@NotNull LApi lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
+    private GatewayWebSocket(@NotNull LApiImpl lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
                              @Nullable GatewayEncoding encoding, @Nullable GatewayCompression compression,
                              @NotNull String os, @NotNull Integer largeThreshold, @Nullable Integer shardId,
                              @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater selfPresence, @NotNull GatewayIntent[] intents,
@@ -176,7 +175,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                              ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
                              @NotNull UnexpectedEventHandler unexpectedEventHandler) {
         this.lApi = lApi;
-        this.lApiPrivateAccess = new LApiPrivateAccess(lApi);
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
         this.token = token;
@@ -302,7 +300,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             return;
         }
 
-        GuildManager guildManager = lApiPrivateAccess.getGuildManager();
+        GuildManager guildManager = lApi.getGuildManager();
 
         switch (type){
             case HELLO:
@@ -523,7 +521,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 this.canResume.set(true);
                 this.pendingConnects.set(0);
 
-                lApiPrivateAccess.getGuildManager().onReady(event);
+                lApi.getGuildManager().onReady(event);
                 transmitter.onReady(event);
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {

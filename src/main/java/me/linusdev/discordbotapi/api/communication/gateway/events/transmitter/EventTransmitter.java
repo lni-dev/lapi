@@ -10,7 +10,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApiPrivateAccess;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import org.jetbrains.annotations.ApiStatus;
@@ -24,15 +24,13 @@ import static me.linusdev.discordbotapi.api.communication.gateway.events.transmi
 
 public class EventTransmitter implements HasLApi, EventListener, AbstractEventTransmitter {
 
-    private final @NotNull LApi lApi;
-    private final @NotNull LApiPrivateAccess lApiPrivateAccess;
+    private final @NotNull LApiImpl lApi;
 
     private final ArrayList<EventListener> listeners = new ArrayList<>(1);
     private final LinkedHashMap<EventIdentifier, ArrayList<EventListener>> specifiedListeners = new LinkedHashMap<>();
 
-    public EventTransmitter(@NotNull LApi lApi){
+    public EventTransmitter(@NotNull LApiImpl lApi){
         this.lApi = lApi;
-        this.lApiPrivateAccess = new LApiPrivateAccess(lApi);
     }
 
     /**
@@ -155,8 +153,8 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
 
         //Sub-events
-        if(lApiPrivateAccess.getGuildManager().allGuildsReceivedEvent()){
-            onGuildsReady(new GuildsReadyEvent(lApi, lApiPrivateAccess.getGuildManager()));
+        if(lApi.getGuildManager().allGuildsReceivedEvent()){
+            onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
         }
     }
 
@@ -174,8 +172,8 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
 
         //Sub-events
-        if(lApiPrivateAccess.getGuildManager().allGuildsReceivedEvent()){
-            onGuildsReady(new GuildsReadyEvent(lApi, lApiPrivateAccess.getGuildManager()));
+        if(lApi.getGuildManager().allGuildsReceivedEvent()){
+            onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
         }
     }
 

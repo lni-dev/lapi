@@ -69,6 +69,8 @@ public class Future<T> implements java.util.concurrent.Future<T> {
 
     private final static LogInstance logger = Logger.getLogger(Future.class.getSimpleName());
 
+    private final LApiImpl lApi;
+
     private final @NotNull Queueable<T> queueable;
     private volatile boolean cancelled = false;
     private volatile @Nullable Container<T> result = null;
@@ -79,7 +81,8 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     private volatile @Nullable Consumer<Future<T>> beforeComplete;
 
 
-    public Future(@NotNull Queueable<T> queueable) {
+    public Future(LApiImpl lApi, @NotNull Queueable<T> queueable) {
+        this.lApi = lApi;
         this.queueable = queueable;
     }
 
@@ -125,7 +128,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         try {
             this.result = queueable.completeHereAndIgnoreQueueThread();
         }catch (NoInternetException noInternetException){
-            queueable.getLApi().queue(this);
+            lApi.queue(this);
             return;
         }
 

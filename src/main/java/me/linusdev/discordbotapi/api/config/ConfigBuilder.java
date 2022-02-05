@@ -10,6 +10,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeExcepti
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -304,7 +305,7 @@ public class ConfigBuilder implements Datable {
      * @return {@link LApi}
      */
     public @NotNull LApi buildLapi() throws LApiException, IOException, ParseException, InterruptedException {
-        return new LApi(build());
+        return new LApiImpl(build());
     }
 
     /**
