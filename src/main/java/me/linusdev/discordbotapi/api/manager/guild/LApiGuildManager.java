@@ -15,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Standard implementation of {@link GuildManager}
+ */
 public class LApiGuildManager implements GuildManager {
 
     private final @NotNull LApi lApi;

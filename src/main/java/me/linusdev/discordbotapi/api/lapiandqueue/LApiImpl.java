@@ -185,7 +185,7 @@ public class LApiImpl implements LApi {
             this.voiceRegions.init(this); //Todo add callback
 
         //Guild Manager
-        this.guildManager = new LApiGuildManager(this);
+        this.guildManager = config.getGuildManagerFactory().newInstance(this);
     }
 
     @Override
