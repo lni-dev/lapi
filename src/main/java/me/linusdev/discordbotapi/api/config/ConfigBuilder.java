@@ -11,6 +11,8 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.discordbotapi.api.manager.guild.GuildManagerFactory;
+import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,6 +46,7 @@ public class ConfigBuilder implements Datable {
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
+    private GuildManagerFactory<?> guildManagerFactory = null;
 
     /**
      * Creates a new {@link ConfigBuilder}
@@ -211,6 +214,21 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code (GuildManagerFactory<LApiGuildManager>) LApiGuildManager::new}
+     * <p>
+     *     Factory for the {@link me.linusdev.discordbotapi.api.manager.guild.GuildManager GuildManager} used by {@link LApiImpl LApi}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param guildManagerFactory the {@link GuildManagerFactory}
+     */
+    public void setGuildManagerFactory(GuildManagerFactory<?> guildManagerFactory) {
+        this.guildManagerFactory = guildManagerFactory;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -295,7 +313,8 @@ public class ConfigBuilder implements Datable {
                 flags,
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
-                gatewayConfigBuilder.build());
+                gatewayConfigBuilder.build(),
+                Objects.requireNonNullElse(guildManagerFactory, (GuildManagerFactory<LApiGuildManager>) LApiGuildManager::new));
     }
 
     /**

@@ -9,7 +9,9 @@ import me.linusdev.discordbotapi.api.manager.Manager;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import org.jetbrains.annotations.NotNull;
 
-
+/**
+ * The GuildManager manages {@link UpdatableGuild UpdateableGuilds}, which represent Discord-servers
+ */
 public interface GuildManager extends GuildPool, Manager {
 
     /**
