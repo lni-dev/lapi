@@ -96,7 +96,7 @@ public class ConfigBuilder implements Datable {
     public static @NotNull ConfigBuilder getDefault(@NotNull String token){
 
         return new ConfigBuilder(token)
-                .enable(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP)
+                .enable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .enable(ConfigFlag.ENABLE_GATEWAY)
                 .adjustGatewayConfig(gb -> {
                     gb.addIntent(GatewayIntent.ALL);

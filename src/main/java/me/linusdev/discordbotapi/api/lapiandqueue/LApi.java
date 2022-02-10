@@ -1,36 +1,19 @@
 package me.linusdev.discordbotapi.api.lapiandqueue;
 
 import me.linusdev.data.Data;
-import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.VoiceRegions;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
-import me.linusdev.discordbotapi.api.communication.PlaceHolder;
-import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.communication.gateway.other.GetGatewayResponse;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
-import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
-import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.IllegalRequestMethodException;
-import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.discordbotapi.api.communication.retriever.ArrayRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.ChannelRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.ConvertingRetriever;
-import me.linusdev.discordbotapi.api.communication.retriever.MessageRetriever;
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
-import me.linusdev.discordbotapi.api.communication.retriever.query.LinkQuery;
-import me.linusdev.discordbotapi.api.communication.retriever.query.Query;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
-import me.linusdev.discordbotapi.api.config.Config;
-import me.linusdev.discordbotapi.api.config.ConfigFlag;
-import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
-import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
@@ -44,28 +27,16 @@ import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.other.Error;
-import me.linusdev.discordbotapi.api.templates.message.AllowedMentions;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
-import me.linusdev.discordbotapi.log.LogInstance;
-import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.net.ConnectException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.http.*;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
-import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.*;
 
 /**
  * <h2 style="margin:0;padding:0;">What is LApi?</h2>

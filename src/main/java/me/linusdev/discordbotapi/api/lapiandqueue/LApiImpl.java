@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.lapiandqueue;
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.discordbotapi.api.VoiceRegions;
+import me.linusdev.discordbotapi.api.VoiceRegionManager;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.PlaceHolder;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
@@ -29,13 +29,9 @@ import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListT
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
-import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
-import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.invite.Invite;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.embed.Embed;
@@ -110,7 +106,7 @@ public class LApiImpl implements LApi {
     private final ThreadPoolExecutor executor;
 
     //stores and manages the voice regions
-    final VoiceRegions voiceRegions;
+    final VoiceRegionManager voiceRegionManager;
 
     //guild manager
     final GuildManager guildManager;
@@ -180,9 +176,9 @@ public class LApiImpl implements LApi {
         }
 
         //VoiceRegions
-        this.voiceRegions = new VoiceRegions();
-        if(this.config.isFlagSet(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP))
-            this.voiceRegions.init(this); //Todo add callback
+        this.voiceRegionManager = new VoiceRegionManager(this);
+        if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS))
+            this.voiceRegionManager.init();
 
         //Guild Manager
         this.guildManager = config.getGuildManagerFactory().newInstance(this);

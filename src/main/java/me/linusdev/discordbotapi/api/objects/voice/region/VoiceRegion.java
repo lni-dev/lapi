@@ -3,6 +3,7 @@ package me.linusdev.discordbotapi.api.objects.voice.region;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/voice#voice-region-object" target="_top">Voice Region Object</a>
@@ -15,13 +16,13 @@ public class VoiceRegion implements Datable, Updatable {
     public static final String DEPRECATED_KEY = "deprecated";
     public static final String OPTIMAL_KEY = "optimal";
 
-    private final String id;
+    private @NotNull final String id;
     private String name;
     private boolean custom;
     private boolean deprecated;
     private boolean optimal;
 
-    public VoiceRegion(String id, String name, boolean custom, boolean deprecated, boolean optimal){
+    public VoiceRegion(@NotNull String id, String name, boolean custom, boolean deprecated, boolean optimal){
         this.id = id;
         this.name = name;
         this.custom = custom;
@@ -67,7 +68,7 @@ public class VoiceRegion implements Datable, Updatable {
     /**
      * unique ID for the region
      */
-    public String getId() {
+    public @NotNull String getId() {
         return id;
     }
 
@@ -97,6 +98,17 @@ public class VoiceRegion implements Datable, Updatable {
      */
     public boolean isOptimal() {
         return optimal;
+    }
+
+    /**
+     *
+     * If this returns {@code true} {@link #isCustom()}, {@link #isDeprecated()} and {@link #isOptimal()} must not be used
+     * and {@link #getName()} will always return {@code null}
+     *
+     * @return {@code true} if this voice region was not retrieved from Discord!
+     */
+    public boolean isUnknown(){
+        return name == null;
     }
 
     public static VoiceRegion fromData(Data data){

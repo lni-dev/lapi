@@ -12,9 +12,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
-import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEncoding;
@@ -23,7 +21,6 @@ import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
-import me.linusdev.discordbotapi.api.objects.message.embed.Author;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.discordbotapi.helper.Helper;
@@ -33,13 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
-
-import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicationHelper.DISCORD_COM;
 
 public class Test implements EventListener{
 
@@ -50,7 +41,7 @@ public class Test implements EventListener{
 
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
-                .disable(ConfigFlag.LOAD_VOICE_REGIONS_ON_STARTUP)
+                .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
                             .setApiVersion(ApiVersion.V9)

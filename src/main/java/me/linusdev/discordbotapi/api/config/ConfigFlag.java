@@ -3,7 +3,6 @@ package me.linusdev.discordbotapi.api.config;
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("PointlessBitwiseExpression")
 public enum ConfigFlag implements SimpleDatable {
@@ -12,7 +11,13 @@ public enum ConfigFlag implements SimpleDatable {
      */
     NOTHING(0),
 
-    LOAD_VOICE_REGIONS_ON_STARTUP(1 << 0),
+    /**
+     * <p>
+     *     retrieves and caches all voice regions when {@link me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl LApi} starts.
+     * </p>
+     * @see me.linusdev.discordbotapi.api.VoiceRegionManager VoiceRegionManager
+     */
+    CACHE_VOICE_REGIONS(1 << 0),
 
     ENABLE_GATEWAY(1 << 1),
 
