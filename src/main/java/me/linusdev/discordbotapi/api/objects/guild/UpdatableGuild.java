@@ -161,9 +161,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
             //TODO: will we even keep the permission list in this class? maybe generate it when required...
 
         });
-        data.processIfContained(REGION_KEY, (String region) -> {
-            //TODO getVoiceRegion from VoiceRegions in LApi....
-        });
+        data.processIfContained(REGION_KEY, (String region) -> this.region = lApi.getVoiceRegionManager().getVoiceRegionById(region));
         data.processIfContained(AFK_CHANNEL_ID_KEY, (String id) -> this.afkChannelId = Snowflake.fromString(id));
         data.processIfContained(AFK_TIMEOUT_KEY, (Long timeout) -> this.afkTimeout = timeout.intValue());
         data.processIfContained(WIDGET_ENABLED_KEY, (Boolean enabled) -> this.widgetEnabled = enabled);
