@@ -13,6 +13,7 @@ import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -118,5 +119,11 @@ public class LApiGuildManager implements GuildManager {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<UpdatableGuild> iterator() {
+        return guilds.values().iterator();
     }
 }

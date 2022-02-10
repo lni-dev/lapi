@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.guild;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.*;
@@ -9,6 +10,7 @@ import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
+import me.linusdev.discordbotapi.api.objects.local.Locale;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
@@ -16,6 +18,7 @@ import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
+import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -146,14 +149,77 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         this.unavailable = (Boolean) data.getOrDefault(UNAVAILABLE_KEY, false);
 
         data.processIfContained(NAME_KEY, (String name) -> this.name = name);
+        data.processIfContained(ICON_HASH_KEY, (String hash) -> this.iconHash = hash);
+        data.processIfContained(SPLASH_KEY, (String splash) -> this.splashHash = splash);
+        data.processIfContained(DISCOVERY_SPLASH_KEY, (String splash) -> this.discoverySplashHash = splash);
+        data.processIfContained(OWNER_KEY, (Boolean owner) -> this.owner = owner);
+        data.processIfContained(OWNER_ID_KEY, (String id) -> this.ownerId = Snowflake.fromString(id));
+        data.processIfContained(PERMISSIONS_KEY, (String permissions) -> {
+            //TODO: maybe not even save this, it may get changed....
+            this.permissions = permissions;
+            //TODO update permissions list
+            //TODO: will we even keep the permission list in this class? maybe generate it when required...
 
-        //TODO
+        });
+        data.processIfContained(REGION_KEY, (String region) -> {
+            //TODO getVoiceRegion from VoiceRegions in LApi....
+        });
+        data.processIfContained(AFK_CHANNEL_ID_KEY, (String id) -> this.afkChannelId = Snowflake.fromString(id));
+        data.processIfContained(AFK_TIMEOUT_KEY, (Long timeout) -> this.afkTimeout = timeout.intValue());
+        data.processIfContained(WIDGET_ENABLED_KEY, (Boolean enabled) -> this.widgetEnabled = enabled);
+        data.processIfContained(WIDGET_CHANNEL_ID_KEY, (String id) -> this.widgetChannelId = Snowflake.fromString(id));
+        data.processIfContained(VERIFICATION_LEVEL_KEY, (Long level) -> this.verificationLevel = VerificationLevel.ofValue(level.intValue()));
+        data.processIfContained(DEFAULT_MESSAGE_NOTIFICATIONS_KEY, (Long level) -> this.defaultMessageNotifications = DefaultMessageNotificationLevel.ofValue(level.intValue()));
+        data.processIfContained(EXPLICIT_CONTENT_FILTER_KEY, (Long level) -> this.explicitContentFilter = ExplicitContentFilterLevel.fromValue(level.intValue()));
+        data.processIfContained(MFA_LEVEL_KEY, (Long level) -> this.mfaLevel = MFALevel.fromValue(level.intValue()));
+        data.processIfContained(APPLICATION_ID_KEY, (String id) -> this.applicationId = Snowflake.fromString(id));
+        data.processIfContained(SYSTEM_CHANNEL_ID_KEY, (String id) -> this.systemChannelId = Snowflake.fromString(id));
+        data.processIfContained(SYSTEM_CHANNEL_FLAGS_KEY, (Long flags) -> this.systemChannelFlagsAsInt = flags.intValue());
+        data.processIfContained(RULES_CHANNEL_ID_KEY, (String id) -> this.rulesChannelId = Snowflake.fromString(id));
+        data.processIfContained(MAX_PRESENCES_KEY, (Long max) -> this.maxPresences = max == null ? null : max.intValue());
+        data.processIfContained(MAX_MEMBERS_KEY, (Long max) -> this.maxMembers = max == null ? null : max.intValue());
+        data.processIfContained(VANITY_URL_CODE_KEY, (String code) -> this.vanityUrlCode = code);
+        data.processIfContained(DESCRIPTION_KEY, (String description) -> this.description = description);
+        data.processIfContained(BANNER_KEY, (String hash) -> this.bannerHash = hash);
+        data.processIfContained(PREMIUM_TIER_KEY, (Long tier) -> this.premiumTier = PremiumTier.fromValue(tier.intValue()));
+        data.processIfContained(PREMIUM_SUBSCRIPTION_COUNT_KEY, (Long count) -> this.premiumSubscriptionCount = count == null ? null : count.intValue());
+        data.processIfContained(PREFERRED_LOCALE_KEY, (String locale) -> this.preferredLocale = Locale.fromString(locale));
+        data.processIfContained(PUBLIC_UPDATES_CHANNEL_ID_KEY, (String id) -> this.publicUpdatesChannelId = Snowflake.fromString(id));
+        data.processIfContained(MAX_VIDEO_CHANNEL_USERS_KEY, (Long max) -> this.maxVideoChannelUsers = max == null ? null : max.intValue());
+        data.processIfContained(APPROXIMATE_MEMBER_COUNT_KEY, (Long count) -> this.approximateMemberCount = count == null ? null : count.intValue());
+        data.processIfContained(APPROXIMATE_PRESENCE_COUNT_KEY, (Long count) -> this.approximatePresenceCount = count == null ? null : count.intValue());
+        data.processIfContained(WELCOME_SCREEN_KEY, (Data screen) -> {
+            try {
+                this.welcomeScreen = WelcomeScreen.fromData(screen);
+            } catch (InvalidDataException e) {
+                //TODO: InvalidDataException in an updateSelf...
+                //TODO: maybe add a throws InvalidDataException to the interface?
+                Logger.getLogger(this).error(e);
+            }
+        });
+        data.processIfContained(NSFW_LEVEL_KEY, (Long level) -> this.nsfwLevel = GuildNsfwLevel.fromValue(level.intValue()));
+
+        //TODO Roles[], Emojis[], Features[], Sticker[]
 
         //Guild Create
         data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));
         data.processIfContained(LARGE_KEY, (Boolean large) -> this.large = large);
-        data.processIfContained(MEMBER_COUNT_KEY, (Integer memberCount) -> this.memberCount = memberCount);
+        data.processIfContained(MEMBER_COUNT_KEY, (Long count) -> this.memberCount = count == null ? null : count.intValue());
 
         //TODO voice states, members, ...
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("\nUpdatableGuild: \n");
+
+        sb.append("\t").append("name: ").append(name).append("\n");
+        sb.append("\t").append("owner-id: ").append(ownerId).append("\n");
+        sb.append("\t").append("current user permissions: ").append(permissions).append("\n");
+        sb.append("\t").append("approximate member count: ").append(approximateMemberCount).append("\n");
+        sb.append("\t").append("member count: ").append(memberCount).append("\n");
+        sb.append("\t").append("current user joined at: ").append(joinedAt).append("\n");
+
+        return sb.toString();
     }
 }

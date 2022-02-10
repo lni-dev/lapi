@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
+import me.linusdev.discordbotapi.api.objects.local.Locale;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
@@ -38,7 +39,7 @@ public class Guild implements GuildAbstract{
     protected @Nullable Snowflake applicationId;
     protected @NotNull Snowflake systemChannelId;
     protected int systemChannelFlagsAsInt;
-    protected @NotNull SystemChannelFlag[] systemChannelFlags;
+    protected @NotNull SystemChannelFlag[] systemChannelFlags; //TODO convert to array in get method!
     protected @Nullable Snowflake rulesChannelId;
     protected @Nullable Integer maxPresences;
     protected @Nullable Integer maxMembers;
@@ -47,7 +48,7 @@ public class Guild implements GuildAbstract{
     protected @Nullable String bannerHash;
     protected @Nullable PremiumTier premiumTier;
     protected @Nullable Integer premiumSubscriptionCount;
-    protected @NotNull String preferredLocale;
+    protected @NotNull Locale preferredLocale;
     protected @Nullable Snowflake publicUpdatesChannelId;
     protected @Nullable Integer maxVideoChannelUsers;
     protected @Nullable Integer approximateMemberCount;
@@ -70,7 +71,7 @@ public class Guild implements GuildAbstract{
             @NotNull SystemChannelFlag[] systemChannelFlags, @Nullable Snowflake rulesChannelId,
             @Nullable Integer maxPresences, @Nullable Integer maxMembers, @Nullable String vanityUrlCode,
             @Nullable String description, @Nullable String bannerHash, @Nullable PremiumTier premiumTier,
-            @Nullable Integer premiumSubscriptionCount, @NotNull String preferredLocale,
+            @Nullable Integer premiumSubscriptionCount, @NotNull Locale preferredLocale,
             @Nullable Snowflake publicUpdatesChannelId, @Nullable Integer maxVideoChannelUsers,
             @Nullable Integer approximateMemberCount, @Nullable Integer approximatePresenceCount,
             @Nullable WelcomeScreen welcomeScreen, @NotNull GuildNsfwLevel nsfwLevel, @Nullable Sticker[] stickers

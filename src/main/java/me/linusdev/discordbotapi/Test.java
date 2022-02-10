@@ -21,6 +21,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEnco
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.message.embed.Author;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -82,6 +83,10 @@ public class Test implements EventListener{
     @Override
     public void onGuildsReady(@NotNull GuildsReadyEvent event) {
         System.out.println("onGuildsReady");
+
+        for(UpdatableGuild guild : event.getGuildPool()){
+            System.out.println(guild);
+        }
     }
 
     @Override
