@@ -168,8 +168,19 @@ public class Guild implements GuildAbstract{
                 null);
     }
 
+    @Override
     public @NotNull String getName() {
         return name;
+    }
+
+    @Override
+    public @Nullable String getIconHash() {
+        return iconHash;
+    }
+
+    @Override
+    public @Nullable String getSplashHash() {
+        return splashHash;
     }
 
     @Override

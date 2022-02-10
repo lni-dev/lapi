@@ -2,6 +2,10 @@ package me.linusdev.discordbotapi.api.objects.guild;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImage;
+import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
+import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
+import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
@@ -77,6 +81,62 @@ public interface GuildAbstract extends Datable, HasLApi, SnowflakeAble {
         //TODO
         return null;
     }
+
+    /**
+     * guild name
+     */
+    @Nullable String getName();
+
+    /**
+     * icon hash
+     */
+    @Nullable String getIconHash();
+
+    /**
+     *
+     * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
+     * @param fileType see {@link CDNImage#ofGuildIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getIcon(int desiredSize, @NotNull AbstractFileType fileType){
+        if(getIconHash() == null) throw new IllegalArgumentException("This guild object has no icon hash");
+        return new CDNImageRetriever(CDNImage.ofGuildIcon(getLApi(), getId(), getIconHash(), fileType), desiredSize, true);
+    }
+
+    /**
+     *
+     * @param fileType see {@link CDNImage#ofGuildIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getIcon(@NotNull AbstractFileType fileType){
+        if(getIconHash() == null) throw new IllegalArgumentException("This guild object has no icon hash");
+        return new CDNImageRetriever(CDNImage.ofGuildIcon(getLApi(), getId(), getIconHash(), fileType));
+    }
+
+    @Nullable String getSplashHash();
+
+    /**
+     *
+     * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
+     * @param fileType see {@link CDNImage#ofGuildSplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getSplash(int desiredSize, @NotNull AbstractFileType fileType){
+        if(getSplashHash() == null) throw new IllegalArgumentException("This guild object has no splash hash");
+        return new CDNImageRetriever(CDNImage.ofGuildSplash(getLApi(), getId(), getSplashHash(), fileType), desiredSize, true);
+    }
+
+    /**
+     *
+     * @param fileType see {@link CDNImage#ofGuildSplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getSplash(@NotNull AbstractFileType fileType) {
+        if (getSplashHash() == null) throw new IllegalArgumentException("This guild object has no splash hash");
+        return new CDNImageRetriever(CDNImage.ofGuildSplash(getLApi(), getId(), getSplashHash(), fileType));
+    }
+
+    //TODO: discovery splash, ...
 
     @Override
     @NotNull Snowflake getIdAsSnowflake();
