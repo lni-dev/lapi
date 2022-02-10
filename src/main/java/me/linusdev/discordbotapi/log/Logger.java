@@ -76,6 +76,10 @@ public class Logger {
         return getLogger(source, Type.INFO);
     }
 
+    public static LogInstance getLogger(@NotNull Object source){
+        return getLogger(source.getClass().getSimpleName(), Type.INFO);
+    }
+
     public static LogInstance getLogger(@NotNull String source, @NotNull Type defaultType){
         return new LogInstance(source, defaultType);
     }
