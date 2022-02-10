@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.lapiandqueue;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.discordbotapi.api.VoiceRegionManager;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
@@ -662,4 +663,13 @@ public interface LApi extends HasLApi {
      * @return {@link SelfUserPresenceUpdater}
      */
     SelfUserPresenceUpdater getSelfPresenceUpdater();
+
+    /**
+     * <p>
+     *     Manager for the {@link me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion VoiceRegions}
+     *     retrieved from Discord if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_VOICE_REGIONS} is enabled
+     * </p>
+     * @return {@link VoiceRegionManager}
+     */
+    VoiceRegionManager getVoiceRegionManager();
 }

@@ -550,6 +550,11 @@ public class LApiImpl implements LApi {
     }
 
     @Override
+    public VoiceRegionManager getVoiceRegionManager() {
+        return voiceRegionManager;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return this;
     }
