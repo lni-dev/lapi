@@ -111,7 +111,7 @@ public class GatewayConfigBuilder implements Datable {
     }
 
     /**
-     * <em>Optional</em><br>
+     * <em>Optional / Not Recommended</em><br>
      * Default: {@link LApi#NEWEST_API_VERSION}<br>
      * <p>
      * Sets the {@link ApiVersion discord api version} the {@link GatewayWebSocket gateway} should use.
@@ -259,7 +259,7 @@ public class GatewayConfigBuilder implements Datable {
     }
 
     /**
-     * <em>Optional / Not Recommended</em><br>
+     * <em>Optional</em><br>
      * Default: {@code null}
      * <p>
      *    Adjusts the presence, when your bot connects to the gateway (goes online)
