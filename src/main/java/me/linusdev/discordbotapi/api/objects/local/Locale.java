@@ -2,13 +2,12 @@ package me.linusdev.discordbotapi.api.objects.local;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/reference#locales" target="_top">Locales</a>
  */
-public enum Local {
+public enum Locale {
     UNKNOWN("unknown", "unknown"),
 
 
@@ -46,16 +45,16 @@ public enum Local {
 
     ;
 
-    private final String local;
+    private final String locale;
     private final String languageName;
 
-    Local(String local, String languageName){
-        this.local = local;
+    Locale(String locale, String languageName){
+        this.locale = locale;
         this.languageName = languageName;
     }
 
-    public String getLocal() {
-        return local;
+    public String getLocale() {
+        return locale;
     }
 
     public String getLanguageName() {
@@ -64,15 +63,15 @@ public enum Local {
 
     /**
      *
-     * @param local String local or {@code null}
-     * @return {@link Local} matching given string or {@link #UNKNOWN} if none matches or {@code null} if given string was {@code null}
+     * @param local String locale or {@code null}
+     * @return {@link Locale} matching given string or {@link #UNKNOWN} if none matches or {@code null} if given string was {@code null}
      */
     @Contract("null -> null; !null -> !null")
     @Nullable
-    public static Local fromString(@Nullable String local){
-        if(local == null) return null;
-        for(Local loc : Local.values()){
-            if(loc.local.equals(local)) return loc;
+    public static Locale fromString(@Nullable String locale){
+        if(locale == null) return null;
+        for(Locale loc : Locale.values()){
+            if(loc.locale.equals(locale)) return loc;
         }
 
         return UNKNOWN;
