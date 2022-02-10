@@ -43,6 +43,12 @@ public enum Link implements AbstractLink{
      */
     GET_GATEWAY_BOT(GET, O_DISCORD_API_VERSION_LINK + "gateway/bot"),
 
+    /**
+     * Returns an array of {@link me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion voice region objects}
+     * that can be used when setting a voice or stage channel's rtc_region.
+     *
+     * @see <a href="https://discord.com/developers/docs/resources/voice#list-voice-regions" target="_top">List Voice Regions</a>
+     */
     GET_VOICE_REGIONS(GET, O_DISCORD_API_VERSION_LINK + "voice/regions"),
     ;
 
