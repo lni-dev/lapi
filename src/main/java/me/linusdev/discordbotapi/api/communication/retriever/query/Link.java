@@ -42,6 +42,8 @@ public enum Link implements AbstractLink{
      * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway-bot" target="_top">Get Gateway Bot</a>
      */
     GET_GATEWAY_BOT(GET, O_DISCORD_API_VERSION_LINK + "gateway/bot"),
+
+    GET_VOICE_REGIONS(GET, O_DISCORD_API_VERSION_LINK + "voice/regions"),
     ;
 
     private final @NotNull Method method;

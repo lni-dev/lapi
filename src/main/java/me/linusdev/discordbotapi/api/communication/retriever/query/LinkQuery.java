@@ -17,17 +17,21 @@ import org.jetbrains.annotations.Nullable;
 public class LinkQuery implements Query, HasLApi {
 
     private final @NotNull LApi lApi;
-    private final @NotNull Link link;
+    private final @NotNull AbstractLink link;
     private final @Nullable LApiHttpBody body;
     private final @Nullable Data queryStringsData;
     private final @NotNull PlaceHolder[] placeHolders;
 
-    public LinkQuery(@NotNull LApi lApi, @NotNull Link link, @Nullable LApiHttpBody body, @Nullable Data queryStringsData, PlaceHolder... placeHolders){
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable Data queryStringsData, PlaceHolder... placeHolders){
         this.lApi = lApi;
         this.link = link;
         this.body = body;
         this.queryStringsData = queryStringsData;
         this.placeHolders = placeHolders;
+    }
+
+    public LinkQuery(@NotNull LApi lApi, @NotNull Link link){
+        this(lApi, link, null, null);
     }
 
     @Override
