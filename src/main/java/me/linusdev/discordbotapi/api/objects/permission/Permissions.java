@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.permission;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +31,10 @@ public class Permissions {
         return new Permissions(new BigInteger(setBits));
     }
 
+    public void set(String setBits){
+        this.setBits = new BigInteger(setBits);
+    }
+
     /**
      * Adds given permissions. If it is already contained, nothing will happen
      * @param permission {@link Permission} to add
@@ -47,9 +52,10 @@ public class Permissions {
     }
 
     /**
-     *
+     * The returned int is backed by this {@link Permissions} object, but may be dropped at any time!
      * @return {@link BigInteger} with set bits
      */
+    @ApiStatus.Internal
     public @NotNull BigInteger getInt() {
         return setBits;
     }
@@ -63,10 +69,11 @@ public class Permissions {
     }
 
     /**
-     *
+     * the returned List will not change if this {@link Permissions} object is changed.
      * @return List of {@link Permission}
      */
     @NotNull
+    @Contract(value = "-> new", pure = true)
     public ArrayList<Permission> toPermissionList(){
         return Permission.getPermissionsFromBits(getInt());
     }
