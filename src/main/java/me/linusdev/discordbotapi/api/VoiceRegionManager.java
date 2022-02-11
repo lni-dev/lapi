@@ -84,7 +84,10 @@ public class VoiceRegionManager implements HasLApi {
 
     /**
      *
-     * Iterates through {@link #regions} and returns the first voice region with given id. <br><br>
+     * Iterates through {@link #regions the regions list} and returns the first voice region with given id.
+     * <br>
+     * This list will only be available if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_VOICE_REGIONS CACHE_VOICE_REGIONS} is enabled.
+     * <br><br>
      * If none matches a <b>new</b> {@link VoiceRegion} is created, which will not be added to this manager!
      * This new voice region can be considered unknown,
      * that can also be checked with {@link VoiceRegion#isUnknown()}.
