@@ -85,7 +85,8 @@ public class VoiceRegionManager implements HasLApi {
     /**
      *
      * Iterates through {@link #regions} and returns the first voice region with given id. <br><br>
-     * If none matches a <b>new</b> {@link VoiceRegion} is created. This new voice region can be considered unknown,
+     * If none matches a <b>new</b> {@link VoiceRegion} is created, which will not be added to this manager!
+     * This new voice region can be considered unknown,
      * that can also be checked with {@link VoiceRegion#isUnknown()}.
      *
      * @param id voice region id
