@@ -25,7 +25,11 @@ public interface AbstractVoiceStateManager {
         String userId = (String) voiceStateData.get(VoiceState.USER_ID_KEY);
 
         if(userId == null) return false; //TODO throw exception?
-        get(userId).updateSelfByData(voiceStateData);
+        try {
+            get(userId).updateSelfByData(voiceStateData);
+        } catch (me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 }

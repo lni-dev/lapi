@@ -5,6 +5,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
+import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.Manager;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ public interface GuildManager extends GuildPool, Manager {
     UpdatableGuild onGuildDelete( @NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
 
     /**
-     * This method should call {@link UpdatableGuild#updateSelfByData(Data)}
+     * This method should call {@link Updatable#updateSelfByData(Data)}
      * @param payload the payload received from Discord
      * @return the updated guild
      */

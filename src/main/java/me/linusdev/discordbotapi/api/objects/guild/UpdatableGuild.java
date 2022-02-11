@@ -7,7 +7,6 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.*;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
@@ -15,10 +14,7 @@ import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
-import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.discordbotapi.api.objects.role.Role;
-import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -98,7 +94,11 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
 
 
         UpdatableGuild guild = new UpdatableGuild(lApi, Snowflake.fromString(id), unavailable, false);
-        guild.updateSelfByData(data);
+        try {
+            guild.updateSelfByData(data);
+        } catch (InvalidDataException e) {
+            e.printStackTrace();
+        }
 
         return guild;
     }
@@ -164,7 +164,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     }
 
     @Override
-    public void updateSelfByData(@Nullable Data data) {
+    public void updateSelfByData(@Nullable Data data) throws InvalidDataException {
         if(data == null) return;
         this.awaitingEvent = false;
         this.unavailable = (Boolean) data.getOrDefault(UNAVAILABLE_KEY, false);

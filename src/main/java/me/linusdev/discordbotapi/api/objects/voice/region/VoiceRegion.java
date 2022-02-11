@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.voice.region;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +50,7 @@ public class VoiceRegion implements Datable, Updatable {
     }
 
     @Override
-    public void updateSelfByData(Data data) {
+    public void updateSelfByData(Data data) throws InvalidDataException {
         name = (String) data.get(NAME_KEY, name);
         custom = (boolean) data.get(CUSTOM_KEY, custom);
         deprecated = (boolean) data.get(DEPRECATED_KEY, deprecated);

@@ -125,7 +125,7 @@ public class VoiceState implements Updatable, Datable, HasLApi {
     }
 
     @Override
-    public void updateSelfByData(@NotNull Data data) {
+    public void updateSelfByData(@NotNull Data data) throws InvalidDataException {
         //guildId will not be updated
         String channelId = (String) data.get(CHANNEL_ID_KEY);
         //userId will not be updated
