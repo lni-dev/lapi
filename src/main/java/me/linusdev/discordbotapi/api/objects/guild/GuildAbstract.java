@@ -8,15 +8,20 @@ import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
-import me.linusdev.discordbotapi.api.objects.guild.enums.*;
+import me.linusdev.discordbotapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
+import me.linusdev.discordbotapi.api.objects.guild.enums.ExplicitContentFilterLevel;
+import me.linusdev.discordbotapi.api.objects.guild.enums.VerificationLevel;
+import me.linusdev.discordbotapi.api.objects.permission.Permission;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
+import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
-import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
-import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <a href="https://discord.com/developers/docs/resources/guild#guild-resource" target="_top">Guild Resource</a>
@@ -136,7 +141,156 @@ public interface GuildAbstract extends Datable, HasLApi, SnowflakeAble {
         return new CDNImageRetriever(CDNImage.ofGuildSplash(getLApi(), getId(), getSplashHash(), fileType));
     }
 
-    //TODO: discovery splash, ...
+    @Nullable String getDiscoverySplashHash();
+
+    /**
+     *
+     * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
+     * @param fileType see {@link CDNImage#ofGuildDiscoverySplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getDiscoverySplash(int desiredSize, @NotNull AbstractFileType fileType){
+        if(getDiscoverySplashHash() == null) throw new IllegalArgumentException("This guild object has no discovery splash hash");
+        return new CDNImageRetriever(CDNImage.ofGuildDiscoverySplash(getLApi(), getId(), getDiscoverySplashHash(), fileType), desiredSize, true);
+    }
+
+    /**
+     *
+     * @param fileType see {@link CDNImage#ofGuildDiscoverySplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.discordbotapi.api.communication.file.types.FileType FileType}
+     * @return {@link me.linusdev.discordbotapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     */
+    default @NotNull CDNImageRetriever getDiscoverySplash(@NotNull AbstractFileType fileType) {
+        if (getDiscoverySplashHash() == null) throw new IllegalArgumentException("This guild object has no discovery splash hash");
+        return new CDNImageRetriever(CDNImage.ofGuildDiscoverySplash(getLApi(), getId(), getDiscoverySplashHash(), fileType));
+    }
+
+    /**
+     * Whether the current user is owner of this guild.
+     */
+    @Nullable Boolean getOwner();
+
+    /**
+     * Id as {@link Snowflake} of the owner of this guild.
+     */
+    @NotNull Snowflake getOwnerIdAsSnowflake();
+
+    /**
+     * Id as {@link String} of the owner of this guild.
+     */
+    @SuppressWarnings("ConstantConditions")
+    default @NotNull String getOwnerId(){
+        if(getOwnerIdAsSnowflake() == null) return null;
+        return getOwnerIdAsSnowflake().asString();
+    }
+
+    /**
+     * total permissions for the user in the guild (excludes overwrites).<br>
+     * <p>
+     *     This field is only sent when using the {@link me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
+     * </p>
+     * @see #getPermissions()
+     */
+    @Nullable String getPermissionsAsString();
+
+    /**
+     * total permissions for the user in the guild (excludes overwrites).<br>
+     * <p>
+     *     This field is only sent when using the {@link me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
+     * </p>
+     * <p>
+     *     Changes on the {@link Permissions} object will change the {@link String} returned by {@link #getPermissionsAsString()} as well.
+     * </p>
+     */
+    @Nullable Permissions getPermissions();
+
+    /**
+     * 	voice region for the guild (deprecated).
+     *  <br><br>
+     *  All {@link VoiceRegion VoiceRegions} are managed by the {@link me.linusdev.discordbotapi.api.VoiceRegionManager VoiceRegionManager}.
+     *  See {@link me.linusdev.discordbotapi.api.VoiceRegionManager#getVoiceRegionById(String) getVoiceRegionById()} for more information.
+     */
+    @Deprecated
+    @Nullable VoiceRegion getRegion();
+
+    /**
+     * id as {@link Snowflake} of afk channel.
+     * <p>
+     *     returns {@code null} if no afk channel is set
+     * </p>
+     */
+    @Nullable Snowflake getAfkChannelIdAsSnowflake();
+
+    /**
+     * id as {@link String} of the afk channel.
+     * <p>
+     *     returns {@code null} if no afk channel is set
+     * </p>
+     */
+    @Nullable default String getAfkChannelId(){
+        if(getAfkChannelIdAsSnowflake() == null) return null;
+        return getAfkChannelIdAsSnowflake().asString();
+    }
+
+    /**
+     * afk timeout in seconds.<br>
+     * TODO: what means no timeout?
+     */
+    int getAfkTimeout();
+
+    /**
+     * {@code true} if the server widget is enabled. <br>
+     * {@code null} probably means, that the widget is disabled.
+     */
+    @Nullable Boolean getWidgetEnabled();
+
+    /**
+     * {@code true} if the server widget is enabled.
+     * @return {@code false} if {@link #getWidgetEnabled()} is {@code null}. Otherwise returns {@link #getWidgetEnabled()}.
+     */
+    default boolean isWidgetEnabled(){
+        return getWidgetEnabled() != null && getWidgetEnabled();
+    }
+
+    /**
+     * check if {@link #isWidgetEnabled()} is {@code true} first!<br>
+     *
+     * the channel id as {@link Snowflake} that the widget will generate an invite to, or {@code null} if set to no invite.
+     * @see #getWidgetChannelId()
+     */
+    @Nullable Snowflake getWidgetChannelIdAsSnowflake();
+
+    /**
+     * check if {@link #isWidgetEnabled()} is {@code true} first!<br>
+     *
+     * the channel id as {@link String} that the widget will generate an invite to, or {@code null} if set to no invite.
+     * @see #getWidgetChannelIdAsSnowflake()
+     */
+    @Nullable default String getWidgetChannelId(){
+        if(getWidgetChannelIdAsSnowflake() == null) return null;
+        return getWidgetChannelIdAsSnowflake().asString();
+    }
+
+    /**
+     * {@link VerificationLevel} required for the guild
+     */
+    @NotNull VerificationLevel getVerificationLevel();
+
+    /**
+     * 	{@link DefaultMessageNotificationLevel default message notifications level}
+     */
+    @NotNull DefaultMessageNotificationLevel getDefaultMessageNotifications();
+
+    /**
+     * {@link ExplicitContentFilterLevel explicit content filter level}
+     */
+    @NotNull ExplicitContentFilterLevel getExplicitContentFilter();
+
+    /**
+     * roles in the guild
+     */
+    @NotNull Collection<Role> getRoles();
+
+    //TODO: emojis, features, ...
 
     @Override
     @NotNull Snowflake getIdAsSnowflake();

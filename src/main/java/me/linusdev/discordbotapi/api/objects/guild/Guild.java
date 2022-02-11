@@ -5,12 +5,16 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.sticker.Sticker;
 import me.linusdev.discordbotapi.api.objects.voice.region.VoiceRegion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 public class Guild implements GuildAbstract{
 
@@ -23,7 +27,7 @@ public class Guild implements GuildAbstract{
     protected @Nullable String discoverySplashHash;
     protected @Nullable Boolean owner;
     protected @NotNull Snowflake ownerId;
-    protected @Nullable String permissions; //TODO PermissionsList
+    protected @Nullable String permissions;
     protected @Nullable @Deprecated VoiceRegion region;
     protected @Nullable Snowflake afkChannelId;
     protected int afkTimeout;
@@ -32,7 +36,7 @@ public class Guild implements GuildAbstract{
     protected @NotNull VerificationLevel verificationLevel;
     protected @NotNull DefaultMessageNotificationLevel defaultMessageNotifications;
     protected @NotNull ExplicitContentFilterLevel explicitContentFilter;
-    protected @NotNull Role[] roles;
+    protected @NotNull List<Role> roles;
     protected @NotNull EmojiObject[] emojis;
     protected @Nullable String[] features; //see GuildFeature
     protected @NotNull MFALevel mfaLevel;
@@ -57,6 +61,8 @@ public class Guild implements GuildAbstract{
     protected @NotNull GuildNsfwLevel nsfwLevel;
     protected @Nullable Sticker[] stickers;
 
+    protected @Nullable Permissions permissionsAsList;
+
     public Guild(
             @NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name,
             @Nullable String iconHash, @Nullable String splashHash, @Nullable String discoverySplashHash,
@@ -65,7 +71,7 @@ public class Guild implements GuildAbstract{
             @Nullable Boolean widgetEnabled, @Nullable Snowflake widgetChannelId,
             @NotNull VerificationLevel verificationLevel,
             @NotNull DefaultMessageNotificationLevel defaultMessageNotifications,
-            @NotNull ExplicitContentFilterLevel explicitContentFilter, @NotNull Role[] roles,
+            @NotNull ExplicitContentFilterLevel explicitContentFilter, @NotNull List<Role> roles,
             @NotNull EmojiObject[] emojis, @Nullable String[] features, @NotNull MFALevel mfaLevel,
             @Nullable Snowflake applicationId, @NotNull Snowflake systemChannelId, int systemChannelFlagsAsInt,
             @NotNull SystemChannelFlag[] systemChannelFlags, @Nullable Snowflake rulesChannelId,
@@ -181,6 +187,79 @@ public class Guild implements GuildAbstract{
     @Override
     public @Nullable String getSplashHash() {
         return splashHash;
+    }
+
+    @Override
+    public @Nullable String getDiscoverySplashHash() {
+        return discoverySplashHash;
+    }
+
+    @Override
+    public @Nullable Boolean getOwner() {
+        return owner;
+    }
+
+    @Override
+    public @NotNull Snowflake getOwnerIdAsSnowflake() {
+        return ownerId;
+    }
+
+    @Override
+    public @Nullable String getPermissionsAsString() {
+        return permissionsAsList == null ? permissions : permissionsAsList.getValueAsString();
+    }
+
+    @Override
+    public @Nullable Permissions getPermissions() {
+        if(permissionsAsList != null) return permissionsAsList;
+        if(getPermissionsAsString() == null) return null;
+        permissionsAsList = Permissions.ofString(getPermissionsAsString());
+        return permissionsAsList;
+    }
+
+    @Override
+    public @Nullable VoiceRegion getRegion() {
+        return region;
+    }
+
+    @Override
+    public @Nullable Snowflake getAfkChannelIdAsSnowflake() {
+        return afkChannelId;
+    }
+
+    @Override
+    public int getAfkTimeout() {
+        return afkTimeout;
+    }
+
+    @Override
+    public @Nullable Boolean getWidgetEnabled() {
+        return widgetEnabled;
+    }
+
+    @Override
+    public @Nullable Snowflake getWidgetChannelIdAsSnowflake() {
+        return widgetChannelId;
+    }
+
+    @Override
+    public @NotNull VerificationLevel getVerificationLevel() {
+        return verificationLevel;
+    }
+
+    @Override
+    public @NotNull DefaultMessageNotificationLevel getDefaultMessageNotifications() {
+        return defaultMessageNotifications;
+    }
+
+    @Override
+    public @NotNull ExplicitContentFilterLevel getExplicitContentFilter() {
+        return explicitContentFilter;
+    }
+
+    @Override
+    public @NotNull Collection<Role> getRoles() {
+        return roles;
     }
 
     @Override

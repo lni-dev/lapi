@@ -11,6 +11,7 @@ import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
+import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
@@ -113,6 +114,26 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         return super.getName();
     }
 
+    /**
+     * total permissions for the current user in the guild (excludes overwrites).<br>
+     * This field is probably {@code null} or already be outdated!
+     */
+    @Override
+    public @Nullable String getPermissionsAsString() {
+        return super.getPermissionsAsString();
+    }
+
+    /**
+     * total permissions for the current user in the guild (excludes overwrites).<br>
+     * This field is probably {@code null} or already be outdated!<br>
+     * <br>
+     * The returned {@link Permissions} object should not be changed.
+     */
+    @Override
+    public @Nullable Permissions getPermissions() {
+        return super.getPermissions();
+    }
+
     @Override
     public boolean isUnavailable() {
         return (!(unavailable == null)) && unavailable;
@@ -155,11 +176,8 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         data.processIfContained(OWNER_KEY, (Boolean owner) -> this.owner = owner);
         data.processIfContained(OWNER_ID_KEY, (String id) -> this.ownerId = Snowflake.fromString(id));
         data.processIfContained(PERMISSIONS_KEY, (String permissions) -> {
-            //TODO: maybe not even save this, it may get changed....
             this.permissions = permissions;
-            //TODO update permissions list
-            //TODO: will we even keep the permission list in this class? maybe generate it when required...
-
+            if(this.permissionsAsList != null) this.permissionsAsList.set(permissions);
         });
         data.processIfContained(REGION_KEY, (String region) -> this.region = lApi.getVoiceRegionManager().getVoiceRegionById(region));
         data.processIfContained(AFK_CHANNEL_ID_KEY, (String id) -> this.afkChannelId = Snowflake.fromString(id));

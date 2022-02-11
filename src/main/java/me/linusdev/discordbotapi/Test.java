@@ -1,5 +1,6 @@
 package me.linusdev.discordbotapi;
 
+import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
@@ -98,6 +99,7 @@ public class Test implements EventListener{
     @Override
     public void onGuildUpdate(@NotNull GuildUpdateEvent event) {
         System.out.println("onGuildUpdate");
+        System.out.println(((Data)event.getPayload().getPayloadData()).getJsonString());
     }
 
     @Override
