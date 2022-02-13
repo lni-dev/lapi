@@ -8,8 +8,10 @@ import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.updatable.IsUpdatable;
+import me.linusdev.discordbotapi.api.lapiandqueue.updatable.NotUpdatable;
+import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.permission.Permission;
 import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
@@ -17,7 +19,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -30,7 +32,7 @@ import java.util.List;
  *
  * @see <a href="https://discord.com/developers/docs/topics/permissions#role-object" target="_top">Role Object</a>
  */
-public class Role implements Datable, SnowflakeAble, HasLApi {
+public class Role implements Datable, SnowflakeAble, HasLApi, Updatable {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -44,18 +46,23 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
     public static final String MENTIONABLE_KEY = "mentionable";
     public static final String TAGS_KEY = "tags";
 
+    @NotUpdatable
     private final @NotNull LApi lApi;
+
+    @NotUpdatable
     private final @NotNull Snowflake id;
-    private final @NotNull String name;
-    private final int color;
-    private final boolean hoist;
-    private final @Nullable String iconHash;
-    private final @Nullable String unicodeEmoji;
-    private final  int position;
-    private final @NotNull String permissions;
-    private final boolean managed;
-    private final boolean mentionable;
-    private final @Nullable RoleTags tags;
+
+    private @IsUpdatable @NotNull String name;
+    private @IsUpdatable int color;
+    private @IsUpdatable boolean hoist;
+    private @IsUpdatable @Nullable String iconHash;
+    private @IsUpdatable @Nullable String unicodeEmoji;
+    private @IsUpdatable int position;
+    private @IsUpdatable @NotNull String permissions;
+    private @IsUpdatable boolean managed;
+    private @IsUpdatable boolean mentionable;
+    private @IsUpdatable @Nullable RoleTags tags;
+    private @IsUpdatable @Nullable Permissions permissionsAsList;
 
     /**
      *
@@ -196,14 +203,21 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
      * @see #getPermissions()
      */
     public String getPermissionsAsString() {
-        return permissions;
+        return permissionsAsList == null ? permissions : permissionsAsList.getValueAsString();
     }
 
     /**
-     * the permissions as {@link Permissions}
+     * <p>
+     *     returned {@link Permissions} is backed by this {@link Role} object.
+     *     Changes on the returned {@link Permissions} will also change the return value of {@link #getPermissionsAsString()}.
+     * </p>
+     *
+     * @return the permissions as {@link Permissions}
      */
     public Permissions getPermissions() {
-        return Permissions.ofString(permissions);
+        if(permissionsAsList == null)
+            permissionsAsList = Permissions.ofString(permissions);
+        return permissionsAsList;
     }
 
     /**
@@ -253,5 +267,27 @@ public class Role implements Datable, SnowflakeAble, HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        try{
+            data.processIfContained(NAME_KEY, (String name) -> this.name = Objects.requireNonNull(name));
+            data.processIfContained(COLOR_KEY, (Number color) -> this.color = Objects.requireNonNull(color).intValue());
+            data.processIfContained(HOIST_KEY, (Boolean hoist) -> this.hoist = Objects.requireNonNull(hoist));
+            data.processIfContained(ICON_KEY, (String hash) -> this.iconHash = hash);
+            data.processIfContained(UNICODE_EMOJI_KEY, (String emoji) -> this.unicodeEmoji = emoji);
+            data.processIfContained(POSITION_KEY, (Integer pos) -> this.position = Objects.requireNonNull(pos));
+            data.processIfContained(PERMISSIONS_KEY, (String permissions) -> {
+                this.permissions = Objects.requireNonNull(permissions);
+                if(permissionsAsList != null) permissionsAsList.set(permissions);
+            });
+            data.processIfContained(MANAGED_KEY, (Boolean managed) -> this.managed = Objects.requireNonNull(managed));
+            data.processIfContained(MENTIONABLE_KEY, (Boolean mentionable) -> this.mentionable = Objects.requireNonNull(mentionable));
+            data.processIfContained(TAGS_KEY, (Data d) -> this.tags = RoleTags.fromData(Objects.requireNonNull(d)));
+
+        }catch (NullPointerException e){
+            throw new InvalidDataException(data, "NotNull field is set to null!", e);
+        }
     }
 }
