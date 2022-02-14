@@ -8,9 +8,9 @@ import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.lapiandqueue.updatable.IsUpdatable;
-import me.linusdev.discordbotapi.api.lapiandqueue.updatable.NotUpdatable;
-import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.IsUpdatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.NotUpdatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.permission.Permissions;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
@@ -290,4 +290,5 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable {
             throw new InvalidDataException(data, "NotNull field is set to null!", e);
         }
     }
+
 }

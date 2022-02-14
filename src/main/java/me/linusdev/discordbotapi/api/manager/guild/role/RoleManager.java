@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.api.manager.guild.role;
 
 import me.linusdev.data.Data;
+import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
@@ -37,7 +38,7 @@ public class RoleManager implements HasLApi {
         this.roles.remove(role.getId());
     }
 
-    public void updateRole(@NotNull String id, @NotNull Data updateData){
+    public void updateRole(@NotNull String id, @NotNull Data updateData) throws InvalidDataException {
         Role role = this.roles.get(id);
 
         if(role == null) {
@@ -45,7 +46,7 @@ public class RoleManager implements HasLApi {
             return;
         }
 
-        //TODO update role
+        role.updateSelfByData(updateData);
     }
 
     @Override

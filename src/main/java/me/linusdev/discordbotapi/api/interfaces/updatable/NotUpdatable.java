@@ -1,4 +1,4 @@
-package me.linusdev.discordbotapi.api.lapiandqueue.updatable;
+package me.linusdev.discordbotapi.api.interfaces.updatable;
 
 import org.jetbrains.annotations.NonNls;
 

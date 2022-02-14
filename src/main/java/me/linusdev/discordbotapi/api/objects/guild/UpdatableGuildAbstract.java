@@ -1,6 +1,6 @@
 package me.linusdev.discordbotapi.api.objects.guild;
 
-import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import org.jetbrains.annotations.Nullable;
 
 public interface UpdatableGuildAbstract extends Updatable {

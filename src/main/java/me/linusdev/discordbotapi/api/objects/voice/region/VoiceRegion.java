@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.objects.voice.region;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.lapiandqueue.updatable.Updatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
