@@ -1,6 +1,7 @@
 package me.linusdev.discordbotapi.api.objects.snowflake;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.discordbotapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +11,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
  *
  * @see <a href="https://discord.com/developers/docs/reference#snowflakes" target="_top">Snowflakes<a/>
  */
-public class Snowflake implements SimpleDatable {
+public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
     private final @NotNull String string;
     private Long asLong = null;
     private Long timestamp = null;
@@ -96,5 +97,15 @@ public class Snowflake implements SimpleDatable {
     @Override
     public String toString() {
         return asString();
+    }
+
+    /**
+     * This will not return an actual copy of this object, but the same object instead. <br>
+     * That is not a problem, because this class is completely constant and cannot be changed after creation.
+     * @return this
+     */
+    @Override
+    public @NotNull Snowflake copy() {
+        return this;
     }
 }

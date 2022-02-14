@@ -7,6 +7,8 @@ import me.linusdev.discordbotapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.discordbotapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.file.types.AbstractFileType;
+import me.linusdev.discordbotapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.discordbotapi.api.interfaces.copyable.Copyable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.interfaces.updatable.IsUpdatable;
 import me.linusdev.discordbotapi.api.interfaces.updatable.NotUpdatable;
@@ -32,7 +34,7 @@ import java.util.Objects;
  *
  * @see <a href="https://discord.com/developers/docs/topics/permissions#role-object" target="_top">Role Object</a>
  */
-public class Role implements Datable, SnowflakeAble, HasLApi, Updatable {
+public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAndUpdatable<Role> {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -291,4 +293,8 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable {
         }
     }
 
+    @Override
+    public @NotNull Role copy() {
+        return new Role(lApi, id, name, color, hoist, iconHash, unicodeEmoji, position, permissions, managed, mentionable, Copyable.copy(tags));
+    }
 }

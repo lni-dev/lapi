@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.role;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.interfaces.copyable.Copyable;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/permissions#role-object-role-tags-structure" target="_top">Role Tags Structure</a>
  */
-public class RoleTags implements Datable {
+public class RoleTags implements Datable, Copyable<RoleTags> {
 
     public static final String BOT_ID_KEY = "bot_id";
     public static final String INTEGRATION_ID_KEY = "integration_id";
@@ -100,5 +101,10 @@ public class RoleTags implements Datable {
         if(isPremiumSubscriberRole) data.add(PREMIUM_SUBSCRIBER_KEY, null);
 
         return data;
+    }
+
+    @Override
+    public @NotNull RoleTags copy() {
+        return new RoleTags(Copyable.copy(botId), Copyable.copy(integrationId), isPremiumSubscriberRole);
     }
 }
