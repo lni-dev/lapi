@@ -21,6 +21,28 @@ public enum ConfigFlag implements SimpleDatable {
 
     ENABLE_GATEWAY(1 << 1),
 
+    /**
+     * <p>
+     *     Caches all {@link me.linusdev.discordbotapi.api.objects.role.Role roles} retrieved by the
+     *     {@link me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     *
+     * @see me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild UpdatableGuild
+     * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
+     */
+    CACHE_ROLES(1 << 2),
+
+    /**
+     * <p>
+     *     Copies {@link me.linusdev.discordbotapi.api.objects.role.Role role} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     *
+     * @see me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild UpdatableGuild
+     * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
+     */
+    COPY_ROLE_ON_UPDATE_EVENT(1 << 3),
+
     ;
 
     private final long value;
