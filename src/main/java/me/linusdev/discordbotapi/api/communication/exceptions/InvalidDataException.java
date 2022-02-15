@@ -20,21 +20,21 @@ public class InvalidDataException extends LApiException{
     /**
      * @see #getData()
      */
-    private final Data data;
+    private final @Nullable Data data;
 
-    public InvalidDataException(Data data) {
+    public InvalidDataException(@Nullable Data data) {
         this.data = data;
         this.missingFields = new ArrayList<>();
     }
 
-    public InvalidDataException(Data data, String message) {
+    public InvalidDataException(@Nullable Data data, String message) {
         super(message);
         this.data = data;
         this.missingFields = new ArrayList<>();
 
     }
 
-    public InvalidDataException(Data data, String message, Throwable cause, String... missingFields) {
+    public InvalidDataException(@Nullable Data data, String message, Throwable cause, String... missingFields) {
         super(message, cause);
         this.data = data;
         this.missingFields = new ArrayList<>();
@@ -62,7 +62,7 @@ public class InvalidDataException extends LApiException{
     /**
      * @return The {@link Data} where the fields are missing
      */
-    public Data getData() {
+    public @Nullable Data getData() {
         return data;
     }
 
@@ -73,6 +73,8 @@ public class InvalidDataException extends LApiException{
         for(String s : missingFields){
             msg += s + ", ";
         }
+
+        msg += data != null ? "in data: \n" + data.getJsonString() + "\n": "";
 
         return msg;
     }
