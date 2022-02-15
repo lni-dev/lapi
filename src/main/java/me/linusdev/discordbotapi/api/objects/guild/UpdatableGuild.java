@@ -6,6 +6,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.*;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
@@ -16,6 +17,7 @@ import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.discordbotapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +27,8 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     protected @Nullable Boolean unavailable;
     protected boolean awaitingEvent;
     protected boolean removed;
+
+    protected @Nullable RoleManager roleManager;
 
     //Create Guild
     protected @Nullable ISO8601Timestamp joinedAt;
@@ -237,5 +241,10 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         sb.append("\t").append("current user joined at: ").append(joinedAt).append("\n");
 
         return sb.toString();
+    }
+
+    @ApiStatus.Internal
+    public @Nullable RoleManager getRoleManager() {
+        return roleManager;
     }
 }

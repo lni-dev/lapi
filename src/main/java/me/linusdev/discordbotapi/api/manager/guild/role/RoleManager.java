@@ -2,12 +2,14 @@ package me.linusdev.discordbotapi.api.manager.guild.role;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.discordbotapi.api.communication.gateway.update.Update;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,15 +40,15 @@ public class RoleManager implements HasLApi {
         this.roles.remove(role.getId());
     }
 
-    public void updateRole(@NotNull String id, @NotNull Data updateData) throws InvalidDataException {
+    public @Nullable Update<Role> updateRole(@NotNull String id, @NotNull Data updateData) throws InvalidDataException {
         Role role = this.roles.get(id);
 
         if(role == null) {
             Logger.getLogger(this).warning("Trying to update role that does not exist...");
-            return;
+            return null;
         }
 
-        role.updateSelfByData(updateData);
+        return new Update<Role>(role, updateData);
     }
 
     @Override
