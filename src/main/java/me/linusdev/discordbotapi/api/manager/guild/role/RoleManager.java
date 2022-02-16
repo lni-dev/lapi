@@ -14,18 +14,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * Manages cached {@link Role roles}. An instance of this class should only exist if
+ * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_ROLES} is enabled
+ */
 public class RoleManager implements HasLApi {
 
     private final @NotNull LApiImpl lApi;
 
     private final @NotNull HashMap<String, Role> roles;
 
-    public RoleManager(@NotNull LApiImpl lApi, @NotNull Collection<Role> roles){
+    public RoleManager(@NotNull LApiImpl lApi){
         this.lApi = lApi;
         this.roles = new HashMap<>();
-
-        for(Role role : roles)
-            this.roles.put(role.getId(), role);
     }
 
     public @NotNull Collection<Role> getRoles(){
@@ -36,19 +37,25 @@ public class RoleManager implements HasLApi {
         this.roles.put(role.getId(), role);
     }
 
-    public void removeRole(@NotNull Role role){
-        this.roles.remove(role.getId());
+    public Role removeRole(@NotNull String roleId){
+        return this.roles.remove(roleId);
     }
 
-    public @Nullable Update<Role> updateRole(@NotNull String id, @NotNull Data updateData) throws InvalidDataException {
+    public @Nullable Update<Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
+        String id = (String) updateData.get(Role.ID_KEY);
         Role role = this.roles.get(id);
 
         if(role == null) {
+            //This should never happen...
             Logger.getLogger(this).warning("Trying to update role that does not exist...");
             return null;
         }
 
-        return new Update<Role>(role, updateData);
+        if(lApi.isCopyOldRolesOnUpdateEventEnabled()){
+            return new Update<Role>(role, updateData);
+        }else {
+            return new Update<Role>(null, role);
+        }
     }
 
     @Override

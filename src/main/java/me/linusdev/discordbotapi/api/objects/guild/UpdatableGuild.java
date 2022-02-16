@@ -5,6 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.*;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
@@ -12,6 +13,7 @@ import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
 import me.linusdev.discordbotapi.api.objects.permission.Permissions;
+import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.stage.StageInstance;
@@ -22,13 +24,15 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Datable, HasLApi, SnowflakeAble, Updatable {
 
     protected @Nullable Boolean unavailable;
     protected boolean awaitingEvent;
     protected boolean removed;
 
-    protected @Nullable RoleManager roleManager;
+    protected @Nullable RoleManager roleManager = null;
 
     //Create Guild
     protected @Nullable ISO8601Timestamp joinedAt;
@@ -43,7 +47,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
 
 
-    public UpdatableGuild(@NotNull LApi lApi, @NotNull Snowflake id, @Nullable Boolean unavailable, boolean awaitingEvent){
+    public UpdatableGuild(@NotNull LApiImpl lApi, @NotNull Snowflake id, @Nullable Boolean unavailable, boolean awaitingEvent){
         super(lApi,
                 id,
                 null,
@@ -88,10 +92,14 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         this.unavailable = unavailable;
         this.awaitingEvent = awaitingEvent;
         this.removed = unavailable == null;
+
+        if(lApi.isCacheRolesEnabled()){
+            this.roleManager = new RoleManager(lApi);
+        }
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable UpdatableGuild fromData(@NotNull LApi lApi, @Nullable Data data){
+    public static @Nullable UpdatableGuild fromData(@NotNull LApiImpl lApi, @Nullable Data data){
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         Boolean unavailable = (Boolean) data.getOrDefaultIfNull(UNAVAILABLE_KEY, false);
@@ -108,7 +116,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     }
 
 
-    public static @NotNull UpdatableGuild fromUnavailableGuild(@NotNull LApi lApi, @NotNull UnavailableGuild guild){
+    public static @NotNull UpdatableGuild fromUnavailableGuild(@NotNull LApiImpl lApi, @NotNull UnavailableGuild guild){
         return new UpdatableGuild(lApi, guild.getIdAsSnowflake(), guild.getUnavailable(), true);
     }
 
@@ -219,7 +227,18 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         });
         data.processIfContained(NSFW_LEVEL_KEY, (Long level) -> this.nsfwLevel = GuildNsfwLevel.fromValue(level.intValue()));
 
-        //TODO Roles[], Emojis[], Features[], Sticker[]
+        //Roles
+        if(roleManager != null){
+            @SuppressWarnings("unchecked")
+            ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+            if(rolesData != null){
+                for(Object o : rolesData){
+                    roleManager.addRole(Role.fromData(lApi, (Data) o));
+                }
+            }
+        }
+
+        // TODO Roles[], Emojis[], Features[], Sticker[]
 
         //Guild Create
         data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));

@@ -1,6 +1,9 @@
 package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -33,6 +36,13 @@ public enum EventIdentifier{
     UNKNOWN,
 
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             READY                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * identifier for {@link EventListener#onReady(ReadyEvent)}.
@@ -49,6 +59,14 @@ public enum EventIdentifier{
      */
     LAPI_READY,
 
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             GUILD                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}.
@@ -85,6 +103,29 @@ public enum EventIdentifier{
      */
     GUILD_AVAILABLE,
 
+    /**
+     * identifier for {@link EventListener#onGuildRoleCreate(GuildRoleCreateEvent)}.
+     */
+    GUILD_ROLE_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildRoleUpdate(GuildRoleUpdateEvent)}.
+     */
+    GUILD_ROLE_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildRoleDelete(GuildRoleDeleteEvent)}.
+     */
+    GUILD_ROLE_DELETE,
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                           MESSAGE                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * identifier for {@link EventListener#onMessageCreate(MessageCreateEvent)}.
@@ -102,4 +143,17 @@ public enum EventIdentifier{
      * sub-event of {@link #MESSAGE_CREATE}.
      */
     NON_GUILD_MESSAGE_CREATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             OTHER                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onLApiError(LApiErrorEvent)}.
+     */
+    LAPI_ERROR,
 }

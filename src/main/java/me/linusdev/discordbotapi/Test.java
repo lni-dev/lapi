@@ -7,7 +7,11 @@ import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -42,6 +46,8 @@ public class Test implements EventListener{
 
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
+                .enable(ConfigFlag.CACHE_ROLES)
+                .enable(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT)
                 .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
@@ -123,6 +129,21 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {
+        System.out.println("onGuildRoleCreate: " + event.getRole().getName());
+    }
+
+    @Override
+    public void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {
+        System.out.println("onGuildRoleUpdate: old: " + event.getOldRole().getName() + ", new: " + event.getRole().getName());
+    }
+
+    @Override
+    public void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {
+        System.out.println("onGuildRoleDelete: " + event.getRole().getName());
+    }
+
+    @Override
     public void onMessageCreate(@NotNull MessageCreateEvent event) {
         System.out.println("onMessageCreate");
     }
@@ -159,5 +180,10 @@ public class Test implements EventListener{
                     .getQueueable(channelId)
                     .queue();
         }
+    }
+
+    @Override
+    public void onLApiError(@NotNull LApiErrorEvent event) {
+        System.out.println("onLApiError in event " + event.getInEvent() + ", error code: " + event.getError().getCode());
     }
 }

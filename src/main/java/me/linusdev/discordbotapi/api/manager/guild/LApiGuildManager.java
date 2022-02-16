@@ -6,6 +6,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayl
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
 import me.linusdev.discordbotapi.api.objects.guild.UnavailableGuild;
@@ -21,11 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LApiGuildManager implements GuildManager {
 
-    private final @NotNull LApi lApi;
+    private final @NotNull LApiImpl lApi;
 
     private final @NotNull ConcurrentHashMap<String, UpdatableGuild> guilds;
 
-    public LApiGuildManager(@NotNull LApi lApi){
+    public LApiGuildManager(@NotNull LApiImpl lApi){
         this.lApi = lApi;
         guilds = new ConcurrentHashMap<>();
     }
@@ -34,7 +35,7 @@ public class LApiGuildManager implements GuildManager {
     @Override
     public void onReady(@NotNull ReadyEvent event){
         for(UnavailableGuild uGuild : event.getGuilds()){
-            UpdatableGuild guild = UpdatableGuild.fromUnavailableGuild(getLApi(), uGuild);
+            UpdatableGuild guild = UpdatableGuild.fromUnavailableGuild(lApi, uGuild);
             guilds.put(guild.getId(), guild);
         }
     }
@@ -99,6 +100,12 @@ public class LApiGuildManager implements GuildManager {
         UpdatableGuild guild = guilds.get(uGuild.getId());
         guild.updateSelfByData((Data) payload.getPayloadData());
         return guild;
+    }
+
+    @Override
+    public @Nullable UpdatableGuild getUpdatableGuildById(String id) {
+        if(id == null) return null;
+        return guilds.get(id);
     }
 
     @Override

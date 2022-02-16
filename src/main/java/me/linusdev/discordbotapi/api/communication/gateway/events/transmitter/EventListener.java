@@ -2,7 +2,11 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -82,11 +86,19 @@ public interface EventListener {
      */
     default void onGuildAvailable(@NotNull GuildAvailableEvent event) {}
 
+    default void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {}
+
+    default void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {}
+
+    default void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {}
+
     default void onMessageCreate(@NotNull MessageCreateEvent event) {}
 
     default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {}
 
     default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {}
+
+    default void onLApiError(@NotNull LApiErrorEvent event) { }
 
 }
 

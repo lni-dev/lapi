@@ -81,8 +81,13 @@ public class LApiImpl implements LApi {
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
 
+    //Config
     private @NotNull final String token;
     private @NotNull final Config config;
+
+    private final boolean cacheVoiceRegions;
+    private final boolean cacheRoles;
+    private final boolean copyOldRolesOnUpdateEvent;
 
     //Http
     private final LApiHttpHeader authorizationHeader;
@@ -115,8 +120,14 @@ public class LApiImpl implements LApi {
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
     public LApiImpl(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
+        //Config
         this.token = config.getToken();
         this.config = config;
+
+        this.cacheVoiceRegions = config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS);
+        this.cacheRoles = config.isFlagSet(ConfigFlag.CACHE_ROLES);
+        this.copyOldRolesOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT);
+
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
         this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
 
@@ -559,6 +570,20 @@ public class LApiImpl implements LApi {
         return this;
     }
 
+    @Override
+    public boolean isCacheVoiceRegionsEnabled() {
+        return cacheVoiceRegions;
+    }
+
+    @Override
+    public boolean isCacheRolesEnabled() {
+        return cacheRoles;
+    }
+
+    @Override
+    public boolean isCopyOldRolesOnUpdateEventEnabled() {
+        return copyOldRolesOnUpdateEvent;
+    }
 
     //api-internal getter
 

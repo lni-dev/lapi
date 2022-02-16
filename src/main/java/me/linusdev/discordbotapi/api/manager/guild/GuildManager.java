@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.Manager;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The GuildManager manages {@link UpdatableGuild UpdateableGuilds}, which represent Discord-servers
@@ -62,5 +63,13 @@ public interface GuildManager extends GuildPool, Manager {
      * @return the updated guild
      */
     UpdatableGuild onGuildUpdate( @NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
+
+    /**
+     *
+     * @param id the id of the guild
+     * @return {@link UpdatableGuild} managed by this {@link GuildManager} or {@code null} if no guild with given id was found
+     */
+    @Nullable
+    UpdatableGuild getUpdatableGuildById(@Nullable String id);
 
 }

@@ -5,6 +5,7 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * an {@link Update} contains an {@link #obj object}, which was updated and a {@link #copy} of the same object, before
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Update<T extends Updatable> {
 
-    private final @NotNull T copy;
+    private final @Nullable T copy;
     private final @NotNull T obj;
 
     /**
@@ -21,7 +22,7 @@ public class Update<T extends Updatable> {
      * @param copy a copy of the object, before it was updated.
      * @param obj the updated object.
      */
-    public Update(@NotNull T copy, @NotNull T obj){
+    public Update(@Nullable T copy, @NotNull T obj){
         this.copy = copy;
         this.obj = obj;
     }
@@ -50,7 +51,7 @@ public class Update<T extends Updatable> {
     /**
      * The old Object before it was updated.
      */
-    public @NotNull T getCopy() {
+    public @Nullable T getCopy() {
         return copy;
     }
 }

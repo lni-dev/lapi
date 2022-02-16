@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.objects.guild;
 
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class Guild implements GuildAbstract{
 
-    protected @NotNull LApi lApi;
+    protected @NotNull LApiImpl lApi;
 
     protected @NotNull Snowflake id;
     protected @NotNull String name;
@@ -64,7 +65,7 @@ public class Guild implements GuildAbstract{
     protected @Nullable Permissions permissionsAsList;
 
     public Guild(
-            @NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name,
+            @NotNull LApiImpl lApi, @NotNull Snowflake id, @NotNull String name,
             @Nullable String iconHash, @Nullable String splashHash, @Nullable String discoverySplashHash,
             @Nullable Boolean owner, @NotNull Snowflake ownerId, @Nullable String permissions,
             @Nullable VoiceRegion region, @Nullable Snowflake afkChannelId, int afkTimeout,
@@ -125,7 +126,7 @@ public class Guild implements GuildAbstract{
         this.stickers = stickers;
     }
 
-    static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable Data data){
+    static @Nullable Guild fromData(@NotNull LApiImpl lApi, @Nullable Data data){
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);

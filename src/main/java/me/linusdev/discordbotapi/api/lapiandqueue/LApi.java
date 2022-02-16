@@ -15,6 +15,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
+import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Thread;
@@ -672,4 +673,20 @@ public interface LApi extends HasLApi {
      * @return {@link VoiceRegionManager}
      */
     VoiceRegionManager getVoiceRegionManager();
+
+    /**
+     * @see ConfigFlag#CACHE_VOICE_REGIONS
+     */
+    boolean isCacheVoiceRegionsEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_ROLES
+     */
+    boolean isCacheRolesEnabled();
+
+    /**
+     *
+     * @see ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldRolesOnUpdateEventEnabled();
 }

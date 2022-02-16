@@ -2,7 +2,11 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -279,6 +283,48 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
+    @Override
+    public void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildRoleCreate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildRoleCreate(event);
+            }
+        }
+    }
+
+    @Override
+    public void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildRoleUpdate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildRoleUpdate(event);
+            }
+        }
+    }
+
+    @Override
+    public void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildRoleDelete(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildRoleDelete(event);
+            }
+        }
+    }
+
     @ApiStatus.Internal
     @Override
     public void onMessageCreate(@NotNull MessageCreateEvent event) {
@@ -328,24 +374,19 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
+    @Override
+    public void onLApiError(@NotNull LApiErrorEvent event) {
+        for(EventListener listener : listeners){
+            listener.onLApiError(event);
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onLApiError(event);
+            }
+        }
+    }
 
 
     @Override

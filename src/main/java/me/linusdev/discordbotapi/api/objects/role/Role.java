@@ -279,7 +279,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
             data.processIfContained(HOIST_KEY, (Boolean hoist) -> this.hoist = Objects.requireNonNull(hoist));
             data.processIfContained(ICON_KEY, (String hash) -> this.iconHash = hash);
             data.processIfContained(UNICODE_EMOJI_KEY, (String emoji) -> this.unicodeEmoji = emoji);
-            data.processIfContained(POSITION_KEY, (Integer pos) -> this.position = Objects.requireNonNull(pos));
+            data.processIfContained(POSITION_KEY, (Number pos) -> this.position = Objects.requireNonNull(pos).intValue());
             data.processIfContained(PERMISSIONS_KEY, (String permissions) -> {
                 this.permissions = Objects.requireNonNull(permissions);
                 if(permissionsAsList != null) permissionsAsList.set(permissions);

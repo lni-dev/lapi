@@ -9,7 +9,12 @@ import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataExcepti
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiError;
+import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -18,15 +23,19 @@ import me.linusdev.discordbotapi.api.communication.gateway.identify.Identify;
 import me.linusdev.discordbotapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.discordbotapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.discordbotapi.api.communication.gateway.resume.Resume;
+import me.linusdev.discordbotapi.api.communication.gateway.update.Update;
 import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
+import me.linusdev.discordbotapi.api.objects.role.Role;
+import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.log.LogInstance;
 import me.linusdev.discordbotapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -58,6 +67,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String QUERY_STRING_COMPRESS_KEY = "compress";
 
     public static final String HEARTBEAT_INTERVAL_KEY = "heartbeat_interval";
+
+    //Some payload fields
+    public static final String GUILD_ID_KEY = "guild_id";
+    public static final String ROLE_KEY = "role";
+    public static final String ROLE_ID_KEY = "role_id";
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
@@ -410,12 +424,104 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 break;
 
             case GUILD_ROLE_CREATE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    String guildId = (String) data.get(GUILD_ID_KEY);
+                    Data roleData = (Data) data.get(ROLE_KEY);
+
+                    if(guildId == null || roleData == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
+
+                    UpdatableGuild guild = (UpdatableGuild) guildManager.getGuildById(guildId);
+                    if(guild != null){
+                        RoleManager roleManager = guild.getRoleManager();
+
+                        Role role = Role.fromData(lApi, roleData);
+                        if(roleManager != null) roleManager.addRole(role);
+
+                        transmitter.onGuildRoleCreate(new GuildRoleCreateEvent(lApi, payload, Snowflake.fromString(guildId), role));
+                    } else {
+                        transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                        break;
+                    }
+
+                }
                 break;
 
             case GUILD_ROLE_UPDATE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    String guildId = (String) data.get(GUILD_ID_KEY);
+                    Data roleData = (Data) data.get(ROLE_KEY);
+
+                    if(guildId == null || roleData == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
+
+                    UpdatableGuild guild = guildManager.getUpdatableGuildById(guildId);
+                    if(guild == null){
+                        transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                        break;
+                    }
+
+                    RoleManager roleManager = guild.getRoleManager();
+                    if(roleManager == null) {
+                        //RoleManager may be null, if CACHE_ROLES is disabled.
+                        Update<Role> role = new Update<Role>(null, Role.fromData(lApi, roleData));
+                        transmitter.onGuildRoleUpdate(new GuildRoleUpdateEvent(lApi, payload, Snowflake.fromString(guildId), role));
+                        break;
+                    }
+
+                    Update<Role> role = roleManager.updateRole(roleData);
+                    if(role == null){
+                        //RoleManager didn't contain this role...
+                        transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_ROLE, null)));
+                        break;
+                    }
+
+                    transmitter.onGuildRoleUpdate(new GuildRoleUpdateEvent(lApi, payload, Snowflake.fromString(guildId), role));
+                }
+
                 break;
 
             case GUILD_ROLE_DELETE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    String guildId = (String) data.get(GUILD_ID_KEY);
+                    String roleId = (String) data.get(ROLE_ID_KEY);
+
+                    if(guildId == null || roleId == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_ID_KEY);
+
+                    UpdatableGuild guild = guildManager.getUpdatableGuildById(guildId);
+                    if(guild == null){
+                        transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                        break;
+                    }
+
+                    RoleManager roleManager = guild.getRoleManager();
+                    if(roleManager == null) {
+                        //RoleManager may be null, if CACHE_ROLES is disabled.
+                        transmitter.onGuildRoleDelete(new GuildRoleDeleteEvent(lApi, payload, guildId, roleId));
+                        break;
+                    }
+
+                    Role role = roleManager.removeRole(roleId);
+                    if(role == null){
+                        //RoleManager didn't contain this role...
+                        transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_ROLE, null)));
+                        break;
+                    }
+                    transmitter.onGuildRoleDelete(new GuildRoleDeleteEvent(lApi, payload, guildId, role));
+
+                }
                 break;
 
             case GUILD_SCHEDULED_EVENT_CREATE:

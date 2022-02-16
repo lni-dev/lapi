@@ -21,7 +21,7 @@ public class GuildMessageCreateEvent extends MessageCreateEvent implements Guild
     @SuppressWarnings("ConstantConditions")
     @Override
     public @NotNull Snowflake getGuildIdAsSnowflake() {
-        //Guild messages will have a message id
+        //Guild messages will have a guild id
         return super.getGuildIdAsSnowflake();
     }
 
