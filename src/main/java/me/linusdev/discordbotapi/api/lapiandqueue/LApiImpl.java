@@ -88,6 +88,8 @@ public class LApiImpl implements LApi {
     private final boolean cacheVoiceRegions;
     private final boolean cacheRoles;
     private final boolean copyOldRolesOnUpdateEvent;
+    private final boolean cacheGuilds;
+    private final boolean copyOldGuildOnUpdateEvent;
 
     //Http
     private final LApiHttpHeader authorizationHeader;
@@ -111,10 +113,14 @@ public class LApiImpl implements LApi {
     private final ThreadPoolExecutor executor;
 
     //stores and manages the voice regions
-    final VoiceRegionManager voiceRegionManager;
+    private final @NotNull VoiceRegionManager voiceRegionManager;
 
     //guild manager
-    final GuildManager guildManager;
+    /**
+     * {@link GuildManager} that manages cached guilds. will be {@code null}
+     * if {@link ConfigFlag#CACHE_GUILDS CACHE_GUILDS} is not set.
+     */
+    private final @Nullable GuildManager guildManager;
 
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
@@ -127,6 +133,8 @@ public class LApiImpl implements LApi {
         this.cacheVoiceRegions = config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS);
         this.cacheRoles = config.isFlagSet(ConfigFlag.CACHE_ROLES);
         this.copyOldRolesOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT);
+        this.cacheGuilds = config.isFlagSet(ConfigFlag.CACHE_GUILDS);
+        this.copyOldGuildOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_GUILD_ON_UPDATE_EVENT);
 
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
         this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -191,8 +199,13 @@ public class LApiImpl implements LApi {
         if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS))
             this.voiceRegionManager.init();
 
-        //Guild Manager
-        this.guildManager = config.getGuildManagerFactory().newInstance(this);
+        //GuildImpl Manager
+        if(isCacheGuildsEnabled()){
+            this.guildManager = config.getGuildManagerFactory().newInstance(this);
+        }else{
+            this.guildManager = null;
+        }
+
     }
 
     @Override
@@ -561,7 +574,7 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public VoiceRegionManager getVoiceRegionManager() {
+    public @NotNull VoiceRegionManager getVoiceRegionManager() {
         return voiceRegionManager;
     }
 
@@ -585,10 +598,23 @@ public class LApiImpl implements LApi {
         return copyOldRolesOnUpdateEvent;
     }
 
+    @Override
+    public boolean isCacheGuildsEnabled(){
+        return cacheGuilds;
+    }
+
+    @Override
+    public boolean isCopyOldGuildOnUpdateEventEnabled(){
+        return copyOldGuildOnUpdateEvent;
+    }
+
     //api-internal getter
 
+    /**
+     * @see #guildManager
+     */
     @ApiStatus.Internal
-    public GuildManager getGuildManager() {
+    public @Nullable GuildManager getGuildManager() {
         return guildManager;
     }
 

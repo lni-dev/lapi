@@ -370,7 +370,7 @@ public interface LApi extends HasLApi {
      *     Returns all active threads in the channel, including public and private threads. Threads are ordered by their id, in descending order.
      * </p>
      * <p>
-     *     This route is deprecated and will be removed in v10. It is replaced by List Active Guild Threads.
+     *     This route is deprecated and will be removed in v10. It is replaced by List Active GuildImpl Threads.
      * </p>
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
      * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Thread threads} from
@@ -689,4 +689,15 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT
      */
     boolean isCopyOldRolesOnUpdateEventEnabled();
+
+    /**
+     *
+     * @see ConfigFlag#CACHE_GUILDS
+     */
+    boolean isCacheGuildsEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_GUILD_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldGuildOnUpdateEventEnabled();
 }

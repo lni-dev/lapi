@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.config;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("PointlessBitwiseExpression")
@@ -19,6 +20,11 @@ public enum ConfigFlag implements SimpleDatable {
      */
     CACHE_VOICE_REGIONS(1 << 0),
 
+    /**
+     * <p>
+     *     enables the gateway, which connects a websocket to retrieve events from Discord.
+     * </p>
+     */
     ENABLE_GATEWAY(1 << 1),
 
     /**
@@ -27,7 +33,7 @@ public enum ConfigFlag implements SimpleDatable {
      *     {@link me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
      * </p>
      *
-     * @see me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild UpdatableGuild
+     * @see CachedGuildImpl CachedGuildImpl
      * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
      */
     CACHE_ROLES(1 << 2),
@@ -38,10 +44,26 @@ public enum ConfigFlag implements SimpleDatable {
      *     you can check the difference between the old object and the updated one.
      * </p>
      *
-     * @see me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild UpdatableGuild
+     * @see CachedGuildImpl CachedGuildImpl
      * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
      */
     COPY_ROLE_ON_UPDATE_EVENT(1 << 3),
+
+    /**
+     * <p>
+     *     Whether to cache guilds retrieved from Discord.
+     * </p>
+     */
+    CACHE_GUILDS(1 << 4),
+
+    /**
+     * <p>
+     *     Copies {@link me.linusdev.discordbotapi.api.objects.guild.CachedGuild guild} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     *
+     */
+    COPY_GUILD_ON_UPDATE_EVENT(1 << 5),
 
     ;
 

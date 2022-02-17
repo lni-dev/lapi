@@ -11,7 +11,6 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.Event;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.application.PartialApplication;
-import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
 import me.linusdev.discordbotapi.api.objects.guild.UnavailableGuild;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import org.jetbrains.annotations.Contract;

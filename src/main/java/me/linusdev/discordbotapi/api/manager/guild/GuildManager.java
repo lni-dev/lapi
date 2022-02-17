@@ -4,15 +4,17 @@ import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.update.Update;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.manager.Manager;
-import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The GuildManager manages {@link UpdatableGuild UpdateableGuilds}, which represent Discord-servers
+ * The GuildManager manages {@link CachedGuildImpl UpdateableGuilds}, which represent Discord-servers
  */
 public interface GuildManager extends GuildPool, Manager {
 
@@ -45,31 +47,32 @@ public interface GuildManager extends GuildPool, Manager {
     /**
      *
      * @param payload the payload received from Discord
-     * @return The {@link UpdatableGuild}, whether is a new guild for the current user (user joined), whether this guild was unavailable and turned available
+     * @return The {@link CachedGuildImpl}, whether is a new guild for the current user (user joined), whether this guild was unavailable and turned available
      */
     GatewayWebSocket.OnGuildCreateReturn onGuildCreate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
 
     /**
-     * This method must set {@link UpdatableGuild#setRemoved(boolean) UpdateableGuild.setRemoved}, if the current user was removed or left the guild.
+     * This method must set {@link CachedGuildImpl#setRemoved(boolean) UpdateableGuild.setRemoved}, if the current user was removed or left the guild.
      * (This is important for the {@link me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket GatewayWebSocket})
      *
      * @param payload the payload received from Discord
      */
-    UpdatableGuild onGuildDelete( @NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
+    CachedGuildImpl onGuildDelete(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
 
     /**
      * This method should call {@link Updatable#updateSelfByData(Data)}
      * @param payload the payload received from Discord
-     * @return the updated guild
+     * @return the updated guild and a copy of the guild before it was updated (if
+     * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_GUILD_ON_UPDATE_EVENT COPY_GUILD_ON_UPDATE_EVENT} is enabled)
      */
-    UpdatableGuild onGuildUpdate( @NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
+    Update<CachedGuildImpl, Guild> onGuildUpdate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException;
 
     /**
      *
      * @param id the id of the guild
-     * @return {@link UpdatableGuild} managed by this {@link GuildManager} or {@code null} if no guild with given id was found
+     * @return {@link CachedGuildImpl} managed by this {@link GuildManager} or {@code null} if no guild with given id was found
      */
     @Nullable
-    UpdatableGuild getUpdatableGuildById(@Nullable String id);
+    CachedGuildImpl getUpdatableGuildById(@Nullable String id);
 
 }

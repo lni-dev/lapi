@@ -24,7 +24,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEnco
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.templates.message.builder.MessageBuilder;
@@ -82,7 +82,7 @@ public class Test implements EventListener{
     public void onGuildsReady(@NotNull GuildsReadyEvent event) {
         System.out.println("onGuildsReady");
 
-        for(UpdatableGuild guild : event.getGuildPool()){
+        for(CachedGuildImpl guild : event.getGuildPool()){
             System.out.println(guild);
         }
     }
@@ -94,7 +94,7 @@ public class Test implements EventListener{
 
     @Override
     public void onGuildCreate(@NotNull GuildCreateEvent event) {
-        System.out.println("Guild create: " + event.getGuild().getName());
+        System.out.println("GuildImpl create: " + event.getCachedGuild().getName());
     }
 
     @Override

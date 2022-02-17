@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * @see <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-features" target="_top">Guild Features</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-features" target="_top">GuildImpl Features</a>
  */
 public enum GuildFeature implements SimpleDatable {
 

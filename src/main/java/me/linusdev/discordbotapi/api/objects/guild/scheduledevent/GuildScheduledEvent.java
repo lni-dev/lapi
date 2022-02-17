@@ -5,7 +5,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.discordbotapi.api.objects.timestamp.ISO8601Timestamp;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  *
  * <p>
- *     A representation of a scheduled event in a {@link GuildAbstract guild}.
+ *     A representation of a scheduled event in a {@link Guild guild}.
  * </p>
  *
  * <p>
@@ -27,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *     See {@link EntityType field requirements by entity type} to understand the relationship between {@link #getEntityType() entity_type} and the following fields: {@link #getChannelId() channel_id}, {@link #getEntityMetadata() entity_metadata}, and {@link #getScheduledEndTime() scheduled_end_time}
  * </p>
  *
- * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object" target="_top">Guild Scheduled Event Object</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object" target="_top">GuildImpl Scheduled Event Object</a>
  */
 public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
 

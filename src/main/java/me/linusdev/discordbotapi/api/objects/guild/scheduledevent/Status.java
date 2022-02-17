@@ -7,7 +7,7 @@ import me.linusdev.data.SimpleDatable;
  *     Once status is set to {@link #COMPLETED} or {@link #CANCELED}, the status can no longer be updated.
  * </p>
  * <p>
- * <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-valid-guild-scheduled-event-status-transitions" target="_top">Valid Guild Scheduled Event Status Transitions</a>:<br>
+ * <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-valid-guild-scheduled-event-status-transitions" target="_top">Valid GuildImpl Scheduled Event Status Transitions</a>:<br>
  *
  * SCHEDULED --> ACTIVE<br>
  *
@@ -16,7 +16,7 @@ import me.linusdev.data.SimpleDatable;
  * SCHEDULED --> CANCELED<br>
  * </p>
  *
- * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status" target="_top">Guild Scheduled Event Status</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-status" target="_top">GuildImpl Scheduled Event Status</a>
  */
 public enum Status implements SimpleDatable {
 

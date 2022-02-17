@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.objects.guild;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.*;
@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Datable, HasLApi, SnowflakeAble, Updatable {
+public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, HasLApi, SnowflakeAble, CopyAndUpdatable<Guild>, Updatable {
 
     protected @Nullable Boolean unavailable;
     protected boolean awaitingEvent;
@@ -34,7 +34,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
 
     protected @Nullable RoleManager roleManager = null;
 
-    //Create Guild
+    //Create GuildImpl
     protected @Nullable ISO8601Timestamp joinedAt;
     protected @Nullable Boolean large;
     protected @Nullable Integer memberCount;
@@ -47,7 +47,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
 
 
-    public UpdatableGuild(@NotNull LApiImpl lApi, @NotNull Snowflake id, @Nullable Boolean unavailable, boolean awaitingEvent){
+    public CachedGuildImpl(@NotNull LApiImpl lApi, @NotNull Snowflake id, @Nullable Boolean unavailable, boolean awaitingEvent){
         super(lApi,
                 id,
                 null,
@@ -99,13 +99,13 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable UpdatableGuild fromData(@NotNull LApiImpl lApi, @Nullable Data data){
+    public static @Nullable CachedGuildImpl fromData(@NotNull LApiImpl lApi, @Nullable Data data){
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         Boolean unavailable = (Boolean) data.getOrDefaultIfNull(UNAVAILABLE_KEY, false);
 
 
-        UpdatableGuild guild = new UpdatableGuild(lApi, Snowflake.fromString(id), unavailable, false);
+        CachedGuildImpl guild = new CachedGuildImpl(lApi, Snowflake.fromString(id), unavailable, false);
         try {
             guild.updateSelfByData(data);
         } catch (InvalidDataException e) {
@@ -116,14 +116,8 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     }
 
 
-    public static @NotNull UpdatableGuild fromUnavailableGuild(@NotNull LApiImpl lApi, @NotNull UnavailableGuild guild){
-        return new UpdatableGuild(lApi, guild.getIdAsSnowflake(), guild.getUnavailable(), true);
-    }
-
-
-    @Override
-    public @Nullable String getName() {
-        return super.getName();
+    public static @NotNull CachedGuildImpl fromUnavailableGuild(@NotNull LApiImpl lApi, @NotNull UnavailableGuild guild){
+        return new CachedGuildImpl(lApi, guild.getIdAsSnowflake(), guild.getUnavailable(), true);
     }
 
     /**
@@ -151,6 +145,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
         return (!(unavailable == null)) && unavailable;
     }
 
+    @ApiStatus.Internal
     public boolean isAwaitingEvent() {
         return awaitingEvent;
     }
@@ -158,6 +153,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     /**
      * {@code true} if the current user left (or was removed from) this guild
      */
+    @Override
     public boolean isRemoved() {
         return removed;
     }
@@ -238,9 +234,9 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
             }
         }
 
-        // TODO Roles[], Emojis[], Features[], Sticker[]
+        // TODO: Emojis[], Features[], Sticker[]
 
-        //Guild Create
+        //GuildImpl Create
         data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));
         data.processIfContained(LARGE_KEY, (Boolean large) -> this.large = large);
         data.processIfContained(MEMBER_COUNT_KEY, (Long count) -> this.memberCount = count == null ? null : count.intValue());
@@ -250,7 +246,7 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("\nUpdatableGuild: \n");
+        StringBuilder sb = new StringBuilder("\nCachedGuildImpl: \n");
 
         sb.append("\t").append("name: ").append(name).append("\n");
         sb.append("\t").append("owner-id: ").append(ownerId).append("\n");
@@ -265,5 +261,12 @@ public class UpdatableGuild extends Guild implements UpdatableGuildAbstract, Dat
     @ApiStatus.Internal
     public @Nullable RoleManager getRoleManager() {
         return roleManager;
+    }
+
+    @NotNull
+    @Override
+    public Guild copy() {
+        //TODO
+        return null;
     }
 }

@@ -22,11 +22,11 @@ public class UnavailableGuild implements Datable {
     @Contract("!null -> !null; null -> null")
     public static @Nullable UnavailableGuild fromData(@Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
-        String id = (String) data.get(Guild.ID_KEY);
-        Boolean unavailable = (Boolean) data.get(Guild.UNAVAILABLE_KEY);
+        String id = (String) data.get(GuildImpl.ID_KEY);
+        Boolean unavailable = (Boolean) data.get(GuildImpl.UNAVAILABLE_KEY);
 
         if(id == null) {
-            InvalidDataException.throwException(data, null, UnavailableGuild.class, new Object[]{null}, new String[]{Guild.ID_KEY});
+            InvalidDataException.throwException(data, null, UnavailableGuild.class, new Object[]{null}, new String[]{GuildImpl.ID_KEY});
         }
 
         //noinspection ConstantConditions
@@ -48,8 +48,8 @@ public class UnavailableGuild implements Datable {
     @Override
     public Data getData() {
         Data data = new Data(2);
-        data.add(Guild.ID_KEY, id);
-        data.add(Guild.UNAVAILABLE_KEY, unavailable);
+        data.add(GuildImpl.ID_KEY, id);
+        data.add(GuildImpl.UNAVAILABLE_KEY, unavailable);
         return data;
     }
 }

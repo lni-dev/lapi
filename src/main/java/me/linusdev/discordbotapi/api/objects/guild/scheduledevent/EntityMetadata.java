@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * {@link #getLocation() location} is required for events with {@link GuildScheduledEvent#getEntityType() 'entity_type'}: {@link EntityType#EXTERNAL}
  *
- * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata" target="_top">Guild Scheduled Event Entity Metadata</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata" target="_top">GuildImpl Scheduled Event Entity Metadata</a>
  */
 public class EntityMetadata implements Datable {
 

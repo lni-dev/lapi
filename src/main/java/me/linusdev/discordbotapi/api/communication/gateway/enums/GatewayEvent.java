@@ -165,7 +165,7 @@ public enum GatewayEvent implements SimpleDatable {
     GUILD_MEMBER_UPDATE("GUILD_MEMBER_UPDATE"),
 
     /**
-     * response to Request Guild Members
+     * response to Request GuildImpl Members
      */
     GUILD_MEMBERS_CHUNK("GUILD_MEMBERS_CHUNK"),
 

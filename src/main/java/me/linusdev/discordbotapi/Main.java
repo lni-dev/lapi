@@ -60,13 +60,13 @@ public class Main {
         // Private Message
         // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
 
-        // Guild Sticker Message
+        // GuildImpl Sticker Message
         //MessageRetriever msgRetriever = new MessageRetriever(api, "751169122775334942", "905396558969847879");
 
-        // Guild Message with Reactions (also animated Emoji) https://ptb.discord.com/channels/317290087383826442/820084724693073921/854807543603003402
+        // GuildImpl Message with Reactions (also animated Emoji) https://ptb.discord.com/channels/317290087383826442/820084724693073921/854807543603003402
         //MessageRetriever msgRetriever = new MessageRetriever(api, "820084724693073921", "854807543603003402");
 
-        //Guild message pinned
+        //GuildImpl message pinned
         //MessageRetriever msgRetriever = new MessageRetriever(api, "714942057260515398", "908716411927547924");
 
         /*api.getChannelRetriever("765540882387828746").queue(new BiConsumer<Channel, Error>() {

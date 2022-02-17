@@ -4,13 +4,15 @@ import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.discordbotapi.api.communication.gateway.update.Update;
 import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.discordbotapi.api.objects.guild.GuildImpl;
 import me.linusdev.discordbotapi.api.objects.guild.Guild;
-import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
 import me.linusdev.discordbotapi.api.objects.guild.UnavailableGuild;
-import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
+import me.linusdev.discordbotapi.api.objects.role.Role;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +26,7 @@ public class LApiGuildManager implements GuildManager {
 
     private final @NotNull LApiImpl lApi;
 
-    private final @NotNull ConcurrentHashMap<String, UpdatableGuild> guilds;
+    private final @NotNull ConcurrentHashMap<String, CachedGuildImpl> guilds;
 
     public LApiGuildManager(@NotNull LApiImpl lApi){
         this.lApi = lApi;
@@ -35,21 +37,21 @@ public class LApiGuildManager implements GuildManager {
     @Override
     public void onReady(@NotNull ReadyEvent event){
         for(UnavailableGuild uGuild : event.getGuilds()){
-            UpdatableGuild guild = UpdatableGuild.fromUnavailableGuild(lApi, uGuild);
+            CachedGuildImpl guild = CachedGuildImpl.fromUnavailableGuild(lApi, uGuild);
             guilds.put(guild.getId(), guild);
         }
     }
 
     @Override
     public GatewayWebSocket.OnGuildCreateReturn onGuildCreate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "Guild data is missing!");
+        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         Data guildData = (Data) payload.getPayloadData();
 
-        String guildId = (String) guildData.get(Guild.ID_KEY);
-        UpdatableGuild guild = guilds.get(guildId);
+        String guildId = (String) guildData.get(GuildImpl.ID_KEY);
+        CachedGuildImpl guild = guilds.get(guildId);
         if(guild == null) {
             //Current user joined a new guild
-            guild = UpdatableGuild.fromData(lApi, guildData);
+            guild = CachedGuildImpl.fromData(lApi, guildData);
             guilds.put(guildId, guild);
             return new GatewayWebSocket.OnGuildCreateReturn(guild, true, false);
 
@@ -71,46 +73,45 @@ public class LApiGuildManager implements GuildManager {
     }
 
     @Override
-    public UpdatableGuild onGuildDelete(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "Guild data is missing!");
+    public CachedGuildImpl onGuildDelete(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
 
         if(uGuild.getUnavailable() == null) {
             //The unavailable field is not set, this means
             //the user was removed from the guild
-            UpdatableGuild guild = guilds.remove(uGuild.getId());
-            if(guild == null) guild = UpdatableGuild.fromUnavailableGuild(lApi, uGuild);
+            CachedGuildImpl guild = guilds.remove(uGuild.getId());
+            if(guild == null) guild = CachedGuildImpl.fromUnavailableGuild(lApi, uGuild);
             guild.setRemoved(true);
             //GuildLeftEvent is invoked by GatewayWebSocket
             return guild;
         }
 
         //The unavailable field is set, this means, the guild is unavailable
-        UpdatableGuild guild = guilds.get(uGuild.getId());
+        CachedGuildImpl guild = guilds.get(uGuild.getId());
         guild.updateSelfByData((Data) payload.getPayloadData());
         //GuildUnavailableEvent is invoked by GatewayWebSocket
         return guild;
     }
 
     @Override
-    public UpdatableGuild onGuildUpdate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "Guild data is missing!");
+    public Update<CachedGuildImpl, Guild> onGuildUpdate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
 
-        UpdatableGuild guild = guilds.get(uGuild.getId());
-        guild.updateSelfByData((Data) payload.getPayloadData());
-        return guild;
+        CachedGuildImpl guild = guilds.get(uGuild.getId());
+        return new Update<CachedGuildImpl, Guild>(guild, (Data) payload.getPayloadData());
     }
 
     @Override
-    public @Nullable UpdatableGuild getUpdatableGuildById(String id) {
+    public @Nullable CachedGuildImpl getUpdatableGuildById(String id) {
         if(id == null) return null;
         return guilds.get(id);
     }
 
     @Override
     public boolean allGuildsReceivedEvent(){
-        for(UpdatableGuild guild : guilds.values()){
+        for(CachedGuildImpl guild : guilds.values()){
             if(guild.isAwaitingEvent()) return false;
         }
 
@@ -118,7 +119,7 @@ public class LApiGuildManager implements GuildManager {
     }
 
     @Override
-    public @Nullable GuildAbstract getGuildById(@Nullable String guildId) {
+    public @Nullable Guild getGuildById(@Nullable String guildId) {
         if(guildId == null) return null;
         return guilds.get(guildId);
     }
@@ -130,7 +131,7 @@ public class LApiGuildManager implements GuildManager {
 
     @NotNull
     @Override
-    public Iterator<UpdatableGuild> iterator() {
+    public Iterator<CachedGuildImpl> iterator() {
         return guilds.values().iterator();
     }
 }

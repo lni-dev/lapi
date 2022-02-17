@@ -9,6 +9,8 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.discordbotapi.api.config.ConfigFlag;
+import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 
 /**
  * <p>
@@ -25,6 +27,10 @@ import me.linusdev.discordbotapi.api.communication.gateway.events.ready.ReadyEve
  *     sub-events are events, which we don't receive from Discord directly, but are the result of splitting other events.
  *     All this information is probably useless to you, you can just listen to the events using a {@link EventListener}.
  *     It is just documented for the sake of being documented.
+ * </p>
+ *
+ * <p>
+ *     Almost all events require {@link ConfigFlag#ENABLE_GATEWAY}. This won't be listed below.
  * </p>
  *
  */
@@ -51,6 +57,16 @@ public enum EventIdentifier{
 
     /**
      * identifier for {@link EventListener#onGuildsReady(GuildsReadyEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#CACHE_GUILDS}
+     *     </li>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILDS_READY,
 
@@ -70,51 +86,134 @@ public enum EventIdentifier{
 
     /**
      * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_CREATE,
 
     /**
      * identifier for {@link EventListener#onGuildDelete(GuildDeleteEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_DELETE,
 
     /**
      * identifier for {@link EventListener#onGuildUpdate(GuildUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_UPDATE,
 
     /**
      * identifier for {@link EventListener#onGuildJoined(GuildJoinedEvent)}.
+     *
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#CACHE_GUILDS}
+     *     </li>
+     *     <li>
+     *         {@link ConfigFlag#ENABLE_GATEWAY}
+     *     </li>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_JOINED,
 
     /**
      * identifier for {@link EventListener#onGuildLeft(GuildLeftEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#CACHE_GUILDS}
+     *     </li>
+     *     <li>
+     *         {@link ConfigFlag#ENABLE_GATEWAY}
+     *     </li>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_LEFT,
 
     /**
      * identifier for {@link EventListener#onGuildUnavailable(GuildUnavailableEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_UNAVAILABLE,
 
     /**
      * identifier for {@link EventListener#onGuildAvailable(GuildAvailableEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_AVAILABLE,
 
     /**
      * identifier for {@link EventListener#onGuildRoleCreate(GuildRoleCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_ROLE_CREATE,
 
     /**
      * identifier for {@link EventListener#onGuildRoleUpdate(GuildRoleUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_ROLE_UPDATE,
 
     /**
-     * identifier for {@link EventListener#onGuildRoleDelete(GuildRoleDeleteEvent)}.
+     * identifier for {@link EventListener#onGuildRoleUpdate(GuildRoleUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
      */
     GUILD_ROLE_DELETE,
 

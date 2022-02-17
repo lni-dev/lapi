@@ -3,7 +3,7 @@ package me.linusdev.discordbotapi.api.objects.guild.scheduledevent;
 import me.linusdev.data.SimpleDatable;
 
 /**
- * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level" target="_top">Guild Scheduled Event Privacy Level</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-privacy-level" target="_top">GuildImpl Scheduled Event Privacy Level</a>
  */
 public enum PrivacyLevel implements SimpleDatable {
     /**

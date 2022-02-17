@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * This is basically the same as {@link GuildTextChannel}
- * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-news-channel" target="_top">Exmaple Guild News Channel</a>
+ * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-news-channel" target="_top">Exmaple GuildImpl News Channel</a>
  * Bots can post or publish messages in this type of channel if they have the proper permissions. These are called "Announcement Channels" in the client.
  * */
 public class GuildNewsChannel extends GuildTextChannel{

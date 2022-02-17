@@ -31,7 +31,9 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
-import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.GuildImpl;
 import me.linusdev.discordbotapi.api.objects.message.MessageImplementation;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.role.Role;
@@ -301,6 +303,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     }
 
 
+    @SuppressWarnings("DuplicateBranchesInSwitch")
     protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable Data innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
         if(innerPayload == null){
             //handle events without an inner payload. for example RESUMED
@@ -312,7 +315,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             return;
         }
 
-        GuildManager guildManager = lApi.getGuildManager();
+        @Nullable GuildManager guildManager = lApi.getGuildManager();
 
         switch (type){
             case HELLO:
@@ -363,6 +366,16 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             case GUILD_CREATE:
                 {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    if(guildManager == null){
+                        //we can't do this event properly if CACHE_GUILDS is disabled.
+                        GuildImpl guild = GuildImpl.fromData(lApi, data);
+                        transmitter.onGuildCreate(new GuildCreateEvent(lApi, payload, guild));
+                        break;
+                    }
+
                     OnGuildCreateReturn ret = guildManager.onGuildCreate(payload);
                     transmitter.onGuildCreate(new GuildCreateEvent(lApi, payload, ret.guild));
 
@@ -376,21 +389,44 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             case GUILD_UPDATE:
                 {
-                    UpdatableGuild guild = guildManager.onGuildUpdate(payload);
-                    transmitter.onGuildUpdate(new GuildUpdateEvent(lApi, payload, guild));
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    if(guildManager == null){
+                        //we can't do this event properly if CACHE_GUILDS is disabled.
+                        GuildImpl guild = GuildImpl.fromData(lApi, data);
+                        transmitter.onGuildUpdate(new GuildUpdateEvent(lApi, payload, guild));
+                        break;
+                    }
+
+                    Update<CachedGuildImpl, Guild> update = guildManager.onGuildUpdate(payload);
+                    transmitter.onGuildUpdate(new GuildUpdateEvent(lApi, payload, update));
                 }
                 break;
 
             case GUILD_DELETE:
                 {
-                    UpdatableGuild guild = guildManager.onGuildDelete(payload);
+
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    if(guildManager == null) {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if(guildId == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        transmitter.onGuildDelete(new GuildDeleteEvent(lApi, payload, guildId));
+                        break;
+                    }
+
+                    CachedGuildImpl guild = guildManager.onGuildDelete(payload);
                     transmitter.onGuildDelete(new GuildDeleteEvent(lApi, payload, guild));
 
                     if(guild.isRemoved()){
                         //If this is set by the GuildManager, it means, the current user left the guild
                         transmitter.onGuildLeft(new GuildLeftEvent(lApi, guild));
                     } else {
-                        //The Guild became unavailable
+                        //The GuildImpl became unavailable
                         transmitter.onGuildUnavailable(new GuildUnavailableEvent(lApi, guild));
                     }
                 }
@@ -433,7 +469,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     if(guildId == null || roleData == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
 
-                    UpdatableGuild guild = (UpdatableGuild) guildManager.getGuildById(guildId);
+                    CachedGuildImpl guild = (CachedGuildImpl) guildManager.getGuildById(guildId);
                     if(guild != null){
                         RoleManager roleManager = guild.getRoleManager();
 
@@ -460,7 +496,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     if(guildId == null || roleData == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
 
-                    UpdatableGuild guild = guildManager.getUpdatableGuildById(guildId);
+                    CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
                     if(guild == null){
                         transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
                                 new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
@@ -470,12 +506,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     RoleManager roleManager = guild.getRoleManager();
                     if(roleManager == null) {
                         //RoleManager may be null, if CACHE_ROLES is disabled.
-                        Update<Role> role = new Update<Role>(null, Role.fromData(lApi, roleData));
+                        Update<Role, Role> role = new Update<Role, Role>(null, Role.fromData(lApi, roleData));
                         transmitter.onGuildRoleUpdate(new GuildRoleUpdateEvent(lApi, payload, Snowflake.fromString(guildId), role));
                         break;
                     }
 
-                    Update<Role> role = roleManager.updateRole(roleData);
+                    Update<Role, Role> role = roleManager.updateRole(roleData);
                     if(role == null){
                         //RoleManager didn't contain this role...
                         transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
@@ -498,7 +534,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     if(guildId == null || roleId == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_ID_KEY);
 
-                    UpdatableGuild guild = guildManager.getUpdatableGuildById(guildId);
+                    CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
                     if(guild == null){
                         transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
                                 new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
@@ -1171,17 +1207,17 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      */
     public static class OnGuildCreateReturn{
 
-        public final UpdatableGuild guild;
+        public final CachedGuildImpl guild;
         public final boolean isNew;
         public final boolean becameAvailable;
 
         /**
          *
-         * @param guild the {@link UpdatableGuild} object
+         * @param guild the {@link CachedGuildImpl} object
          * @param isNew true if the current user just joined this guild
          * @param becameAvailable true if this guild was unavailable and is available again
          */
-        public OnGuildCreateReturn(UpdatableGuild guild, boolean isNew, boolean becameAvailable){
+        public OnGuildCreateReturn(CachedGuildImpl guild, boolean isNew, boolean becameAvailable){
             this.guild = guild;
             this.isNew = isNew;
             this.becameAvailable = becameAvailable;

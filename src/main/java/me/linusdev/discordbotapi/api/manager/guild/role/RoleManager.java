@@ -41,7 +41,7 @@ public class RoleManager implements HasLApi {
         return this.roles.remove(roleId);
     }
 
-    public @Nullable Update<Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
+    public @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
         String id = (String) updateData.get(Role.ID_KEY);
         Role role = this.roles.get(id);
 
@@ -52,9 +52,9 @@ public class RoleManager implements HasLApi {
         }
 
         if(lApi.isCopyOldRolesOnUpdateEventEnabled()){
-            return new Update<Role>(role, updateData);
+            return new Update<Role, Role>(role, updateData);
         }else {
-            return new Update<Role>(null, role);
+            return new Update<Role, Role>(null, role);
         }
     }
 

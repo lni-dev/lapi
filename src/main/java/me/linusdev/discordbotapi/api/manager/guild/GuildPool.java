@@ -1,10 +1,10 @@
 package me.linusdev.discordbotapi.api.manager.guild;
 
-import me.linusdev.discordbotapi.api.objects.guild.GuildAbstract;
-import me.linusdev.discordbotapi.api.objects.guild.UpdatableGuild;
+import me.linusdev.discordbotapi.api.objects.guild.Guild;
+import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.Nullable;
 
-public interface GuildPool extends Iterable<UpdatableGuild> {
+public interface GuildPool extends Iterable<CachedGuildImpl> {
 
-    @Nullable GuildAbstract getGuildById(@Nullable String guildId);
+    @Nullable Guild getGuildById(@Nullable String guildId);
 }

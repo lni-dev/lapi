@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class GuildRoleUpdateEvent extends Event implements GuildEvent {
 
-    private final @NotNull Update<Role> role;
+    private final @NotNull Update<Role, Role> role;
 
-    public GuildRoleUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull Snowflake guildId, @NotNull Update<Role> role) {
+    public GuildRoleUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull Snowflake guildId, @NotNull Update<Role, Role> role) {
         super(lApi, payload, guildId);
 
         this.role = role;
@@ -25,7 +25,7 @@ public class GuildRoleUpdateEvent extends Event implements GuildEvent {
     }
 
     /**
-     * TODO add Config flag () and describe when this is null!
+     * This will not be {@code null} if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT} is enabled.
      * @return copy of the {@link Role} before it was updated.
      */
     public @Nullable Role getOldRole(){

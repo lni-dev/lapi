@@ -184,7 +184,8 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
 
         //Sub-events
-        if(!triggeredGuildsReadyEvent.get() && lApi.getGuildManager().allGuildsReceivedEvent()){
+        if(!triggeredGuildsReadyEvent.get() && lApi.getGuildManager() != null && lApi.getGuildManager().allGuildsReceivedEvent()){
+            //check if guild Manager is not null. if it is CACHE_GUILDS is disabled and this event can't be triggered
             onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
         }
     }
@@ -204,7 +205,8 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
 
         //Sub-events
-        if(!triggeredGuildsReadyEvent.get() &&  lApi.getGuildManager().allGuildsReceivedEvent()){
+        if(!triggeredGuildsReadyEvent.get() && lApi.getGuildManager() != null && lApi.getGuildManager().allGuildsReceivedEvent()){
+            //check if guild Manager is not null. if it is CACHE_GUILDS is disabled and this event can't be triggered
             onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
         }
     }

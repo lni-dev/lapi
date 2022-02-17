@@ -20,7 +20,7 @@ public enum ChannelType implements SimpleDatable {
     /**
      * a text channel within a server
      */
-    GUILD_TEXT(0, "Guild Text Channel", SimpleChannelType.TEXT),
+    GUILD_TEXT(0, "GuildImpl Text Channel", SimpleChannelType.TEXT),
 
     /**
      * a direct message between users
@@ -30,7 +30,7 @@ public enum ChannelType implements SimpleDatable {
     /**
      * a voice channel within a server
      */
-    GUILD_VOICE(2, "Guild Voice Channel", SimpleChannelType.VOICE),
+    GUILD_VOICE(2, "GuildImpl Voice Channel", SimpleChannelType.VOICE),
 
     /**
      * a direct message between multiple users
@@ -52,7 +52,7 @@ public enum ChannelType implements SimpleDatable {
      * users can follow and crosspost into their own server
      * </a>
      */
-    GUILD_NEWS(5, "Guild News Channel", SimpleChannelType.TEXT),
+    GUILD_NEWS(5, "GuildImpl News Channel", SimpleChannelType.TEXT),
 
     /**
      * a channel in which game developers can
@@ -60,24 +60,24 @@ public enum ChannelType implements SimpleDatable {
      * sell their game on Discord
      * </a>
      */
-    GUILD_STORE(6, "Guild Store Channel", SimpleChannelType.TEXT),
+    GUILD_STORE(6, "GuildImpl Store Channel", SimpleChannelType.TEXT),
 
     /**
      * a temporary sub-channel within a GUILD_NEWS channel
      */
-    GUILD_NEWS_THREAD(10, "Guild News Thread", SimpleChannelType.THREAD),
+    GUILD_NEWS_THREAD(10, "GuildImpl News Thread", SimpleChannelType.THREAD),
 
     /**
      * a temporary sub-channel within a GUILD_TEXT channel
      */
-    GUILD_PUBLIC_THREAD(11, "Guild Public Thread", SimpleChannelType.THREAD),
+    GUILD_PUBLIC_THREAD(11, "GuildImpl Public Thread", SimpleChannelType.THREAD),
 
     /**
      * a temporary sub-channel within a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel
      * that is only viewable by those invited and those with the
      * {@link Permission#MANAGE_THREADS MANAGE_THREADS} permission
      */
-    GUILD_PRIVATE_THREAD(12, "Guild Private Chat", SimpleChannelType.THREAD),
+    GUILD_PRIVATE_THREAD(12, "GuildImpl Private Chat", SimpleChannelType.THREAD),
 
     /**
      * a voice channel for
@@ -85,7 +85,7 @@ public enum ChannelType implements SimpleDatable {
      * hosting events with an audience
      * <a/>
      */
-    GUILD_STAGE_VOICE(13, "Guild Stage Voice Channel", SimpleChannelType.STAGE),
+    GUILD_STAGE_VOICE(13, "GuildImpl Stage Voice Channel", SimpleChannelType.STAGE),
     ;
 
     private final int id;
@@ -122,7 +122,7 @@ public enum ChannelType implements SimpleDatable {
     }
 
     /**
-     * @return a readable String for example "Guild Text Channel"
+     * @return a readable String for example "GuildImpl Text Channel"
      */
     public String asString() {
         return string;

@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  * * entity_metadata with a non-null location must be provided
  *
  *
- * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types" target="_top">Guild Scheduled Event Entity Types</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-types" target="_top">GuildImpl Scheduled Event Entity Types</a>
  */
 public enum EntityType implements SimpleDatable {
 

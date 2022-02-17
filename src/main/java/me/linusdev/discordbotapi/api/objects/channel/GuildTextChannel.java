@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-text-channel" target="_top">Exmaple Guild Text Channel</a>
+ * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-text-channel" target="_top">Exmaple GuildImpl Text Channel</a>
  * @see GuildTextChannelAbstract
  */
 public class GuildTextChannel extends Channel implements GuildTextChannelAbstract {

@@ -44,8 +44,8 @@ public class Identify implements Datable {
      * @param properties connection properties
      * @param compress whether this connection supports compression of packets
      * @param largeThreshold value between 50 and 250, total number of members where the gateway will stop sending offline members in the guild member list
-     * @param shardId used for Guild Sharding
-     * @param shardNumber 	used for Guild Sharding
+     * @param shardId used for GuildImpl Sharding
+     * @param shardNumber 	used for GuildImpl Sharding
      * @param presence presence structure for initial presence information
      * @param intents the Gateway Intents you wish to receive
      */
@@ -128,14 +128,14 @@ public class Identify implements Datable {
     }
 
     /**
-     * used for Guild Sharding
+     * used for GuildImpl Sharding
      */
     public @Nullable Integer getShardId() {
         return shardId;
     }
 
     /**
-     * used for Guild Sharding
+     * used for GuildImpl Sharding
      */
     public @Nullable Integer getShardNumber() {
         return shardNumber;

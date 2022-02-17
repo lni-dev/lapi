@@ -148,13 +148,13 @@ public interface Message extends Datable, SnowflakeAble {
 
     /**
      * id as {@link Snowflake} of the guild the message was sent in or {@code null} if this message
-     * was not sent in a Guild
+     * was not sent in a GuildImpl
      */
     @Nullable Snowflake getGuildIdAsSnowflake();
 
     /**
      * id as {@link String} of the guild the message was sent in or {@code null} if this message
-     * was not sent in a Guild
+     * was not sent in a GuildImpl
      */
     default @Nullable String getGuildId(){
         Snowflake snowflake = getGuildIdAsSnowflake();

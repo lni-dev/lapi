@@ -4,7 +4,7 @@ import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @see <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level" target="_top">Guild NSFW Level</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-nsfw-level" target="_top">GuildImpl NSFW Level</a>
  */
 public enum GuildNsfwLevel implements SimpleDatable {
 

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">Guild Member Object</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">GuildImpl Member Object</a>
  */
 public class Member implements Datable, HasLApi {
 
