@@ -505,7 +505,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     RoleManager roleManager = guild.getRoleManager();
                     if(roleManager == null) {
-                        //RoleManager may be null, if CACHE_ROLES is disabled.
+                        //RoleManagerImpl may be null, if CACHE_ROLES is disabled.
                         Update<Role, Role> role = new Update<Role, Role>(null, Role.fromData(lApi, roleData));
                         transmitter.onGuildRoleUpdate(new GuildRoleUpdateEvent(lApi, payload, Snowflake.fromString(guildId), role));
                         break;
@@ -513,7 +513,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     Update<Role, Role> role = roleManager.updateRole(roleData);
                     if(role == null){
-                        //RoleManager didn't contain this role...
+                        //RoleManagerImpl didn't contain this role...
                         transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
                                 new LApiError(LApiError.ErrorCode.UNKNOWN_ROLE, null)));
                         break;
@@ -543,14 +543,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                     RoleManager roleManager = guild.getRoleManager();
                     if(roleManager == null) {
-                        //RoleManager may be null, if CACHE_ROLES is disabled.
+                        //RoleManagerImpl may be null, if CACHE_ROLES is disabled.
                         transmitter.onGuildRoleDelete(new GuildRoleDeleteEvent(lApi, payload, guildId, roleId));
                         break;
                     }
 
                     Role role = roleManager.removeRole(roleId);
                     if(role == null){
-                        //RoleManager didn't contain this role...
+                        //RoleManagerImpl didn't contain this role...
                         transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
                                 new LApiError(LApiError.ErrorCode.UNKNOWN_ROLE, null)));
                         break;

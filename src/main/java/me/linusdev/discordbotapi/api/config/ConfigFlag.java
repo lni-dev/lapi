@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.config;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +35,7 @@ public enum ConfigFlag implements SimpleDatable {
      * </p>
      *
      * @see CachedGuildImpl CachedGuildImpl
-     * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
+     * @see RoleManager RoleManager
      */
     CACHE_ROLES(1 << 2),
 
@@ -45,7 +46,7 @@ public enum ConfigFlag implements SimpleDatable {
      * </p>
      *
      * @see CachedGuildImpl CachedGuildImpl
-     * @see me.linusdev.discordbotapi.api.manager.guild.role.RoleManager RoleManager
+     * @see RoleManager RoleManager
      */
     COPY_ROLE_ON_UPDATE_EVENT(1 << 3),
 

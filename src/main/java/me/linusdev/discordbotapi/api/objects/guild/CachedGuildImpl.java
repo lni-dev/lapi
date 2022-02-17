@@ -8,6 +8,7 @@ import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.*;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManagerImpl;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
@@ -94,7 +95,8 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         this.removed = unavailable == null;
 
         if(lApi.isCacheRolesEnabled()){
-            this.roleManager = new RoleManager(lApi);
+            //TODO: make roleManager variable in Config.
+            this.roleManager = new RoleManagerImpl(lApi);
         }
     }
 
@@ -263,10 +265,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         return roleManager;
     }
 
+
     @NotNull
     @Override
     public Guild copy() {
-        //TODO
+        //TODO: implement copy method
         return null;
     }
 }

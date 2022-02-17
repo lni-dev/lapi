@@ -3,63 +3,34 @@ package me.linusdev.discordbotapi.api.manager.guild.role;
 import me.linusdev.data.Data;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.communication.gateway.update.Update;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
-import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
-import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.objects.role.Role;
-import me.linusdev.discordbotapi.log.Logger;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 
-/**
- * Manages cached {@link Role roles}. An instance of this class should only exist if
- * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_ROLES} is enabled
- */
-public class RoleManager implements HasLApi {
+public interface RoleManager extends RolePool{
 
-    private final @NotNull LApiImpl lApi;
+    /**
+     *
+     * @param updateData the updated {@link Data} for the role to update.
+     * @return {@link Update} contain the updated {@link Role}. {@link Update#getCopy() a copy of the role before it was updated} will be contained if
+     * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT COPY_ROLE_ON_UPDATE_EVENT} is set.
+     * @throws InvalidDataException if given updateData is Invalid.
+     */
+    @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException;
 
-    private final @NotNull HashMap<String, Role> roles;
+    /**
+     * Adds given {@link Role} to this {@link RoleManager}
+     * @param role the {@link Role} to add
+     */
+    void addRole(@NotNull Role role);
 
-    public RoleManager(@NotNull LApiImpl lApi){
-        this.lApi = lApi;
-        this.roles = new HashMap<>();
-    }
-
-    public @NotNull Collection<Role> getRoles(){
-        return roles.values();
-    }
-
-    public void addRole(@NotNull Role role){
-        this.roles.put(role.getId(), role);
-    }
-
-    public Role removeRole(@NotNull String roleId){
-        return this.roles.remove(roleId);
-    }
-
-    public @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
-        String id = (String) updateData.get(Role.ID_KEY);
-        Role role = this.roles.get(id);
-
-        if(role == null) {
-            //This should never happen...
-            Logger.getLogger(this).warning("Trying to update role that does not exist...");
-            return null;
-        }
-
-        if(lApi.isCopyOldRolesOnUpdateEventEnabled()){
-            return new Update<Role, Role>(role, updateData);
-        }else {
-            return new Update<Role, Role>(null, role);
-        }
-    }
-
-    @Override
-    public @NotNull LApi getLApi() {
-        return lApi;
-    }
+    /**
+     *
+     * @param roleId the id of the {@link Role}, that should be removed
+     * @return the {@link Role}, that has been removed or {@code null} if no role with given id exists.
+     */
+    @Nullable Role removeRole(@NotNull String roleId);
 }
