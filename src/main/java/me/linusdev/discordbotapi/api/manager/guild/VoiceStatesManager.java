@@ -1,13 +1,14 @@
-package me.linusdev.discordbotapi.api.manager;
+package me.linusdev.discordbotapi.api.manager.guild;
 
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.manager.AbstractVoiceStateManager;
 import me.linusdev.discordbotapi.api.objects.guild.voice.VoiceState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 
-public class VoiceStatesManager implements AbstractVoiceStateManager{
+public class VoiceStatesManager implements AbstractVoiceStateManager {
 
     private final @NotNull LApi lApi;
 

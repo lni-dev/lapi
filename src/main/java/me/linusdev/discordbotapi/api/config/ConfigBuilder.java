@@ -11,8 +11,9 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.lapiandqueue.Future;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
-import me.linusdev.discordbotapi.api.manager.guild.GuildManagerFactory;
+import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
+import me.linusdev.discordbotapi.api.manager.ManagerFactory;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +47,7 @@ public class ConfigBuilder implements Datable {
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
-    private GuildManagerFactory<?> guildManagerFactory = null;
+    private ManagerFactory<GuildManager> guildManagerFactory = null;
 
     /**
      * Creates a new {@link ConfigBuilder}
@@ -215,16 +216,16 @@ public class ConfigBuilder implements Datable {
 
     /**
      * <em>Optional</em><br>
-     * Default: {@code (GuildManagerFactory<LApiGuildManager>) LApiGuildManager::new}
+     * Default: {@code lApi -> new LApiGuildManager(lApi)}
      * <p>
      *     Factory for the {@link me.linusdev.discordbotapi.api.manager.guild.GuildManager GuildManager} used by {@link LApiImpl LApi}
      * </p>
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param guildManagerFactory the {@link GuildManagerFactory}
+     * @param guildManagerFactory the {@link ManagerFactory<GuildManager> ManagerFactory<GuildManager>}
      */
-    public void setGuildManagerFactory(GuildManagerFactory<?> guildManagerFactory) {
+    public void setGuildManagerFactory(ManagerFactory<GuildManager> guildManagerFactory) {
         this.guildManagerFactory = guildManagerFactory;
     }
 
@@ -314,7 +315,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
                 gatewayConfigBuilder.build(),
-                Objects.requireNonNullElse(guildManagerFactory, (GuildManagerFactory<LApiGuildManager>) LApiGuildManager::new));
+                Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)));
     }
 
     /**
