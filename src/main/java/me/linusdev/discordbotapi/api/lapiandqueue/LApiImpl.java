@@ -29,6 +29,7 @@ import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListT
 import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.discordbotapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji;
@@ -616,6 +617,10 @@ public class LApiImpl implements LApi {
     @ApiStatus.Internal
     public @Nullable GuildManager getGuildManager() {
         return guildManager;
+    }
+
+    public @NotNull RoleManager getNewRoleManager(){
+        return config.getRoleManagerFactory().newInstance(this);
     }
 
     @ApiStatus.Internal

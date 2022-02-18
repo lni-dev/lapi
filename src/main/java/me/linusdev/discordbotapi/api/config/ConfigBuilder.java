@@ -14,6 +14,8 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.discordbotapi.api.manager.ManagerFactory;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
+import me.linusdev.discordbotapi.api.manager.guild.role.RoleManagerImpl;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,6 +50,7 @@ public class ConfigBuilder implements Datable {
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
+    private ManagerFactory<RoleManager> roleManagerFactory = null;
 
     /**
      * Creates a new {@link ConfigBuilder}
@@ -230,6 +233,21 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new RoleManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link RoleManager} used by {@link me.linusdev.discordbotapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param roleManagerFactory the {@link ManagerFactory<RoleManager> ManagerFactory<RoleManager>}
+     */
+    public void setRoleManagerFactory(ManagerFactory<RoleManager> roleManagerFactory) {
+        this.roleManagerFactory = roleManagerFactory;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -315,7 +333,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
                 gatewayConfigBuilder.build(),
-                Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)));
+                Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)),
+                Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)));
     }
 
     /**

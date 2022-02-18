@@ -99,8 +99,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         this.removed = unavailable == null;
 
         if(lApi.isCacheRolesEnabled()){
-            //TODO: make roleManager variable in Config.
-            this.roleManager = new RoleManagerImpl(lApi);
+            this.roleManager = lApi.getNewRoleManager();
         }
     }
 
