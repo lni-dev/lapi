@@ -4,6 +4,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayl
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -85,6 +86,8 @@ public interface EventListener {
      * Triggered when an unavailable guild (due to an outage) becomes available again
      */
     default void onGuildAvailable(@NotNull GuildAvailableEvent event) {}
+
+    default void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {}
 
     default void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {}
 

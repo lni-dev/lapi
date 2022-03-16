@@ -2,6 +2,7 @@ package me.linusdev.discordbotapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
@@ -180,6 +181,18 @@ public enum EventIdentifier{
      * </ul>
      */
     GUILD_AVAILABLE,
+
+    /**
+     * identifier for {@link EventListener#onGuildEmojisUpdate(GuildEmojisUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_EMOJIS_AND_STICKERS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_EMOJIS_UPDATE,
 
     /**
      * identifier for {@link EventListener#onGuildRoleCreate(GuildRoleCreateEvent)}.

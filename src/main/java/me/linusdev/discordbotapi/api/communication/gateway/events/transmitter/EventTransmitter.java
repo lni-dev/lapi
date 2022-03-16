@@ -4,6 +4,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.abstracts.GatewayPayl
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -281,6 +282,20 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         if(listeners != null){
             for(EventListener listener : listeners){
                 listener.onGuildAvailable(event);
+            }
+        }
+    }
+
+    @Override
+    public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildEmojisUpdate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildEmojisUpdate(event);
             }
         }
     }

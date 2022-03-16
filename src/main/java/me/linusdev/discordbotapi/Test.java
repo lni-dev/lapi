@@ -9,6 +9,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -47,6 +48,8 @@ public class Test implements EventListener{
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
                 .enable(ConfigFlag.CACHE_ROLES)
+                .enable(ConfigFlag.CACHE_GUILDS)
+                .enable(ConfigFlag.COPY_GUILD_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT)
                 .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
@@ -126,6 +129,12 @@ public class Test implements EventListener{
     @Override
     public void onGuildAvailable(@NotNull GuildAvailableEvent event) {
         System.out.println("onGuildAvailable");
+    }
+
+    @Override
+    public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
+        System.out.println("onGuildEmojisUpdate");
+        System.out.println(event.updateData.getJsonString());
     }
 
     @Override

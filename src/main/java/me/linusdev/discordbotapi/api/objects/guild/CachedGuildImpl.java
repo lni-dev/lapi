@@ -11,6 +11,7 @@ import me.linusdev.discordbotapi.api.manager.guild.MembersManager;
 import me.linusdev.discordbotapi.api.manager.guild.PresencesManager;
 import me.linusdev.discordbotapi.api.manager.guild.ThreadsManager;
 import me.linusdev.discordbotapi.api.manager.guild.VoiceStatesManager;
+import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManagerImpl;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
@@ -38,6 +39,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected boolean removed;
 
     protected @Nullable RoleManager roleManager = null;
+    protected @Nullable EmojiManager emojiManager = null;
 
     //Create GuildImpl
     protected @Nullable ISO8601Timestamp joinedAt;
@@ -101,6 +103,8 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(lApi.isCacheRolesEnabled()){
             this.roleManager = lApi.getNewRoleManager();
         }
+
+
     }
 
     @Contract("_, null -> null; _, !null -> !null")

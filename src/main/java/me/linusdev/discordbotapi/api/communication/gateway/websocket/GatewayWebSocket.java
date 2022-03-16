@@ -12,6 +12,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.enums.*;
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.discordbotapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.*;
+import me.linusdev.discordbotapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.discordbotapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -439,6 +440,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 break;
 
             case GUILD_EMOJIS_UPDATE:
+                transmitter.onGuildEmojisUpdate(new GuildEmojisUpdateEvent(lApi, payload, null, (Data) payload.getPayloadData()));
                 break;
 
             case GUILD_STICKERS_UPDATE:
@@ -669,13 +671,15 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             if (payload.getType() == GatewayEvent.READY) {
                 if(Logger.DEBUG_LOG) logger.debug("Received " + payload.getType() + " event");
                 //ready event. we need to save the session id
+                if(payload.getPayloadData() == null)
+                    throw new InvalidDataException(null, "READY event data was null!");
                 ReadyEvent event = ReadyEvent.fromData(lApi, payload, (Data) payload.getPayloadData());
 
                 this.sessionId = event.getSessionId();
                 this.canResume.set(true);
                 this.pendingConnects.set(0);
 
-                lApi.getGuildManager().onReady(event);
+                if(lApi.getGuildManager() != null) lApi.getGuildManager().onReady(event);
                 transmitter.onReady(event);
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {
