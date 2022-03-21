@@ -2,21 +2,25 @@ package me.linusdev.discordbotapi.api.objects.emoji;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.discordbotapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.discordbotapi.api.interfaces.updatable.Updatable;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.discordbotapi.api.objects.snowflake.Snowflake;
 import me.linusdev.discordbotapi.api.objects.role.Role;
 import me.linusdev.discordbotapi.api.objects.user.User;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/emoji#emoji-resource" target="_top">Emoji Resource</a>
  */
-public class EmojiObject implements Datable, me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji, HasLApi {
+public class EmojiObject implements CopyAndUpdatable<EmojiObject>, Updatable, Datable, me.linusdev.discordbotapi.api.objects.emoji.abstracts.Emoji, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -35,39 +39,39 @@ public class EmojiObject implements Datable, me.linusdev.discordbotapi.api.objec
     /**
      * @see #getName()
      */
-    private final @Nullable String name;
+    private @Nullable String name;
 
     /**
      * @see #getRoles()
      */
-    private final @Nullable Role[] roles;
+    private @Nullable Role[] roles;
 
     /**
      * @see #getUser()
      */
-    private final @Nullable User user;
+    private @Nullable User user;
 
     /**
      * @see #getRequireColons()
      */
-    private final @Nullable Boolean requireColons;
+    private @Nullable Boolean requireColons;
 
     /**
      * @see #getManaged()
      */
-    private final @Nullable Boolean managed;
+    private @Nullable Boolean managed;
 
     /**
      * @see #isAnimated()
      * @see #getAnimated()
      */
-    private final @Nullable Boolean animated;
+    private @Nullable Boolean animated;
 
     /**
      * @see #isAvailable()
      * @see #getAvailable()
      */
-    private final @Nullable Boolean available;
+    private @Nullable Boolean available;
 
     private final @NotNull LApi lApi;
 
@@ -223,7 +227,7 @@ public class EmojiObject implements Datable, me.linusdev.discordbotapi.api.objec
      */
     @Override
     public Data getData() {
-        Data data = new Data(0);
+        Data data = new Data(2);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);
@@ -237,8 +241,101 @@ public class EmojiObject implements Datable, me.linusdev.discordbotapi.api.objec
         return data;
     }
 
+    /**
+     *
+     * This will compare this emoji with given {@link Data}.
+     * {@link #ID_KEY ID} and {@link #USER_KEY USER} will not be checked,
+     * because these fields should not change in the first place
+     *
+     * @param emojiData the {@link Data}, which should be compared to this emoji
+     * @return {@code false} if given data could represent this emoji,
+     * {@code true} if given {@link Data} would change this emoji.
+     */
+    @ApiStatus.Internal
+    public boolean checkIfChanged(@NotNull Data emojiData){
+
+        //id won't be checked here, because it should never change
+        //user won't be checked here, because it should not change
+
+        if(!Objects.equals(this.name, emojiData.get(NAME_KEY))){
+           return true;
+        }
+
+        if(roles != null){
+            ArrayList<Data> rolesData = (ArrayList<Data>) emojiData.get(ROLES_KEY);
+            if(rolesData == null)
+                return true;
+
+            //if rolesData is longer than roles, a new role was added
+            if(rolesData.size() > roles.length) return true;
+
+            first: for(Role role : roles){
+                for(Data roleData : rolesData){
+                    if(role.getId().equals(roleData.get(Role.ID_KEY))){
+                        continue first;
+                    }
+                }
+
+                //we are missing a role... -> emoji was changed
+                return true;
+            }
+        }else{
+            //roles must be null to be unchanged...
+            if(emojiData.get(ROLES_KEY) != null)
+                return true;
+        }
+
+        return !(Objects.equals(requireColons, emojiData.get(REQUIRE_COLONS_KEY)) ||
+                Objects.equals(managed, emojiData.get(MANAGED_KEY)) ||
+                Objects.equals(animated, emojiData.get(ANIMATED_KEY)) ||
+                Objects.equals(available, emojiData.get(AVAILABLE_KEY)));
+    }
+
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        //id will never change and won't be updated here
+
+        //user should never change, but it will still be updated here.
+        this.user = User.fromData(lApi, (Data) data.get(USER_KEY));
+
+        this.name = (String) data.get(NAME_KEY);
+
+        ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+        if(rolesData != null){
+            roles = new Role[rolesData.size()];
+            int i = 0;
+            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (Data) o);
+        }
+
+        this.requireColons = (Boolean) data.get(REQUIRE_COLONS_KEY);
+        this.managed = (Boolean) data.get(MANAGED_KEY);
+        this.animated = (Boolean) data.get(ANIMATED_KEY);
+        this.available = (Boolean) data.get(AVAILABLE_KEY);
+
+    }
+
+    /**
+     * {@link #user} is not copied properly. The copied {@link EmojiObject} may have the same {@link User} object as the original
+     * {@link EmojiObject}.
+     * @return
+     */
+    @Override
+    public @NotNull EmojiObject copy() {
+        Role[] cRoles = null;
+
+        if(roles != null){
+            cRoles = new Role[roles.length];
+            int i = 0;
+            for(Role role : roles){
+                cRoles[i++] = role.copy();
+            }
+        }
+
+        return new EmojiObject(lApi, id, name, cRoles, user, requireColons, managed, animated, available);
     }
 }
