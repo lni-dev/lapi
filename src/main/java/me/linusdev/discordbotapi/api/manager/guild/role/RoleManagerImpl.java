@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages cached {@link Role roles}. An instance of this class should only exist if
@@ -22,11 +23,11 @@ public class RoleManagerImpl implements RoleManager, HasLApi {
 
     private final @NotNull LApiImpl lApi;
 
-    private final @NotNull HashMap<String, Role> roles;
+    private final @NotNull ConcurrentHashMap<String, Role> roles;
 
     public RoleManagerImpl(@NotNull LApiImpl lApi){
         this.lApi = lApi;
-        this.roles = new HashMap<>();
+        this.roles = new ConcurrentHashMap<>();
     }
 
     @Override
