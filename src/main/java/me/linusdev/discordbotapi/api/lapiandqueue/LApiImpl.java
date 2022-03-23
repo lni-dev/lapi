@@ -91,6 +91,8 @@ public class LApiImpl implements LApi {
     private final boolean copyOldRolesOnUpdateEvent;
     private final boolean cacheGuilds;
     private final boolean copyOldGuildOnUpdateEvent;
+    private final boolean cacheEmojis;
+    private final boolean copyOldEmojisOnUpdateEvent;
 
     //Http
     private final LApiHttpHeader authorizationHeader;
@@ -136,6 +138,8 @@ public class LApiImpl implements LApi {
         this.copyOldRolesOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT);
         this.cacheGuilds = config.isFlagSet(ConfigFlag.CACHE_GUILDS);
         this.copyOldGuildOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_GUILD_ON_UPDATE_EVENT);
+        this.cacheEmojis = config.isFlagSet(ConfigFlag.CACHE_EMOJIS);
+        this.copyOldEmojisOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_EMOJI_ON_UPDATE_EVENT);
 
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
         this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -609,6 +613,16 @@ public class LApiImpl implements LApi {
         return copyOldGuildOnUpdateEvent;
     }
 
+    @Override
+    public boolean isCacheEmojisEnabled() {
+        return cacheEmojis;
+    }
+
+    @Override
+    public boolean isCopyOldEmojiOnUpdateEventEnabled() {
+        return copyOldEmojisOnUpdateEvent;
+    }
+
     //api-internal getter
 
     /**
@@ -619,8 +633,8 @@ public class LApiImpl implements LApi {
         return guildManager;
     }
 
-    public @NotNull RoleManager getNewRoleManager(){
-        return config.getRoleManagerFactory().newInstance(this);
+    public @NotNull Config getConfig() {
+        return config;
     }
 
     @ApiStatus.Internal

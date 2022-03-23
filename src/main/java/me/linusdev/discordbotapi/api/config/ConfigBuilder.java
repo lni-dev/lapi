@@ -14,6 +14,8 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.discordbotapi.api.manager.ManagerFactory;
+import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManager;
+import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManagerImpl;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManagerImpl;
 import org.jetbrains.annotations.Contract;
@@ -51,6 +53,7 @@ public class ConfigBuilder implements Datable {
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
     private ManagerFactory<RoleManager> roleManagerFactory = null;
+    private ManagerFactory<EmojiManager> emojiManagerFactory = null;
 
     /**
      * Creates a new {@link ConfigBuilder}
@@ -248,6 +251,21 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new EmojiManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link EmojiManager} used by {@link me.linusdev.discordbotapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param emojiManagerFactory the {@link ManagerFactory<EmojiManager> ManagerFactory<EmojiManager>}
+     */
+    public void setEmojiManagerFactory(ManagerFactory<EmojiManager> emojiManagerFactory) {
+        this.emojiManagerFactory = emojiManagerFactory;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -334,7 +352,8 @@ public class ConfigBuilder implements Datable {
                 token,
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)),
-                Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)));
+                Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
+                Objects.requireNonNullElse(emojiManagerFactory, lApi -> new EmojiManagerImpl(lApi)));
     }
 
     /**

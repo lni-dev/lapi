@@ -5,6 +5,7 @@ import me.linusdev.discordbotapi.api.lapiandqueue.Queueable;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.manager.guild.GuildManager;
 import me.linusdev.discordbotapi.api.manager.ManagerFactory;
+import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,11 +20,12 @@ public class Config {
     private final @NotNull GatewayConfig gatewayConfig;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
     private final @NotNull ManagerFactory<RoleManager> roleManagerFactory;
+    private final @NotNull ManagerFactory<EmojiManager> emojiManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
-                  @NotNull ManagerFactory<RoleManager> roleManagerFactory){
+                  @NotNull ManagerFactory<RoleManager> roleManagerFactory, @NotNull ManagerFactory<EmojiManager> emojiManagerFactory){
         this.flags = flags;
         this.token = token;
 
@@ -31,6 +33,7 @@ public class Config {
         this.gatewayConfig = gatewayConfig;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
+        this.emojiManagerFactory = emojiManagerFactory;
     }
 
     /**
@@ -63,5 +66,9 @@ public class Config {
 
     public @NotNull ManagerFactory<RoleManager> getRoleManagerFactory() {
         return roleManagerFactory;
+    }
+
+    public @NotNull ManagerFactory<EmojiManager> getEmojiManagerFactory() {
+        return emojiManagerFactory;
     }
 }

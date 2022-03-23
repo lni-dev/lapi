@@ -18,7 +18,12 @@ public class EmojiManagerImpl implements EmojiManager{
 
     public EmojiManagerImpl(@NotNull LApiImpl lApi){
         this.lApi = lApi;
-        this.emojis = new ConcurrentHashMap<>();
+        this.emojis = new ConcurrentHashMap<>(32);
+    }
+
+    @Override
+    public void addEmoji(@NotNull EmojiObject emoji){
+        emojis.put(emoji.getId(), emoji);
     }
 
     public @NotNull EmojisUpdate onEmojiUpdate(@NotNull ArrayList<Data> emojisData) throws InvalidDataException {
@@ -26,7 +31,7 @@ public class EmojiManagerImpl implements EmojiManager{
         ArrayList<EmojiObject> updated = null;
         ArrayList<EmojiObject> added = null;
         ArrayList<EmojiObject> removed = null;
-        //TODO
+
         for(Data data : emojisData){
             String emojiId = (String) data.get(EmojiObject.ID_KEY);
             if(emojiId == null) throw new InvalidDataException(data, "emoji id missing.", null, EmojiObject.ID_KEY);
@@ -38,12 +43,14 @@ public class EmojiManagerImpl implements EmojiManager{
                 emoji = EmojiObject.fromData(lApi, data);
                 if(added == null) added = new ArrayList<>(1);
                 added.add(emoji);
+                emojis.put(emoji.getId(), emoji);
 
             } else {
                 if(emoji.checkIfChanged(data)){
-                    //TODO check config whether to store a old copy
-                    if(old == null) old = new ArrayList<>(1);
-                    old.add(emoji.copy());
+                    if(lApi.isCopyOldEmojiOnUpdateEventEnabled()){
+                        if(old == null) old = new ArrayList<>(1);
+                        old.add(emoji.copy());
+                    }
                     emoji.updateSelfByData(data);
                     if(updated == null) updated = new ArrayList<>(1);
                     updated.add(emoji);
@@ -53,7 +60,6 @@ public class EmojiManagerImpl implements EmojiManager{
 
         //check if an emoji was removed
         if(emojis.size() != emojisData.size() - (added != null ? added.size() : 0)){
-            //TODO check config
             first: for(EmojiObject emojiObject : emojis.values()){
                 for(Data data : emojisData){
                     if(emojiObject.getId().equals(data.get(EmojiObject.ID_KEY))){
@@ -63,6 +69,7 @@ public class EmojiManagerImpl implements EmojiManager{
 
                 if(removed == null) removed = new ArrayList<>(1);
                 removed.add(emojiObject);
+                emojis.remove(emojiObject.getId());
             }
         }
 

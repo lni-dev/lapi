@@ -700,4 +700,14 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_GUILD_ON_UPDATE_EVENT
      */
     boolean isCopyOldGuildOnUpdateEventEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_EMOJIS
+     */
+    boolean isCacheEmojisEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldEmojiOnUpdateEventEnabled();
 }

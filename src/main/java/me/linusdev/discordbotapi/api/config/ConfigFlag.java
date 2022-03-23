@@ -66,6 +66,26 @@ public enum ConfigFlag implements SimpleDatable {
      */
     COPY_GUILD_ON_UPDATE_EVENT(1 << 5),
 
+    /**
+     * <p>
+     *     Caches all {@link me.linusdev.discordbotapi.api.objects.emoji.EmojiObject emojis} retrieved by the
+     *     {@link me.linusdev.discordbotapi.api.communication.gateway.enums.GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     *
+     * @see CachedGuildImpl CachedGuildImpl
+     * @see me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManager EmojiManager
+     */
+    CACHE_EMOJIS(1 << 6),
+
+    /**
+     * <p>
+     *     Copies {@link me.linusdev.discordbotapi.api.objects.emoji.EmojiObject emoji} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     *
+     */
+    COPY_EMOJI_ON_UPDATE_EVENT(1 << 7),
+
     ;
 
     private final long value;

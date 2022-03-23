@@ -15,6 +15,7 @@ import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojiManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManager;
 import me.linusdev.discordbotapi.api.manager.guild.role.RoleManagerImpl;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
+import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import me.linusdev.discordbotapi.api.objects.guild.enums.*;
 import me.linusdev.discordbotapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.discordbotapi.api.objects.local.Locale;
@@ -101,9 +102,12 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         this.removed = unavailable == null;
 
         if(lApi.isCacheRolesEnabled()){
-            this.roleManager = lApi.getNewRoleManager();
+            this.roleManager = lApi.getConfig().getRoleManagerFactory().newInstance(lApi);
         }
 
+        if(lApi.isCacheEmojisEnabled()){
+            this.emojiManager = lApi.getConfig().getEmojiManagerFactory().newInstance(lApi);
+        }
 
     }
 
@@ -237,11 +241,24 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
             @SuppressWarnings("unchecked")
             ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
             if(rolesData != null){
+                //TODO make addall or resize, to avoid that the Hashmap has to resize every time
                 for(Object o : rolesData){
                     roleManager.addRole(Role.fromData(lApi, (Data) o));
                 }
             }
         }
+
+        //Emojis
+        if(emojiManager != null){
+            ArrayList<Object> emojisData = (ArrayList<Object>) data.get(EMOJIS_KEY);
+            if(emojisData != null){
+                for(Object o : emojisData){
+                    emojiManager.addEmoji(EmojiObject.fromData(lApi, (Data) o));
+                }
+            }
+        }
+
+
 
         // TODO: Emojis[], Features[], Sticker[]
 

@@ -440,6 +440,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 break;
 
             case GUILD_EMOJIS_UPDATE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                   //TODO:
+                }
                 transmitter.onGuildEmojisUpdate(new GuildEmojisUpdateEvent(lApi, payload, null, (Data) payload.getPayloadData()));
                 break;
 
