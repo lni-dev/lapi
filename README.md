@@ -40,7 +40,7 @@ Here a small example on how to respond to "Hi":
 ```java
 lApi.getEventTransmitter().addListener(new EventListener() {
             @Override
-            public void onMessageCreate(@NotNull MessageCreateEvent event) {
+            public void onMessageCreate(MessageCreateEvent event) {
                 System.out.println("Message: " + event.getMessage().getContent());
                 
                 if(!event.getMessage().getAuthor().isBot()
