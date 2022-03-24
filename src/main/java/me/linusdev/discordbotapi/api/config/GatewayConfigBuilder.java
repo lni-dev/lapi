@@ -72,7 +72,7 @@ public class GatewayConfigBuilder implements Datable {
         data.addIfNotNull(LARGE_THRESHOLD_KEY, largeThreshold);
         data.addIfNotNull(SHARD_ID_KEY, shardId);
         data.addIfNotNull(NUM_SHARDS_KEY, numShards);
-        data.addIfNotNull(STARTUP_PRESENCE_KEY, startupPresence);
+        data.addIfNotNull(STARTUP_PRESENCE_KEY, startupPresence.getPresenceUpdate());
         data.addIfNotNull(INTENTS_KEY, intents);
 
         return data;
