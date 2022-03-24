@@ -25,9 +25,13 @@ java {
 tasks.named('jar') {
     manifest {
         attributes('Implementation-Title': 'LApi',
-                'Implementation-Version': project.version)
+                'Implementation-Version': project.version,
+                'Automatic-Module-Name': 'me.linusdev.lapi')
+        archiveFileName = 'lapi-' + project.version + '.jar'
     }
+
 }
+
 
 
 
