@@ -140,10 +140,10 @@ public class Test implements EventListener{
 
         EmojisUpdate update = event.getUpdate();
 
-        System.out.println(String.valueOf(update.getOld()));
-        System.out.println(update.getUpdated());
-        System.out.println(update.getAdded());
-        System.out.println(update.getRemoved());
+        System.out.println("old: " + (update.getOld()));
+        System.out.println("updated: " +update.getUpdated());
+        System.out.println("added: " +update.getAdded());
+        System.out.println("removed: " +update.getRemoved());
 
     }
 

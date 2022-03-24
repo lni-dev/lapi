@@ -338,4 +338,9 @@ public class EmojiObject implements CopyAndUpdatable<EmojiObject>, Updatable, Da
 
         return new EmojiObject(lApi, id, name, cRoles, user, requireColons, managed, animated, available);
     }
+
+    @Override
+    public String toString() {
+        return name + " : " + id;
+    }
 }

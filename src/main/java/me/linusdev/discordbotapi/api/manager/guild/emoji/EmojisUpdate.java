@@ -1,6 +1,8 @@
 package me.linusdev.discordbotapi.api.manager.guild.emoji;
 
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -18,19 +20,43 @@ public class EmojisUpdate {
         this.removed = removed;
     }
 
-    public List<EmojiObject> getOld() {
+    /**
+     * if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS}
+     * and {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT COPY_EMOJI_ON_UPDATE_EVENT}
+     * is enabled, emojis will be copied into this {@link List} before they are updated.<br><br>
+     *
+     * If no {@link EmojiObject emojis} have been updated or
+     * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT COPY_EMOJI_ON_UPDATE_EVENT} is
+     * disabled this will return {@code null}
+     */
+    public @Nullable List<EmojiObject> getOld() {
         return old;
     }
 
-    public List<EmojiObject> getUpdated() {
+    /**
+     * if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS}
+     * is enabled, updated emojis will be in this {@link List}<br><br>
+     * If no {@link EmojiObject emojis} have been updated, this will return {@code null}
+     */
+    public @Nullable List<EmojiObject> getUpdated() {
         return updated;
     }
 
-    public List<EmojiObject> getAdded() {
+    /**
+     * If no {@link EmojiObject emojis} have been added, this will return {@code null}
+     */
+    public @Nullable List<EmojiObject> getAdded() {
         return added;
     }
 
-    public List<EmojiObject> getRemoved() {
+    /**
+     * if {@link me.linusdev.discordbotapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS}
+     * is enabled, updated emojis will be in this {@link List}<br><br>
+     * If no {@link EmojiObject emojis} have been removed or
+     * {@link me.linusdev.discordbotapi.api.config.ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT COPY_EMOJI_ON_UPDATE_EVENT} is
+     * disabled this will return {@code null}
+     */
+    public @Nullable List<EmojiObject> getRemoved() {
         return removed;
     }
 }
