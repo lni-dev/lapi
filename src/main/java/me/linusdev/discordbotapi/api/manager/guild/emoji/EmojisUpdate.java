@@ -17,4 +17,20 @@ public class EmojisUpdate {
         this.added = added;
         this.removed = removed;
     }
+
+    public List<EmojiObject> getOld() {
+        return old;
+    }
+
+    public List<EmojiObject> getUpdated() {
+        return updated;
+    }
+
+    public List<EmojiObject> getAdded() {
+        return added;
+    }
+
+    public List<EmojiObject> getRemoved() {
+        return removed;
+    }
 }

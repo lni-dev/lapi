@@ -6,8 +6,10 @@ import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.discordbotapi.api.objects.emoji.EmojiObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -80,5 +82,15 @@ public class EmojiManagerImpl implements EmojiManager{
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @Nullable EmojiObject getEmoji(@NotNull String id) {
+        return emojis.get(id);
+    }
+
+    @Override
+    public @NotNull Collection<EmojiObject> getEmojis() {
+        return emojis.values();
     }
 }

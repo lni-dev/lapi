@@ -25,6 +25,7 @@ import me.linusdev.discordbotapi.api.communication.gateway.websocket.GatewayEnco
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.lapiandqueue.LApi;
+import me.linusdev.discordbotapi.api.manager.guild.emoji.EmojisUpdate;
 import me.linusdev.discordbotapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.discordbotapi.api.objects.message.abstracts.Message;
 import me.linusdev.discordbotapi.api.objects.user.User;
@@ -51,6 +52,8 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.CACHE_GUILDS)
                 .enable(ConfigFlag.COPY_GUILD_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT)
+                .enable(ConfigFlag.CACHE_EMOJIS)
+                .enable(ConfigFlag.COPY_EMOJI_ON_UPDATE_EVENT)
                 .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
@@ -134,7 +137,14 @@ public class Test implements EventListener{
     @Override
     public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
         System.out.println("onGuildEmojisUpdate");
-        System.out.println(event.updateData.getJsonString());
+
+        EmojisUpdate update = event.getUpdate();
+
+        System.out.println(String.valueOf(update.getOld()));
+        System.out.println(update.getUpdated());
+        System.out.println(update.getAdded());
+        System.out.println(update.getRemoved());
+
     }
 
     @Override

@@ -289,6 +289,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         return roleManager;
     }
 
+    @ApiStatus.Internal
+    public EmojiManager getEmojiManager() {
+        return emojiManager;
+    }
 
     @NotNull
     @Override
