@@ -260,7 +260,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
 
 
-        // TODO: Emojis[], Features[], Sticker[]
+        // TODO: Features[], Sticker[]
 
         //GuildImpl Create
         data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));
@@ -290,7 +290,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     }
 
     @ApiStatus.Internal
-    public EmojiManager getEmojiManager() {
+    public @Nullable EmojiManager getEmojiManager() {
         return emojiManager;
     }
 

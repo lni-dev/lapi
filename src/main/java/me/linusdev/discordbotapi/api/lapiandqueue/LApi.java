@@ -4,6 +4,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.discordbotapi.api.VoiceRegionManager;
 import me.linusdev.discordbotapi.api.communication.ApiVersion;
+import me.linusdev.discordbotapi.api.communication.exceptions.LApiException;
 import me.linusdev.discordbotapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.discordbotapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.discordbotapi.api.communication.gateway.other.GetGatewayResponse;
@@ -14,6 +15,7 @@ import me.linusdev.discordbotapi.api.communication.lapihttprequest.LApiHttpReque
 import me.linusdev.discordbotapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.discordbotapi.api.communication.retriever.query.Link;
 import me.linusdev.discordbotapi.api.communication.retriever.response.body.ListThreadsResponseBody;
+import me.linusdev.discordbotapi.api.config.Config;
 import me.linusdev.discordbotapi.api.config.ConfigBuilder;
 import me.linusdev.discordbotapi.api.config.ConfigFlag;
 import me.linusdev.discordbotapi.api.objects.HasLApi;
@@ -31,6 +33,7 @@ import me.linusdev.discordbotapi.api.objects.user.User;
 import me.linusdev.discordbotapi.api.other.Error;
 import me.linusdev.discordbotapi.api.templates.message.MessageTemplate;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,6 +100,11 @@ public interface LApi extends HasLApi {
     public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
+
+    @Contract(value = "_ -> new", pure = true)
+    static LApi newInstance(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
+        return new LApiImpl(config);
+    }
 
     /**
      *
