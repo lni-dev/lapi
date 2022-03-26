@@ -83,7 +83,7 @@ public enum ChannelType implements SimpleDatable {
      * a voice channel for
      * <a href="https://support.discord.com/hc/en-us/articles/1500005513722" target="_top">
      * hosting events with an audience
-     * <a/>
+     * </a>
      */
     GUILD_STAGE_VOICE(13, "GuildImpl Stage Voice Channel", SimpleChannelType.STAGE),
     ;

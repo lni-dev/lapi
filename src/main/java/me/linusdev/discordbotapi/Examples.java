@@ -13,6 +13,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
+
+/**
+ * Heading 1:<br>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">Title</span><br>
+ * Heading 2:<br>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:15px;font-weight:'bold';">Title</span><br>
+ */
 public class Examples {
 
     public static void main(String... args) throws LApiException, IOException, ParseException, InterruptedException {

@@ -9,7 +9,7 @@ import static me.linusdev.discordbotapi.api.communication.DiscordApiCommunicatio
 
 /**
  *
- * @see <a href="https://discord.com/developers/docs/reference#snowflakes" target="_top">Snowflakes<a/>
+ * @see <a href="https://discord.com/developers/docs/reference#snowflakes" target="_top">Snowflakes</a>
  */
 public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
     private final @NotNull String string;
@@ -60,7 +60,7 @@ public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
     }
 
     /**
-     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure<a/>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure</a>
      */
     public @NotNull Integer getInternalWorkerID() {
         if(internalWorkerID == null) internalWorkerID = (int) ((asLong() & 0x3E0000) >> 17);
@@ -68,7 +68,7 @@ public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
     }
 
     /**
-     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure<a/>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure</a>
      */
     public @NotNull Integer getInternalProcessID() {
         if(internalProcessID == null) internalProcessID = (int) ((asLong() & 0x1F000) >> 12);
@@ -77,7 +77,7 @@ public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
 
     /**
      * For every ID that is generated on that process, this number is incremented
-     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure<a/>
+     * @see <a href="https://discord.com/developers/docs/reference#snowflakes-snowflake-id-format-structure-left-to-right" target="_top">Snowflake Structure</a>
      */
     public @NotNull Integer getIncrement() {
         if(increment == null) increment = (int) (asLong() & 0xFFF);

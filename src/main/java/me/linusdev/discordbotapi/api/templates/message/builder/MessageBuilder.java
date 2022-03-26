@@ -32,7 +32,7 @@ import java.util.function.Function;
 /**
  * This Builder can create you a rather complex {@link MessageTemplate}.<br><br>
  *
- * <h3>Example:</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">Example:</span><br>
  * This will send a message with the content:<br>
  * "Hello, @everyone how are you?" <br>
  * in the channel with id = 912377387868639282
@@ -46,7 +46,7 @@ import java.util.function.Function;
  *     }
  * </pre>
  *
- * <h3>Mention-safe messages</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">Mention-safe messages</span><br>
  * If you create a message containing user input, it is recommended to use {@link #setNoMentionsAllowed()},
  * this will assure, that the message cannot mention @everyone, @here, any role or users. You can still append
  * mentions with {@link #appendUserMention(String)} and the other appendMention() methods. These will then be

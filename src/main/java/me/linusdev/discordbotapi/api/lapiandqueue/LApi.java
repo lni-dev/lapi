@@ -57,7 +57,7 @@ import java.util.function.Consumer;
  *     {@code TOKEN} must be replaced with {@link ConfigBuilder#setToken(String) your bot token}
  * </p>
  * <br>
- * <p>
+ * <div>
  *     Alternatively you can also make your own Config. For example:<br>
  *     <pre>
  *         {@code
@@ -74,15 +74,15 @@ import java.util.function.Consumer;
  *  }
  *     </pre>
  *     {@code TOKEN} must be replaced with {@link ConfigBuilder#setToken(String) your bot token}
- * </p>
+ * </div>
  * <br>
  * <br>
  * <h2 style="margin:0;padding:0;">How to listen to events?</h2>
- * <p style="margin:0;padding:0;">
+ * <div style="margin:0;padding:0;">
  *     You can listen to events by adding a listener to the {@link AbstractEventTransmitter event transmitter}:
  *     <pre>{@code lApi.getEventTransmitter().addListener(yourListener)}</pre>
  *     for more information see {@link me.linusdev.discordbotapi.api.communication.gateway.events.transmitter.EventListener EventListener}
- * </p>
+ * </div>
  */
 public interface LApi extends HasLApi {
 
@@ -135,7 +135,7 @@ public interface LApi extends HasLApi {
     <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete);
 
     /**
-     * Queues given {@link Queueable} after a given amount of time. see {@link #queue(Queueable)}
+     * Queues given {@link Queueable} after a given amount of time. see {@link LApiImpl#queue(Queueable, BiConsumer, Consumer, Consumer)}
      *
      * @param queueable {@link Queueable}
      * @param delay the delay to wait before queueing

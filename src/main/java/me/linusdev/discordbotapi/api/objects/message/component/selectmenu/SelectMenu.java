@@ -26,7 +26,7 @@ import java.util.ArrayList;
  *     clicking on a select menu opens a dropdown-style UI; on mobile,
  *     tapping a select menu opens up a half-sheet with the options.
  * </p>
- * <img src="https://discord.com/assets/0845178564ed70a6c657d9b40d1de8fc.png" height="400">
+ * <img src="https://discord.com/assets/0845178564ed70a6c657d9b40d1de8fc.png" alt="select menu example" height="400">
  * <p>
  *     Select menus support single-select and multi-select behavior, meaning you can prompt a user to choose just one item from a list,
  *     or multiple.

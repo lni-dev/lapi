@@ -120,7 +120,7 @@ public enum Permission {
     }
 
     /**
-     * This iterates through {@link Permission#values()} and checks if (bits & permissionBits) == permissionBits.
+     * This iterates through {@link Permission#values()} and checks if (bits &amp; permissionBits) == permissionBits.
      * If this is {@code true}, the {@link Permission} with these permissionBits is added to the list
      *
      * @param bits the set permission bits

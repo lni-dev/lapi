@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  *
  *  <br>
  *  <h2 style="padding:0;margin:0;">Caveats</h2>
- *  <p style="padding:0;margin:0;">
+ *
  *      Any {@link GatewayEvent events} not defined in an intent will always be sent to you.
  *      <ul style="padding-top:0;margin-top:0;padding-bottom:0;margin-bottom:0;">
  *          <li>
@@ -44,12 +44,12 @@ import org.jetbrains.annotations.Nullable;
  *          </li>
  *      </ul>
  *      You can read more about these <a href="https://discord.com/developers/docs/topics/gateway#caveats" target="_top">here</a>
- *  </p>
+ *
  *
  *
  * <br><br>
  * <h2 style="padding:0;margin:0;">Privileged Intents</h2>
- * <p style="padding:0;margin:0;">
+ *
  *     Some intents are defined as "Privileged" due to the sensitive nature of the data. Those intents are:
  *     <ul style="padding-top:0;margin-top:0;padding-bottom:0;margin-bottom:0;">
  *         <li>
@@ -65,7 +65,7 @@ import org.jetbrains.annotations.Nullable;
  *     </ul>
  *     To specify these intents, you need to activate them on the Discord website. Best you read it yourself
  *     <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents" target="_top">here</a>
- * </p>
+ *
  *
  * @see GatewayEvent
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateway-intents" target="_top">Gateway Intents</a>

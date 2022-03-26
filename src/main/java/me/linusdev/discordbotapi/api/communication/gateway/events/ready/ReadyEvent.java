@@ -46,7 +46,7 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
      * @param lApi {@link LApi}
      * @param version gateway version
      * @param user information about the user including email
-     * @param guildsData the guilds the user is in
+     * @param guilds the guilds the user is in
      * @param sessionId used for resuming connections
      * @param shardId the shard information associated with this session, if sent when identifying
      * @param numShards the shard information associated with this session, if sent when identifying

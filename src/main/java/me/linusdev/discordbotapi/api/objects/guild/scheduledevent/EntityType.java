@@ -7,12 +7,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>
  *     <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-field-requirements-by-entity-type" target="_top">Field Requirements By Entity Type</a><br>
- *      The following table shows field requirements based on current entity type.<br>
+ *      The following table shows field requirements based on current entity type.<br><br>
  *      value : This field is required to be a non-null value<br>
  *      null : This field is required to be null<br>
  *      - : No strict requirements<br>
- * </p>
+ * </p><br>
  * <table>
+ *     <caption>field requirements based on current entity type</caption>
  *     <thead>
  *         <tr>
  *             <th scope="col">Entity Type&nbsp;&nbsp;&nbsp;</th

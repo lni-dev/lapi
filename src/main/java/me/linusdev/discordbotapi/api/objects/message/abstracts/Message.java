@@ -39,10 +39,10 @@ import java.util.List;
  * I was thinking about making several Interfaces for different types of messages, like
  * I did with the channels, but I decided against it, duo to its complexity. Like a Reply and a Thread-Starter-Message
  * having the same field (message_reference) but are different types of messages. It would also be really annoying to cast
- * each message depending on it's type. <br><br>
+ * each message depending on its type. <br><br>
  *
- *
- * <h1 style="margin-bottom:0;padding-bottom:0"><a href="" target="_top">Limits</a></h1>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:20px;font-weight:'bold';" href="#" target="_top">Limits</a><br>
  * <ul>
  *     <li>
  *         A Message can have up to {@value MessageBuilder.Limits#MAX_EMBEDS} {@link Embed Embeds}.
@@ -58,12 +58,14 @@ import java.util.List;
  *
 
  *
- * <h1 style="margin-bottom:0;padding-bottom:0"><a href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a> ({@link MessageType})</h1>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:20px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types" target="_top">Message Types</a> ({@link MessageType})<br>
  * <p>There are multiple message types that have a message_reference object. Since message references are generic attribution
  * to a previous message, there will be more types of messages which have this information in the future.
  * </p>
  *
- * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-crosspost-messages" target="_top">Crosspost messages</a> </h3>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types-crosspost-messages" target="_top">Crosspost messages</a>
+ * <ul>
  *     <li>
  *         These are messages that originated from another channel ({@link MessageFlag#IS_CROSSPOST IS_CROSSPOST} flag).
  *          <br> see {@link #getFlagsAsMessageFlags()}
@@ -72,9 +74,9 @@ import java.util.List;
  *         These messages have all three fields, with data of the original message that was crossposted.
  *     </li>
  * </ul>
- *
- *
- * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-channel-follow-add-messages" target="_top">Channel Follow Add messages</a></h3>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types-channel-follow-add-messages" target="_top">Channel Follow Add messages</a>
+ * <ul>
  *      <li>
  *          These are automatic messages sent when a channel is followed into the current channel ({@link MessageType#CHANNEL_FOLLOW_ADD type 12}).
  *      </li>
@@ -82,8 +84,9 @@ import java.util.List;
  *          These messages have the {@link MessageReference#getChannelId() channel_id} and {@link MessageReference#getGuildId() guild_id} fields, with data of the followed announcement channel.
  *      </li>
  * </ul>
- *
- * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-pin-messages" target="_top">Pin messages</a></h3>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types-pin-messages" target="_top">Pin messages</a>
+ * <ul>
  *      <li>
  *          These are automatic messages sent when a message is pinned ({@link MessageType#CHANNEL_PINNED_MESSAGE type 6}).
  *      </li>
@@ -91,8 +94,9 @@ import java.util.List;
  *          These messages have {@link MessageReference#getMessageId() message_id} and {@link MessageReference#getChannelId() channel_id}, and {@link MessageReference#getGuildId() guild_id} (when testing guild_id was missing) if it is in a guild, with data of the message that was pinned.
  *      </li>
  * </ul>
- *
- * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-replies" target="_top">Replies</a></h3>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types-replies" target="_top">Replies</a>
+ * <ul>
  *      <li>
  *          These are messages replying to a previous message ({@link MessageType#REPLY type 19}).
  *      </li>
@@ -104,8 +108,9 @@ import java.util.List;
  *          <br>
  *      </li>
  * </ul>
- *
- * <ul><h3 style="margin-bottom:0;padding-bottom:0"> <a href="https://discord.com/developers/docs/resources/channel#message-types-thread-starter-messsage" target="_top">Thread starter messsage</a></h3>
+ * <br>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/channel#message-types-thread-starter-messsage" target="_top">Thread starter messsage</a>
+ * <ul>
  *      <li>
  *          These are the first message in a public thread. They point back to the message in the parent channel from which the thread was started ({@link MessageType#THREAD_STARTER_MESSAGE type 21})
  *      </li>

@@ -31,7 +31,7 @@ import java.util.function.Consumer;
  *     This will delay the queue and could lead to an infinite {@link Object#wait()}
  * </p><br><br>
  *
- * <h3 style="margin-bottom:0;padding-bottom:0">How to use a {@link Queueable}:</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">How to use a {@link Queueable}:</span>
  * <pre>{@code
  * LApi api = new LApi(Private.TOKEN, config);
  *

@@ -21,7 +21,7 @@ public enum MembershipState implements SimpleDatable {
     /**
      *
      * @param value int
-     * @return {@link #ACCEPTED} if value equals 1 ({@link #ACCEPTED#value}), {@link #INVITED} otherwise
+     * @return {@link #ACCEPTED} if value equals 1, {@link #INVITED} otherwise
      */
     public static @NotNull MembershipState fromValue(int value){
         if(value == ACCEPTED.value) return ACCEPTED;

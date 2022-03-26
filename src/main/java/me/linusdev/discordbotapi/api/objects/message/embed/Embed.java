@@ -15,7 +15,7 @@ import java.util.List;
  * <br> Objects of this class are static and do not change its content. Even if the embed is changed on discords end
  * <br><br>
  *
- * <h3 style="margin-bottom:0; padding-bottom:0"><a href="https://discord.com/developers/docs/reference#editing-message-attachments-using-attachments-within-embeds" target="_top">Using Attachments within Embeds</a>:</h3>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/reference#editing-message-attachments-using-attachments-within-embeds" target="_top">Using Attachments within Embeds:</a><br>
  * <p>You can upload attachments when creating a message and use those attachments within your embed. To do this, you will want to upload files as part of your multipart/form-data body. Make sure that you're uploading files that contain a filename, as you will need a filename to reference against.</p>
  * <p>Only filenames with proper image extensions are supported for the time being.</p>
  *

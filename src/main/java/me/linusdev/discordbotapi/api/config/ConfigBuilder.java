@@ -222,14 +222,14 @@ public class ConfigBuilder implements Datable {
 
     /**
      * <em>Optional</em><br>
-     * Default: {@code lApi -> new LApiGuildManager(lApi)}
+     * Default: {@code lApi -&gt; new LApiGuildManager(lApi)}
      * <p>
      *     Factory for the {@link me.linusdev.discordbotapi.api.manager.guild.GuildManager GuildManager} used by {@link LApiImpl LApi}
      * </p>
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param guildManagerFactory the {@link ManagerFactory<GuildManager> ManagerFactory<GuildManager>}
+     * @param guildManagerFactory the {@link ManagerFactory<GuildManager> ManagerFactory&lt;GuildManager&gt;}
      */
     public void setGuildManagerFactory(ManagerFactory<GuildManager> guildManagerFactory) {
         this.guildManagerFactory = guildManagerFactory;
@@ -244,7 +244,7 @@ public class ConfigBuilder implements Datable {
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param roleManagerFactory the {@link ManagerFactory<RoleManager> ManagerFactory<RoleManager>}
+     * @param roleManagerFactory the {@link ManagerFactory<RoleManager> ManagerFactory&lt;RoleManager&gt;}
      */
     public void setRoleManagerFactory(ManagerFactory<RoleManager> roleManagerFactory) {
         this.roleManagerFactory = roleManagerFactory;
@@ -259,7 +259,7 @@ public class ConfigBuilder implements Datable {
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param emojiManagerFactory the {@link ManagerFactory<EmojiManager> ManagerFactory<EmojiManager>}
+     * @param emojiManagerFactory the {@link ManagerFactory<EmojiManager> ManagerFactory&lt;EmojiManager&gt;}
      */
     public void setEmojiManagerFactory(ManagerFactory<EmojiManager> emojiManagerFactory) {
         this.emojiManagerFactory = emojiManagerFactory;

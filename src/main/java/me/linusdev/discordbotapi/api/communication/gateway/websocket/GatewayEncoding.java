@@ -10,13 +10,14 @@ import org.jetbrains.annotations.Nullable;
 public enum GatewayEncoding implements SimpleDatable {
     /**
      * Supported by LApi as standard.<br>
-     * You can implement {@link GatewayWebSocket#setJsonToPayloadConverter(ExceptionConverter)}
+     * You can implement
+     * {@link me.linusdev.discordbotapi.api.config.GatewayConfigBuilder#setJsonToPayloadConverter(ExceptionConverter) JsonToPayloadConverter}
      */
     JSON("json"),
 
     /**
      * Not supported by LApi.<br>
-     * You <b>must</b> implement {@link GatewayWebSocket#setEtfToPayloadConverter(ExceptionConverter)}
+     * You <b>must</b> implement {@link me.linusdev.discordbotapi.api.config.GatewayConfigBuilder#setBytesToPayloadConverter(ExceptionConverter) BytesToPayloadConverter}
      */
     ETF("etf"),
     ;

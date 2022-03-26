@@ -63,7 +63,7 @@ public enum Locale {
 
     /**
      *
-     * @param local String locale or {@code null}
+     * @param locale String locale or {@code null}
      * @return {@link Locale} matching given string or {@link #UNKNOWN} if none matches or {@code null} if given string was {@code null}
      */
     @Contract("null -> null; !null -> !null")

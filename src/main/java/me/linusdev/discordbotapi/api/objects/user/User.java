@@ -16,15 +16,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * <h1 style="margin-bottom:0;padding-bottom:0"><a href="https://discord.com/developers/docs/resources/user#users-resource" target="_top">User Resource</a></h1>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:20px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/user#users-resource" target="_top">User Resource</a><br>
  * <p>
  *     Users in Discord are generally considered the base entity. Users can spawn across the entire platform, be members of guilds, participate in text and voice chat, and much more. Users are separated by a distinction of "bot" vs "normal." Although they are similar, bot users are automated users that are "owned" by another user. Unlike normal users, bot users do not have a limitation on the number of Guilds they can be a part of.
  * </p>
  * <br>
- * <h2 style="margin-bottom:0;padding-bottom:0"><a href="https://discord.com/developers/docs/resources/user#usernames-and-nicknames" target="_top">Usernames and Nicknames</a></h1>
- *  <p>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:15px;font-weight:'bold';" href="https://discord.com/developers/docs/resources/user#usernames-and-nicknames" target="_top">Usernames and Nicknames</a><br>
+ * <p>
  *      Discord enforces the following restrictions for usernames and nicknames:
- *  </p>
+ * </p>
  *  <ol>
  *      <li>
  *          Names can contain most valid unicode characters. We limit some zero-width and non-rendering characters.

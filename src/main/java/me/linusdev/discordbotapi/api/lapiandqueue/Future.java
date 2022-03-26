@@ -24,12 +24,12 @@ import java.util.function.Consumer;
  * it will remain in the queue and pass through it, but it won't be {@link #completeHere() completed}
  * <br>
  * <br>
- * <h3 style="margin-bottom:0;padding-bottom:0">Before the future will supposedly {@link Queueable#completeHereAndIgnoreQueueThread() complete}:</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">Before the future will supposedly {@link Queueable#completeHereAndIgnoreQueueThread() complete}:</span><br>
  * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  * {@link #beforeComplete} Listener will be called before and can still {@link #cancel(boolean)} this Future
  * </p> <br>
  *
- * <h3 style="margin-bottom:0;padding-bottom:0">Once the Future has finished (if it wasn't canceled):</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">Once the Future has finished (if it wasn't canceled):</span><br>
  * Meaning that {@link Queueable#completeHereAndIgnoreQueueThread()} has been called and finished. The following actions will follow
  * in following order
  * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
@@ -44,7 +44,7 @@ import java.util.function.Consumer;
  *     </li>
  * </ul><br>
  *
- * <h3 style="margin-bottom:0;padding-bottom:0">If the Future was {@link #cancel(boolean) cancled}:</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">If the Future was {@link #cancel(boolean) cancled}:</span><br>
  * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     <li>
  *         All Threads waiting on {@link #get()} or {@link #get(long, TimeUnit)} will be resumed and {@code null} will
@@ -58,7 +58,7 @@ import java.util.function.Consumer;
  *     </li>
  * </ul><br>
  *
- * <h3 style="margin-bottom:0;padding-bottom:0">If {@link #then(BiConsumer)} or {@link #then(Consumer)} is set after the {@link #result} has already been retrieved:</h3>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">If {@link #then(BiConsumer)} or {@link #then(Consumer)} is set after the {@link #result} has already been retrieved:</span><br>
  * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     The Listener will be called immediately in the setting thread
  * </p>

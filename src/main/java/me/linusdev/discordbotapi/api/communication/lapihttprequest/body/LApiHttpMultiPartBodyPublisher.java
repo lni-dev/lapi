@@ -18,9 +18,9 @@ import java.util.concurrent.Flow;
  *   The Http-header content-type is: multipart/form-data; boundary=
  * </p><br>
  *
- * <h1 style="margin-bottom:0;padding-bottom:0;">Format</h1>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:15px;font-weight:'bold';">Format</span><br>
  *
- * <p>
+ * <div>
  *     each data starts with a "--{@link #boundaryString boundary}" (yes, 2 dashes are added in front of the boundary) and is then followed by a sub-part header.
  *     The sub-part header looks like this:
  *     <pre>
@@ -37,9 +37,9 @@ import java.util.concurrent.Flow;
  *     two dashes will be added in front and after the boundary. like this: "--{@link #boundaryString boundary}--"<br>
  *     Note that every line (including the last one) is terminated by a {@code "\r\n"} sequence.
  *
- * </p><br><br>
+ * </div><br><br>
  *
- * <h1 style="margin-bottom:0;padding-bottom:0;">Information Sources</h1>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:15px;font-weight:'bold';">Information Sources</span><br>
  * I have gathered most of this information from different sites and stack overflow questions:
  * <ul>
  *

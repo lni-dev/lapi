@@ -20,6 +20,10 @@ java {
     withJavadocJar()
 }
 
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
 
 
 tasks.named('jar') {
@@ -40,14 +44,13 @@ shadowJar {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    implementation 'io.github.lni-dev:data:1.0'
+    implementation 'io.github.lni-dev:data:1.0.0'
     implementation 'org.jetbrains:annotations:23.0.0'
 }
 

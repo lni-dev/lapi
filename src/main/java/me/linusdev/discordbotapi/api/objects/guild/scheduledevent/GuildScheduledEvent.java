@@ -108,7 +108,7 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
      * @param lApi {@link LApi}
      * @param data {@link Data} with required fields
      * @return {@link GuildScheduledEvent}
-     * @throws InvalidDataException if {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #NAME_KEY}, {@link #SCHEDULED_START_TIME_KEY}, {@link #PRIVACY_LEVEL_KEY}, {@link #TATUS_KEY} or {@link #ENTITY_TYPE_KEY} are null or missing
+     * @throws InvalidDataException if {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #NAME_KEY}, {@link #SCHEDULED_START_TIME_KEY}, {@link #PRIVACY_LEVEL_KEY}, {@link #STATUS_KEY} or {@link #ENTITY_TYPE_KEY} are null or missing
      */
     public static @Nullable GuildScheduledEvent fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;

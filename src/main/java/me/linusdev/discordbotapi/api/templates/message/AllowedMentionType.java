@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
  *     https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types
  * </p>
  * @see <a href="https://discord.com/developers/docs/resources/channel#allowed-mentions-object-allowed-mention-types" target="_top">Allowed Mention Types</a>
- * @see
  */
 public enum AllowedMentionType implements SimpleDatable {
 

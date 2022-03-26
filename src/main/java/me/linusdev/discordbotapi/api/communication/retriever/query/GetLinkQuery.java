@@ -277,9 +277,9 @@ public class GetLinkQuery implements Query{
         /**
          * Returns a list of partial {@link Guild guild} objects the current user is a member of. Requires the guilds OAuth2 scope.
          * <br><br>
-         * <h3 style="margin:0;padding:0">
+         * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">
          *     This can have Query String parameters:<br>
-         * </h3>
+         * </span>
          * <ul style="margin:0;padding:0">
          *     <li>
          *         {@value #BEFORE_KEY}: get guilds before this guild ID

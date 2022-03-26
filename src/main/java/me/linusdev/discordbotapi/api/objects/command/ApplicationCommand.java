@@ -21,7 +21,7 @@ import java.util.ArrayList;
  * If you are looking to create your own Command,
  * see {@link me.linusdev.discordbotapi.api.templates.commands.ApplicationCommandBuilder ApplicationCommandBuilder}.<br><br>
  *
- * <h3 style="padding:0;margin:0"><a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming" target="_top">Application Command Naming:</a></h3>
+ * <a style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';" href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-naming" target="_top">Application Command Naming:</a><br>
  * {@link ApplicationCommandType#CHAT_INPUT CHAT_INPUT} command names and command option names must match the following regex "^[\w-]{1,32}$"
  * with the unicode flag set. If there is a lowercase variant of any letters used, you must use those.
  * Characters with no lowercase variants and/or uncased letters are still allowed.

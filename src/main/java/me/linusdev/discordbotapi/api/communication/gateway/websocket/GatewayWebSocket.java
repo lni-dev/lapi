@@ -1221,7 +1221,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         void handleError(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull Throwable error);
 
         /**
-         * You can just return {@link true} if you wish.
+         * You can just return {@code true} if you wish.
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket} connection was closed
          * @param closeStatusCode {@link GatewayCloseStatusCode}
