@@ -43,15 +43,19 @@ javadoc {
 publishing {
     repositories {
         maven {
-            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
-            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            if(project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")){
+                def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
-            credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                credentials {
+                    username = ossrhUsername
+                    password = ossrhPassword
+                }
+
+            }else {
+                project.logger.lifecycle("no OSSRH username and password given. Cannot deploy.")
             }
-
         }
     }
 
@@ -92,6 +96,10 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    if(project.hasProperty("signing.keyId") && project.hasProperty("signing.password") && project.hasProperty("signing.secretKeyRingFile")){
+        sign publishing.publications.mavenJava
+    }else {
+        project.logger.lifecycle("No Signing information given. Cannot sign.")
+    }
 }
 
