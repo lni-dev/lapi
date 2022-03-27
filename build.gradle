@@ -8,7 +8,7 @@ plugins {
 
 group = 'io.github.lni-dev'
 archivesBaseName = 'lapi'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.0'
 
 targetCompatibility = JavaVersion.VERSION_11
 sourceCompatibility = JavaVersion.VERSION_11
