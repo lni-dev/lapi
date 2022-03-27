@@ -87,7 +87,6 @@ public class Logger {
         Files.createFile(logFile);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("closing log file!");
             try {
                 close();
             } catch (IOException e) {
