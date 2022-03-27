@@ -1,4 +1,4 @@
-# LApi
+# LApi [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/lni-dev/lapi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/lni-dev/lapi/context:java)
 LApi is a Discord API written in Java
 
 ## Installation
