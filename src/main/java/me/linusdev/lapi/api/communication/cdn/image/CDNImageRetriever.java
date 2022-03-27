@@ -68,7 +68,7 @@ public class CDNImageRetriever extends Retriever<InputStream>  {
             throw new IllegalArgumentException("desiredSize must be a power of 2 between "
                     + ImageQuery.SIZE_QUERY_PARAM_MIN + " and " + ImageQuery.SIZE_QUERY_PARAM_MAX);
 
-        int i = ImageQuery.SIZE_QUERY_PARAM_MIN == 0 ? 1 : ImageQuery.SIZE_QUERY_PARAM_MIN;
+        int i = Math.max(1, ImageQuery.SIZE_QUERY_PARAM_MIN);
 
         while(i <= ImageQuery.SIZE_QUERY_PARAM_MAX){
             if(i == desiredSize) return;

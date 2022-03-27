@@ -119,8 +119,10 @@ public class GatewayPayload implements GatewayPayloadAbstract, Datable {
             InvalidDataException.throwException(data, null, GatewayPayload.class, new Object[]{op}, new String[]{OPCODE_KEY});
         }
 
+        //op cannot be null!
+        //noinspection ConstantConditions
         return new GatewayPayload(
-                op == null ? GatewayOpcode.UNKNOWN : GatewayOpcode.fromValue(op.intValue()), d,
+                GatewayOpcode.fromValue(op.intValue()), d,
                 s == null ? null : s.longValue(), GatewayEvent.fromString(t),
                 trace == null ? null : trace.toArray(new String[0]));
     }
