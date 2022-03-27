@@ -60,7 +60,7 @@ public class Test implements EventListener{
 
     public static void main(String... a) throws LApiException, IOException, ParseException, InterruptedException, ExecutionException, URISyntaxException {
 
-        Logger.start();
+        Logger.start(true, false);
 
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)

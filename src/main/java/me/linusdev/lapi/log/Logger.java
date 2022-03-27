@@ -61,7 +61,14 @@ public class Logger {
     public static Path logFile;
     public static BufferedWriter writer;
 
-    public static void start() throws IOException, URISyntaxException {
+    /**
+     *
+     * @param override if this is {@code true} and a log file with the same name already exits, it will be overwritten
+     * @param dateInFileName current date will be added to the log file name
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void start(boolean override, boolean dateInFileName) throws IOException, URISyntaxException {
         if(!ENABLE_LOG) return;
         if(logFolder == null){
             logFolder = Helper.getJarPath().getParent().resolve("log");
@@ -72,12 +79,21 @@ public class Logger {
         }
 
         Date date = new Date(System.currentTimeMillis());
-        //logFile = logFolder.resolve(fileDateFormat.format(date) + logFileEnding);
-        logFile = logFolder.resolve("LApi-log" + logFileEnding);
+        if(dateInFileName) logFile = logFolder.resolve("lapi-" + fileDateFormat.format(date) + "-log" + logFileEnding);
+        else logFile = logFolder.resolve("lapi-log" + logFileEnding);
 
-        //if(Files.exists(logFile)) throw new IOException(logFile.toString() + " already exists");
+        if(!override && Files.exists(logFile)) throw new IOException(logFile.toString() + " already exists");
         if(Files.exists(logFile)) Files.delete(logFile);
         Files.createFile(logFile);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("closing log file!");
+            try {
+                close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
 
         writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         log(Type.INFO, Logger.class.getSimpleName(), null, "Log started...", false);
@@ -85,7 +101,7 @@ public class Logger {
 
     public static void close() throws IOException {
         if(!ENABLE_LOG) return;
-        writer.close();
+        if(writer != null) writer.close();
     }
 
     public static LogInstance getLogger(@NotNull String source){
@@ -140,7 +156,7 @@ public class Logger {
                     finalLog(String.format("(%s - %s) %s: %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name, toLog));
                 }
             }
-            writer.flush();
+            if(writer != null) writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -148,7 +164,7 @@ public class Logger {
 
     private static void finalLog(String s) throws IOException {
         if(SOUT_LOG) System.out.print(s);
-        writer.append(s);
+        if(writer != null) writer.append(s);
     }
 
     public static void setLogFolder(@Nullable Path logFolder){

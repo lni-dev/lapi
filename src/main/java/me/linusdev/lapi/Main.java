@@ -61,7 +61,7 @@ public class Main {
 
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
 
-        Logger.start();
+        Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
 
         final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLapi();
