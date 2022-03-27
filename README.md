@@ -1,10 +1,15 @@
-# LApi [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/lni-dev/lapi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/lni-dev/lapi/context:java)
-LApi is a Discord API written in Java
+# LApi 
+[![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/lni-dev/lapi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/lni-dev/lapi/context:java)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?color=%2300dd00)
+![Lines of code](https://img.shields.io/tokei/lines/github/lni-dev/lapi)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/lni-dev/lapi)
+<br>LApi is a Discord API written in Java
 
 ## Installation
 In order to install it, you can either build it yourself or use gradle and implement it into your Project:<br><br>
 In your `build.gradle` add `mavenCentral()` to the repositories if you have not done so already and add `io.github.lni-dev:lapi:[version]` to the dependencies.
- replace `[version]` with the version you want to install. The newest version is currently `1.0.0`.
+ replace `[version]` with the version you want to install.
+ <br><br>![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?label=current%20newest%20version%3A%20)
 ```gradle
 repositories {
     mavenCentral()
