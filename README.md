@@ -15,7 +15,7 @@ dependencies {
 }
 ```
 
-<br>An Example `build.gradle` could look like this:
+<br>An example `build.gradle` could look like this:
 ```gradle
 plugins {
     id 'java'
@@ -34,6 +34,29 @@ dependencies {
 ```
 (Tested on gradle 7.2)
 
+<br>If you want to make an executable .jar file at some point in time, I recommend
+the gradle plugins `application` and `shadow`. An example `build.gradle` with these plugins could
+look like this:
+```gradle
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+group 'com.example'
+version '1.0'
+mainClassName = 'com.example.exampleProjectName.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.lni-dev:lapi:1.0.0'
+}
+```
+This will then add a gradle task called shadowJar, which will build an executable jar for you.
 ## Getting Started
 First you will need to create a Discord bot and copy it's `TOKEN`.<br>
 Then you can create a Config:
