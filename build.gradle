@@ -1,60 +1,97 @@
 
 plugins {
     id 'java'
-    id 'application'
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id 'maven-publish'
     id 'java-library'
+    id 'signing'
 }
 
-group 'me.linusdev'
-version 'beta-1.0.0'
+group = 'io.github.lni-dev'
+archivesBaseName = "lapi"
+version = '1.0.0-SNAPSHOT'
 
 targetCompatibility = JavaVersion.VERSION_11
 sourceCompatibility = JavaVersion.VERSION_11
-mainClassName = 'me.linusdev.discordbotapi.Main'
 compileJava.options.encoding = 'UTF-8'
 
-
-
-java {
-    withJavadocJar()
+repositories {
+    mavenCentral()
 }
-
-javadoc {
-    options.encoding = 'UTF-8'
-}
-
-
 
 tasks.named('jar') {
     manifest {
         attributes('Implementation-Title': 'LApi',
                 'Implementation-Version': project.version,
                 'Automatic-Module-Name': 'me.linusdev.lapi')
-        archiveFileName = 'lapi-' + project.version + '.jar'
     }
-
-}
-
-
-
-
-shadowJar {
-    archiveFileName = 'bot.${extension}'
-}
-
-repositories {
-    mavenCentral()
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    implementation 'io.github.lni-dev:data:1.0.0'
+    api 'io.github.lni-dev:data:1.0.0'
     implementation 'org.jetbrains:annotations:23.0.0'
 }
 
-test {
-    useJUnitPlatform()
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
+publishing {
+    repositories {
+        maven {
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'lapi'
+            from components.java
+            pom {
+                name = 'LApi'
+                description = 'A Discord Bot API written in Java'
+                url = 'https://lni-dev.github.io/'
+                groupId = 'io.github.lni-dev'
+                version = project.version
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'linusdev'
+                        name = 'LinusDev'
+                        email = 'einsuperlinus@gmail.com'
+                        organizationUrl = 'https://lni-dev.github.io/'
+                    }
+                }
+
+                scm {
+                    connection = 'scm:git:git://github.com/lni-dev/lapi.git'
+                    developerConnection ='scm:git:ssh://github.com:lni-dev/lapi.git'
+                    url = 'http://github.com/lni-dev/lapi/tree/master'
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
 
