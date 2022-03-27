@@ -2,7 +2,37 @@
 LApi is a Discord API written in Java
 
 ## Installation
-TODO
+In order do install it, you can either build it yourself or use gradle and implement it into your Project:<br><br>
+In your `build.gradle` add `mavenCentral()` to the repositories if you havn't done so already and add `io.github.lni-dev:lapi:[version]` to the dependencies.
+ replace `[version]` with the version you want to install. The newest version is currently `1.0.0`.
+```gradle
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.lni-dev:lapi:[version]'
+}
+```
+
+<br>An Example `build.gradle` could look like this:
+```gradle
+plugins {
+    id 'java'
+}
+
+group 'com.example'
+version 'your.version'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.lni-dev:lapi:1.0.0'
+}
+```
+(Tested on gradle 7.2)
 
 ## Getting Started
 First you will need to create a Discord bot and copy it's `TOKEN`.<br>
