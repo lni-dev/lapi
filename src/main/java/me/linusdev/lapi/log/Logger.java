@@ -96,6 +96,7 @@ public class Logger {
 
         writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         log(Type.INFO, Logger.class.getSimpleName(), null, "Log started...", false);
+        log(Type.INFO, Logger.class.getSimpleName(), null, "writing to " + logFile.toString(), false);
     }
 
     public static void close() throws IOException {
