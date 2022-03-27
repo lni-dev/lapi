@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'io.github.lni-dev'
-archivesBaseName = "lapi"
+archivesBaseName = 'lapi'
 version = '1.0.0-SNAPSHOT'
 
 targetCompatibility = JavaVersion.VERSION_11
@@ -28,7 +28,7 @@ tasks.named('jar') {
 
 dependencies {
     api 'io.github.lni-dev:data:1.0.0'
-    implementation 'org.jetbrains:annotations:23.0.0'
+    api 'org.jetbrains:annotations:23.0.0'
 }
 
 java {
@@ -75,7 +75,7 @@ publishing {
                 developers {
                     developer {
                         id = 'linusdev'
-                        name = 'LinusDev'
+                        name = 'Linus Andera'
                         email = 'einsuperlinus@gmail.com'
                         organizationUrl = 'https://lni-dev.github.io/'
                     }
