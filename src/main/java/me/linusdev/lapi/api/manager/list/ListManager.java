@@ -46,7 +46,7 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<T>> implemen
                        @NotNull LApiImplConverter<Data, T, InvalidDataException> converter,
                        @NotNull Supplier<Boolean> doCopy) {
         this.lApi = lApi;
-        this.objects = new ConcurrentHashMap<>(32);
+        this.objects = new ConcurrentHashMap<>(10);
         this.idKey = idKey;
         this.converter = converter;
         this.doCopy = doCopy;
