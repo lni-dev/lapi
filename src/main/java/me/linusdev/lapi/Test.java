@@ -41,7 +41,8 @@ import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojisUpdate;
+import me.linusdev.lapi.api.manager.list.ListUpdate;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.user.User;
@@ -154,7 +155,7 @@ public class Test implements EventListener{
     public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
         System.out.println("onGuildEmojisUpdate");
 
-        EmojisUpdate update = event.getUpdate();
+        ListUpdate<EmojiObject> update = event.getUpdate();
 
         System.out.println("old: " + (update.getOld()));
         System.out.println("updated: " +update.getUpdated());

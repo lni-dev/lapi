@@ -89,7 +89,6 @@ public enum ConfigFlag implements SimpleDatable {
      * </p>
      *
      * @see CachedGuildImpl CachedGuildImpl
-     * @see me.linusdev.lapi.api.manager.guild.emoji.EmojiManager EmojiManager
      */
     CACHE_EMOJIS(1 << 6),
 
@@ -101,6 +100,23 @@ public enum ConfigFlag implements SimpleDatable {
      *
      */
     COPY_EMOJI_ON_UPDATE_EVENT(1 << 7),
+
+    /**
+     * <p>
+     *     Caches all {@link me.linusdev.lapi.api.objects.sticker.Sticker stickers} retrieved by the
+     *     {@link me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_STICKERS(1 << 8),
+
+    /**
+     * <p>
+     *     Copies {@link me.linusdev.lapi.api.objects.sticker.Sticker sticker} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     *
+     */
+    COPY_STICKER_ON_UPDATE_EVENT(1 << 9),
 
     ;
 

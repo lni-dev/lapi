@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild.emoji;
+package me.linusdev.lapi.api.manager.list;
 
-import me.linusdev.data.Data;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
-public interface EmojiManager extends EmojiPool{
+public interface ListPool<T> {
+    @Nullable T get(@NotNull String id);
 
-    void addEmoji(@NotNull EmojiObject emoji);
-
-    @NotNull EmojisUpdate onEmojiUpdate(@NotNull ArrayList<Data> emojisData) throws InvalidDataException;
+    @NotNull Collection<T> getAll();
 }

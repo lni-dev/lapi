@@ -22,8 +22,8 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiPool;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojisUpdate;
+import me.linusdev.lapi.api.manager.list.ListPool;
+import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
@@ -35,14 +35,13 @@ import java.util.ArrayList;
 public class GuildEmojisUpdateEvent extends Event implements GuildEvent {
 
     protected final @NotNull ArrayList<Data> emojisData;
-    protected final @Nullable EmojisUpdate update;
-    private final @Nullable EmojiPool emojiPool;
+    protected final @Nullable ListUpdate<EmojiObject> update;
+    private final @Nullable ListPool<EmojiObject> emojiPool;
 
     public GuildEmojisUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
-                                  @Nullable Snowflake guildId, @NotNull ArrayList<Data> emojisData, @Nullable EmojisUpdate update,
-                                  @Nullable EmojiPool emojiPool) {
+                                  @Nullable Snowflake guildId, @NotNull ArrayList<Data> emojisData, @Nullable ListUpdate<EmojiObject> update,
+                                  @Nullable ListPool<EmojiObject> emojiPool) {
         super(lApi, payload, guildId);
-        //TODO:
         this.emojisData = emojisData;
         this.update = update;
         this.emojiPool = emojiPool;
@@ -50,18 +49,18 @@ public class GuildEmojisUpdateEvent extends Event implements GuildEvent {
 
     /**
      *
-     * @return {@link EmojisUpdate} or {@code null} if
+     * @return {@link ListUpdate} or {@code null} if
      * {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS} is disabled
      */
-    public @Nullable EmojisUpdate getUpdate() {
+    public @Nullable ListUpdate<EmojiObject> getUpdate() {
         return update;
     }
 
     /**
      *
-     * @return {@link EmojiPool} or {@code null} if {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS} is disabled
+     * @return {@link ListPool<EmojiObject>} or {@code null} if {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_EMOJIS CACHE_EMOJIS} is disabled
      */
-    public @Nullable EmojiPool getEmojiPool() {
+    public @Nullable ListPool<EmojiObject> getEmojiPool() {
         return emojiPool;
     }
 

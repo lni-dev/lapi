@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -312,6 +313,20 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         if(listeners != null){
             for(EventListener listener : listeners){
                 listener.onGuildEmojisUpdate(event);
+            }
+        }
+    }
+
+    @Override
+    public void onGuildStickersUpdate(@NotNull GuildStickersUpdateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onGuildStickersUpdate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onGuildStickersUpdate(event);
             }
         }
     }

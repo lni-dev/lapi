@@ -638,6 +638,16 @@ public class LApiImpl implements LApi {
         return copyOldEmojisOnUpdateEvent;
     }
 
+    @Override
+    public boolean isCacheStickersEnabled(){
+        return config.isFlagSet(ConfigFlag.CACHE_STICKERS);
+    }
+
+    @Override
+    public boolean isCopyOldStickerOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_STICKER_ON_UPDATE_EVENT);
+    }
+
     //api-internal getter
 
     /**

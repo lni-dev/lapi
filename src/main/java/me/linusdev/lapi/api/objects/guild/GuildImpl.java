@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class GuildImpl implements Guild {
     protected @NotNull ExplicitContentFilterLevel explicitContentFilter;
     protected @NotNull List<Role> roles;
     protected @NotNull EmojiObject[] emojis;
-    protected @Nullable String[] features; //see GuildFeature
+    protected @Nullable ArrayList<GuildFeature> features; //see GuildFeature
     protected @NotNull MFALevel mfaLevel;
     protected @Nullable Snowflake applicationId;
     protected @NotNull Snowflake systemChannelId;
@@ -90,7 +91,7 @@ public class GuildImpl implements Guild {
             @NotNull VerificationLevel verificationLevel,
             @NotNull DefaultMessageNotificationLevel defaultMessageNotifications,
             @NotNull ExplicitContentFilterLevel explicitContentFilter, @NotNull List<Role> roles,
-            @NotNull EmojiObject[] emojis, @Nullable String[] features, @NotNull MFALevel mfaLevel,
+            @NotNull EmojiObject[] emojis, ArrayList<GuildFeature> features, @NotNull MFALevel mfaLevel,
             @Nullable Snowflake applicationId, @NotNull Snowflake systemChannelId, int systemChannelFlagsAsInt,
             @NotNull SystemChannelFlag[] systemChannelFlags, @Nullable Snowflake rulesChannelId,
             @Nullable Integer maxPresences, @Nullable Integer maxMembers, @Nullable String vanityUrlCode,

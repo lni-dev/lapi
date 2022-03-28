@@ -21,6 +21,8 @@ import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.DISCORD_EPOCH;
 
 /**
@@ -123,5 +125,28 @@ public class Snowflake implements SimpleDatable, Copyable<Snowflake> {
     @Override
     public @NotNull Snowflake copy() {
         return this;
+    }
+
+    /**
+     *
+     * @param id string id
+     * @return {@code true} if given id equals {@link #asString()}, {@code false} otherwise
+     */
+    public boolean idEquals(@Nullable String id){
+        if(id == null) return false;
+        return this.string.equals(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Snowflake snowflake = (Snowflake) o;
+        return string.equals(snowflake.string);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(string);
     }
 }

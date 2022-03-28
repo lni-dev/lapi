@@ -18,13 +18,17 @@ package me.linusdev.lapi.api.objects.sticker;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  *
@@ -37,7 +41,7 @@ import org.jetbrains.annotations.Nullable;
  *      </a>
  * @see StickerItem
  */
-public class Sticker implements Datable, HasLApi {
+public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String PACK_ID_KEY = "pack_id";
@@ -53,17 +57,17 @@ public class Sticker implements Datable, HasLApi {
     public static final String SORT_VALUE_KEY = "sort_value";
 
     private final @NotNull Snowflake id;
-    private final @Nullable Snowflake packId;
-    private final @NotNull String name;
-    private final @Nullable String description;
-    private final @NotNull String tags;
-    private final @Deprecated String asset;
-    private final @NotNull StickerType type;
-    private final @NotNull StickerFormatType formatType;
-    private final @Nullable Boolean available;
-    private final @Nullable Snowflake guildId;
-    private final @Nullable User user;
-    private final @Nullable Integer sortValue;
+    private @Nullable Snowflake packId;
+    private @NotNull String name;
+    private @Nullable String description;
+    private @NotNull String tags;
+    private @Deprecated String asset;
+    private @NotNull StickerType type;
+    private @NotNull StickerFormatType formatType;
+    private @Nullable Boolean available;
+    private @Nullable Snowflake guildId;
+    private @Nullable User user;
+    private @Nullable Integer sortValue;
 
     private final @NotNull LApi lApi;
 
@@ -269,5 +273,51 @@ public class Sticker implements Datable, HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @NotNull Sticker copy() {
+        return new Sticker(lApi, id, packId, name, description, tags, asset, type, formatType, available, guildId, user, sortValue);
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        data.processIfContained(PACK_ID_KEY, (String o) -> this.packId = Snowflake.fromString( o));
+        data.processIfContained(NAME_KEY, (String o) -> this.name =  o);
+        data.processIfContained(DESCRIPTION_KEY, (String o) -> this.description = o);
+        data.processIfContained(TAGS_KEY, (String o) -> this.tags = o);
+        data.processIfContained(ASSET_KEY, (String o) -> this.asset = o);
+        data.processIfContained(TYPE_KEY, (Number n) -> {if(n != null) this.type = StickerType.fromValue(n.intValue());});
+        data.processIfContained(FORMAT_TYPE_KEY, (Number n) -> {if(n != null) this.formatType = StickerFormatType.fromValue(n.intValue());});
+        data.processIfContained(AVAILABLE_KEY, (Boolean b) -> this.available = b);
+        data.processIfContained(GUILD_ID_KEY, (String o) -> this.guildId = Snowflake.fromString(o));
+        //user should never change.
+        data.processIfContained(SORT_VALUE_KEY, (Number n) -> this.sortValue = Objects.requireNonNullElse(n.intValue(), null));
+    }
+
+    @Override
+    public boolean checkIfChanged(Data data) {
+
+        Number t = (Number) data.get(TYPE_KEY);
+        if(t == null) return true;
+        if(t.intValue() != type.getValue()) return true;
+
+        Number ft = (Number) data.get(FORMAT_TYPE_KEY);
+        if(ft == null) return true;
+        if(ft.intValue() != formatType.getValue()) return true;
+
+        Number sv = (Number) data.get(SORT_VALUE_KEY);
+        if(sv == null && sortValue != null) return true;
+        if(sv != null && sortValue != null) {
+            if(sv.intValue() != sortValue) return true;
+        }
+
+        return !(Objects.equals(packId == null ? null : packId.asString(), (String) data.get(ID_KEY))
+                && Objects.equals(name, data.get(NAME_KEY))
+                && Objects.equals(description, data.get(DESCRIPTION_KEY))
+                && Objects.equals(tags, data.get(TAGS_KEY))
+                && Objects.equals(asset, data.get(ASSET_KEY))
+                && Objects.equals(available, data.get(AVAILABLE_KEY))
+                && Objects.equals(guildId == null ? null : guildId.asString(), data.get(GUILD_ID_KEY)));
     }
 }

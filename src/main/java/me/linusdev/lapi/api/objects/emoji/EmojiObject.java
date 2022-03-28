@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.role.Role;
+import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -34,9 +35,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
+ * This class should only be used for emojis, that do have an id.<br>
+ *
  * @see <a href="https://discord.com/developers/docs/resources/emoji#emoji-resource" target="_top">Emoji Resource</a>
  */
-public class EmojiObject implements CopyAndUpdatable<EmojiObject>, Updatable, Datable, me.linusdev.lapi.api.objects.emoji.abstracts.Emoji, HasLApi {
+public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>, Updatable, Datable, me.linusdev.lapi.api.objects.emoji.abstracts.Emoji, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
@@ -154,6 +157,11 @@ public class EmojiObject implements CopyAndUpdatable<EmojiObject>, Updatable, Da
         return id;
     }
 
+    @Override
+    public @NotNull String getId() {
+        return SnowflakeAble.super.getId();
+    }
+
     /**
      * name of the Emoji, or it's corresponding unicode emoji, if it is a standard emoji ({@link #isStandardEmoji()})
      */
@@ -268,6 +276,7 @@ public class EmojiObject implements CopyAndUpdatable<EmojiObject>, Updatable, Da
      * {@code true} if given {@link Data} would change this emoji.
      */
     @ApiStatus.Internal
+    @Override
     public boolean checkIfChanged(@NotNull Data emojiData){
 
         //id won't be checked here, because it should never change

@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -104,6 +105,8 @@ public interface EventListener {
     default void onGuildAvailable(@NotNull GuildAvailableEvent event) {}
 
     default void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {}
+
+    default void onGuildStickersUpdate(@NotNull GuildStickersUpdateEvent event) {}
 
     default void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {}
 

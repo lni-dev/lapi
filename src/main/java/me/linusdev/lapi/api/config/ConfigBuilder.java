@@ -30,10 +30,11 @@ import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.LApiGuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiManager;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
+import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +70,9 @@ public class ConfigBuilder implements Datable {
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
     private ManagerFactory<RoleManager> roleManagerFactory = null;
-    private ManagerFactory<EmojiManager> emojiManagerFactory = null;
+    private ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory = null;
+    private ManagerFactory<ListManager<Sticker>> stickerManagerFactory = null;
+
 
     /**
      * Creates a new {@link ConfigBuilder}
@@ -268,17 +271,32 @@ public class ConfigBuilder implements Datable {
 
     /**
      * <em>Optional</em><br>
-     * Default: {@code lApi -> new EmojiManagerImpl(lApi)}
+     * Default: {@code lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)}
      * <p>
-     *     Factory for the {@link EmojiManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     *     Factory for the {@link ListManager ListManager&lt;EmojiObject&gt;} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
      * </p>
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param emojiManagerFactory the {@link ManagerFactory<EmojiManager> ManagerFactory&lt;EmojiManager&gt;}
+     * @param emojiManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;EmojiObject&gt;&gt;}
      */
-    public void setEmojiManagerFactory(ManagerFactory<EmojiManager> emojiManagerFactory) {
+    public void setEmojiManagerFactory(ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory) {
         this.emojiManagerFactory = emojiManagerFactory;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)}
+     * <p>
+     *     Factory for the {@link ListManager ListManager&lt;Sticker&gt;} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param stickerManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;Sticker&gt;&gt;}
+     */
+    public void setStickerManagerFactory(ManagerFactory<ListManager<Sticker>> stickerManagerFactory) {
+        this.stickerManagerFactory = stickerManagerFactory;
     }
 
     /**
@@ -369,7 +387,9 @@ public class ConfigBuilder implements Datable {
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
-                Objects.requireNonNullElse(emojiManagerFactory, lApi -> new EmojiManagerImpl(lApi)));
+                Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled))
+                );
     }
 
     /**

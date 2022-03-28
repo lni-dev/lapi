@@ -32,6 +32,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -46,10 +47,11 @@ import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiManager;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojisUpdate;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.guild.GuildImpl;
@@ -57,6 +59,7 @@ import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -94,6 +97,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String ROLE_KEY = "role";
     public static final String ROLE_ID_KEY = "role_id";
     public static final String EMOJIS_KEY = "emojis";
+    public static final String STICKERS_KEY = "stickers";
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
@@ -483,7 +487,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         break;
                     }
 
-                    EmojiManager emojiManager = guild.getEmojiManager();
+                    ListManager<EmojiObject> emojiManager = guild.getEmojiManager();
 
                     if(emojiManager == null) {
                         transmitter.onGuildEmojisUpdate(
@@ -491,13 +495,49 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         break;
                     }
 
-                    EmojisUpdate update = emojiManager.onEmojiUpdate(emojisData);
+                    ListUpdate<EmojiObject> update = emojiManager.onUpdate(emojisData);
                     transmitter.onGuildEmojisUpdate(
                             new GuildEmojisUpdateEvent(lApi, payload, null, emojisData, update, emojiManager));
                 }
                 break;
 
             case GUILD_STICKERS_UPDATE:
+            {
+                Data data = (Data) payload.getPayloadData();
+                if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                String guildId = (String) data.get(GUILD_ID_KEY);
+                ArrayList<Data> stickersData = (ArrayList<Data>) data.get(STICKERS_KEY);
+
+
+                if(guildId == null || stickersData == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY, STICKERS_KEY);
+
+                if(guildManager == null){
+                    transmitter.onGuildStickersUpdate(
+                            new GuildStickersUpdateEvent(lApi, payload, null, stickersData, null, null));
+                    break;
+                }
+
+                CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+
+                if(guild == null){
+                    transmitter.onLApiError(new LApiErrorEvent(lApi, payload, type,
+                            new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                    break;
+                }
+
+                ListManager<Sticker> stickerManager = guild.getStickerManager();
+
+                if(stickerManager == null) {
+                    transmitter.onGuildStickersUpdate(
+                            new GuildStickersUpdateEvent(lApi, payload, null, stickersData, null, null));
+                    break;
+                }
+
+                ListUpdate<Sticker> update = stickerManager.onUpdate(stickersData);
+                transmitter.onGuildStickersUpdate(
+                        new GuildStickersUpdateEvent(lApi, payload, null, stickersData, update, stickerManager));
+            }
                 break;
 
             case GUILD_INTEGRATIONS_UPDATE:

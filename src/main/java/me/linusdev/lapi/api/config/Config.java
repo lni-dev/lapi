@@ -21,8 +21,10 @@ import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Queue;
@@ -36,12 +38,14 @@ public class Config {
     private final @NotNull GatewayConfig gatewayConfig;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
     private final @NotNull ManagerFactory<RoleManager> roleManagerFactory;
-    private final @NotNull ManagerFactory<EmojiManager> emojiManagerFactory;
+    private final @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory;
+    private final @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
-                  @NotNull ManagerFactory<RoleManager> roleManagerFactory, @NotNull ManagerFactory<EmojiManager> emojiManagerFactory){
+                  @NotNull ManagerFactory<RoleManager> roleManagerFactory,
+                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory){
         this.flags = flags;
         this.token = token;
 
@@ -50,6 +54,7 @@ public class Config {
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
         this.emojiManagerFactory = emojiManagerFactory;
+        this.stickerManagerFactory = stickerManagerFactory;
     }
 
     /**
@@ -84,7 +89,11 @@ public class Config {
         return roleManagerFactory;
     }
 
-    public @NotNull ManagerFactory<EmojiManager> getEmojiManagerFactory() {
+    public @NotNull ManagerFactory<ListManager<EmojiObject>> getEmojiManagerFactory() {
         return emojiManagerFactory;
+    }
+
+    public @NotNull ManagerFactory<ListManager<Sticker>> getStickerManagerFactory() {
+        return stickerManagerFactory;
     }
 }

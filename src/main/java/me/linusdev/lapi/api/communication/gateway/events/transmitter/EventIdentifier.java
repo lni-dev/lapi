@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -209,6 +210,18 @@ public enum EventIdentifier{
      * </ul>
      */
     GUILD_EMOJIS_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildStickersUpdate(GuildStickersUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_EMOJIS_AND_STICKERS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_STICKERS_UPDATE,
 
     /**
      * identifier for {@link EventListener#onGuildRoleCreate(GuildRoleCreateEvent)}.

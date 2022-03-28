@@ -734,4 +734,14 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT
      */
     boolean isCopyOldEmojiOnUpdateEventEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_STICKERS
+     */
+    boolean isCacheStickersEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_STICKER_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldStickerOnUpdateEventEnabled();
 }

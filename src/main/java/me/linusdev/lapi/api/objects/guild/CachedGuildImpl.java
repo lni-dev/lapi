@@ -27,8 +27,8 @@ import me.linusdev.lapi.api.manager.guild.MembersManager;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
 import me.linusdev.lapi.api.manager.guild.ThreadsManager;
 import me.linusdev.lapi.api.manager.guild.VoiceStatesManager;
-import me.linusdev.lapi.api.manager.guild.emoji.EmojiManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
@@ -39,6 +39,7 @@ import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
+import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -55,7 +56,8 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected boolean removed;
 
     protected @Nullable RoleManager roleManager = null;
-    protected @Nullable EmojiManager emojiManager = null;
+    protected @Nullable ListManager<EmojiObject> emojiManager = null;
+    protected @Nullable ListManager<Sticker> stickerManager = null;
 
     //Create GuildImpl
     protected @Nullable ISO8601Timestamp joinedAt;
@@ -122,6 +124,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheEmojisEnabled()){
             this.emojiManager = lApi.getConfig().getEmojiManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheStickersEnabled()){
+            this.stickerManager = lApi.getConfig().getStickerManagerFactory().newInstance(lApi);
         }
 
     }
@@ -268,14 +274,29 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
             ArrayList<Object> emojisData = (ArrayList<Object>) data.get(EMOJIS_KEY);
             if(emojisData != null){
                 for(Object o : emojisData){
-                    emojiManager.addEmoji(EmojiObject.fromData(lApi, (Data) o));
+                    emojiManager.add(EmojiObject.fromData(lApi, (Data) o));
                 }
             }
         }
 
+        data.processIfContained(FEATURES_KEY, o -> {
+            ArrayList<Object> arr = (ArrayList<Object>) o;
+            if(this.features != null) this.features.clear();
+            else this.features = new ArrayList<>(arr.size());
 
+            for(Object str : arr){
+                features.add(GuildFeature.fromValue((String) str));
+            }
+        });
 
-        // TODO: Features[], Sticker[]
+        if(stickerManager != null){
+            ArrayList<Object> stickersData = (ArrayList<Object>) data.get(STICKERS_KEY);
+            if(stickersData != null){
+                for(Object o : stickersData){
+                    stickerManager.add(Sticker.fromData(lApi, (Data) o));
+                }
+            }
+        }
 
         //GuildImpl Create
         data.processIfContained(JOINED_AT_KEY, (String joinedAt) -> this.joinedAt = ISO8601Timestamp.fromString(joinedAt));
@@ -305,8 +326,13 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     }
 
     @ApiStatus.Internal
-    public @Nullable EmojiManager getEmojiManager() {
+    public @Nullable ListManager<EmojiObject> getEmojiManager() {
         return emojiManager;
+    }
+
+    @ApiStatus.Internal
+    public @Nullable ListManager<Sticker> getStickerManager() {
+        return stickerManager;
     }
 
     @NotNull
