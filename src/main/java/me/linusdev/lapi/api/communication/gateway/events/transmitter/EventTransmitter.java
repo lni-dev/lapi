@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCre
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -418,6 +419,20 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         if(listeners != null){
             for(EventListener listener : listeners){
                 listener.onGuildMessageCreate(event);
+            }
+        }
+    }
+
+    @Override
+    public void onInteractionCreate(@NotNull InteractionCreateEvent event) {
+        for(EventListener listener : listeners){
+            listener.onInteractionCreate(event);
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                listener.onInteractionCreate(event);
             }
         }
     }

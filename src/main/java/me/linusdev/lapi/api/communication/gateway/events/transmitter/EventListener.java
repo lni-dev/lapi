@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCre
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -119,6 +120,8 @@ public interface EventListener {
     default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {}
 
     default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {}
+
+    default void onInteractionCreate(@NotNull InteractionCreateEvent event) {}
 
     default void onLApiError(@NotNull LApiErrorEvent event) { }
 

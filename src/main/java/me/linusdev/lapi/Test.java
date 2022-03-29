@@ -20,6 +20,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -29,6 +30,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -42,10 +44,21 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
+import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
+import me.linusdev.lapi.api.objects.message.component.Component;
+import me.linusdev.lapi.api.objects.message.component.ComponentType;
+import me.linusdev.lapi.api.objects.message.component.actionrow.ActionRow;
+import me.linusdev.lapi.api.objects.message.component.button.Button;
+import me.linusdev.lapi.api.objects.message.component.button.ButtonStyle;
+import me.linusdev.lapi.api.objects.message.embed.Embed;
+import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
+import me.linusdev.lapi.api.objects.message.embed.InvalidEmbedException;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.templates.attachment.AttachmentTemplate;
+import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.helper.Helper;
 import me.linusdev.lapi.log.Logger;
@@ -54,6 +67,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.*;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 
 public class Test implements EventListener{
@@ -192,13 +206,41 @@ public class Test implements EventListener{
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();
 
-        if(!author.isBot() && content.toLowerCase().startsWith("hi")) {
+        System.out.println(content);
 
-            new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
-                    .setReplyTo(msg, true)
-                    .getQueueable(channelId)
-                    .queue();
+        if(!author.isBot()){
+            if(content.toLowerCase().startsWith("hi")) {
+
+                new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
+                        .setReplyTo(msg, true)
+                        .getQueueable(channelId)
+                        .queue();
+            }else if(content.toLowerCase().startsWith("hey")) {
+                System.out.println("hey");
+                LApi lApi = event.getLApi();
+                try {
+                    lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
+                            new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
+                            null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
+                            new Component[]{new Button(lApi, ComponentType.BUTTON,
+                                    ButtonStyle.PRIMARY, "Klick mich UwU",
+                                    null, "me.linusdev.btn_1", null,
+                                    null)}
+                    )}, null,
+                            new Attachment[]{
+                                    new AttachmentTemplate("image.png",
+                                            "fun image",
+                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
+                                            FileType.PNG).setAttachmentId(0)
+                            })).queue();
+                } catch (InvalidEmbedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+
+
+
     }
 
     @Override
@@ -209,17 +251,52 @@ public class Test implements EventListener{
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();
 
-        if(!author.isBot() && content.toLowerCase().startsWith("hi")) {
+        if(!author.isBot()){
+            if(content.toLowerCase().startsWith("hi")) {
 
-            new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
-                    .setReplyTo(msg, true)
-                    .getQueueable(channelId)
-                    .queue();
+                new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
+                        .setReplyTo(msg, true)
+                        .getQueueable(channelId)
+                        .queue();
+            }else if(content.toLowerCase().startsWith("hey")) {
+                System.out.println("hey");
+                LApi lApi = event.getLApi();
+                try {
+                    lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
+                            new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
+                            null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
+                            new Component[]{new Button(lApi, ComponentType.BUTTON,
+                                    ButtonStyle.PRIMARY, "Klick mich UwU",
+                                    null, "me.linusdev.btn_1", null,
+                                    null)}
+                    )}, null,
+                            new Attachment[]{
+                                    new AttachmentTemplate("image.png",
+                                            "fun image",
+                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\E0fcU7MVIAIGoil.jpg"),
+                                            FileType.JPEG).setAttachmentId(0)
+                            })).queue();
+                } catch (InvalidEmbedException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public void onLApiError(@NotNull LApiErrorEvent event) {
         System.out.println("onLApiError in event " + event.getInEvent() + ", error code: " + event.getError().getCode());
+    }
+
+    @Override
+    public void onInteractionCreate(@NotNull InteractionCreateEvent event) {
+        System.out.println("onInteractionCreate");
+        System.out.println("customID: " + event.getCustomId());
+
+        if(event.getCustomId().equals("me.linusdev.btn_1")){
+            System.out.println("button pressed");
+            event.getLApi().createMessage(event.getInteraction().getChannelId(), "good job!").queue();
+        }
+
     }
 }

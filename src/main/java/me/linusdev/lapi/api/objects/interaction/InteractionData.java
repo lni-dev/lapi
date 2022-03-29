@@ -50,9 +50,9 @@ public class InteractionData implements Datable, HasLApi {
 
     private final @NotNull LApi lApi;
 
-    private final @NotNull String id;
-    private final @NotNull String name;
-    private final @NotNull ApplicationCommandType type;
+    private final @Nullable String id;
+    private final @Nullable String name;
+    private final @Nullable ApplicationCommandType type;
     private final @Nullable ResolvedData resolved;
     private final @Nullable ArrayList<ApplicationCommandInteractionDataOption> options;
     private final @Nullable String customId;
@@ -73,7 +73,7 @@ public class InteractionData implements Datable, HasLApi {
      * @param values the values the user selected
      * @param targetId id the of user or message targeted by a user or message command
      */
-    public InteractionData(@NotNull LApi lApi, @NotNull String id, @NotNull String name, @NotNull ApplicationCommandType type, @Nullable ResolvedData resolved, @Nullable ArrayList<ApplicationCommandInteractionDataOption> options, @Nullable String customId, @Nullable ComponentType componentType, @Nullable ArrayList<SelectOption> values, @Nullable Snowflake targetId) {
+    public InteractionData(@NotNull LApi lApi, @Nullable String id, @Nullable String name, @Nullable ApplicationCommandType type, @Nullable ResolvedData resolved, @Nullable ArrayList<ApplicationCommandInteractionDataOption> options, @Nullable String customId, @Nullable ComponentType componentType, @Nullable ArrayList<SelectOption> values, @Nullable Snowflake targetId) {
         this.lApi = lApi;
         this.id = id;
         this.name = name;
@@ -108,84 +108,90 @@ public class InteractionData implements Datable, HasLApi {
         ArrayList<SelectOption> values = data.getAndConvertArrayList(VALUES_KEY, (ExceptionConverter<Data, SelectOption, InvalidDataException>) convertible -> SelectOption.fromData(lApi, convertible));
         String targetId = (String) data.get(TARGET_ID_KEY);
 
-        if(id == null || name == null || type == null){
-            InvalidDataException.throwException(data, null, InteractionData.class,
-                    new Object[]{id, name, type},
-                    new String[]{ID_KEY, NAME_KEY, TYPE_KEY});
-            return null;
-        }
 
 
-        return new InteractionData(lApi, id, name, ApplicationCommandType.fromValue(type.intValue()), resolved, options,
+        return new InteractionData(lApi, id, name,
+                type == null ? null : ApplicationCommandType.fromValue(type.intValue())
+                , resolved, options,
                 customId, componentType == null ? null : ComponentType.fromValue(componentType.intValue()),
                 values, Snowflake.fromString(targetId));
     }
 
     /**
-     * the ID of the invoked command
+     * the ID of the invoked command.<br>
+     * Application Command only
      */
-    public @NotNull String getId() {
+    public @Nullable String getId() {
         return id;
     }
 
     /**
-     * the name of the invoked command
+     * the name of the invoked command<br>
+     * Application Command only
      */
-    public @NotNull String getName() {
+    public @Nullable String getName() {
         return name;
     }
 
     /**
-     * the type of the invoked command
+     * the type of the invoked command<br>
+     * Application Command only
      */
-    public @NotNull ApplicationCommandType getType() {
+    public @Nullable ApplicationCommandType getType() {
         return type;
     }
 
     /**
-     * converted users + roles + channels
+     * converted users + roles + channels<br>
+     * Application Command only
      */
     public @Nullable ResolvedData getResolved() {
         return resolved;
     }
 
     /**
-     * the params + values from the user
+     * the params + values from the user<br>
+     * Application Command only
      */
     public @Nullable ArrayList<ApplicationCommandInteractionDataOption> getOptions() {
         return options;
     }
 
     /**
-     * the custom_id of the component
+     * the custom_id of the component<br>
+     * 	Component and Modal Submit only
      */
     public @Nullable String getCustomId() {
         return customId;
     }
 
     /**
-     * the type of the component
+     * the type of the component<br>
+     * Component only
      */
     public @Nullable ComponentType getComponentType() {
         return componentType;
     }
 
     /**
-     * the values the user selected
+     * the values the user selected<br>
+     * 	Component (Select) only
      */
     public @Nullable ArrayList<SelectOption> getValues() {
         return values;
     }
 
     /**
-     * id as {@link Snowflake} the of user or message targeted by a user or message command
+     * id as {@link Snowflake} the of user or message targeted by a user or message command<br>
+     * User Command and Message Command only
      */
     public @Nullable Snowflake getTargetIdAsSnowflake() {
         return targetId;
     }
 
     /**
-     * id as {@link String} the of user or message targeted by a user or message command
+     * id as {@link String} the of user or message targeted by a user or message command<br>
+     * User Command and Message Command only
      */
     public @Nullable String getTargetId() {
         if(targetId == null) return null;
@@ -198,9 +204,9 @@ public class InteractionData implements Datable, HasLApi {
     public Data getData() {
         Data data = new Data(9);
 
-        data.add(ID_KEY, id);
-        data.add(NAME_KEY, name);
-        data.add(TYPE_KEY, type);
+        data.addIfNotNull(ID_KEY, id);
+        data.addIfNotNull(NAME_KEY, name);
+        data.addIfNotNull(TYPE_KEY, type);
         data.addIfNotNull(RESOLVED_KEY, resolved);
         data.addIfNotNull(OPTIONS_KEY, options);
         data.addIfNotNull(CUSTOM_ID_KEY, customId);

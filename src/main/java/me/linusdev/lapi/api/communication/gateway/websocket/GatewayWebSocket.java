@@ -33,6 +33,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCre
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -55,6 +56,7 @@ import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.guild.GuildImpl;
+import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -697,6 +699,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 break;
 
             case INTERACTION_CREATE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if(data == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    Interaction interaction = Interaction.fromData(lApi, data);
+                    InteractionCreateEvent event = new InteractionCreateEvent(lApi, payload, interaction.getGuildIdAsSnowflake(), interaction);
+                    transmitter.onInteractionCreate(event);
+                }
                 break;
 
             case INVITE_CREATE:

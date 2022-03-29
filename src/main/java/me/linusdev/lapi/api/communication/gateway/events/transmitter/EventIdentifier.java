@@ -22,6 +22,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
@@ -284,6 +285,19 @@ public enum EventIdentifier{
      * sub-event of {@link #MESSAGE_CREATE}.
      */
     NON_GUILD_MESSAGE_CREATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                          INTERACTION                          *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onInteractionCreate(InteractionCreateEvent)}.<br>
+     */
+    INTERACTION_CREATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
