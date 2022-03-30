@@ -40,6 +40,17 @@ public enum Link implements AbstractLink{
     CREATE_MESSAGE(POST, O_DISCORD_API_VERSION_LINK + "channels/" + CHANNEL_ID + "/messages"),
 
     /**
+     * Create a response to an Interaction from the gateway. Body is an interaction response. Returns 204 No Content.<br>
+     *
+     * This endpoint also supports file attachments similar to the webhook endpoints. Refer to Uploading Files for details on uploading files and multipart/form-data requests.
+     *
+     * @see PlaceHolder#INTERACTION_ID
+     * @see PlaceHolder#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
+     */
+    CREATE_INTERACTION_RESPONSE(POST, O_DISCORD_API_VERSION_LINK + "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback"),
+
+    /**
      * Returns an object with a single valid WSS URL, which the client can use for Connecting.
      * Clients should cache this value and only call this endpoint to retrieve a new URL if
      * they are unable to properly establish a connection using the cached version of the URL.

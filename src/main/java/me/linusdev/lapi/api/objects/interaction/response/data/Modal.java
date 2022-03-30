@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.interaction.response.data;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.objects.message.component.Component;
+import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -26,7 +27,7 @@ import java.util.Collection;
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-modal" target="_top">Modal</a>
  */
-public class Modal implements Datable {
+public class Modal implements Datable, Template {
 
     public static final String CUSTOM_ID_KEY = "custom_id";
     public static final String TITLE_KEY = "title";

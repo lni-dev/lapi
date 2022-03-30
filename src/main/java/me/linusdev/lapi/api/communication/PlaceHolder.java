@@ -28,6 +28,9 @@ public class PlaceHolder {
     public static final String STICKER_ID = "{sticker.id}";
     public static final String TEAM_ID = "{team.id}";
 
+    public static final String INTERACTION_ID = "{interaction.id}";
+    public static final String INTERACTION_TOKEN = "{interaction.token}";
+
     public static final String USER_ID = "{user.id}";
     public static final String USER_DISCRIMINATOR = "{user.discriminator}";
 

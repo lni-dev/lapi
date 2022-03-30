@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.interaction.response.data;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionChoice;
+import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -26,7 +27,7 @@ import java.util.Collection;
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-autocomplete" target="_top">Autocomplete</a>
  */
-public class Autocomplete implements Datable {
+public class Autocomplete implements Datable, Template {
 
     public static final String CHOICES_KEY = "choices";
 

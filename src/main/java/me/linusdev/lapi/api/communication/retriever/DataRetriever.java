@@ -58,10 +58,10 @@ public abstract class DataRetriever<T> extends Retriever<T>{
      */
     protected @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException{
         if(storeData){
-            data = lApi.getResponseAsData(query.getLApiRequest());
+            data = lApi.getResponse(query.getLApiRequest()).getData();
             return data;
         }
-        return lApi.getResponseAsData(query.getLApiRequest());
+        return lApi.getResponse(query.getLApiRequest()).getData();
     }
 
     /**

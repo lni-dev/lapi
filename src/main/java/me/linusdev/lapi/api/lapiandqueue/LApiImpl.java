@@ -41,13 +41,16 @@ import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
+import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
@@ -268,20 +271,7 @@ public class LApiImpl implements LApi {
         }
     }
 
-
-    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
-        return getResponseAsData(request, null);
-    }
-
-    public Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException {
-        Reader reader = new InputStreamReader(getResponseAsInputStream(request));
-
-        if(arrayKey != null)
-            return new JsonParser().readDataFromReader(reader, true, arrayKey);
-        return new JsonParser().readDataFromReader(reader);
-    }
-
-    public InputStream getResponseAsInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException {
+    public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException {
         Throwable throwThrough = null;
 
         try {
@@ -343,10 +333,10 @@ public class LApiImpl implements LApi {
     }
 
     @ApiStatus.Internal
-    private InputStream sendRequest(@NotNull HttpRequest request) throws IOException, InterruptedException {
-        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+    private LApiHttpResponse sendRequest(@NotNull HttpRequest request) throws IOException, InterruptedException, ParseException {
+        LApiHttpResponse response = new LApiHttpResponse(client.send(request, HttpResponse.BodyHandlers.ofInputStream()));
         notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
-        return response.body();
+        return response;
     }
 
     public LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request){
@@ -563,6 +553,17 @@ public class LApiImpl implements LApi {
 
     public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
         return createMessage(channelId, true, embeds);
+    }
+
+    @Override
+    public @NotNull Queueable<NoContent> createInteractionResponse(@NotNull String interactionId,
+                                                                   @NotNull String interactionToken,
+                                                                   @NotNull InteractionResponse response) {
+        Query query = new LinkQuery(this, Link.CREATE_INTERACTION_RESPONSE, response.getBody(), null,
+                new PlaceHolder(PlaceHolder.INTERACTION_ID, interactionId),
+                new PlaceHolder(PlaceHolder.INTERACTION_TOKEN, interactionToken));
+
+        return new ConvertingRetriever<>(this, query, (lApi, noContent) -> new NoContent());
     }
 
     //Gateway

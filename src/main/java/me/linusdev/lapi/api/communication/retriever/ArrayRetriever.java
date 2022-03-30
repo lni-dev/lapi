@@ -62,6 +62,6 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
 
     @Override
     public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.getResponseAsData(query.getLApiRequest(), "array");
+        return lApi.getResponse(query.getLApiRequest()).getData("array");
     }
 }

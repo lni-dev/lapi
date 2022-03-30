@@ -57,7 +57,7 @@ public class CDNImageRetriever extends Retriever<InputStream>  {
 
     @Override
     protected @Nullable InputStream retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.getResponseAsInputStream(query.getLApiRequest());
+        return lApi.getResponse(query.getLApiRequest()).getInputStream();
     }
 
     /**

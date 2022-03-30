@@ -46,7 +46,9 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.message.component.Component;
 import me.linusdev.lapi.api.objects.message.component.ComponentType;
@@ -295,7 +297,15 @@ public class Test implements EventListener{
 
         if(event.getCustomId().equals("me.linusdev.btn_1")){
             System.out.println("button pressed");
-            event.getLApi().createMessage(event.getInteraction().getChannelId(), "good job!").queue();
+
+            InteractionResponseBuilder builder = new InteractionResponseBuilder(event.getLApi(), event.getInteraction());
+
+            builder.channelMessageWithSource(messageBuilder -> {
+                messageBuilder.appendContent("good job!")
+                        .setFlag(MessageFlag.EPHEMERAL);
+            }, true);
+
+            builder.getQueueable().queue();
         }
 
     }

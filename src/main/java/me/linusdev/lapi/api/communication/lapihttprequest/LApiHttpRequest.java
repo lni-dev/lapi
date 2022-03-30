@@ -37,6 +37,8 @@ import java.util.concurrent.Flow;
 
 public class LApiHttpRequest {
 
+    public static final String CONTENT_TYPE_HEADER = "Content-Type";
+
     private final String uri;
     private final Method method;
     private final LApiHttpBody body;
@@ -123,10 +125,10 @@ public class LApiHttpRequest {
         if(body != null && method != Method.GET){
             if(body.isMultiPart()) {
                 LApiHttpMultiPartBodyPublisher publisher = new LApiHttpMultiPartBodyPublisher(body);
-                builder.header("Content-Type", "multipart/form-data; boundary=" + publisher.getBoundaryString());
+                builder.header(CONTENT_TYPE_HEADER, "multipart/form-data; boundary=" + publisher.getBoundaryString());
                 builder.method(method.getMethod(), publisher);
             }else if(body.hasJsonPart()){
-                builder.header("Content-Type", "application/json");
+                builder.header(CONTENT_TYPE_HEADER, "application/json");
                 builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(body.getJsonPart().getJsonString().toString()));
             }else{
                 //TODO add the support of single file bodies

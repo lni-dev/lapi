@@ -30,7 +30,9 @@ import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodEx
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
+import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
@@ -40,6 +42,7 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
@@ -164,34 +167,7 @@ public interface LApi extends HasLApi {
     @ApiStatus.Internal
     <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit);
 
-    /**
-     * @see #getResponseAsData(LApiHttpRequest, String)
-     *
-     * Cannot parse pure Arrays!
-     *
-     * @param request
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ParseException
-     */
-    public Data getResponseAsData(LApiHttpRequest request) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException;
-
-    /**
-     *
-     * Sends a Http-request and returns a Data representing the response body`s json
-     *
-     * @param request to send
-     * @param arrayKey if request json is an array, it will be available in the returned Data by this key
-     *                 if this is {@code null}, the json may not be an Array (start with '[')
-     * @return the generated Data
-     * @throws IOException
-     * @throws InterruptedException
-     * @throws ParseException
-     */
-    Data getResponseAsData(@NotNull LApiHttpRequest request, @Nullable String arrayKey) throws IOException, InterruptedException, ParseException, IllegalRequestMethodException, NoInternetException;
-
-    InputStream getResponseAsInputStream(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException;
+    LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException;
 
     /**
      * Appends the required headers to the {@link LApiHttpRequest}.<br>
@@ -652,6 +628,8 @@ public interface LApi extends HasLApi {
      * @see Link#CREATE_MESSAGE
      */
     @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds);
+
+    @NotNull Queueable<NoContent> createInteractionResponse(@NotNull String interactionId, @NotNull String interactionToken, @NotNull InteractionResponse response);
 
     //Gateway
 
