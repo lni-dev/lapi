@@ -27,42 +27,47 @@ public enum MessageFlag {
     /**
      * this message has been published to subscribed channels (via Channel Following)
      */
-    CROSSPOSTED             (1L << 0, "cross-posted"),
+    CROSSPOSTED                             (1L << 0, "cross-posted"),
 
     /**
      * this message originated from a message in another channel (via Channel Following)
      */
-    IS_CROSSPOST            (1L << 1, "is crosspost"),
+    IS_CROSSPOST                            (1L << 1, "is crosspost"),
 
     /**
      * do not include any embeds when serializing this message
      */
-    SUPPRESS_EMBEDS         (1L << 2, "suppress embeds"),
+    SUPPRESS_EMBEDS                         (1L << 2, "suppress embeds"),
 
     /**
      * the source message for this crosspost has been deleted (via Channel Following)
      */
-    SOURCE_MESSAGE_DELETED  (1L << 3, "source message deleted"),
+    SOURCE_MESSAGE_DELETED                  (1L << 3, "source message deleted"),
 
     /**
      * this message came from the urgent message system
      */
-    URGENT                  (1 << 4, "urgent"),
+    URGENT                                  (1L << 4, "urgent"),
 
     /**
      * this message has an associated thread, with the same id as the message
      */
-    HAS_THREAD              (1 << 5, "has thread"),
+    HAS_THREAD                              (1L << 5, "has thread"),
 
     /**
      * this message is only visible to the user who invoked the Interaction
      */
-    EPHEMERAL               (1 << 6, "ephemeral"),
+    EPHEMERAL                               (1L << 6, "ephemeral"),
 
     /**
      * this message is an Interaction Response and the bot is "thinking"
      */
-    LOADING                 (1 << 7, "loading"),
+    LOADING                                 (1L << 7, "loading"),
+
+    /**
+     * this message failed to mention some roles and add their members to the thread
+     */
+    FAILED_TO_MENTION_SOME_ROLES_IN_THREAD  (1L << 8, "failed to mention some roles in thread"),
     ;
 
     private final long value;

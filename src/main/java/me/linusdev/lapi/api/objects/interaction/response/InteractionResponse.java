@@ -18,13 +18,51 @@ package me.linusdev.lapi.api.objects.interaction.response;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-response-object-interaction-response-structure" target="_top">Interaction Response Structure</a>
  */
 public class InteractionResponse implements Datable {
+
+    public static final String TYPE_KEY = "type";
+    public static final String DATA_KEY = "data";
+
+    private final @NotNull InteractionCallbackType type;
+    private final @Nullable Datable data;
+
+    /**
+     *
+     * @param type the type of response
+     * @param data an optional response message
+     */
+    public InteractionResponse(@NotNull InteractionCallbackType type, @Nullable Datable data) {
+        this.type = type;
+        this.data = data;
+    }
+
+    /**
+     * the type of response
+     */
+    public @NotNull InteractionCallbackType getType() {
+        return type;
+    }
+
+    /**
+     * an optional response message
+     */
+    public @Nullable Datable getResponseData(){
+        return data;
+    }
+
     @Override
     public Data getData() {
-        return null;
+        Data data = new Data(2);
+
+        data.add(TYPE_KEY, type);
+        data.addIfNotNull(DATA_KEY, this.data);
+
+        return data;
     }
 }

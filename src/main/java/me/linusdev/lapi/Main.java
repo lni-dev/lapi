@@ -216,34 +216,6 @@ public class Main {
             System.out.println("Username: " + user.getUsername());
         });
 
-        api.createMessage("912377387868639282", new MessageTemplate("look below", false,
-                new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
-                null, null, new Component[]{new ActionRow(api, ComponentType.ACTION_ROW,
-                        new Component[]{new Button(api, ComponentType.BUTTON,
-                                ButtonStyle.Link, "Klick mich UwU",
-                                null, null, "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-                                null)}
-                )}, null,
-                new Attachment[]{
-                        new AttachmentTemplate("image.png",
-                                "fun image",
-                                Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
-                                FileType.PNG).setAttachmentId(0)
-        }));/*.queue((message, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                InvalidDataException e = (InvalidDataException)error.getThrowable();
-                System.out.println(e.getData().getJsonString());
-                return;
-            }
-
-            System.out.println(message.getContent());
-            for(Attachment attachment : message.getAttachments()){
-                System.out.println(attachment.getId());
-                System.out.println(attachment.getDescription());
-            }
-
-        });*/
 
         new MessageBuilder(api, null)
                 .setTTS(false)

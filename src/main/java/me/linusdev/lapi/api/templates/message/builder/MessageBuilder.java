@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.MessageReference;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
@@ -109,6 +110,8 @@ public class MessageBuilder implements HasLApi {
     private @Nullable ArrayList<Attachment> attachments;
     private int nextUploadAttachmentId = 0;
 
+    private @Nullable ArrayList<MessageFlag> flags;
+
     /**
      *
      * @param lApi {@link LApi}
@@ -181,8 +184,8 @@ public class MessageBuilder implements HasLApi {
                 messageReference,
                 components == null ? null : components.toArray(new Component[0]),
                 stickerIds == null ? null : stickerIds.toArray(new String[0]),
-                attachments == null ? null : attachments.toArray(new Attachment[0])
-        );
+                attachments == null ? null : attachments.toArray(new Attachment[0]),
+                flags == null ? null : MessageFlag.getBitsFromFlags(flags));
     }
 
     /**
@@ -635,6 +638,38 @@ public class MessageBuilder implements HasLApi {
 
         stickerIds.add(stickerId);
 
+        return this;
+    }
+
+    /**
+     * replaces current flags with given list.
+     * @param flags {@link ArrayList} of {@link MessageFlag}
+     * @return this
+     */
+    public MessageBuilder setFlags(@Nullable ArrayList<MessageFlag> flags){
+        this.flags = flags;
+        return this;
+    }
+
+    /**
+     *
+     * @param flag the {@link MessageFlag} to set
+     * @return this
+     */
+    public MessageBuilder setFlag(@NotNull MessageFlag flag) {
+        if(this.flags == null) this.flags = new ArrayList<>(1);
+        if(!this.flags.contains(flag)) this.flags.add(flag);
+        return this;
+    }
+
+    /**
+     *
+     * @param flag the {@link MessageFlag} to remove
+     * @return this
+     */
+    public MessageBuilder removeFlag(@NotNull MessageFlag flag) {
+        if(this.flags == null) return this;
+        this.flags.remove(flag);
         return this;
     }
 

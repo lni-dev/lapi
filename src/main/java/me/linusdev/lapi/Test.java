@@ -232,7 +232,7 @@ public class Test implements EventListener{
                                             "fun image",
                                             Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
                                             FileType.PNG).setAttachmentId(0)
-                            })).queue();
+                            }, null)).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }
@@ -275,7 +275,7 @@ public class Test implements EventListener{
                                             "fun image",
                                             Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\E0fcU7MVIAIGoil.jpg"),
                                             FileType.JPEG).setAttachmentId(0)
-                            })).queue();
+                            }, null)).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }

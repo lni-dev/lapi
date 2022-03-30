@@ -545,8 +545,8 @@ public class LApiImpl implements LApi {
                 content,
                 false, null,
                 allowMentions ? null : AllowedMentions.noneAllowed(),
-                null, null, null, null
-        ));
+                null, null, null, null,
+                null));
     }
 
     public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content){
@@ -557,8 +557,8 @@ public class LApiImpl implements LApi {
         return createMessage(channelId,
                 new MessageTemplate(null, false, embeds,
                         allowMentions ? null : AllowedMentions.noneAllowed(),
-                        null, null, null, null
-                ));
+                        null, null, null, null,
+                        null));
     }
 
     public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){

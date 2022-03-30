@@ -43,6 +43,7 @@ public class MessageTemplate implements Template {
     public static final String COMPONENTS_KEY = "components";
     public static final String STICKER_IDS_KEY = "sticker_ids";
     public static final String ATTACHMENTS_KEY = "attachments";
+    public static final String FLAGS_KEY = "flags";
 
     private @Nullable final String content;
     private final boolean tts;
@@ -52,10 +53,10 @@ public class MessageTemplate implements Template {
     private final @Nullable Component[] components;
     private final @Nullable String[] stickerIds;
     private final @Nullable Attachment[] attachments;
+    private final @Nullable Long flags;
 
     /**
-     *
-     * @param content pure text content of the message
+     *  @param content pure text content of the message
      * @param tts whether this message is text to speech
      * @param embeds {@link Embed embeds} for this message
      * @param allowedMentions {@link AllowedMentions}. if {@code null}, Discord will generate the mentions of the content
@@ -63,9 +64,10 @@ public class MessageTemplate implements Template {
      * @param components the {@link Component components} to include with the message
      * @param stickerIds IDs of up to 3 stickers in the server to send in the message
      * @param attachments attachment objects with filename and description
+     * @param flags  {@link me.linusdev.lapi.api.objects.enums.MessageFlag message flags} combined as a bitfield (only {@link me.linusdev.lapi.api.objects.enums.MessageFlag#SUPPRESS_EMBEDS} can be set)
      */
     public MessageTemplate(@Nullable String content, boolean tts, @Nullable Embed[] embeds,
-                           @Nullable AllowedMentions allowedMentions, @Nullable MessageReference messageReference, @Nullable Component[] components, @Nullable String[] stickerIds, @Nullable Attachment[] attachments){
+                           @Nullable AllowedMentions allowedMentions, @Nullable MessageReference messageReference, @Nullable Component[] components, @Nullable String[] stickerIds, @Nullable Attachment[] attachments, @Nullable Long flags){
         this.content = content;
         this.tts = tts;
         this.embeds = embeds;
@@ -74,6 +76,7 @@ public class MessageTemplate implements Template {
         this.components = components;
         this.stickerIds = stickerIds;
         this.attachments = attachments;
+        this.flags = flags;
     }
 
     @Override
@@ -101,6 +104,7 @@ public class MessageTemplate implements Template {
         data.addIfNotNull(COMPONENTS_KEY, components);
         data.addIfNotNull(STICKER_IDS_KEY, stickerIds);
         data.addIfNotNull(ATTACHMENTS_KEY, attachments);
+        data.addIfNotNull(FLAGS_KEY, flags);
 
         return data;
     }
