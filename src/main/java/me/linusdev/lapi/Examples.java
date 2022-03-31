@@ -43,7 +43,7 @@ public class Examples {
 
         lApi.getEventTransmitter().addListener(new EventListener() {
             @Override
-            public void onMessageCreate(@NotNull MessageCreateEvent event) {
+            public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
                 System.out.println("Message: " + event.getMessage().getContent());
 
                 if(!event.getMessage().getAuthor().isBot()
