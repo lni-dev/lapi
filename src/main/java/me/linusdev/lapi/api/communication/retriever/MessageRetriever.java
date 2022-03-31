@@ -16,7 +16,10 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
+import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
@@ -58,7 +61,7 @@ public class MessageRetriever extends DataRetriever<MessageImplementation> {
     }
 
     @Override
-    public @Nullable MessageImplementation retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return new MessageImplementation(lApi, retrieveData());
+    protected @Nullable MessageImplementation processData(@NotNull Data data) throws InvalidDataException {
+        return new MessageImplementation(lApi, data);
     }
 }

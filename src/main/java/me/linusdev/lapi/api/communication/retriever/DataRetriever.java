@@ -18,8 +18,10 @@ package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
@@ -36,8 +38,8 @@ import java.util.function.BiConsumer;
 
 public abstract class DataRetriever<T> extends Retriever<T>{
 
-    protected boolean storeData = false;
-    protected Data data = null;
+    protected LApiHttpResponse response;
+    protected @NotNull Data data;
 
     /**
      * @param lApi  {@link LApi}
@@ -47,22 +49,18 @@ public abstract class DataRetriever<T> extends Retriever<T>{
         super(lApi, query);
     }
 
-
-    /**
-     * Retrieves the wanted Objects JSON and saves it into a {@link Data}.<br>
-     * You are probably looking for {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()}
-     *
-     * @return {@link Data} with all JSON fields
-     * @see Queueable#queue()
-     * @see #completeHereAndIgnoreQueueThread()
-     */
-    protected @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException{
-        if(storeData){
-            data = lApi.getResponse(query.getLApiRequest()).getData();
-            return data;
+    @Override
+    protected @Nullable T process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException {
+        this.response = response;
+        if(response.isJsonArray()){
+            this.data = response.getData(LApi.LAPI_ARRAY_WRAPPER_KEY);
+        } else {
+            this.data = response.getData();
         }
-        return lApi.getResponse(query.getLApiRequest()).getData();
+        return processData(data);
     }
+
+    protected abstract @Nullable T processData(@NotNull Data data) throws InvalidDataException;
 
     /**
      *
@@ -76,7 +74,6 @@ public abstract class DataRetriever<T> extends Retriever<T>{
      */
     @Override
     public @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after) {
-        storeData = true;
         return queue(new BiConsumer<T, Error>() {
             @Override
             public void accept(T t, Error error) {

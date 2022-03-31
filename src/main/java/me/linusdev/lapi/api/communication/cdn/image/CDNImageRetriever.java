@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.communication.cdn.image;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.Retriever;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.log.Logger;
@@ -56,8 +57,8 @@ public class CDNImageRetriever extends Retriever<InputStream>  {
     }
 
     @Override
-    protected @Nullable InputStream retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.getResponse(query.getLApiRequest()).getInputStream();
+    protected @Nullable InputStream process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException {
+        return response.getInputStream();
     }
 
     /**

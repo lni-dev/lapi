@@ -24,7 +24,13 @@ import org.jetbrains.annotations.Nullable;
  * @see <a href="https://en.wikipedia.org/wiki/Media_type" target="_top">Media type</a>
  */
 public enum ContentType implements AbstractContentType {
+    /**
+     * Not an actual content type!
+     */
+    UNKNOWN("-"),
+
     APPLICATION_JSON("application/json"),
+    APPLICATION_XML("application/xml"),
 
     IMAGE_PNG("image/png"),
     IMAGE_JPEG("image/jpeg"),
@@ -33,6 +39,11 @@ public enum ContentType implements AbstractContentType {
     IMAGE_SVG("image/svg+xml"),
 
     MULTIPART_FORM_DATA("multipart/form-data"),
+
+    TEXT_HTML("text/html"),
+    TEXT_CSS("text/css"),
+    TEXT_CSV("text/csv"),
+    TEXT_XML("text/xml"),
     ;
 
     /**

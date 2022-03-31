@@ -120,6 +120,8 @@ public interface LApi extends HasLApi {
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
 
+    public static final String LAPI_ARRAY_WRAPPER_KEY = "lapi_array_wrapper";
+
     @Contract(value = "_ -> new", pure = true)
     static LApi newInstance(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
         return new LApiImpl(config);

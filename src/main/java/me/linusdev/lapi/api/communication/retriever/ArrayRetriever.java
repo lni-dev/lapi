@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
@@ -49,19 +51,14 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
     }
 
     @Override
-    @SuppressWarnings("unchecked cast")
-    public @Nullable ArrayList<R> retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        ArrayList<Object> dataArray = (ArrayList<Object>) retrieveData().get("array");
+    @Nullable
+    protected ArrayList<R> processData(@NotNull Data data) throws InvalidDataException {
+        ArrayList<Object> dataArray = (ArrayList<Object>) data.get("array");
         ArrayList<R> resultArray = new ArrayList<>(dataArray.size());
 
         for(Object o : dataArray)
             resultArray.add(converter.convert(lApi, (C) o));
 
         return resultArray;
-    }
-
-    @Override
-    public @NotNull Data retrieveData() throws LApiException, IOException, ParseException, InterruptedException {
-        return lApi.getResponse(query.getLApiRequest()).getData("array");
     }
 }

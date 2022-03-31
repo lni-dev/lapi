@@ -16,7 +16,10 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
+import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.PlaceHolder;
@@ -40,7 +43,7 @@ public class ChannelRetriever extends DataRetriever<Channel>{
     }
 
     @Override
-    public @Nullable Channel retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return Channel.fromData(lApi, retrieveData());
+    protected @Nullable Channel processData(@NotNull Data data) throws InvalidDataException {
+        return Channel.fromData(lApi, data);
     }
 }

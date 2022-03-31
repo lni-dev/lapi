@@ -20,6 +20,7 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.other.Container;
@@ -57,18 +58,32 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
 
     /**
      * Retrieves the Object. This will happen on the current Thread! <br>
-     * I suggest you use {@link Queueable#queue()} or {@link #completeHereAndIgnoreQueueThread()} instead!
+     * I suggest you use {@link Queueable#queue()} or {@link #completeHere()} instead!
      * @return retrieved Object
      * @see Queueable#queue()
      * @see #completeHereAndIgnoreQueueThread()
      */
-    protected @Nullable abstract T retrieve() throws LApiException, IOException, ParseException, InterruptedException;
+    protected @NotNull LApiHttpResponse retrieve() throws LApiException, IOException, ParseException, InterruptedException {
+        return lApi.getResponse(query.getLApiRequest());
+    }
+
+    /**
+     * Processes the retrieved response
+     * @param response the retrieved response
+     * @return {@link T} converted
+     */
+    protected @Nullable abstract T process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
     protected @NotNull Container<T> completeHereAndIgnoreQueueThread() throws NoInternetException {
         Container<T> container;
         try {
-            container = new Container<T>(retrieve(), null);
+            LApiHttpResponse response = retrieve();
+            if(response.isError()){
+                container = new Container<T>(null, new Error(response.getErrorMessage()));
+            } else {
+                container = new Container<T>(process(response), null);
+            }
 
         } catch (NoInternetException noInternetException){
             throw noInternetException; // future will catch this and queue again...
@@ -77,7 +92,7 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("InvalidDataException while trying to retrieve " + query.toString());
             log.error(invalidDataException);
-            log.errorAlign(invalidDataException.getData().getJsonString().toString(), "Data: ");
+            log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().getJsonString().toString(), "Data: ");
             container = new Container<T>(null, new Error(invalidDataException));
 
         } catch (Throwable t) {

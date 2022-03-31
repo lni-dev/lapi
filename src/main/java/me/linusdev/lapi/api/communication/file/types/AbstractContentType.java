@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.communication.file.types;
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * represents a http content-type
  */
@@ -32,5 +34,15 @@ public interface AbstractContentType extends SimpleDatable {
     @Override
     default Object simplify(){
         return getContentTypeAsString();
+    }
+
+    /**
+     *
+     * @param contentType1 contentType 1
+     * @param contentType2 contentType 2
+     * @return {@code true} if content type string is the same
+     */
+    static boolean equals(AbstractContentType contentType1, AbstractContentType contentType2) {
+        return contentType1.getContentTypeAsString().equalsIgnoreCase(contentType2.getContentTypeAsString());
     }
 }

@@ -271,7 +271,13 @@ public class LApiImpl implements LApi {
         }
     }
 
-    public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException {
+    public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, NoInternetException, ParseException, InterruptedException {
+        LApiHttpResponse response = retrieveResponse(request);
+
+        return response;
+    }
+
+    private LApiHttpResponse retrieveResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException {
         Throwable throwThrough = null;
 
         try {

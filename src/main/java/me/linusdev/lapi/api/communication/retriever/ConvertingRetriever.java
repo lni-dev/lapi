@@ -18,9 +18,11 @@ package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +51,7 @@ public class ConvertingRetriever<R> extends DataRetriever<R>{
     }
 
     @Override
-    public @Nullable R retrieve() throws LApiException, IOException, ParseException, InterruptedException {
-        return converter.convert(lApi, retrieveData());
+    protected @Nullable R processData(@NotNull Data data) throws InvalidDataException {
+        return converter.convert(lApi, data);
     }
 }

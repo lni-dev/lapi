@@ -19,10 +19,10 @@ package me.linusdev.lapi.api.communication.retriever.response;
 import me.linusdev.data.Data;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.response.body.ErrorMessage;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +41,7 @@ public class LApiHttpResponse {
     private final InputStream inputStream;
     private final @Nullable PushbackReader reader;
     private final @NotNull HttpResponseCode responseCode;
+    private final @NotNull AbstractContentType contentType;
 
     private @Nullable Boolean isArray = null;
     private @Nullable ErrorMessage error;
@@ -53,16 +54,17 @@ public class LApiHttpResponse {
 
         Optional<String> contentTypeHeader = source.headers().firstValue(LApiHttpRequest.CONTENT_TYPE_HEADER);
         if(contentTypeHeader.isPresent()){
-            //TODO make a variable to store the content type. Function to check if content type is JSON
-            if(contentTypeHeader.get().equalsIgnoreCase(ContentType.APPLICATION_JSON.getContentTypeAsString())){
+            this.contentType = ContentType.of(contentTypeHeader.get());
+            if(contentType == ContentType.APPLICATION_JSON){
                 this.reader = new PushbackReader(new InputStreamReader(inputStream));
-                if (!isArray()) {
+                if (!isJsonArray()) {
                     error = ErrorMessage.fromData(getData());
                 }
             } else {
                this.reader = null;
             }
         } else {
+            this.contentType = ContentType.UNKNOWN;
             this.reader = null;
         }
     }
@@ -88,7 +90,8 @@ public class LApiHttpResponse {
      */
     public @NotNull Data getData(@Nullable String arrayKey) throws IOException, ParseException {
         if(data != null) return data;
-        if(reader == null) throw new UnsupportedOperationException("No JSON body!");
+        if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
+        if(reader == null) throw new IllegalStateException("Reader is null."); //<- this should never happen
         int c = reader.read();
         reader.unread(c);
         if (c == -1){
@@ -107,9 +110,10 @@ public class LApiHttpResponse {
      * @return {@code true} if the response body starts with a '['
      * @throws IOException from {@link PushbackReader}
      */
-    public boolean isArray() throws IOException {
+    public boolean isJsonArray() throws IOException {
         if (isArray != null) return isArray;
-        if(reader == null) throw new UnsupportedOperationException("No JSON body!");
+        if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
+        if(reader == null) throw new IllegalStateException("Reader is null."); //<- this should never happen
 
         int c;
         while ((c = reader.read()) != -1) {
@@ -136,6 +140,21 @@ public class LApiHttpResponse {
      */
     public boolean noContent(){
         return noContent;
+    }
+
+    /**
+     *
+     * @return {@code true} if the content type is {@link ContentType#APPLICATION_JSON APPLICATION_JSON}.
+     */
+    public boolean hasJsonBody() {
+        return AbstractContentType.equals(contentType, ContentType.APPLICATION_JSON);
+    }
+
+    /**
+     * @return {@code true} if the response contained an error.
+     */
+    public boolean isError() {
+        return error != null;
     }
 
     /**
