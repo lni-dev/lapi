@@ -241,12 +241,12 @@ public class Test implements EventListener{
                                     null, "me.linusdev.btn_1", null,
                                     null)}
                     )}, null,
-                            new Attachment[]{
+                            /*new Attachment[]{
                                     new AttachmentTemplate("image.png",
                                             "fun image",
                                             Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
                                             FileType.PNG).setAttachmentId(0)
-                            }, null)).queue();
+                            }*/null, null)).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }
