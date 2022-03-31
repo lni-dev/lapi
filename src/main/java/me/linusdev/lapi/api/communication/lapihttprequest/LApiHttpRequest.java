@@ -91,13 +91,7 @@ public class LApiHttpRequest {
         this.timeout = timeout;
     }
 
-    /**
-     * builds a {@link HttpRequest}
-     * @return built {@link HttpRequest}
-     * @throws IllegalRequestMethodException if {@link #body} is {@code null} and {@link #method} is not {@link Method#GET GET} or {@link Method#DELETE DELETE}
-     */
-    public HttpRequest getHttpRequest() throws IllegalRequestMethodException, IOException {
-        LogInstance log = Logger.getLogger(this.getClass().getSimpleName(), Logger.Type.INFO);
+    public @NotNull String getFullUri(){
         StringBuilder uri = new StringBuilder(this.uri);
         //Add query string params
 
@@ -117,9 +111,21 @@ public class LApiHttpRequest {
             }
         }
 
+        return uri.toString();
+    }
+
+    /**
+     * builds a {@link HttpRequest}
+     * @return built {@link HttpRequest}
+     * @throws IllegalRequestMethodException if {@link #body} is {@code null} and {@link #method} is not {@link Method#GET GET} or {@link Method#DELETE DELETE}
+     */
+    public HttpRequest getHttpRequest() throws IllegalRequestMethodException, IOException {
+        LogInstance log = Logger.getLogger(this.getClass().getSimpleName(), Logger.Type.INFO);
+        String uri = getFullUri();
+
         log.info("Creating HttpRequest: " + method + " " + uri);
 
-        HttpRequest.Builder builder =  HttpRequest.newBuilder(URI.create(uri.toString()));
+        HttpRequest.Builder builder =  HttpRequest.newBuilder(URI.create(uri));
 
         //GET requests do never have a body!
         if(body != null && method != Method.GET){
@@ -201,6 +207,14 @@ public class LApiHttpRequest {
         }
 
         return builder.build();
+    }
+
+    /**
+     *
+     * @return String in the following format: "GET https://www.example.com?a=b"
+     */
+    public String toSimpleString() {
+        return method.toString() + " " + getFullUri();
     }
 
     @Override

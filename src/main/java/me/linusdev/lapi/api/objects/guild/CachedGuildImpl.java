@@ -143,7 +143,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         try {
             guild.updateSelfByData(data);
         } catch (InvalidDataException e) {
-            e.printStackTrace();
+            Logger.getLogger(CachedGuildImpl.class).error(e);
         }
 
         return guild;

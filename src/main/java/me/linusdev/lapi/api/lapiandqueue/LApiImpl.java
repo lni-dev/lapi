@@ -284,7 +284,7 @@ public class LApiImpl implements LApi {
             HttpRequest builtRequest = request.getHttpRequest();
 
             try {
-                return sendRequest(builtRequest);
+                return sendRequest(request, builtRequest);
             } catch (ConnectException | HttpTimeoutException exception) {
                 Throwable cause = null;
                 if (exception instanceof ConnectException) {
@@ -302,7 +302,7 @@ public class LApiImpl implements LApi {
                         //if we reach this, internet is connected
                         //let's try again
                         try {
-                            return sendRequest(builtRequest);
+                            return sendRequest(request, builtRequest);
                         } catch (Throwable t) {
                             log.error("Cannot send Request even though internet is connected. Uri:" + request.getHttpRequest().uri());
                             throw exception;
@@ -339,9 +339,12 @@ public class LApiImpl implements LApi {
     }
 
     @ApiStatus.Internal
-    private LApiHttpResponse sendRequest(@NotNull HttpRequest request) throws IOException, InterruptedException, ParseException {
-        LApiHttpResponse response = new LApiHttpResponse(client.send(request, HttpResponse.BodyHandlers.ofInputStream()));
+    private LApiHttpResponse sendRequest(@NotNull LApiHttpRequest request, @NotNull HttpRequest built) throws IOException, InterruptedException, ParseException {
+        LApiHttpResponse response = new LApiHttpResponse(client.send(built, HttpResponse.BodyHandlers.ofInputStream()));
         notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
+        if(Logger.DEBUG_LOG) log.debug("Request: " + request.toSimpleString()
+                + " returned with code " + response.getResponseCode() + " (" + response.getResponseCodeAsInt() + ")");
+        //TODO maybe log response body too.
         return response;
     }
 

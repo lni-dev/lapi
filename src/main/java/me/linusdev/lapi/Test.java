@@ -40,6 +40,7 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListen
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
+import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -97,6 +98,17 @@ public class Test implements EventListener{
                             .addIntent(GatewayIntent.ALL)
                             .adjustStartupPresence(presence -> {
                                 presence.setStatus(StatusType.ONLINE);
+                            })
+                            .setUnexpectedEventHandler(new GatewayWebSocket.UnexpectedEventHandler() {
+                                @Override
+                                public void handleError(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull Throwable error) {
+
+                                }
+
+                                @Override
+                                public void onFatal(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, @NotNull String information, @Nullable Throwable cause) {
+                                    System.out.println("Fatal");
+                                }
                             });
                 }).buildLapi();
 

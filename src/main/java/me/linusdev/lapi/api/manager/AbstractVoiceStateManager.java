@@ -20,6 +20,7 @@ import me.linusdev.data.Data;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public interface AbstractVoiceStateManager {
@@ -44,7 +45,7 @@ public interface AbstractVoiceStateManager {
         try {
             get(userId).updateSelfByData(voiceStateData);
         } catch (me.linusdev.lapi.api.communication.exceptions.InvalidDataException e) {
-            e.printStackTrace();
+            Logger.getLogger(this.getClass()).error(e);
         }
         return true;
     }

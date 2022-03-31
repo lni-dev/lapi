@@ -41,6 +41,7 @@ public class LApiHttpResponse {
     private final InputStream inputStream;
     private final @Nullable PushbackReader reader;
     private final @NotNull HttpResponseCode responseCode;
+    private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
 
     private @Nullable Boolean isArray = null;
@@ -50,7 +51,8 @@ public class LApiHttpResponse {
 
     public LApiHttpResponse(HttpResponse<InputStream> source) throws IOException, ParseException {
         this.inputStream = source.body();
-        this.responseCode = HttpResponseCode.fromValue(source.statusCode());
+        this.responseCodeAsInt = source.statusCode();
+        this.responseCode = HttpResponseCode.fromValue(this.responseCodeAsInt);
 
         Optional<String> contentTypeHeader = source.headers().firstValue(LApiHttpRequest.CONTENT_TYPE_HEADER);
         if(contentTypeHeader.isPresent()){
@@ -163,6 +165,10 @@ public class LApiHttpResponse {
      */
     public @NotNull HttpResponseCode getResponseCode() {
         return responseCode;
+    }
+
+    public int getResponseCodeAsInt() {
+        return responseCodeAsInt;
     }
 
     /**
