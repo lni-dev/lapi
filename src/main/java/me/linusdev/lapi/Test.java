@@ -125,12 +125,12 @@ public class Test implements EventListener{
     }
 
     @Override
-    public void onReady(@NotNull ReadyEvent event) {
+    public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
         System.out.println("onReady");
     }
 
     @Override
-    public void onGuildsReady(@NotNull GuildsReadyEvent event) {
+    public void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {
         System.out.println("onGuildsReady");
 
         for(CachedGuildImpl guild : event.getGuildPool()){
@@ -139,48 +139,48 @@ public class Test implements EventListener{
     }
 
     @Override
-    public void onLApiReady(@NotNull LApiReadyEvent event) {
+    public void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {
         System.out.println("onLApiReady");
     }
 
     @Override
-    public void onGuildCreate(@NotNull GuildCreateEvent event) {
+    public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
         System.out.println("GuildImpl create: " + event.getCachedGuild().getName());
     }
 
     @Override
-    public void onGuildDelete(@NotNull GuildDeleteEvent event) {
+    public void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {
         System.out.println("onGuildDelete");
     }
 
     @Override
-    public void onGuildUpdate(@NotNull GuildUpdateEvent event) {
+    public void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {
         System.out.println("onGuildUpdate");
         System.out.println(((Data)event.getPayload().getPayloadData()).getJsonString());
     }
 
     @Override
-    public void onGuildJoined(@NotNull GuildJoinedEvent event) {
+    public void onGuildJoined(@NotNull LApi lApi, @NotNull GuildJoinedEvent event) {
         System.out.println("onGuildJoined");
     }
 
     @Override
-    public void onGuildLeft(@NotNull GuildLeftEvent event) {
+    public void onGuildLeft(@NotNull LApi lApi, @NotNull GuildLeftEvent event) {
         System.out.println("onGuildLeft");
     }
 
     @Override
-    public void onGuildUnavailable(@NotNull GuildUnavailableEvent event) {
+    public void onGuildUnavailable(@NotNull LApi lApi, @NotNull GuildUnavailableEvent event) {
         System.out.println("onGuildUnavailable");
     }
 
     @Override
-    public void onGuildAvailable(@NotNull GuildAvailableEvent event) {
+    public void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {
         System.out.println("onGuildAvailable");
     }
 
     @Override
-    public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
+    public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
         System.out.println("onGuildEmojisUpdate");
 
         ListUpdate<EmojiObject> update = event.getUpdate();
@@ -193,27 +193,27 @@ public class Test implements EventListener{
     }
 
     @Override
-    public void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {
+    public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
         System.out.println("onGuildRoleCreate: " + event.getRole().getName());
     }
 
     @Override
-    public void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {
+    public void onGuildRoleUpdate(@NotNull LApi lApi, @NotNull GuildRoleUpdateEvent event) {
         System.out.println("onGuildRoleUpdate: old: " + event.getOldRole().getName() + ", new: " + event.getRole().getName());
     }
 
     @Override
-    public void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {
+    public void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {
         System.out.println("onGuildRoleDelete: " + event.getRole().getName());
     }
 
     @Override
-    public void onMessageCreate(@NotNull MessageCreateEvent event) {
+    public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         System.out.println("onMessageCreate");
     }
 
     @Override
-    public void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {
+    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         System.out.println("onNonGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
@@ -231,7 +231,6 @@ public class Test implements EventListener{
                         .queue();
             }else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
-                LApi lApi = event.getLApi();
                 try {
                     lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
                             new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
@@ -258,7 +257,7 @@ public class Test implements EventListener{
     }
 
     @Override
-    public void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {
+    public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
         System.out.println("onGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
@@ -274,7 +273,6 @@ public class Test implements EventListener{
                         .queue();
             }else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
-                LApi lApi = event.getLApi();
                 try {
                     lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
                             new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
@@ -298,12 +296,12 @@ public class Test implements EventListener{
     }
 
     @Override
-    public void onLApiError(@NotNull LApiErrorEvent event) {
+    public void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) {
         System.out.println("onLApiError in event " + event.getInEvent() + ", error code: " + event.getError().getCode());
     }
 
     @Override
-    public void onInteractionCreate(@NotNull InteractionCreateEvent event) {
+    public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
         System.out.println("onInteractionCreate");
         System.out.println("customID: " + event.getCustomId());
 

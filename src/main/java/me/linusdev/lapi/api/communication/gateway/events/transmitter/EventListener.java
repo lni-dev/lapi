@@ -63,7 +63,7 @@ public interface EventListener {
 
 
 
-    default void onReady(@NotNull ReadyEvent event) {}
+    default void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {}
 
     /**
      * This event will be triggered, when data for all guilds, the current user is a member of,
@@ -71,59 +71,59 @@ public interface EventListener {
      * This can also happen randomly, if the gateway
      * {@link me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket#reconnect(boolean) reconnects}.
      */
-    default void onGuildsReady(@NotNull GuildsReadyEvent event) {}
+    default void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {}
 
     /**
      * TODO: when does it happen / make it happen<br>
      * This event will only happen once.
      */
-    default void onLApiReady(@NotNull LApiReadyEvent event) {}
+    default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
 
-    default void onGuildCreate(@NotNull GuildCreateEvent event) {}
+    default void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {}
 
-    default void onGuildDelete(@NotNull GuildDeleteEvent event) {}
+    default void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {}
 
-    default void onGuildUpdate(@NotNull GuildUpdateEvent event) {}
+    default void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {}
 
     /**
      * Triggered, when the current user joined a guild
      */
-    default void onGuildJoined(@NotNull GuildJoinedEvent event) {}
+    default void onGuildJoined(@NotNull LApi lApi, @NotNull GuildJoinedEvent event) {}
 
     /**
      * Triggered, when the current user left a guild
      */
-    default void onGuildLeft(@NotNull GuildLeftEvent event) {}
+    default void onGuildLeft(@NotNull LApi lApi, @NotNull GuildLeftEvent event) {}
 
     /**
      * If a guild becomes unavailable (or is already unavailable when the gateway initializes) this event will trigger.
      */
-    default void onGuildUnavailable(@NotNull GuildUnavailableEvent event) {}
+    default void onGuildUnavailable(@NotNull LApi lApi, @NotNull GuildUnavailableEvent event) {}
 
     /**
      * Triggered when an unavailable guild (due to an outage) becomes available again
      */
-    default void onGuildAvailable(@NotNull GuildAvailableEvent event) {}
+    default void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {}
 
-    default void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {}
+    default void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {}
 
-    default void onGuildStickersUpdate(@NotNull GuildStickersUpdateEvent event) {}
+    default void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {}
 
-    default void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {}
+    default void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {}
 
-    default void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {}
+    default void onGuildRoleUpdate(@NotNull LApi lApi, @NotNull GuildRoleUpdateEvent event) {}
 
-    default void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {}
+    default void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {}
 
-    default void onMessageCreate(@NotNull MessageCreateEvent event) {}
+    default void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {}
 
-    default void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {}
+    default void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {}
 
-    default void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {}
+    default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
 
-    default void onInteractionCreate(@NotNull InteractionCreateEvent event) {}
+    default void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {}
 
-    default void onLApiError(@NotNull LApiErrorEvent event) { }
+    default void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) { }
 
 }
 

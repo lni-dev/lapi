@@ -137,316 +137,316 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
 
     @ApiStatus.Internal
     @Override
-    public void onReady(@NotNull ReadyEvent event) {
+    public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
         //Reset this here, so a new GuildsReady event can occur
         //This is required, if the gateway has reconnected
         triggeredGuildsReadyEvent.set(false);
 
 
         for(EventListener listener : listeners){
-            listener.onReady(event);
+            listener.onReady(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onReady(event);
+                listener.onReady(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildsReady(@NotNull GuildsReadyEvent event) {
+    public void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {
         triggeredGuildsReadyEvent.set(true);
         for(EventListener listener : listeners){
-            listener.onGuildsReady(event);
+            listener.onGuildsReady(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildsReady(event);
+                listener.onGuildsReady(lApi, event);
             }
         }
     }
 
     @Override
-    public void onLApiReady(@NotNull LApiReadyEvent event) {
+    public void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {
         //make sure this event is only called once
         if(triggeredLApiReadyEvent.get()) return;
         triggeredLApiReadyEvent.set(true);
         for(EventListener listener : listeners){
-            listener.onLApiReady(event);
+            listener.onLApiReady(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onLApiReady(event);
+                listener.onLApiReady(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildCreate(@NotNull GuildCreateEvent event) {
+    public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildCreate(event);
+            listener.onGuildCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildCreate(event);
+                listener.onGuildCreate(lApi, event);
             }
         }
 
         //Sub-events
-        if(!triggeredGuildsReadyEvent.get() && lApi.getGuildManager() != null && lApi.getGuildManager().allGuildsReceivedEvent()){
+        if(!triggeredGuildsReadyEvent.get() && this.lApi.getGuildManager() != null && this.lApi.getGuildManager().allGuildsReceivedEvent()){
             //check if guild Manager is not null. if it is CACHE_GUILDS is disabled and this event can't be triggered
-            onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
+            onGuildsReady(lApi, new GuildsReadyEvent(lApi, this.lApi.getGuildManager()));
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildDelete(@NotNull GuildDeleteEvent event) {
+    public void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildDelete(event);
+            listener.onGuildDelete(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildDelete(event);
+                listener.onGuildDelete(lApi, event);
             }
         }
 
         //Sub-events
-        if(!triggeredGuildsReadyEvent.get() && lApi.getGuildManager() != null && lApi.getGuildManager().allGuildsReceivedEvent()){
+        if(!triggeredGuildsReadyEvent.get() && this.lApi.getGuildManager() != null && this.lApi.getGuildManager().allGuildsReceivedEvent()){
             //check if guild Manager is not null. if it is CACHE_GUILDS is disabled and this event can't be triggered
-            onGuildsReady(new GuildsReadyEvent(lApi, lApi.getGuildManager()));
+            onGuildsReady(lApi, new GuildsReadyEvent(this.lApi, this.lApi.getGuildManager()));
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildUpdate(@NotNull GuildUpdateEvent event) {
+    public void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildUpdate(event);
+            listener.onGuildUpdate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildUpdate(event);
+                listener.onGuildUpdate(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildJoined(@NotNull GuildJoinedEvent event) {
+    public void onGuildJoined(@NotNull LApi lApi, @NotNull GuildJoinedEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildJoined(event);
+            listener.onGuildJoined(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_JOINED);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildJoined(event);
+                listener.onGuildJoined(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildLeft(@NotNull GuildLeftEvent event) {
+    public void onGuildLeft(@NotNull LApi lApi, @NotNull GuildLeftEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildLeft(event);
+            listener.onGuildLeft(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_LEFT);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildLeft(event);
+                listener.onGuildLeft(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildUnavailable(@NotNull GuildUnavailableEvent event) {
+    public void onGuildUnavailable(@NotNull LApi lApi, @NotNull GuildUnavailableEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildUnavailable(event);
+            listener.onGuildUnavailable(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_UNAVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildUnavailable(event);
+                listener.onGuildUnavailable(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildAvailable(@NotNull GuildAvailableEvent event) {
+    public void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildAvailable(event);
+            listener.onGuildAvailable(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_AVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildAvailable(event);
+                listener.onGuildAvailable(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildEmojisUpdate(@NotNull GuildEmojisUpdateEvent event) {
+    public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildEmojisUpdate(event);
+            listener.onGuildEmojisUpdate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildEmojisUpdate(event);
+                listener.onGuildEmojisUpdate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildStickersUpdate(@NotNull GuildStickersUpdateEvent event) {
+    public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildStickersUpdate(event);
+            listener.onGuildStickersUpdate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildStickersUpdate(event);
+                listener.onGuildStickersUpdate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildRoleCreate(@NotNull GuildRoleCreateEvent event) {
+    public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleCreate(event);
+            listener.onGuildRoleCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleCreate(event);
+                listener.onGuildRoleCreate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildRoleUpdate(@NotNull GuildRoleUpdateEvent event) {
+    public void onGuildRoleUpdate(@NotNull LApi lApi, @NotNull GuildRoleUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleUpdate(event);
+            listener.onGuildRoleUpdate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleUpdate(event);
+                listener.onGuildRoleUpdate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onGuildRoleDelete(@NotNull GuildRoleDeleteEvent event) {
+    public void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleDelete(event);
+            listener.onGuildRoleDelete(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleDelete(event);
+                listener.onGuildRoleDelete(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onMessageCreate(@NotNull MessageCreateEvent event) {
+    public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onMessageCreate(event);
+            listener.onMessageCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onMessageCreate(event);
+                listener.onMessageCreate(lApi, event);
             }
         }
 
         //Sub-events
-        if(event.isGuildEvent()) onGuildMessageCreate(new GuildMessageCreateEvent(event));
-        else onNonGuildMessageCreate(event);
+        if(event.isGuildEvent()) onGuildMessageCreate(lApi, new GuildMessageCreateEvent(event));
+        else onNonGuildMessageCreate(lApi, event);
     }
 
     @ApiStatus.Internal
     @Override
-    public void onNonGuildMessageCreate(@NotNull MessageCreateEvent event) {
+    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onNonGuildMessageCreate(event);
+            listener.onNonGuildMessageCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(NON_GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onNonGuildMessageCreate(event);
+                listener.onNonGuildMessageCreate(lApi, event);
             }
         }
     }
 
     @ApiStatus.Internal
     @Override
-    public void onGuildMessageCreate(@NotNull GuildMessageCreateEvent event) {
+    public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildMessageCreate(event);
+            listener.onGuildMessageCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildMessageCreate(event);
+                listener.onGuildMessageCreate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onInteractionCreate(@NotNull InteractionCreateEvent event) {
+    public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onInteractionCreate(event);
+            listener.onInteractionCreate(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onInteractionCreate(event);
+                listener.onInteractionCreate(lApi, event);
             }
         }
     }
 
     @Override
-    public void onLApiError(@NotNull LApiErrorEvent event) {
+    public void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) {
         for(EventListener listener : listeners){
-            listener.onLApiError(event);
+            listener.onLApiError(lApi, event);
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onLApiError(event);
+                listener.onLApiError(lApi, event);
             }
         }
     }
