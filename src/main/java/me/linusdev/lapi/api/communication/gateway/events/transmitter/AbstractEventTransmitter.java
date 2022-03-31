@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,15 +46,15 @@ public interface AbstractEventTransmitter extends HasLApi {
      * Adding a {@link EventListener} as specified listener means, that the listener's methods will only listen to
      * events with the specified {@link EventIdentifier}.<br><br>
      *
-     * For Example if you add a listener, which overwrites {@link EventListener#onMessageCreate(MessageCreateEvent)} and
+     * For Example if you add a listener, which overwrites {@link EventListener#onMessageCreate(LApi, MessageCreateEvent)} and
      * add it with the specification {@link EventIdentifier#READY READY}, your listener will have no effect.<br>
      * But if you add this listener with the specification {@link EventIdentifier#MESSAGE_CREATE MESSAGE_CREATE}, the
-     * {@link EventListener#onMessageCreate(MessageCreateEvent) onMessageCreate(MessageCreateEvent)} method of your listener will be called, when a new message
+     * {@link EventListener#onMessageCreate(LApi, MessageCreateEvent) onMessageCreate(MessageCreateEvent)} method of your listener will be called, when a new message
      * was created.<br><br>
      *
      * Note that sub-event-methods of an event are not called if you add the {@link EventIdentifier} for the (super-)event. For Example:<br>
      * If you add a listener with the specification {@link EventIdentifier#MESSAGE_CREATE MESSAGE_CREATE},
-     * the {@link EventListener#onGuildMessageCreate(GuildMessageCreateEvent) onGuildMessageCreate(GuildMessageCreateEvent)}
+     * the {@link EventListener#onGuildMessageCreate(LApi, GuildMessageCreateEvent) onGuildMessageCreate(GuildMessageCreateEvent)}
      * method of your listener will never be called. If you want that method to be called, you will have to add
      * {@link EventIdentifier#GUILD_MESSAGE_CREATE GUILD_MESSAGE_CREATE} instead. You can also add both if you wish.
      *

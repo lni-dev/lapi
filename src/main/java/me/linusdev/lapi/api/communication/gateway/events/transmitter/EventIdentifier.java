@@ -30,6 +30,7 @@ import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 
 /**
  * <p>
@@ -70,12 +71,12 @@ public enum EventIdentifier{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * identifier for {@link EventListener#onReady(ReadyEvent)}.
+     * identifier for {@link EventListener#onReady(LApi, ReadyEvent)}.
      */
     READY,
 
     /**
-     * identifier for {@link EventListener#onGuildsReady(GuildsReadyEvent)}.
+     * identifier for {@link EventListener#onGuildsReady(LApi, GuildsReadyEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -90,7 +91,7 @@ public enum EventIdentifier{
     GUILDS_READY,
 
     /**
-     * identifier for {@link EventListener#onLApiReady(LApiReadyEvent)}.
+     * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
      */
     LAPI_READY,
 
@@ -104,7 +105,7 @@ public enum EventIdentifier{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * identifier for {@link EventListener#onGuildCreate(GuildCreateEvent)}.
+     * identifier for {@link EventListener#onGuildCreate(LApi, GuildCreateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -116,7 +117,7 @@ public enum EventIdentifier{
     GUILD_CREATE,
 
     /**
-     * identifier for {@link EventListener#onGuildDelete(GuildDeleteEvent)}.
+     * identifier for {@link EventListener#onGuildDelete(LApi, GuildDeleteEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -128,7 +129,7 @@ public enum EventIdentifier{
     GUILD_DELETE,
 
     /**
-     * identifier for {@link EventListener#onGuildUpdate(GuildUpdateEvent)}.
+     * identifier for {@link EventListener#onGuildUpdate(LApi, GuildUpdateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -140,7 +141,7 @@ public enum EventIdentifier{
     GUILD_UPDATE,
 
     /**
-     * identifier for {@link EventListener#onGuildJoined(GuildJoinedEvent)}.
+     * identifier for {@link EventListener#onGuildJoined(LApi, GuildJoinedEvent)}.
      *
      * <br><br>
      * requires:
@@ -159,7 +160,7 @@ public enum EventIdentifier{
     GUILD_JOINED,
 
     /**
-     * identifier for {@link EventListener#onGuildLeft(GuildLeftEvent)}.
+     * identifier for {@link EventListener#onGuildLeft(LApi, GuildLeftEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -177,7 +178,7 @@ public enum EventIdentifier{
     GUILD_LEFT,
 
     /**
-     * identifier for {@link EventListener#onGuildUnavailable(GuildUnavailableEvent)}.
+     * identifier for {@link EventListener#onGuildUnavailable(LApi, GuildUnavailableEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -189,7 +190,7 @@ public enum EventIdentifier{
     GUILD_UNAVAILABLE,
 
     /**
-     * identifier for {@link EventListener#onGuildAvailable(GuildAvailableEvent)}.
+     * identifier for {@link EventListener#onGuildAvailable(LApi, GuildAvailableEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -201,7 +202,7 @@ public enum EventIdentifier{
     GUILD_AVAILABLE,
 
     /**
-     * identifier for {@link EventListener#onGuildEmojisUpdate(GuildEmojisUpdateEvent)}.
+     * identifier for {@link EventListener#onGuildEmojisUpdate(LApi, GuildEmojisUpdateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -213,7 +214,7 @@ public enum EventIdentifier{
     GUILD_EMOJIS_UPDATE,
 
     /**
-     * identifier for {@link EventListener#onGuildStickersUpdate(GuildStickersUpdateEvent)}.
+     * identifier for {@link EventListener#onGuildStickersUpdate(LApi, GuildStickersUpdateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -225,7 +226,7 @@ public enum EventIdentifier{
     GUILD_STICKERS_UPDATE,
 
     /**
-     * identifier for {@link EventListener#onGuildRoleCreate(GuildRoleCreateEvent)}.
+     * identifier for {@link EventListener#onGuildRoleCreate(LApi, GuildRoleCreateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -237,7 +238,7 @@ public enum EventIdentifier{
     GUILD_ROLE_CREATE,
 
     /**
-     * identifier for {@link EventListener#onGuildRoleUpdate(GuildRoleUpdateEvent)}.
+     * identifier for {@link EventListener#onGuildRoleUpdate(LApi, GuildRoleUpdateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -249,7 +250,7 @@ public enum EventIdentifier{
     GUILD_ROLE_UPDATE,
 
     /**
-     * identifier for {@link EventListener#onGuildRoleUpdate(GuildRoleUpdateEvent)}.
+     * identifier for {@link EventListener#onGuildRoleUpdate(LApi, GuildRoleUpdateEvent)}.
      * <br><br>
      * requires:
      * <ul>
@@ -270,18 +271,18 @@ public enum EventIdentifier{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * identifier for {@link EventListener#onMessageCreate(MessageCreateEvent)}.
+     * identifier for {@link EventListener#onMessageCreate(LApi, MessageCreateEvent)}.
      */
     MESSAGE_CREATE,
 
     /**
-     * identifier for {@link EventListener#onGuildMessageCreate(GuildMessageCreateEvent)}.<br>
+     * identifier for {@link EventListener#onGuildMessageCreate(LApi, GuildMessageCreateEvent)}.<br>
      * sub-event of {@link #MESSAGE_CREATE}.
      */
     GUILD_MESSAGE_CREATE,
 
     /**
-     * identifier for {@link EventListener#onNonGuildMessageCreate(MessageCreateEvent)}.<br>
+     * identifier for {@link EventListener#onNonGuildMessageCreate(LApi, MessageCreateEvent)}.<br>
      * sub-event of {@link #MESSAGE_CREATE}.
      */
     NON_GUILD_MESSAGE_CREATE,
@@ -295,7 +296,7 @@ public enum EventIdentifier{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * identifier for {@link EventListener#onInteractionCreate(InteractionCreateEvent)}.<br>
+     * identifier for {@link EventListener#onInteractionCreate(LApi, InteractionCreateEvent)}.<br>
      */
     INTERACTION_CREATE,
 
@@ -308,7 +309,7 @@ public enum EventIdentifier{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * identifier for {@link EventListener#onLApiError(LApiErrorEvent)}.
+     * identifier for {@link EventListener#onLApiError(LApi, LApiErrorEvent)}.
      */
     LAPI_ERROR,
 }
