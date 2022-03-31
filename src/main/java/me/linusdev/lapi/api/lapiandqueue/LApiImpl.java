@@ -33,10 +33,7 @@ import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
-import me.linusdev.lapi.api.communication.retriever.ChannelRetriever;
-import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
-import me.linusdev.lapi.api.communication.retriever.MessageRetriever;
+import me.linusdev.lapi.api.communication.retriever.*;
 import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
@@ -565,14 +562,14 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public @NotNull Queueable<NoContent> createInteractionResponse(@NotNull String interactionId,
+    public @NotNull Queueable<LApiHttpResponse> createInteractionResponse(@NotNull String interactionId,
                                                                    @NotNull String interactionToken,
                                                                    @NotNull InteractionResponse response) {
         Query query = new LinkQuery(this, Link.CREATE_INTERACTION_RESPONSE, response.getBody(), null,
                 new PlaceHolder(PlaceHolder.INTERACTION_ID, interactionId),
                 new PlaceHolder(PlaceHolder.INTERACTION_TOKEN, interactionToken));
 
-        return new ConvertingRetriever<>(this, query, (lApi, noContent) -> new NoContent());
+        return new NoContentRetriever(this, query);
     }
 
     //Gateway

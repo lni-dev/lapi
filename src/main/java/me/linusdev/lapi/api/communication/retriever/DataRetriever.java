@@ -96,12 +96,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
                     if(after != null) after.accept(t, null);
 
                 } catch (IOException e) {
-                    StringBuilder s = new StringBuilder();
-                    s.append(e);
-                    for (StackTraceElement traceElement : e.getStackTrace())
-                        s.append("\tat ").append(traceElement);
-
-                    Logger.log(Logger.Type.ERROR, this.getClass().getSimpleName(), null, s.toString(), true);
+                    Logger.getLogger(this.getClass()).error(e);
                     if(after != null) after.accept(t, new Error(e));
                 }
             }

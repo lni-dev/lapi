@@ -631,7 +631,7 @@ public interface LApi extends HasLApi {
      */
     @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds);
 
-    @NotNull Queueable<NoContent> createInteractionResponse(@NotNull String interactionId, @NotNull String interactionToken, @NotNull InteractionResponse response);
+    @NotNull Queueable<LApiHttpResponse> createInteractionResponse(@NotNull String interactionId, @NotNull String interactionToken, @NotNull InteractionResponse response);
 
     //Gateway
 

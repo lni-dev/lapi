@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever.response;
 
 import me.linusdev.data.Data;
+import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
@@ -181,5 +182,21 @@ public class LApiHttpResponse {
 
     public InputStream getInputStream() {
         return inputStream;
+    }
+
+
+    @Override
+    public String toString() {
+
+        Data data = new Data(6);
+
+        data.add("responseCode", responseCode);
+        data.add("responseCodeAsInt", responseCodeAsInt);
+        data.add("contentType", contentType);
+        data.add("isArray", isArray);
+        data.add("error", error);
+        data.add("data", this.data);
+
+        return data.getJsonString().toString();
     }
 }

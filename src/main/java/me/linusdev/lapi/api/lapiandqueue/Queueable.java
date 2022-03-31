@@ -20,10 +20,15 @@ import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.lapi.api.other.Container;
 import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -168,7 +173,36 @@ public abstract class Queueable<T> implements HasLApi {
      * @param after {@link BiConsumer}, what to do after the file as been written or an error has occurred
      * @return {@link Future}
      */
-    public abstract @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after);
+    public @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after){
+        return queue(new BiConsumer<>() {
+            @Override
+            public void accept(T t, Error error) {
+
+                if (error != null) {
+                    if (after != null) after.accept(t, error);
+                    return;
+                }
+
+                if (Files.exists(file)) {
+                    if (!overwriteIfExists) {
+                        if (after != null)
+                            after.accept(t, new Error(new FileAlreadyExistsException(file + " already exists.")));
+                        return;
+                    }
+                }
+
+                try {
+                    Files.deleteIfExists(file);
+                    Files.writeString(file, Objects.toString(t));
+                    if (after != null) after.accept(t, null);
+
+                } catch (IOException e) {
+                    Logger.getLogger(this.getClass()).error(e);
+                    if (after != null) after.accept(t, new Error(e));
+                }
+            }
+        });
+    }
 
     public @NotNull Container<T> completeHere() throws NoInternetException {
         getLApi().checkQueueThread();

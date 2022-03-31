@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.interaction.response;
 
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
@@ -45,7 +46,7 @@ public class InteractionResponseBuilder implements HasLApi {
         this.lApi = lApi;
     }
 
-    public @NotNull Queueable<NoContent> getQueueable(){
+    public @NotNull Queueable<LApiHttpResponse> getQueueable(){
         return lApi.createInteractionResponse(interaction.getId(), interaction.getToken(), build());
     }
 
