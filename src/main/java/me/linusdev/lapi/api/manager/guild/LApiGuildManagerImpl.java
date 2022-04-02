@@ -37,20 +37,33 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Standard implementation of {@link GuildManager}
  */
-public class LApiGuildManager implements GuildManager {
+public class LApiGuildManagerImpl implements GuildManager {
 
     private final @NotNull LApiImpl lApi;
+    private boolean initialized = false;
 
-    private final @NotNull ConcurrentHashMap<String, CachedGuildImpl> guilds;
+    private @Nullable ConcurrentHashMap<String, CachedGuildImpl> guilds;
 
-    public LApiGuildManager(@NotNull LApiImpl lApi){
+    public LApiGuildManagerImpl(@NotNull LApiImpl lApi){
         this.lApi = lApi;
-        guilds = new ConcurrentHashMap<>();
+
+    }
+
+    @Override
+    public void init(int initialCapacity) {
+        guilds = new ConcurrentHashMap<>(initialCapacity);
+        initialized = true;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 
 
     @Override
     public void onReady(@NotNull ReadyEvent event){
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         for(UnavailableGuild uGuild : event.getGuilds()){
             CachedGuildImpl guild = CachedGuildImpl.fromUnavailableGuild(lApi, uGuild);
             guilds.put(guild.getId(), guild);
@@ -59,6 +72,7 @@ public class LApiGuildManager implements GuildManager {
 
     @Override
     public GatewayWebSocket.OnGuildCreateReturn onGuildCreate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         Data guildData = (Data) payload.getPayloadData();
 
@@ -89,6 +103,7 @@ public class LApiGuildManager implements GuildManager {
 
     @Override
     public CachedGuildImpl onGuildDelete(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
 
@@ -111,6 +126,7 @@ public class LApiGuildManager implements GuildManager {
 
     @Override
     public Update<CachedGuildImpl, Guild> onGuildUpdate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
         UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
 
@@ -120,12 +136,14 @@ public class LApiGuildManager implements GuildManager {
 
     @Override
     public @Nullable CachedGuildImpl getUpdatableGuildById(String id) {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         if(id == null) return null;
         return guilds.get(id);
     }
 
     @Override
     public boolean allGuildsReceivedEvent(){
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         for(CachedGuildImpl guild : guilds.values()){
             if(guild.isAwaitingEvent()) return false;
         }
@@ -135,6 +153,7 @@ public class LApiGuildManager implements GuildManager {
 
     @Override
     public @Nullable Guild getGuildById(@Nullable String guildId) {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         if(guildId == null) return null;
         return guilds.get(guildId);
     }
@@ -147,6 +166,7 @@ public class LApiGuildManager implements GuildManager {
     @NotNull
     @Override
     public Iterator<CachedGuildImpl> iterator() {
+        if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
         return guilds.values().iterator();
     }
 }

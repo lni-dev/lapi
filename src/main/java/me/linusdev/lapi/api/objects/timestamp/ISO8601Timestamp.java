@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.timestamp;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ import java.time.format.DateTimeFormatter;
  * @see <a href="https://discord.com/developers/docs/reference#iso8601-datetime" target="_top">ISO8601 Date/Time</a>
  * @see DateTimeFormatter#ISO_OFFSET_DATE_TIME
  */
-public class ISO8601Timestamp implements SimpleDatable {
+public class ISO8601Timestamp implements SimpleDatable, Copyable<ISO8601Timestamp> {
 
     //2021-11-25T22:22:47.664000+00:00
     public static final DateTimeFormatter ISO8601_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -125,5 +126,14 @@ public class ISO8601Timestamp implements SimpleDatable {
     @Override
     public String toString() {
         return timestamp;
+    }
+
+    /**
+     *
+     * @return this, because it is immutable
+     */
+    @Override
+    public @NotNull ISO8601Timestamp copy() {
+        return this;
     }
 }

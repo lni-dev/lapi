@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
@@ -33,10 +34,12 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
-public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<T>> implements HasLApi, ListPool<T> {
+public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<T>> implements HasLApi, ListPool<T>, Manager {
+
+    private boolean initialized = false;
 
     private final @NotNull LApiImpl lApi;
-    private final @NotNull ConcurrentHashMap<String, T> objects;
+    private @Nullable ConcurrentHashMap<String, T> objects;
 
     private final @NotNull String idKey;
     private final @NotNull LApiImplConverter<Data, T, InvalidDataException> converter;
@@ -46,17 +49,29 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<T>> implemen
                        @NotNull LApiImplConverter<Data, T, InvalidDataException> converter,
                        @NotNull Supplier<Boolean> doCopy) {
         this.lApi = lApi;
-        this.objects = new ConcurrentHashMap<>(10);
         this.idKey = idKey;
         this.converter = converter;
         this.doCopy = doCopy;
     }
 
+    @Override
+    public void init(int initialCapacity) {
+        this.objects = new ConcurrentHashMap<>(initialCapacity);
+        initialized = true;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
     public void add(T obj){
+        if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         objects.put(obj.getId(), obj);
     }
 
     public ListUpdate<T> onUpdate(ArrayList<Data> data) throws InvalidDataException {
+        if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         ArrayList<T> old = null;
         ArrayList<T> updated = null;
         ArrayList<T> added = null;
@@ -114,11 +129,13 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<T>> implemen
 
     @Override
     public @Nullable T get(@NotNull String id) {
+        if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         return objects.get(id);
     }
 
     @Override
     public @NotNull Collection<T> getAll() {
+        if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         return objects.values();
     }
 }

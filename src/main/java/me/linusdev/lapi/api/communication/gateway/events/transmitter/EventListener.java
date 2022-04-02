@@ -31,7 +31,10 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.log.LogInstance;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,6 +61,24 @@ import org.jetbrains.annotations.Nullable;
  *
  */
 public interface EventListener {
+
+    /**
+     * This will be called, if an {@link Exception} or {@link Throwable} was thrown inside this
+     * {@link EventListener EventListener's} methods.<br>
+     * Note: This method should <b>never</b> throw an Exception!
+     * @param uncaught {@link Throwable} that was not caught.
+     */
+    default void onUncaughtException(Throwable uncaught) {
+        try{
+            LogInstance log = Logger.getLogger(this.getClass());
+            log.error("Uncaught exception in an event listener:");
+            log.error(uncaught);
+        }catch (Throwable printToConsole){
+            printToConsole.printStackTrace();
+        }
+    }
+
+
 
     default void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload){}
 
@@ -119,11 +140,14 @@ public interface EventListener {
 
     default void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {}
 
-    default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
-
     default void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {}
 
+    default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
+
+    default void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {}
+
     default void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) { }
+
 
 }
 

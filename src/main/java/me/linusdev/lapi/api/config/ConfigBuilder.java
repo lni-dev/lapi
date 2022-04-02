@@ -28,10 +28,12 @@ import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
-import me.linusdev.lapi.api.manager.guild.LApiGuildManager;
+import me.linusdev.lapi.api.manager.guild.LApiGuildManagerImpl;
 import me.linusdev.lapi.api.manager.ManagerFactory;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
+import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
+import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -72,6 +74,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<RoleManager> roleManagerFactory = null;
     private ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory = null;
     private ManagerFactory<ListManager<Sticker>> stickerManagerFactory = null;
+    private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
 
 
     /**
@@ -233,6 +236,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      *
      * @param setConfig the consumer, to adjust the {@link GatewayConfigBuilder}
+     * @return this
      */
     public ConfigBuilder adjustGatewayConfig(@NotNull Consumer<GatewayConfigBuilder> setConfig) {
         setConfig.accept(gatewayConfigBuilder);
@@ -241,7 +245,7 @@ public class ConfigBuilder implements Datable {
 
     /**
      * <em>Optional</em><br>
-     * Default: {@code lApi -&gt; new LApiGuildManager(lApi)}
+     * Default: {@code lApi -&gt; new LApiGuildManagerImpl(lApi)}
      * <p>
      *     Factory for the {@link me.linusdev.lapi.api.manager.guild.GuildManager GuildManager} used by {@link LApiImpl LApi}
      * </p>
@@ -249,9 +253,11 @@ public class ConfigBuilder implements Datable {
      *     Set to {@code null} to reset to default
      * </p>
      * @param guildManagerFactory the {@link ManagerFactory<GuildManager> ManagerFactory&lt;GuildManager&gt;}
+     * @return this
      */
-    public void setGuildManagerFactory(ManagerFactory<GuildManager> guildManagerFactory) {
+    public ConfigBuilder setGuildManagerFactory(ManagerFactory<GuildManager> guildManagerFactory) {
         this.guildManagerFactory = guildManagerFactory;
+        return this;
     }
 
     /**
@@ -264,9 +270,11 @@ public class ConfigBuilder implements Datable {
      *     Set to {@code null} to reset to default
      * </p>
      * @param roleManagerFactory the {@link ManagerFactory<RoleManager> ManagerFactory&lt;RoleManager&gt;}
+     * @return this
      */
-    public void setRoleManagerFactory(ManagerFactory<RoleManager> roleManagerFactory) {
+    public ConfigBuilder setRoleManagerFactory(ManagerFactory<RoleManager> roleManagerFactory) {
         this.roleManagerFactory = roleManagerFactory;
+        return this;
     }
 
     /**
@@ -279,9 +287,11 @@ public class ConfigBuilder implements Datable {
      *     Set to {@code null} to reset to default
      * </p>
      * @param emojiManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;EmojiObject&gt;&gt;}
+     * @return this
      */
-    public void setEmojiManagerFactory(ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory) {
+    public ConfigBuilder setEmojiManagerFactory(ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory) {
         this.emojiManagerFactory = emojiManagerFactory;
+        return this;
     }
 
     /**
@@ -294,9 +304,29 @@ public class ConfigBuilder implements Datable {
      *     Set to {@code null} to reset to default
      * </p>
      * @param stickerManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;Sticker&gt;&gt;}
+     * @return this
      */
-    public void setStickerManagerFactory(ManagerFactory<ListManager<Sticker>> stickerManagerFactory) {
+    public ConfigBuilder setStickerManagerFactory(ManagerFactory<ListManager<Sticker>> stickerManagerFactory) {
         this.stickerManagerFactory = stickerManagerFactory;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new VoiceStatesManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link VoiceStateManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param voiceStateManagerFactory the {@link ManagerFactory ManagerFactory&lt;VoiceStateManager&gt;}
+     * @return this
+     */
+    public ConfigBuilder setVoiceStateManagerFactory(ManagerFactory<VoiceStateManager> voiceStateManagerFactory) {
+        this.voiceStateManagerFactory = voiceStateManagerFactory;
+        return this;
+
     }
 
     /**
@@ -385,11 +415,12 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
                 gatewayConfigBuilder.build(),
-                Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManager(lApi)),
+                Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
                 Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),
-                Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled))
-                );
+                Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi))
+        );
     }
 
     /**

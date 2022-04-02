@@ -31,9 +31,11 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -124,13 +126,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload) {
         for(EventListener listener : listeners){
-            listener.onUnknownEvent(lApi, type, payload);
+            try {
+                listener.onUnknownEvent(lApi, type, payload);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(UNKNOWN);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onUnknownEvent(lApi, type, payload);
+                try {
+                    listener.onUnknownEvent(lApi, type, payload);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -144,13 +154,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
 
 
         for(EventListener listener : listeners){
-            listener.onReady(lApi, event);
+            try{
+                listener.onReady(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onReady(lApi, event);
+                try{
+                    listener.onReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -160,13 +178,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     public void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {
         triggeredGuildsReadyEvent.set(true);
         for(EventListener listener : listeners){
-            listener.onGuildsReady(lApi, event);
+            try{
+                listener.onGuildsReady(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildsReady(lApi, event);
+                try{
+                    listener.onGuildsReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -177,13 +203,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         if(triggeredLApiReadyEvent.get()) return;
         triggeredLApiReadyEvent.set(true);
         for(EventListener listener : listeners){
-            listener.onLApiReady(lApi, event);
+            try{
+                listener.onLApiReady(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onLApiReady(lApi, event);
+                try{
+                    listener.onLApiReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -192,13 +226,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildCreate(lApi, event);
+            try{
+                listener.onGuildCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildCreate(lApi, event);
+                try{
+                    listener.onGuildCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
 
@@ -213,13 +255,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildDelete(lApi, event);
+            try{
+                listener.onGuildDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildDelete(lApi, event);
+                try{
+                    listener.onGuildDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
 
@@ -234,13 +284,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildUpdate(lApi, event);
+            try{
+                listener.onGuildUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildUpdate(lApi, event);
+                try{
+                    listener.onGuildUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -249,13 +307,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildJoined(@NotNull LApi lApi, @NotNull GuildJoinedEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildJoined(lApi, event);
+            try{
+                listener.onGuildJoined(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_JOINED);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildJoined(lApi, event);
+                try{
+                    listener.onGuildJoined(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -264,13 +330,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildLeft(@NotNull LApi lApi, @NotNull GuildLeftEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildLeft(lApi, event);
+            try{
+                listener.onGuildLeft(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_LEFT);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildLeft(lApi, event);
+                try{
+                    listener.onGuildLeft(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -279,13 +353,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildUnavailable(@NotNull LApi lApi, @NotNull GuildUnavailableEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildUnavailable(lApi, event);
+            try{
+                listener.onGuildUnavailable(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_UNAVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildUnavailable(lApi, event);
+                try {
+                    listener.onGuildUnavailable(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -293,13 +375,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildAvailable(lApi, event);
+            try {
+                listener.onGuildAvailable(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_AVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildAvailable(lApi, event);
+                try {
+                    listener.onGuildAvailable(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -307,13 +397,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildEmojisUpdate(lApi, event);
+            try {
+                listener.onGuildEmojisUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildEmojisUpdate(lApi, event);
+                try {
+                    listener.onGuildEmojisUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -321,13 +419,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildStickersUpdate(lApi, event);
+            try {
+                listener.onGuildStickersUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildStickersUpdate(lApi, event);
+                try {
+                    listener.onGuildStickersUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -335,13 +441,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleCreate(lApi, event);
+            try {
+                listener.onGuildRoleCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleCreate(lApi, event);
+                try {
+                    listener.onGuildRoleCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -349,13 +463,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildRoleUpdate(@NotNull LApi lApi, @NotNull GuildRoleUpdateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleUpdate(lApi, event);
+            try {
+                listener.onGuildRoleUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleUpdate(lApi, event);
+                try {
+                    listener.onGuildRoleUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -363,13 +485,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildRoleDelete(lApi, event);
+            try {
+                listener.onGuildRoleDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildRoleDelete(lApi, event);
+                try {
+                    listener.onGuildRoleDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -378,13 +508,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onMessageCreate(lApi, event);
+            try {
+                listener.onMessageCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onMessageCreate(lApi, event);
+                try {
+                    listener.onMessageCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
 
@@ -397,13 +535,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onNonGuildMessageCreate(lApi, event);
+            try {
+                listener.onNonGuildMessageCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(NON_GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onNonGuildMessageCreate(lApi, event);
+                try {
+                    listener.onNonGuildMessageCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -412,13 +558,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onGuildMessageCreate(lApi, event);
+            try {
+                listener.onGuildMessageCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onGuildMessageCreate(lApi, event);
+                try {
+                    listener.onGuildMessageCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -426,13 +580,43 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
         for(EventListener listener : listeners){
-            listener.onInteractionCreate(lApi, event);
+            try {
+                listener.onInteractionCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onInteractionCreate(lApi, event);
+                try {
+                    listener.onInteractionCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onVoiceStateUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_STATE_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onVoiceStateUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }
@@ -440,13 +624,21 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     @Override
     public void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) {
         for(EventListener listener : listeners){
-            listener.onLApiError(lApi, event);
+            try {
+                listener.onLApiError(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
         }
 
         ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
         if(listeners != null){
             for(EventListener listener : listeners){
-                listener.onLApiError(lApi, event);
+                try {
+                    listener.onLApiError(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
             }
         }
     }

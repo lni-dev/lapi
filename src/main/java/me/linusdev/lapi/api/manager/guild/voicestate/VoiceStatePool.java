@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager;
+package me.linusdev.lapi.api.manager.guild.voicestate;
 
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.objects.guild.member.Member;
+import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
+import me.linusdev.lapi.api.objects.user.User;
 
-public interface Manager extends HasLApi {
+public interface VoiceStatePool {
 
-    void init(int initialCapacity);
+    VoiceState get(String userId);
 
-    boolean isInitialized();
+    default VoiceState get(User user){
+        return get(user.getId());
+    }
+
+    default VoiceState get(Member member){
+        if(member.getUser() == null) return null;
+        return get(member.getUser());
+    }
+
 }

@@ -30,6 +30,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
@@ -37,6 +38,7 @@ import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
@@ -88,6 +90,8 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.CACHE_EMOJIS)
                 .enable(ConfigFlag.COPY_EMOJI_ON_UPDATE_EVENT)
+                .enable(ConfigFlag.CACHE_VOICE_STATES)
+                .enable(ConfigFlag.COPY_VOICE_STATE_ON_UPDATE_EVENT)
                 .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
@@ -193,6 +197,11 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
+        System.out.println("onGuildStickersUpdate");
+    }
+
+    @Override
     public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
         System.out.println("onGuildRoleCreate: " + event.getRole().getName());
     }
@@ -293,6 +302,16 @@ public class Test implements EventListener{
                 }
             }
         }
+    }
+
+    @Override
+    public void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {
+        System.out.println("onVoiceStateUpdate");
+        System.out.println("updated: " + event.getVoiceState().getData().getJsonString());
+        if(!event.isNewVoiceState()){
+            System.out.println("old: " + event.getOldVoiceState().getData().getJsonString());
+        }
+
     }
 
     @Override

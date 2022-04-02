@@ -723,4 +723,14 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_STICKER_ON_UPDATE_EVENT
      */
     boolean isCopyOldStickerOnUpdateEventEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_VOICE_STATES
+     */
+    boolean isCacheVoiceStatesEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_VOICE_STATE_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldVoiceStateOnUpdateEventEnabled();
 }

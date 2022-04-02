@@ -26,13 +26,15 @@ import me.linusdev.lapi.api.manager.*;
 import me.linusdev.lapi.api.manager.guild.MembersManager;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
 import me.linusdev.lapi.api.manager.guild.ThreadsManager;
-import me.linusdev.lapi.api.manager.guild.VoiceStatesManager;
+import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
+import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
+import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.local.Locale;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -60,10 +62,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable ListManager<Sticker> stickerManager = null;
 
     //Create GuildImpl
+    protected @Nullable VoiceStateManager voiceStatesManager;
+
     protected @Nullable ISO8601Timestamp joinedAt;
     protected @Nullable Boolean large;
     protected @Nullable Integer memberCount;
-    protected @Nullable VoiceStatesManager voiceStatesManager;
     protected @Nullable MembersManager membersManager;
     protected @Nullable ChannelsManager channelsManager;
     protected @Nullable ThreadsManager threadsManager;
@@ -128,6 +131,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheStickersEnabled()){
             this.stickerManager = lApi.getConfig().getStickerManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheVoiceStatesEnabled()) {
+            this.voiceStatesManager = lApi.getConfig().getVoiceStateManagerFactory().newInstance(lApi);
         }
 
     }
@@ -259,27 +266,40 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         //Roles
         if(roleManager != null){
-            @SuppressWarnings("unchecked")
-            ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
-            if(rolesData != null){
-                //TODO make addall or resize, to avoid that the Hashmap has to resize every time
-                for(Object o : rolesData){
-                    roleManager.addRole(Role.fromData(lApi, (Data) o));
+            if(!roleManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+                if(rolesData != null){
+                    roleManager.init(rolesData.size());
+                    for(Object o : rolesData){
+                        roleManager.addRole(Role.fromData(lApi, (Data) o));
+                    }
+                } else {
+                    roleManager.init(1);
                 }
             }
+
         }
 
         //Emojis
         if(emojiManager != null){
-            ArrayList<Object> emojisData = (ArrayList<Object>) data.get(EMOJIS_KEY);
-            if(emojisData != null){
-                for(Object o : emojisData){
-                    emojiManager.add(EmojiObject.fromData(lApi, (Data) o));
+            if(!emojiManager.isInitialized()){
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> emojisData = (ArrayList<Object>) data.get(EMOJIS_KEY);
+                if(emojisData != null){
+                    emojiManager.init(emojisData.size());
+                    for(Object o : emojisData){
+                        emojiManager.add(EmojiObject.fromData(lApi, (Data) o));
+                    }
+                } else {
+                    emojiManager.init(1);
                 }
             }
+
         }
 
         data.processIfContained(FEATURES_KEY, o -> {
+            @SuppressWarnings("unchecked")
             ArrayList<Object> arr = (ArrayList<Object>) o;
             if(this.features != null) this.features.clear();
             else this.features = new ArrayList<>(arr.size());
@@ -290,10 +310,16 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         });
 
         if(stickerManager != null){
-            ArrayList<Object> stickersData = (ArrayList<Object>) data.get(STICKERS_KEY);
-            if(stickersData != null){
-                for(Object o : stickersData){
-                    stickerManager.add(Sticker.fromData(lApi, (Data) o));
+            if(!stickerManager.isInitialized()){
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> stickersData = (ArrayList<Object>) data.get(STICKERS_KEY);
+                if(stickersData != null){
+                    stickerManager.init(stickersData.size());
+                    for(Object o : stickersData){
+                        stickerManager.add(Sticker.fromData(lApi, (Data) o));
+                    }
+                } else {
+                    stickerManager.init(1);
                 }
             }
         }
@@ -303,7 +329,27 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         data.processIfContained(LARGE_KEY, (Boolean large) -> this.large = large);
         data.processIfContained(MEMBER_COUNT_KEY, (Long count) -> this.memberCount = count == null ? null : count.intValue());
 
-        //TODO voice states, members, ...
+        if(voiceStatesManager != null) {
+            if(!voiceStatesManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> voiceStatesData = (ArrayList<Object>) data.get(VOICE_STATES_KEY);
+                if(voiceStatesData != null) {
+                    voiceStatesManager.init(voiceStatesData.size());
+                    for(Object o : voiceStatesData){
+                        //the data won't contain a guild_id field, because this data was contained, in the GUILD_CREATE event
+                        //of this guild. -> add it here
+                        //TODO: Maybe do the same with member field
+                        Data d = (Data) o;
+                        d.add(VoiceState.GUILD_ID_KEY, this.id.asString());
+                        voiceStatesManager.add(VoiceState.fromData(lApi, d));
+                    }
+                } else {
+                    voiceStatesManager.init(1);
+                }
+            }
+        }
+
+        //TODO members, channels, threads, ...
     }
 
     @Override
@@ -333,6 +379,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     @ApiStatus.Internal
     public @Nullable ListManager<Sticker> getStickerManager() {
         return stickerManager;
+    }
+
+    public @Nullable VoiceStateManager getVoiceStatesManager() {
+        return voiceStatesManager;
     }
 
     @NotNull

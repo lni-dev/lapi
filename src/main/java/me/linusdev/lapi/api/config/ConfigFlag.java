@@ -118,6 +118,23 @@ public enum ConfigFlag implements SimpleDatable {
      */
     COPY_STICKER_ON_UPDATE_EVENT(1 << 9),
 
+    /**
+     * <p>
+     *     Caches all {@link me.linusdev.lapi.api.objects.guild.voice.VoiceState voice states} retrieved by the
+     *     {@link me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent#VOICE_STATE_UPDATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_VOICE_STATES(1 << 10),
+
+    /**
+     * <p>
+     *     Copies {@link me.linusdev.lapi.api.objects.guild.voice.VoiceState voice state} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     *
+     */
+    COPY_VOICE_STATE_ON_UPDATE_EVENT(1 << 11),
+
     ;
 
     private final long value;

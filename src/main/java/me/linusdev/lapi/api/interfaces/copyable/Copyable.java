@@ -38,4 +38,14 @@ public interface Copyable<T> {
     static <T extends Copyable<T>> T copy(@Nullable T obj){
         return obj == null ? null : obj.copy();
     }
+
+    /**
+     *
+     * @param string the string to be copied
+     * @return the same string, because string is immutable.
+     */
+    @Contract("null -> null; !null -> !null")
+    static String copy(@Nullable String string) {
+        return string;
+    }
 }

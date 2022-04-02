@@ -213,6 +213,7 @@ public class LApiImpl implements LApi {
             this.gateway = null;
         }
 
+        //TODO: Probably move these before the Gateway! since Gateway uses the GuildManager
         //VoiceRegions
         this.voiceRegionManager = new VoiceRegionManager(this);
         if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS))
@@ -221,6 +222,7 @@ public class LApiImpl implements LApi {
         //GuildImpl Manager
         if(isCacheGuildsEnabled()){
             this.guildManager = config.getGuildManagerFactory().newInstance(this);
+            this.guildManager.init(16);
         }else{
             this.guildManager = null;
         }
@@ -652,6 +654,16 @@ public class LApiImpl implements LApi {
     @Override
     public boolean isCopyOldStickerOnUpdateEventEnabled() {
         return config.isFlagSet(ConfigFlag.COPY_STICKER_ON_UPDATE_EVENT);
+    }
+
+    @Override
+    public boolean isCacheVoiceStatesEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_VOICE_STATES);
+    }
+
+    @Override
+    public boolean isCopyOldVoiceStateOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_VOICE_STATE_ON_UPDATE_EVENT);
     }
 
     //api-internal getter

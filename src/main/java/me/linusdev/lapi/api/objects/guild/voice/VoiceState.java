@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.objects.guild.voice;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.interfaces.updatable.IsUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.NotUpdatable;
@@ -35,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/voice#voice-state-object" target="_top">Voice State Object</a>
  */
-public class VoiceState implements Updatable, Datable, HasLApi {
+public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLApi {
 
     public static final String GUILD_ID_KEY = "guild_id";
     public static final String CHANNEL_ID_KEY = "channel_id";
@@ -53,7 +55,7 @@ public class VoiceState implements Updatable, Datable, HasLApi {
 
     private final @NotNull LApi lApi;
 
-    private @NotUpdatable @Nullable final Snowflake guildId;
+    private @NotUpdatable @Nullable Snowflake guildId;
     private @IsUpdatable @Nullable Snowflake channelId;
     private @NotUpdatable @NotNull final Snowflake userId;
     private @NotUpdatable @Nullable Member member = null;
@@ -142,33 +144,22 @@ public class VoiceState implements Updatable, Datable, HasLApi {
 
     @Override
     public void updateSelfByData(@NotNull Data data) throws InvalidDataException {
-        //guildId will not be updated
-        String channelId = (String) data.get(CHANNEL_ID_KEY);
+        //guildId will only be updated if it is null
+        if(guildId == null) data.processIfContained(GUILD_ID_KEY, (String str) -> this.guildId = Snowflake.fromString(str));
+        data.processIfContained(CHANNEL_ID_KEY, (String str) -> this.channelId = Snowflake.fromString(str));
         //userId will not be updated
-        //member will not be updated
-        String sessionId = (String) data.get(SESSION_ID_KEY);
-        Boolean deaf = (Boolean) data.get(DEAF_KEY);
-        Boolean mute = (Boolean) data.get(MUTE_KEY);
-        Boolean selfDeaf = (Boolean) data.get(SELF_DEAF_KEY);
-        Boolean selfMute = (Boolean) data.get(SELF_MUTE_KEY);
-        Boolean selfStream = (Boolean) data.get(SELF_STREAM_KEY);
-        Boolean selfVideo = (Boolean) data.get(SELF_VIDEO_KEY);
-        Boolean suppress = (Boolean) data.get(SUPPRESS_KEY);
-        String requestToSpeakTimestamp = (String) data.get(REQUEST_TO_SPEAK_TIMESTAMP_KEY);
+        //member will only be updated if it is null
+        if(member == null) member = Member.fromData(lApi, (Data) data.get(MEMBER_KEY));
 
-
-        this.channelId = channelId == null ? this.channelId : Snowflake.fromString(channelId);
-
-
-        if(sessionId != null) this.sessionId = sessionId;
-        if(deaf != null) this.deaf = deaf;
-        if(mute != null) this.mute = mute;
-        if(selfDeaf != null) this.selfDeaf = selfDeaf;
-        if(selfMute != null) this.selfMute = selfMute;
-        if(selfStream != null) this.selfStream = selfStream;
-        if(selfVideo != null) this.selfVideo = selfVideo;
-        if(suppress != null) this.suppress = suppress;
-        if(requestToSpeakTimestamp != null) this.requestToSpeakTimestamp = ISO8601Timestamp.fromString(requestToSpeakTimestamp);
+        data.processIfContained(SESSION_ID_KEY, (String str) -> this.sessionId = str);
+        data.processIfContained(DEAF_KEY, (Boolean bool) -> this.deaf = bool);
+        data.processIfContained(MUTE_KEY, (Boolean bool) -> this.mute = bool);
+        data.processIfContained(SELF_DEAF_KEY, (Boolean bool) -> this.selfDeaf = bool);
+        data.processIfContained(SELF_MUTE_KEY, (Boolean bool) -> this.selfMute = bool);
+        data.processIfContained(SELF_STREAM_KEY, (Boolean bool) -> this.selfStream = bool);
+        data.processIfContained(SELF_VIDEO_KEY, (Boolean bool) -> this.selfVideo = bool);
+        data.processIfContained(SUPPRESS_KEY, (Boolean bool) -> this.suppress = bool);
+        data.processIfContained(REQUEST_TO_SPEAK_TIMESTAMP_KEY, (String str) -> this.requestToSpeakTimestamp = ISO8601Timestamp.fromString(str));
     }
 
     /**
@@ -313,5 +304,17 @@ public class VoiceState implements Updatable, Datable, HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @NotNull VoiceState copy() {
+        return new VoiceState(
+                lApi,
+                Copyable.copy(guildId),
+                Copyable.copy(channelId),
+                Copyable.copy(userId),
+                member, //member object is not copied, because this voice state will always be for the same person.
+                Copyable.copy(sessionId),
+                deaf, mute, selfDeaf, selfMute, selfStream, selfVideo, suppress, Copyable.copy(requestToSpeakTimestamp));
     }
 }

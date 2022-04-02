@@ -37,31 +37,47 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RoleManagerImpl implements RoleManager, HasLApi {
 
     private final @NotNull LApiImpl lApi;
+    private boolean initialized = false;
 
-    private final @NotNull ConcurrentHashMap<String, Role> roles;
+    private @Nullable ConcurrentHashMap<String, Role> roles;
 
     public RoleManagerImpl(@NotNull LApiImpl lApi){
         this.lApi = lApi;
-        this.roles = new ConcurrentHashMap<>();
+
+    }
+
+    @Override
+    public void init(int initialCapacity) {
+        this.roles = new ConcurrentHashMap<>(initialCapacity);
+        this.initialized = true;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
     }
 
     @Override
     public @NotNull Collection<Role> getRoles(){
+        if(roles == null) throw new UnsupportedOperationException("init() not yet called");
         return roles.values();
     }
 
     @Override
     public void addRole(@NotNull Role role){
+        if(roles == null) throw new UnsupportedOperationException("init() not yet called");
         this.roles.put(role.getId(), role);
     }
 
     @Override
     public Role removeRole(@NotNull String roleId){
+        if(roles == null) throw new UnsupportedOperationException("init() not yet called");
         return this.roles.remove(roleId);
     }
 
     @Override
     public @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
+        if(roles == null) throw new UnsupportedOperationException("init() not yet called");
         String id = (String) updateData.get(Role.ID_KEY);
         Role role = this.roles.get(id);
 
@@ -82,4 +98,6 @@ public class RoleManagerImpl implements RoleManager, HasLApi {
     public @NotNull LApi getLApi() {
         return lApi;
     }
+
+
 }

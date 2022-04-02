@@ -32,6 +32,7 @@ public class Update<OBJ extends Updatable, COPY> {
 
     private final @Nullable COPY copy;
     private final @NotNull OBJ obj;
+    private final boolean isNew;
 
     /**
      *
@@ -39,8 +40,29 @@ public class Update<OBJ extends Updatable, COPY> {
      * @param obj the updated object.
      */
     public Update(@Nullable COPY copy, @NotNull OBJ obj){
+        this(copy, obj, false);
+    }
+
+    /**
+     *
+     * @param obj the updated object.
+     * @param isNew {@code true} if obj is a new object and had no entry before (but caching is enabled), {@code false} otherwise.
+     */
+    public Update( @NotNull OBJ obj, boolean isNew){
+        this(null, obj, isNew);
+    }
+
+
+    /**
+     *
+     * @param copy a copy of the object, before it was updated.
+     * @param obj the updated object.
+     * @param isNew {@code true} if obj is a new object and had no entry before (but caching is enabled), {@code false} otherwise.
+     */
+    private Update(@Nullable COPY copy, @NotNull OBJ obj, boolean isNew){
         this.copy = copy;
         this.obj = obj;
+        this.isNew = isNew;
     }
 
     /**
@@ -55,6 +77,7 @@ public class Update<OBJ extends Updatable, COPY> {
         //noinspection unchecked
         this.obj = (OBJ) obj;
         this.obj.updateSelfByData(data);
+        this.isNew = false;
     }
 
     /**
@@ -69,5 +92,13 @@ public class Update<OBJ extends Updatable, COPY> {
      */
     public @Nullable COPY getCopy() {
         return copy;
+    }
+
+    /**
+     *
+     * @return {@code true} if obj is a new object and had no entry before (but caching is enabled), {@code false} otherwise.
+     */
+    public boolean isNew() {
+        return isNew;
     }
 }
