@@ -32,7 +32,6 @@ import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
-import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;

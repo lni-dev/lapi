@@ -40,7 +40,6 @@ import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
-import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;

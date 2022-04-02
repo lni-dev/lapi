@@ -16,9 +16,7 @@
 
 package me.linusdev.lapi.api.objects.interaction.response;
 
-import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.communication.retriever.response.body.NoContent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
