@@ -30,6 +30,8 @@ import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.LApiGuildManagerImpl;
 import me.linusdev.lapi.api.manager.ManagerFactory;
+import me.linusdev.lapi.api.manager.guild.member.MemberManager;
+import me.linusdev.lapi.api.manager.guild.member.MemberManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
@@ -75,6 +77,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory = null;
     private ManagerFactory<ListManager<Sticker>> stickerManagerFactory = null;
     private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
+    private ManagerFactory<MemberManager> memberManagerFactory = null;
 
 
     /**
@@ -330,6 +333,23 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new MemberManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link MemberManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param memberManagerFactory the {@link ManagerFactory ManagerFactory&lt;MemberManager&gt;}
+     * @return this
+     */
+    public ConfigBuilder setMemberManagerFactory(ManagerFactory<MemberManager> memberManagerFactory) {
+        this.memberManagerFactory = memberManagerFactory;
+        return this;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -419,7 +439,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
                 Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),
                 Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)),
-                Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi))
+                Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
+                Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi))
         );
     }
 

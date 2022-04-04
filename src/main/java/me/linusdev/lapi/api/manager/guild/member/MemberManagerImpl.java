@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,17 +65,22 @@ public class MemberManagerImpl implements MemberManager{
     }
 
     @Override
-    public @NotNull Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException {
+    public @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
 
         Member member = members.get(userId);
 
         if(member == null) {
-            //TODO
+            Logger.getLogger(this).warning("Trying to update member that does not exist...");
             return null;
         }
 
-        return new Update<Member, Member>(member, data);
+        if(!lApi.isCopyOldMemberOnUpdateEventEnabled()){
+            member.updateSelfByData(data);
+            return new Update<>(null, member);
+        }
+
+        return new Update<>(member, data);
     }
 
     @Override
@@ -86,7 +92,7 @@ public class MemberManagerImpl implements MemberManager{
     @Override
     public void onGuildMemberChunk(@NotNull Data data) {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
-
+        //TODO: implement
     }
 
     @Override

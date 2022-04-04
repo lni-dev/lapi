@@ -21,6 +21,9 @@ import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -431,6 +434,72 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildStickersUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildMemberAdd(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_ADD);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildMemberAdd(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildMemberUpdate(@NotNull LApi lApi, @NotNull GuildMemberUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildMemberUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildMemberUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildMemberRemove(@NotNull LApi lApi, @NotNull GuildMemberRemoveEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildMemberRemove(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_REMOVE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildMemberRemove(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

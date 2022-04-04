@@ -28,6 +28,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.user.abstracts.BasicUserInformation;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -155,6 +156,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @return {@link User}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #USERNAME_KEY}, {@link #DISCRIMINATOR_KEY} are missing or null
      */
+    @Contract("_, null -> null; _, !null -> !null")
     public static @Nullable User fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);

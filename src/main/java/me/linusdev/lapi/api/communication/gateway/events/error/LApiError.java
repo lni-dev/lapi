@@ -23,6 +23,7 @@ public class LApiError {
     public enum ErrorCode{
         UNKNOWN_GUILD,
         UNKNOWN_ROLE,
+        UNKNOWN_MEMBER,
     }
 
     private final @Nullable ErrorCode code;

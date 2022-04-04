@@ -666,6 +666,16 @@ public class LApiImpl implements LApi {
         return config.isFlagSet(ConfigFlag.COPY_VOICE_STATE_ON_UPDATE_EVENT);
     }
 
+    @Override
+    public boolean isCacheMembersEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_MEMBERS);
+    }
+
+    @Override
+    public boolean isCopyOldMemberOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_MEMBER_ON_UPDATE_EVENT);
+    }
+
     //api-internal getter
 
     /**

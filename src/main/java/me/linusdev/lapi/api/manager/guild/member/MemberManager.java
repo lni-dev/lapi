@@ -30,7 +30,7 @@ public interface MemberManager extends Manager, HasLApi, MemberPool {
     @NotNull Member addMember(@NotNull Data data) throws InvalidDataException;
 
     @NotNull Member onMemberAdd(@NotNull Data data) throws InvalidDataException;
-    @NotNull Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException;
+    @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException;
     @Nullable Member onMemberRemove(@NotNull String userId);
 
     void onGuildMemberChunk(@NotNull Data data);

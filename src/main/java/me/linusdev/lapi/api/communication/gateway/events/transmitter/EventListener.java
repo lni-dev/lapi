@@ -21,6 +21,9 @@ import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -129,6 +132,12 @@ public interface EventListener {
     default void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {}
 
     default void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {}
+
+    default void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {}
+
+    default void onGuildMemberUpdate(@NotNull LApi lApi, @NotNull GuildMemberUpdateEvent event) {}
+
+    default void onGuildMemberRemove(@NotNull LApi lApi, @NotNull GuildMemberRemoveEvent event) {}
 
     default void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {}
 

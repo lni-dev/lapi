@@ -19,6 +19,9 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
@@ -225,6 +228,42 @@ public enum EventIdentifier{
      * </ul>
      */
     GUILD_STICKERS_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildMemberAdd(LApi, GuildMemberAddEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_MEMBERS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_MEMBER_ADD,
+
+    /**
+     * identifier for {@link EventListener#onGuildMemberUpdate(LApi, GuildMemberUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_MEMBERS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_MEMBER_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildMemberRemove(LApi, GuildMemberRemoveEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_MEMBERS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_MEMBER_REMOVE,
 
     /**
      * identifier for {@link EventListener#onGuildRoleCreate(LApi, GuildRoleCreateEvent)}.

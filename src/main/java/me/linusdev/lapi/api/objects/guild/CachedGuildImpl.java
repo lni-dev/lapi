@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.*;
+import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManagerImpl;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
 import me.linusdev.lapi.api.manager.guild.ThreadsManager;
@@ -66,7 +67,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable ISO8601Timestamp joinedAt;
     protected @Nullable Boolean large;
     protected @Nullable Integer memberCount;
-    protected @Nullable MemberManagerImpl membersManager;
+    protected @Nullable MemberManager memberManager;
     protected @Nullable ChannelsManager channelsManager;
     protected @Nullable ThreadsManager threadsManager;
     protected @Nullable PresencesManager presencesManager;
@@ -134,6 +135,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheVoiceStatesEnabled()) {
             this.voiceStatesManager = lApi.getConfig().getVoiceStateManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheMembersEnabled()) {
+            this.memberManager = lApi.getConfig().getMemberManagerFactory().newInstance(lApi);
         }
 
     }
@@ -348,7 +353,23 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
             }
         }
 
-        //TODO members, channels, threads, ...
+        if(memberManager != null){
+            if(!memberManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
+                if(membersData != null){
+                    memberManager.init(membersData.size());
+                    for(Object o : membersData){
+                        memberManager.addMember((Data) o);
+                    }
+                } else {
+                    memberManager.init(1);
+                }
+            }
+
+        }
+
+        //TODO channels, threads, ...
     }
 
     @Override
@@ -382,6 +403,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
     public @Nullable VoiceStateManager getVoiceStatesManager() {
         return voiceStatesManager;
+    }
+
+    public @Nullable MemberManager getMemberManager() {
+        return memberManager;
     }
 
     @NotNull

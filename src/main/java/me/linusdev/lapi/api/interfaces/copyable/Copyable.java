@@ -58,7 +58,7 @@ public interface Copyable<T> {
      * @param <T> {@link Copyable}
      * @return A copy of given array. Every element of the array will be copied with {@link #copy(Copyable)}
      */
-    static <T extends Copyable<T>> T[] copy(@Nullable T[] array){
+    static <T extends Copyable<T>> T[] copyArrayDeep(@Nullable T[] array){
         @SuppressWarnings("unchecked")
         T[] copy = (T[]) Array.newInstance(array.getClass().getComponentType(), array.length);
 
@@ -67,5 +67,15 @@ public interface Copyable<T> {
         }
 
         return copy;
+    }
+
+    /**
+     *
+     * @param array the array to be copied
+     * @param <T> {@link Copyable}
+     * @return A copy of given array. Every element of the array will be the same as element in the input array (not copied)
+     */
+    static <T> T[] copyArrayFlat(@Nullable T[] array){
+        return Arrays.copyOf(array, array.length);
     }
 }

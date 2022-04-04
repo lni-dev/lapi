@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
+import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -42,12 +43,13 @@ public class Config {
     private final @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory;
     private final @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory;
     private final @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory;
+    private final @NotNull ManagerFactory<MemberManager> memberManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
-                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory){
+                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory){
         this.flags = flags;
         this.token = token;
 
@@ -58,6 +60,7 @@ public class Config {
         this.emojiManagerFactory = emojiManagerFactory;
         this.stickerManagerFactory = stickerManagerFactory;
         this.voiceStateManagerFactory = voiceStateManagerFactory;
+        this.memberManagerFactory = memberManagerFactory;
     }
 
     /**
@@ -102,5 +105,9 @@ public class Config {
 
     public @NotNull ManagerFactory<VoiceStateManager> getVoiceStateManagerFactory() {
         return voiceStateManagerFactory;
+    }
+
+    public @NotNull ManagerFactory<MemberManager> getMemberManagerFactory() {
+        return memberManagerFactory;
     }
 }

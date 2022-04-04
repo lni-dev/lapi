@@ -53,17 +53,16 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     public static final String PENDING_KEY = "pending";
     public static final String PERMISSIONS_KEY = "permissions";
 
-    private @Nullable final User user;
-    private @Nullable final String nick;
-    private @Nullable final String avatarHash;
-    private @NotNull final Snowflake[] roles;
-    private @NotNull final String[] rolesAsString;
+    private @Nullable User user;
+    private @Nullable String nick;
+    private @Nullable String avatarHash;
+    private @NotNull Snowflake[] roles;
     private @NotNull final ISO8601Timestamp joinedAt;
-    private @Nullable final ISO8601Timestamp premiumSince;
-    private final boolean deaf;
-    private final boolean mute;
-    private @Nullable final Boolean pending;
-    private @Nullable final String permissionsString;
+    private @Nullable ISO8601Timestamp premiumSince;
+    private boolean deaf;
+    private boolean mute;
+    private @Nullable Boolean pending;
+    private @Nullable String permissionsString;
 
     private @NotNull final LApi lApi;
 
@@ -73,7 +72,6 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
      * @param nick this users guild nickname
      * @param avatarHash the member's guild avatar hash
      * @param roles array of role object ids as {@link Snowflake Snowflake[]}
-     * @param rolesAsString array of role object ids as {@link String String[]}
      * @param joinedAt when the user joined the guild
      * @param premiumSince when the user started boosting the guild
      * @param deaf whether the user is deafened in voice channels
@@ -81,7 +79,7 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
      * @param pending whether the user has not yet passed the guild's Membership Screening requirements
      * @param permissionsString total permissions of the member in the channel, including overwrites, returned when in the interaction object
      */
-    public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable String avatarHash, @NotNull Snowflake[] roles, @NotNull String[] rolesAsString,
+    public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable String avatarHash, @NotNull Snowflake[] roles,
                   @NotNull ISO8601Timestamp joinedAt, @Nullable ISO8601Timestamp premiumSince, boolean deaf, boolean mute,
                   @Nullable Boolean pending, @Nullable String permissionsString){
         this.lApi = lApi;
@@ -89,7 +87,6 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
         this.nick = nick;
         this.avatarHash = avatarHash;
         this.roles = roles;
-        this.rolesAsString = rolesAsString;
         this.joinedAt = joinedAt;
         this.premiumSince = premiumSince;
         this.deaf = deaf;
@@ -130,14 +127,12 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
         }
 
         Snowflake[] roles = new Snowflake[rolesList.size()];
-        String[] rolesAsString = new String[rolesList.size()];
         int i = 0;
         for(Object o : rolesList) {
-            rolesAsString[i] = (String) o;
             roles[i++] = Snowflake.fromString((String) o);
         }
 
-        return new Member(lApi, userData == null ? null : User.fromData(lApi, userData), nick, avatarHash, roles, rolesAsString, ISO8601Timestamp.fromString(joinedAt),
+        return new Member(lApi, userData == null ? null : User.fromData(lApi, userData), nick, avatarHash, roles, ISO8601Timestamp.fromString(joinedAt),
                 ISO8601Timestamp.fromString(premiumSince), deaf, mute, pending, permissions);
     }
 
@@ -181,12 +176,8 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     /**
      * array of role object ids as {@link Snowflake Snowflake[]}
      */
-    public @NotNull Snowflake[] getRoleIdsAsSnowflakes() {
+    public @NotNull Snowflake[] getRoleIds() {
         return roles;
-    }
-
-    public @NotNull String[] getRoleIds(){
-        return rolesAsString;
     }
 
     /**
@@ -267,18 +258,37 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
 
     @Override
     public @NotNull Member copy() {
-        //TODO
         return new Member(
                 lApi,
                 user, //User will not be copied
                 Copyable.copy(nick),
                 Copyable.copy(avatarHash),
-
+                Copyable.copyArrayFlat(roles),
+                Copyable.copy(joinedAt),
+                Copyable.copy(premiumSince),
+                deaf, mute, pending,
+                Copyable.copy(permissionsString)
         );
     }
 
     @Override
     public void updateSelfByData(Data data) throws InvalidDataException {
-        //TODO
+
+        if(user == null) this.user = User.fromData(lApi, (Data) data.get(USER_KEY));
+        data.processIfContained(NICK_KEY, (String str) -> this.nick = str);
+        data.processIfContained(AVATAR_KEY, (String str) -> this.avatarHash = str);
+        data.processIfContained(ROLES_KEY, (ArrayList<Object> array) -> {
+            this.roles = new Snowflake[array.size()];
+
+            int i = 0;
+            for(Object o : array) {
+                roles[i++] = Snowflake.fromString((String) o);
+            }
+        });
+        data.processIfContained(PREMIUM_SINCE_KEY, (String str) -> this.premiumSince = ISO8601Timestamp.fromString(str));
+        data.processIfContained(DEAF_KEY, (Boolean deaf) -> this.deaf = deaf);
+        data.processIfContained(MUTE_KEY, (Boolean mute) -> this.mute = deaf);
+        data.processIfContained(PENDING_KEY, (Boolean pending) -> this.pending = deaf);
+        data.processIfContained(PERMISSIONS_KEY, (String str) -> this.permissionsString = str);
     }
 }

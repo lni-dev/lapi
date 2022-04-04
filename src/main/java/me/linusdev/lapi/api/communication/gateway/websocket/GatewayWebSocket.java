@@ -29,6 +29,9 @@ import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -49,6 +52,7 @@ import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
+import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -58,6 +62,7 @@ import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.guild.GuildImpl;
+import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
@@ -65,6 +70,7 @@ import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
+import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -552,15 +558,139 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_MEMBER_ADD:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Data userData = (Data) data.get(Member.USER_KEY);
+                        if(userData == null || guildId == null)
+                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
+
+                        String userId = (String) userData.get(User.ID_KEY);
+                        if(userId == null)
+                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+
+                        if(guildManager == null) {
+                            transmitter.onGuildMemberAdd(lApi,
+                                    new GuildMemberAddEvent(lApi, payload, Snowflake.fromString(guildId),
+                                            Member.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        MemberManager memberManager = guild.getMemberManager();
+                        if (memberManager == null) {
+                            transmitter.onGuildMemberAdd(lApi, new GuildMemberAddEvent(lApi,
+                                    payload, Snowflake.fromString(guildId), Member.fromData(lApi, data)));
+                            break;
+                        }
+
+                        Member member = memberManager.onMemberAdd(data);
+                        transmitter.onGuildMemberAdd(lApi, new GuildMemberAddEvent(lApi,
+                                payload, Snowflake.fromString(guildId), member));
+                    }
                     break;
 
                 case GUILD_MEMBER_REMOVE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Data userData = (Data) data.get(Member.USER_KEY);
+                        if(userData == null || guildId == null)
+                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
+
+                        String userId = (String) userData.get(User.ID_KEY);
+                        if(userId == null)
+                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+
+                        if(guildManager == null) {
+                            transmitter.onGuildMemberRemove(lApi, new GuildMemberRemoveEvent(lApi,
+                                    payload, Snowflake.fromString(guildId), null, User.fromData(lApi, userData)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        MemberManager memberManager = guild.getMemberManager();
+                        if (memberManager == null) {
+                            transmitter.onGuildMemberRemove(lApi, new GuildMemberRemoveEvent(lApi,
+                                    payload, Snowflake.fromString(guildId), null, User.fromData(lApi, userData)));
+                            break;
+                        }
+
+                        Member member = memberManager.onMemberRemove(userId);
+                        transmitter.onGuildMemberRemove(lApi, new GuildMemberRemoveEvent(lApi,
+                                payload, Snowflake.fromString(guildId), member, User.fromData(lApi, userData)));
+                    }
                     break;
 
                 case GUILD_MEMBER_UPDATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Data userData = (Data) data.get(Member.USER_KEY);
+                        if(userData == null || guildId == null)
+                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
+
+                        String userId = (String) userData.get(User.ID_KEY);
+                        if(userId == null)
+                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+
+                        if(guildManager == null) {
+                            transmitter.onGuildMemberUpdate(lApi, new GuildMemberUpdateEvent(
+                                    lApi, payload, Snowflake.fromString(guildId), data
+                            ));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        MemberManager memberManager = guild.getMemberManager();
+                        if (memberManager == null) {
+                            transmitter.onGuildMemberUpdate(lApi, new GuildMemberUpdateEvent(
+                                    lApi, payload, Snowflake.fromString(guildId), data
+                            ));
+                            break;
+                        }
+
+                        Update<Member, Member> update = memberManager.onMemberUpdate(userId, data);
+                        if (update == null) {
+                            //MemberManager didn't contain this role...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_MEMBER, null)));
+                            break;
+                        }
+                        transmitter.onGuildMemberUpdate(lApi, new GuildMemberUpdateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), update));
+                    }
                     break;
 
                 case GUILD_MEMBERS_CHUNK:
+                    //TODO: store to MembersManager
                     break;
 
                 case GUILD_ROLE_CREATE: {
