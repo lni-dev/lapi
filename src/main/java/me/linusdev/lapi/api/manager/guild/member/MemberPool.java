@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild;
+package me.linusdev.lapi.api.manager.guild.member;
 
-public class MembersManager {
+public interface MemberPool {
 }

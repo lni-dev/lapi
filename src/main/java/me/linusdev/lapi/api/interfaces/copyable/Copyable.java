@@ -20,6 +20,9 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 /**
  * This interface indicates, that given class can be copied using the {@link #copy()} method.
  * A copy of an object should be a new object with the same values. In case of constant objects, the {@link #copy()} method
@@ -47,5 +50,22 @@ public interface Copyable<T> {
     @Contract("null -> null; !null -> !null")
     static String copy(@Nullable String string) {
         return string;
+    }
+
+    /**
+     *
+     * @param array the array to be copied
+     * @param <T> {@link Copyable}
+     * @return A copy of given array. Every element of the array will be copied with {@link #copy(Copyable)}
+     */
+    static <T extends Copyable<T>> T[] copy(@Nullable T[] array){
+        @SuppressWarnings("unchecked")
+        T[] copy = (T[]) Array.newInstance(array.getClass().getComponentType(), array.length);
+
+        for(int i = 0; i < copy.length; i++){
+            copy[i] = Copyable.copy(array[i]);
+        }
+
+        return copy;
     }
 }

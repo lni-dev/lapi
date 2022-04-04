@@ -21,6 +21,9 @@ import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
+import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -28,6 +31,7 @@ import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +40,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">GuildImpl Member Object</a>
  */
-public class Member implements Datable, HasLApi {
+public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
 
     public static final String USER_KEY = "user";
     public static final String NICK_KEY = "nick";
@@ -100,6 +104,7 @@ public class Member implements Datable, HasLApi {
      * @return {@link Member} or {@code null} if data was {@code null}
      * @throws InvalidDataException if {@link #ROLES_KEY}, {@link #JOINED_AT_KEY}, {@link #DEAF_KEY} or {@link #MUTE_KEY} are null or missing
      */
+    @Contract("_, null -> null; _, !null -> !null")
     public static @Nullable Member fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
@@ -258,5 +263,22 @@ public class Member implements Datable, HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @NotNull Member copy() {
+        //TODO
+        return new Member(
+                lApi,
+                user, //User will not be copied
+                Copyable.copy(nick),
+                Copyable.copy(avatarHash),
+
+        );
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        //TODO
     }
 }
