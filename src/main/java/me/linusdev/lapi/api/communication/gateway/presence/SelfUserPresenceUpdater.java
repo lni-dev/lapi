@@ -200,7 +200,7 @@ public class SelfUserPresenceUpdater {
      */
     public SelfUserPresenceUpdater updateNow(){
         if(gateway == null) throw new IllegalStateException("This SelfUserPresenceUpdater has not gateway! Are you currently adjusting the config? If yes, don't call this method.");
-        //TODO
+        //TODO: queue command
         gateway.sendCommand(GatewayCommand.UPDATE_PRESENCE, getPresenceUpdate());
         return this;
     }
