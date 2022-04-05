@@ -79,7 +79,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
 
     @SuppressWarnings("unchecked")
     @Contract("_, null -> null; _, !null -> !null")
-    public @Nullable GuildMemberChunkEventData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable GuildMemberChunkEventData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if (data == null) return null;
 
         String guildId = (String) data.get(GUILD_ID_KEY);

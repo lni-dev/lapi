@@ -32,6 +32,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMemberChunkEventData;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -690,7 +692,19 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_MEMBERS_CHUNK:
-                    //TODO: store to MembersManager
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        if(guildId == null)
+                            throw new InvalidDataException(data, "guildId missing", null, GUILD_ID_KEY);
+
+                        transmitter.onGuildMembersChunk(lApi, new GuildMembersChunkEvent(lApi,
+                                payload, Snowflake.fromString(guildId),
+                                GuildMemberChunkEventData.fromData(lApi, data)));
+                    }
                     break;
 
                 case GUILD_ROLE_CREATE: {

@@ -22,6 +22,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
@@ -264,6 +265,12 @@ public enum EventIdentifier{
      * </ul>
      */
     GUILD_MEMBER_REMOVE,
+
+    /**
+     * identifier for {@link EventListener#onGuildMembersChunk(LApi, GuildMembersChunkEvent)}.
+     * <br><br>
+     */
+    GUILD_MEMBERS_CHUNK,
 
     /**
      * identifier for {@link EventListener#onGuildRoleCreate(LApi, GuildRoleCreateEvent)}.

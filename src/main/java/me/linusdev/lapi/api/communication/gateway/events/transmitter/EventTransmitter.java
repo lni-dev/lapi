@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojis
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -500,6 +501,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildMemberRemove(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildMembersChunk(@NotNull LApi lApi, @NotNull GuildMembersChunkEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildMembersChunk(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBERS_CHUNK);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildMembersChunk(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }
