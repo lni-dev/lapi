@@ -17,7 +17,9 @@
 package me.linusdev.lapi.api.communication.gateway.presence;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#update-presence-status-types" target="_top">Status Types</a>
@@ -66,7 +68,9 @@ public enum StatusType implements SimpleDatable {
      * @param value {@link String}
      * @return {@link StatusType} matching given value or {@link #UNKNOWN} if none matches
      */
-    public static @NotNull StatusType fromValue(String value){
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable StatusType fromValue(@Nullable String value){
+        if(value == null) return null;
         for(StatusType type : StatusType.values()){
             if(type.value.equalsIgnoreCase(value)) return type;
         }

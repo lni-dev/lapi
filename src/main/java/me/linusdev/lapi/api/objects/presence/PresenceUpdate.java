@@ -1,0 +1,148 @@
+/*
+ * Copyright  2022 Linus Andera
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package me.linusdev.lapi.api.objects.presence;
+
+import me.linusdev.data.Data;
+import me.linusdev.data.Datable;
+import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.gateway.activity.Activity;
+import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+
+/**
+ * received from the {@link me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket Gateway} to
+ * indicate a presence update of a specific user.
+ * <br><br>
+ * <p>
+ *     The user object within this event can be partial, the only field which must be sent is the id field,
+ *     everything else is optional. Along with this limitation, no fields are required, and the types of the fields
+ *     are not validated. Your client should expect any combination of fields and types within this event.
+ * </p>
+ *
+ * @see <a href="https://discord.com/developers/docs/topics/gateway#presence-update" target="_top">Presence Update</a>
+ */
+public class PresenceUpdate implements Datable {
+
+    public static final String USER_KEY = "user";
+    public static final String GUILD_ID_KEY = "guild_id";
+    public static final String STATUS_KEY = "status";
+    public static final String ACTIVITIES_KEY = "activities";
+    public static final String CLIENT_STATUS_KEY = "client_status";
+
+    private final @NotNull PartialUser user;
+    private final @NotNull Snowflake guildId;
+    private final @NotNull StatusType status;
+    private final @NotNull ArrayList<Activity> activities;
+    private final @NotNull ClientStatus clientStatus;
+
+    /**
+     *
+     * @param user the user presence is being updated for
+     * @param guildId id of the guild
+     * @param status either "idle", "dnd", "online", or "offline"
+     * @param activities user's current activities
+     * @param clientStatus user's platform-dependent status
+     */
+    public PresenceUpdate(@NotNull PartialUser user, @NotNull Snowflake guildId, @NotNull StatusType status, @NotNull ArrayList<Activity> activities, @NotNull ClientStatus clientStatus) {
+        this.user = user;
+        this.guildId = guildId;
+        this.status = status;
+        this.activities = activities;
+        this.clientStatus = clientStatus;
+    }
+
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable PresenceUpdate fromData(@Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
+
+        Data userData = (Data) data.get(USER_KEY);
+        String guildId = (String) data.get(GUILD_ID_KEY);
+        String status = (String) data.get(STATUS_KEY);
+        ArrayList<Activity> activities = data.getAndConvertArrayList(ACTIVITIES_KEY,
+                (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
+        Data clientStatusData = (Data) data.get(CLIENT_STATUS_KEY);
+
+        if(userData == null || guildId == null || status == null || activities == null || clientStatusData == null){
+            InvalidDataException.throwException(data, null, PresenceUpdate.class,
+                    new Object[]{userData, guildId, status, activities, clientStatusData},
+                    new String[]{USER_KEY, GUILD_ID_KEY, STATUS_KEY, ACTIVITIES_KEY, CLIENT_STATUS_KEY});
+            return null; //appeasing the IDE null-checks: this line will never be executed.
+        }
+
+        return new PresenceUpdate(
+                new PartialUser(data),
+                Snowflake.fromString(guildId),
+                StatusType.fromValue(status),
+                activities,
+                ClientStatus.fromData(clientStatusData)
+        );
+    }
+
+    /**
+     * the user presence is being updated for
+     */
+    public @NotNull PartialUser getUser() {
+        return user;
+    }
+
+    /**
+     * id of the guild
+     */
+    public @NotNull Snowflake getGuildId() {
+        return guildId;
+    }
+
+    /**
+     * either "idle", "dnd", "online", or "offline"
+     */
+    public @NotNull StatusType getStatus() {
+        return status;
+    }
+
+    /**
+     * user's current activities
+     */
+    public @NotNull ArrayList<Activity> getActivities() {
+        return activities;
+    }
+
+    /**
+     * user's platform-dependent status
+     */
+    public @NotNull ClientStatus getClientStatus() {
+        return clientStatus;
+    }
+
+    @Override
+    public Data getData() {
+        Data data = new Data(5);
+
+        data.add(USER_KEY, user);
+        data.add(GUILD_ID_KEY, guildId);
+        data.add(STATUS_KEY, status);
+        data.add(ACTIVITIES_KEY, activities);
+        data.add(CLIENT_STATUS_KEY, clientStatus);
+
+        return data;
+    }
+}

@@ -17,7 +17,10 @@
 package me.linusdev.lapi.api.objects.message.nonce;
 
 import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * used in {@link me.linusdev.lapi.api.objects.message.abstracts.Message}
@@ -39,6 +42,7 @@ public class Nonce implements SimpleDatable {
      * @param stringOrInt {@link String} or {@link Integer} or {@code null}
      * @return {@link Nonce} or {@code null} if stringOrInt was {@code null}
      */
+    @Contract("null -> null; !null -> !null")
     public static @Nullable Nonce fromStringOrInteger(@Nullable Object stringOrInt){
         if(stringOrInt == null) return null;
         if(stringOrInt instanceof Number){
@@ -47,7 +51,7 @@ public class Nonce implements SimpleDatable {
             return new Nonce((String) stringOrInt, null);
         }
 
-        return null;
+        return new Nonce(Objects.toString(stringOrInt), null);
     }
 
 
