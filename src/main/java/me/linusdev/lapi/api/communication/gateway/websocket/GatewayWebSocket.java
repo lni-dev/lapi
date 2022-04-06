@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.command.GatewayCommand;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.communication.gateway.enums.*;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
@@ -91,6 +92,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  *
@@ -194,6 +196,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     private final AtomicInteger pendingConnects;
 
     private final LogInstance logger;
+
+    /**
+     * Queue for commands. Is currently periodically checked, when a Heartbeat ack is received. (in {@link #handleReceivedPayload(GatewayPayloadAbstract)})
+     */
+    private final ConcurrentLinkedQueue<GatewayCommand> commandQueue;
+    private final AtomicBoolean queueWorking = new AtomicBoolean(false);
     
     public GatewayWebSocket(@NotNull LApiImpl lApi, @NotNull EventTransmitter transmitter, @NotNull Config config){
         this(lApi, transmitter, config.getToken(),
@@ -271,6 +279,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         this.jsonToPayloadConverter = jsonToPayloadConverter;
         this.bytesToPayloadConverter = bytesToPayloadConverter;
+
+        this.commandQueue = new ConcurrentLinkedQueue<>();
     }
 
     public void start() {
@@ -996,10 +1006,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 if(lApi.getGuildManager() != null) lApi.getGuildManager().onReady(event);
                 transmitter.onReady(lApi, event);
+                workOnQueueIfPossible();
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {
                 //resume successful...
                 if(Logger.DEBUG_LOG) logger.debug("successfully resumed");
+                workOnQueueIfPossible();
             }
 
             if(payload.getType() == null){
@@ -1068,6 +1080,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             heartbeatAcknowledgementsReceived.incrementAndGet();
             if(Logger.DEBUG_LOG) logger.debug(String.format("Heartbeat ack received. Heartbeats sent: %d, acks received: %d"
                     , heartbeatsSent.get(), heartbeatAcknowledgementsReceived.get()));
+
+            //Periodically check queue:
+            workOnQueueIfPossible();
 
         } else {
             //This should never be sent to us... something might have gone wrong
@@ -1250,23 +1265,49 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         });
     }
 
+    public synchronized void queueCommand(@NotNull GatewayCommand command) {
+        this.commandQueue.add(command);
+        workOnQueueIfPossible();
+    }
+
+    /**
+     * Triggerd periodically, when a Heartbeat ACK is received.<br>
+     * Also triggered, when a {@link GatewayEvent#READY} or {@link GatewayEvent#RESUMED} event is received
+     */
+    public synchronized void workOnQueueIfPossible(){
+        if(!queueWorking.get()) {
+            if(webSocket != null && !webSocket.isOutputClosed())
+                sendNextInCommandQueue();
+        }
+    }
+
+     public synchronized void sendNextInCommandQueue(){
+        GatewayCommand cmd = commandQueue.poll();
+        if(cmd != null) {
+            queueWorking.set(true);
+            sendCommand(cmd.getType(), cmd.getData());
+        }
+    }
+
     /**
      * Sends given command to Discord
      * @param command the command to send
      * @param data the data of the command, most like to be a {@link Data}
      */
     @ApiStatus.Internal
-    public CompletableFuture<WebSocket> sendCommand(GatewayCommandType command, Object data){
+    public void sendCommand(GatewayCommandType command, Object data){
 
         GatewayPayload payload = new GatewayPayload(command.getOpcode(), data, null, null, null);
 
         if(command == GatewayCommandType.IDENTIFY || command == GatewayCommandType.RESUME || command == GatewayCommandType.HEARTBEAT){
             logger.warning("Sending a " + command + " command using method sendCommand(). This should never be done! " +
                     "The GatewayWebSocket will send these commands automatically when required.");
-            return sendPayload(payload);
         }
 
-        return sendPayload(payload);
+        sendPayload(payload).thenApply(webSocket -> {
+            sendNextInCommandQueue();
+            return null;
+        });
     }
 
 
