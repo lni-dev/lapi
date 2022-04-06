@@ -196,7 +196,9 @@ public class RequestGuildMembersCommand extends GatewayCommand implements HasLAp
         return createCommand(lApi, guildId, null, 100, presences, nonce, userIds);
     }
 
-
+    public void send() {
+        //TODO: get gateway and queue command
+    }
 
     @Override
     public @NotNull LApi getLApi() {

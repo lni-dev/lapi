@@ -92,7 +92,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 
 /**
  *
@@ -1285,7 +1284,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         GatewayCommand cmd = commandQueue.poll();
         if(cmd != null) {
             queueWorking.set(true);
-            sendCommand(cmd.getType(), cmd.getData());
+            sendCommand(cmd.getType(), cmd.getObject());
         }
     }
 

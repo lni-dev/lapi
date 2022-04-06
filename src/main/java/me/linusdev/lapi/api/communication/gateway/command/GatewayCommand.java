@@ -25,9 +25,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class GatewayCommand {
     private final @NotNull GatewayCommandType type;
-    private final @Nullable Data data;
+    private final @Nullable Object data;
 
-    public GatewayCommand(@NotNull GatewayCommandType type, @Nullable Data data) {
+    public GatewayCommand(@NotNull GatewayCommandType type, @Nullable Object data) {
         this.type = type;
         this.data = data;
     }
@@ -36,7 +36,7 @@ public class GatewayCommand {
         return type;
     }
 
-    public @Nullable Data getData() {
+    public @Nullable Object getObject() {
         return data;
     }
 }
