@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.communication.gateway.enums.*;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
@@ -1255,11 +1256,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * @param data the data of the command, most like to be a {@link Data}
      */
     @ApiStatus.Internal
-    public CompletableFuture<WebSocket> sendCommand(GatewayCommand command, Object data){
+    public CompletableFuture<WebSocket> sendCommand(GatewayCommandType command, Object data){
 
         GatewayPayload payload = new GatewayPayload(command.getOpcode(), data, null, null, null);
 
-        if(command == GatewayCommand.IDENTIFY || command == GatewayCommand.RESUME || command == GatewayCommand.HEARTBEAT){
+        if(command == GatewayCommandType.IDENTIFY || command == GatewayCommandType.RESUME || command == GatewayCommandType.HEARTBEAT){
             logger.warning("Sending a " + command + " command using method sendCommand(). This should never be done! " +
                     "The GatewayWebSocket will send these commands automatically when required.");
             return sendPayload(payload);

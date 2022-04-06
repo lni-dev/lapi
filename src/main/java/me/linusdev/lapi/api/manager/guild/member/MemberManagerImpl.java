@@ -104,4 +104,10 @@ public class MemberManagerImpl implements MemberManager{
     public @NotNull LApi getLApi() {
         return lApi;
     }
+
+    @Override
+    public Member get(@NotNull String userId) {
+        if(members == null) throw new UnsupportedOperationException("init() not yet called");
+        return members.get(userId);
+    }
 }

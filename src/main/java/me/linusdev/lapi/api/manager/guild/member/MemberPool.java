@@ -16,5 +16,9 @@
 
 package me.linusdev.lapi.api.manager.guild.member;
 
+import me.linusdev.lapi.api.objects.guild.member.Member;
+import org.jetbrains.annotations.NotNull;
+
 public interface MemberPool {
+    Member get(@NotNull String userId);
 }

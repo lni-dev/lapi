@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.gateway.enums;
+package me.linusdev.lapi.api.communication.gateway.command;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#commands-and-events-gateway-commands" target="_top">Gateway Commands</a>
  */
-public enum GatewayCommand implements SimpleDatable {
+public enum GatewayCommandType implements SimpleDatable {
 
     /**
      * LApi specific
@@ -70,7 +71,7 @@ public enum GatewayCommand implements SimpleDatable {
     private final @NotNull GatewayOpcode opcode;
     private final @NotNull String name;
 
-    GatewayCommand(@NotNull GatewayOpcode opcode, @NotNull String value) {
+    GatewayCommandType(@NotNull GatewayOpcode opcode, @NotNull String value) {
         this.opcode = opcode;
         this.name = value;
     }
@@ -78,11 +79,11 @@ public enum GatewayCommand implements SimpleDatable {
     /**
      *
      * @param value event-string
-     * @return {@link GatewayCommand} matching given string or {@link #UNKNOWN} if none matches. Or {@code null} if given value is {@code null}
+     * @return {@link GatewayCommandType} matching given string or {@link #UNKNOWN} if none matches. Or {@code null} if given value is {@code null}
      */
-    public static @Nullable GatewayCommand fromString(@Nullable String value){
+    public static @Nullable GatewayCommandType fromString(@Nullable String value){
         if(value == null) return null;
-        for(GatewayCommand event : GatewayCommand.values()){
+        for(GatewayCommandType event : GatewayCommandType.values()){
             if(event.name.equalsIgnoreCase(value)){
                 return event;
             }

@@ -20,7 +20,7 @@ import me.linusdev.data.Data;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.activity.ActivityType;
-import me.linusdev.lapi.api.communication.gateway.enums.GatewayCommand;
+import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -201,7 +201,7 @@ public class SelfUserPresenceUpdater {
     public SelfUserPresenceUpdater updateNow(){
         if(gateway == null) throw new IllegalStateException("This SelfUserPresenceUpdater has not gateway! Are you currently adjusting the config? If yes, don't call this method.");
         //TODO: queue command
-        gateway.sendCommand(GatewayCommand.UPDATE_PRESENCE, getPresenceUpdate());
+        gateway.sendCommand(GatewayCommandType.UPDATE_PRESENCE, getPresenceUpdate());
         return this;
     }
 

@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
  *          </li>
  *          <li>
  *              {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} and
- *              {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS} are uniquely affected by intents.
+ *              {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS} are uniquely affected by intents.
  *          </li>
  *          <li>
  *              {@link GatewayEvent#THREAD_MEMBER_UPDATE THREAD_MEMBER_UPDATE} by default only includes if the current

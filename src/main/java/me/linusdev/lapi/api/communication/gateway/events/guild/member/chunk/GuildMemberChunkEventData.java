@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.message.nonce.Nonce;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
-import me.linusdev.lapi.api.communication.gateway.enums.GatewayCommand;
+import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,9 +60,9 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
      * @param members    set of guild members
      * @param chunkIndex the chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count)
      * @param chunkCount the total number of expected chunks for this response
-     * @param notFound   if passing an invalid id to {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
-     * @param presences  if passing true to {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, presences of the returned members will be here
-     * @param nonce      the nonce used in the {@link GatewayCommand#REQUEST_GUILD_MEMBERS Guild Members Request}
+     * @param notFound   if passing an invalid id to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
+     * @param presences  if passing true to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, presences of the returned members will be here
+     * @param nonce      the nonce used in the {@link GatewayCommandType#REQUEST_GUILD_MEMBERS Guild Members Request}
      */
     public GuildMemberChunkEventData(@NotNull LApi lApi, @NotNull Snowflake guildId, @NotNull ArrayList<Member> members,
                                      int chunkIndex, int chunkCount, @Nullable ArrayList<Object> notFound,
@@ -157,21 +157,21 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
 
     /**
      * The type of this array is not specified in Discord's docs. probably a {@link String} though.
-     * if passing an invalid id to {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
+     * if passing an invalid id to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
      */
     public @Nullable ArrayList<Object> getNotFound() {
         return notFound;
     }
 
     /**
-     * if passing true to {@link GatewayCommand#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, presences of the returned members will be here
+     * if passing true to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, presences of the returned members will be here
      */
     public @Nullable ArrayList<PresenceUpdate> getPresences() {
         return presences;
     }
 
     /**
-     * the nonce used in the {@link GatewayCommand#REQUEST_GUILD_MEMBERS Guild Members Request}
+     * the nonce used in the {@link GatewayCommandType#REQUEST_GUILD_MEMBERS Guild Members Request}
      */
     public @Nullable Nonce getNonce() {
         return nonce;
