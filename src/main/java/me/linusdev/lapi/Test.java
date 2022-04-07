@@ -80,6 +80,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class Test implements EventListener{
@@ -91,7 +92,7 @@ public class Test implements EventListener{
 
         long cMillis = System.currentTimeMillis();
 
-        while(System.currentTimeMillis() - cMillis < 10000){}
+        while(System.currentTimeMillis() - cMillis < 1){}
 
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
@@ -262,55 +263,7 @@ public class Test implements EventListener{
     @Override
     public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         System.out.println("onMessageCreate");
-    }
 
-    @Override
-    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
-        System.out.println("onNonGuildMessageCreate");
-        Message msg = event.getMessage();
-        String content = msg.getContent();
-        String channelId = msg.getChannelId();
-        User author = msg.getAuthor();
-
-        System.out.println(content);
-
-        if(!author.isBot()){
-            if(content.toLowerCase().startsWith("hi")) {
-
-                new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
-                        .setReplyTo(msg, true)
-                        .getQueueable(channelId)
-                        .queue();
-            }else if(content.toLowerCase().startsWith("hey")) {
-                System.out.println("hey");
-                try {
-                    lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
-                            new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
-                            null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
-                            new Component[]{new Button(lApi, ComponentType.BUTTON,
-                                    ButtonStyle.PRIMARY, "Klick mich UwU",
-                                    null, "me.linusdev.btn_1", null,
-                                    null)}
-                    )}, null,
-                            /*new Attachment[]{
-                                    new AttachmentTemplate("image.png",
-                                            "fun image",
-                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
-                                            FileType.PNG).setAttachmentId(0)
-                            }*/null, null)).queue();
-                } catch (InvalidEmbedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-
-
-    }
-
-    @Override
-    public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
-        System.out.println("onGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
         String channelId = msg.getChannelId();
@@ -346,10 +299,36 @@ public class Test implements EventListener{
             } else if(content.equalsIgnoreCase("info")) {
                 MessageBuilder builder = new MessageBuilder(lApi);
                 EmbedBuilder embed = new EmbedBuilder();
-                embed.setTitle("Info")
-                        .setDescription("");
+
+                embed.setTitle("Info");
+
+                Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+                StringBuilder ts = new StringBuilder();
+                ts.append("");
+                for(Thread t : threadSet) {
+                    ts.append(t.getName());
+                    ts.append(", ");
+                }
+                embed.setDescription("Threads: " + ts + "\n");
+
+                try {
+                    builder.addEmbed(embed.build(false));
+                    builder.getQueueable(event.getChannelId()).queue();
+                } catch (InvalidEmbedException e) {
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    @Override
+    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
+        System.out.println("onNonGuildMessageCreate");
+    }
+
+    @Override
+    public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
+        System.out.println("onGuildMessageCreate");
     }
 
     @Override
