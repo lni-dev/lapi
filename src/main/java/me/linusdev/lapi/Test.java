@@ -89,6 +89,10 @@ public class Test implements EventListener{
 
         Logger.start(true, false);
 
+        long cMillis = System.currentTimeMillis();
+
+        while(System.currentTimeMillis() - cMillis < 10000){}
+
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
                 .enable(ConfigFlag.CACHE_ROLES)
@@ -330,15 +334,20 @@ public class Test implements EventListener{
                                     null, "me.linusdev.btn_1", null,
                                     null)}
                     )}, null,
-                            new Attachment[]{
+                            /*new Attachment[]{
                                     new AttachmentTemplate("image.png",
                                             "fun image",
                                             Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\E0fcU7MVIAIGoil.jpg"),
                                             FileType.JPEG).setAttachmentId(0)
-                            }, null)).queue();
+                            }*/null, null)).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }
+            } else if(content.equalsIgnoreCase("info")) {
+                MessageBuilder builder = new MessageBuilder(lApi);
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.setTitle("Info")
+                        .setDescription("");
             }
         }
     }
