@@ -67,4 +67,9 @@ public class Nonce implements SimpleDatable {
     public Object simplify() {
         return string == null ? integer : string;
     }
+
+    @Override
+    public String toString() {
+        return Objects.toString(simplify());
+    }
 }

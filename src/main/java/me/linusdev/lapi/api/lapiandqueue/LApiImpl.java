@@ -607,6 +607,11 @@ public class LApiImpl implements LApi {
     }
 
     @Override
+    public @Nullable GatewayWebSocket getGateway() {
+        return gateway;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return this;
     }

@@ -110,7 +110,9 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
             presences = new ArrayList<>(presencesData.size());
 
             for (int i = 0; i < presencesData.size(); i++) {
-                presences.add(PresenceUpdate.fromData((Data) presencesData.get(i)));
+                Data psData = (Data) presencesData.get(i);
+                psData.add(PresenceUpdate.GUILD_ID_KEY, guildId); //add guild_id field, because it is missing here
+                presences.add(PresenceUpdate.fromData(psData));
                 presencesData.set(i, null); //release memory
             }
         }
@@ -135,7 +137,8 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
     }
 
     /**
-     * set of guild members
+     * set of guild members.<br>
+     * {@link Member#getUser()} should not return {@code null}
      */
     public @NotNull ArrayList<Member> getMembers() {
         return members;

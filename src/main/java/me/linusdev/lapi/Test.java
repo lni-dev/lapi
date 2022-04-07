@@ -22,11 +22,16 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.command.RequestGuildMembersCommand;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -51,6 +56,7 @@ import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.message.component.Component;
@@ -73,6 +79,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class Test implements EventListener{
@@ -81,6 +89,10 @@ public class Test implements EventListener{
     public static void main(String... a) throws LApiException, IOException, ParseException, InterruptedException, ExecutionException, URISyntaxException {
 
         Logger.start(true, false);
+
+        long cMillis = System.currentTimeMillis();
+
+        while(System.currentTimeMillis() - cMillis < 1){}
 
         LApi lApi = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
@@ -141,7 +153,11 @@ public class Test implements EventListener{
 
         for(CachedGuildImpl guild : event.getGuildPool()){
             System.out.println(guild);
+            RequestGuildMembersCommand cmd = RequestGuildMembersCommand.createQueryGuildMembersCommand(lApi, guild.getId(),
+                    "Lin", true, "fjdsijfdsjfojdsofjdslk");
+            cmd.send();
         }
+
     }
 
     @Override
@@ -204,6 +220,32 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {
+        System.out.println("onGuildMemberAdd: " + event.getMember().getUser().getUsername());
+    }
+
+    @Override
+    public void onGuildMemberUpdate(@NotNull LApi lApi, @NotNull GuildMemberUpdateEvent event) {
+        System.out.println("onGuildMemberUpdate");
+    }
+
+    @Override
+    public void onGuildMemberRemove(@NotNull LApi lApi, @NotNull GuildMemberRemoveEvent event) {
+        System.out.println("onGuildMemberRemove");
+    }
+
+    @Override
+    public void onGuildMembersChunk(@NotNull LApi lApi, @NotNull GuildMembersChunkEvent event) {
+        ArrayList<Member> members = event.getChunkData().getMembers();
+
+        System.out.println("onGuildMembersChunk: " + members.size() + " members, nonce: " + event.getChunkData().getNonce());
+
+        for(Member member : members) {
+            System.out.println(member.getUser().getId() + ": " + member.getUser().getUsername());
+        }
+    }
+
+    @Override
     public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
         System.out.println("onGuildRoleCreate: " + event.getRole().getName());
     }
@@ -221,17 +263,11 @@ public class Test implements EventListener{
     @Override
     public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         System.out.println("onMessageCreate");
-    }
 
-    @Override
-    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
-        System.out.println("onNonGuildMessageCreate");
         Message msg = event.getMessage();
         String content = msg.getContent();
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();
-
-        System.out.println(content);
 
         if(!author.isBot()){
             if(content.toLowerCase().startsWith("hi")) {
@@ -254,56 +290,45 @@ public class Test implements EventListener{
                             /*new Attachment[]{
                                     new AttachmentTemplate("image.png",
                                             "fun image",
-                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\ezgif-3-909f89a603e6.png"),
-                                            FileType.PNG).setAttachmentId(0)
+                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\E0fcU7MVIAIGoil.jpg"),
+                                            FileType.JPEG).setAttachmentId(0)
                             }*/null, null)).queue();
+                } catch (InvalidEmbedException e) {
+                    e.printStackTrace();
+                }
+            } else if(content.equalsIgnoreCase("info")) {
+                MessageBuilder builder = new MessageBuilder(lApi);
+                EmbedBuilder embed = new EmbedBuilder();
+
+                embed.setTitle("Info");
+
+                Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+                StringBuilder ts = new StringBuilder();
+                ts.append("");
+                for(Thread t : threadSet) {
+                    ts.append(t.getName());
+                    ts.append(", ");
+                }
+                embed.setDescription("Threads: " + ts + "\n");
+
+                try {
+                    builder.addEmbed(embed.build(false));
+                    builder.getQueueable(event.getChannelId()).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
 
-
-
+    @Override
+    public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
+        System.out.println("onNonGuildMessageCreate");
     }
 
     @Override
     public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
         System.out.println("onGuildMessageCreate");
-        Message msg = event.getMessage();
-        String content = msg.getContent();
-        String channelId = msg.getChannelId();
-        User author = msg.getAuthor();
-
-        if(!author.isBot()){
-            if(content.toLowerCase().startsWith("hi")) {
-
-                new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
-                        .setReplyTo(msg, true)
-                        .getQueueable(channelId)
-                        .queue();
-            }else if(content.toLowerCase().startsWith("hey")) {
-                System.out.println("hey");
-                try {
-                    lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
-                            new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
-                            null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
-                            new Component[]{new Button(lApi, ComponentType.BUTTON,
-                                    ButtonStyle.PRIMARY, "Klick mich UwU",
-                                    null, "me.linusdev.btn_1", null,
-                                    null)}
-                    )}, null,
-                            new Attachment[]{
-                                    new AttachmentTemplate("image.png",
-                                            "fun image",
-                                            Paths.get("C:\\Users\\Linus\\Pictures\\Discord PP\\E0fcU7MVIAIGoil.jpg"),
-                                            FileType.JPEG).setAttachmentId(0)
-                            }, null)).queue();
-                } catch (InvalidEmbedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override
