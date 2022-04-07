@@ -22,11 +22,16 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.command.RequestGuildMembersCommand;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
@@ -51,6 +56,7 @@ import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.message.component.Component;
@@ -73,6 +79,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class Test implements EventListener{
@@ -141,7 +148,11 @@ public class Test implements EventListener{
 
         for(CachedGuildImpl guild : event.getGuildPool()){
             System.out.println(guild);
+            RequestGuildMembersCommand cmd = RequestGuildMembersCommand.createQueryGuildMembersCommand(lApi, guild.getId(),
+                    "Lin", true, "fjdsijfdsjfojdsofjdslk");
+            cmd.send();
         }
+
     }
 
     @Override
@@ -201,6 +212,32 @@ public class Test implements EventListener{
     @Override
     public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
         System.out.println("onGuildStickersUpdate");
+    }
+
+    @Override
+    public void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {
+        System.out.println("onGuildMemberAdd: " + event.getMember().getUser().getUsername());
+    }
+
+    @Override
+    public void onGuildMemberUpdate(@NotNull LApi lApi, @NotNull GuildMemberUpdateEvent event) {
+        System.out.println("onGuildMemberUpdate");
+    }
+
+    @Override
+    public void onGuildMemberRemove(@NotNull LApi lApi, @NotNull GuildMemberRemoveEvent event) {
+        System.out.println("onGuildMemberRemove");
+    }
+
+    @Override
+    public void onGuildMembersChunk(@NotNull LApi lApi, @NotNull GuildMembersChunkEvent event) {
+        ArrayList<Member> members = event.getChunkData().getMembers();
+
+        System.out.println("onGuildMembersChunk: " + members.size() + " members, nonce: " + event.getChunkData().getNonce());
+
+        for(Member member : members) {
+            System.out.println(member.getUser().getId() + ": " + member.getUser().getUsername());
+        }
     }
 
     @Override

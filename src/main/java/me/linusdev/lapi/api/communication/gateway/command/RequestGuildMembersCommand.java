@@ -196,8 +196,14 @@ public class RequestGuildMembersCommand extends GatewayCommand implements HasLAp
         return createCommand(lApi, guildId, null, 100, presences, nonce, userIds);
     }
 
+    /**
+     * @throws UnsupportedOperationException if {@link me.linusdev.lapi.api.config.ConfigFlag#ENABLE_GATEWAY ENABLE_GATEWAY} is not enabled
+     */
     public void send() {
-        //TODO: get gateway and queue command
+        if(lApi.getGateway() == null) {
+            throw new UnsupportedOperationException("Gateway must be enabled to queue a command on it");
+        }
+        lApi.getGateway().queueCommand(this);
     }
 
     @Override

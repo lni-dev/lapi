@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.lapi.api.communication.gateway.other.GetGatewayResponse;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
+import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
@@ -676,6 +677,12 @@ public interface LApi extends HasLApi {
      * @return {@link VoiceRegionManager}
      */
     VoiceRegionManager getVoiceRegionManager();
+
+    /**
+     *
+     * @return {@link GatewayWebSocket} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY ENABLE_GATEWAY} is not enabled.
+     */
+    @Nullable GatewayWebSocket getGateway();
 
     /**
      * @see ConfigFlag#CACHE_VOICE_REGIONS

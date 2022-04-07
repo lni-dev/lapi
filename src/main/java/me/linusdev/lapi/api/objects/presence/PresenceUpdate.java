@@ -90,7 +90,7 @@ public class PresenceUpdate implements Datable {
         }
 
         return new PresenceUpdate(
-                new PartialUser(data),
+                new PartialUser(userData),
                 Snowflake.fromString(guildId),
                 StatusType.fromValue(status),
                 activities,
