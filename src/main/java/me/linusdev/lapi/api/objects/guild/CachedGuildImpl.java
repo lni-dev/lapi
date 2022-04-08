@@ -378,6 +378,9 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
                 if(channelsData != null){
                     channelManager.init(channelsData.size());
                     for(Object o : channelsData){
+                        Data channelData = (Data) o;
+                        //add guildId to channel data
+                        channelData.add(Channel.GUILD_ID_KEY, id.asString());
                         channelManager.add(Channel.fromData(lApi, (Data) o));
                     }
                 } else {

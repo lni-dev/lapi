@@ -110,6 +110,8 @@ public class Test implements EventListener{
                 .disable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .enable(ConfigFlag.CACHE_MEMBERS)
                 .enable(ConfigFlag.COPY_MEMBER_ON_UPDATE_EVENT)
+                .enable(ConfigFlag.CACHE_CHANNELS)
+                .enable(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
                             .setApiVersion(ApiVersion.V9)
