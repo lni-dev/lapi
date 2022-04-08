@@ -750,4 +750,14 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_MEMBER_ON_UPDATE_EVENT
      */
     boolean isCopyOldMemberOnUpdateEventEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_CHANNELS
+     */
+    boolean isCacheChannelsEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_CHANNEL_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldChannelOnUpdateEventEnabled();
 }

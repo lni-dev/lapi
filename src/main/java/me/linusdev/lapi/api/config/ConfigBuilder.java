@@ -37,6 +37,7 @@ import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
@@ -78,6 +79,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<ListManager<Sticker>> stickerManagerFactory = null;
     private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
     private ManagerFactory<MemberManager> memberManagerFactory = null;
+    private ManagerFactory<ListManager<Channel<?>>> channelManagerFactory = null;
 
 
     /**
@@ -349,6 +351,24 @@ public class ConfigBuilder implements Datable {
         return this;
     }
 
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled)}
+     * <p>
+     *     Factory for the {@link ListManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild} to cache channels
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param channelManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;Channel&lt;?&gt;&gt;&gt;}
+     * @return this
+     */
+    public ConfigBuilder setChannelManagerFactory(ManagerFactory<ListManager<Channel<?>>> channelManagerFactory) {
+        this.channelManagerFactory = channelManagerFactory;
+        return this;
+    }
+
     /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
@@ -426,6 +446,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      * @return {@link Config}
      */
+    @SuppressWarnings("Convert2MethodRef")
     public @NotNull Config build(){
 
         if(token == null) throw new LApiRuntimeException("Token is null. A config always requires a token.");
@@ -440,7 +461,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),
                 Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)),
                 Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
-                Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi))
+                Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
+                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled))
         );
     }
 

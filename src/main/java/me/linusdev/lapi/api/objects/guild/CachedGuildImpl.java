@@ -22,9 +22,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
-import me.linusdev.lapi.api.manager.*;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
-import me.linusdev.lapi.api.manager.guild.member.MemberManagerImpl;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
 import me.linusdev.lapi.api.manager.guild.ThreadsManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
@@ -69,7 +67,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable Boolean large;
     protected @Nullable Integer memberCount;
     protected @Nullable MemberManager memberManager;
-    protected @Nullable ListManager<Channel<?>> channelsManager;
+    protected @Nullable ListManager<Channel<?>> channelManager;
     protected @Nullable ThreadsManager threadsManager;
     protected @Nullable PresencesManager presencesManager;
     protected @Nullable StageInstance[] stageInstances;
@@ -140,6 +138,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheMembersEnabled()) {
             this.memberManager = lApi.getConfig().getMemberManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheChannelsEnabled()) {
+            this.channelManager = lApi.getConfig().getChannelManagerFactory().newInstance(lApi);
         }
 
     }
@@ -367,10 +369,25 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
                     memberManager.init(1);
                 }
             }
+        }
+
+        if(channelManager != null){
+            if(!channelManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> channelsData = (ArrayList<Object>) data.get(CHANNELS_KEY);
+                if(channelsData != null){
+                    channelManager.init(channelsData.size());
+                    for(Object o : channelsData){
+                        channelManager.add(Channel.fromData(lApi, (Data) o));
+                    }
+                } else {
+                    channelManager.init(1);
+                }
+            }
 
         }
 
-        //TODO channels, threads, ...
+        //TODO: threads, ...
     }
 
     @Override
@@ -408,6 +425,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
     public @Nullable MemberManager getMemberManager() {
         return memberManager;
+    }
+
+    public @Nullable ListManager<Channel<?>> getChannelManager() {
+        return channelManager;
     }
 
     @NotNull

@@ -27,6 +27,9 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommand;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.communication.gateway.enums.*;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
@@ -62,6 +65,7 @@ import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -383,12 +387,151 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case CHANNEL_CREATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild channels
+                            transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
+                                    null, Channel.fromData(lApi, data)));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
+                                    Snowflake.fromString(guildId), Channel.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ListManager<Channel<?>> channelManager = guild.getChannelManager();
+
+                        if(channelManager == null) {
+                            transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
+                                    Snowflake.fromString(guildId), Channel.fromData(lApi, data)));
+                            break;
+                        }
+
+                        Channel<?> channel = Channel.fromData(lApi, data);
+                        channelManager.add(channel);
+                        transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), channel));
+                    }
                     break;
 
                 case CHANNEL_UPDATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild channels
+                            transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
+                                    null, new Update<>(null, Channel.fromData(lApi, data))));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ListManager<Channel<?>> channelManager = guild.getChannelManager();
+
+                        if(channelManager == null) {
+                            transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                            break;
+                        }
+
+
+                        Update<Channel<?>, Channel<?>> update = channelManager.onUpdate(data);
+
+                        if(update == null) {
+                            //ChannelManager did not contain this channel -> error
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_CHANNEL, null)));
+                            break;
+                        }
+
+                        transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), update));
+                    }
                     break;
 
                 case CHANNEL_DELETE:
+                {
+                    Data data = (Data) payload.getPayloadData();
+                    if (data == null)
+                        throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                    String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                    if(guildId == null) {
+                        //This may be a non guild channel
+                        //TODO: cache non guild channels
+                        transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
+                                null, null, Channel.fromData(lApi, data)));
+                        break;
+                    }
+
+                    if(guildManager == null) {
+                        transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
+                                Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                        break;
+                    }
+
+                    CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                    if(guild == null) {
+                        transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                        break;
+                    }
+
+                    ListManager<Channel<?>> channelManager = guild.getChannelManager();
+
+                    if(channelManager == null) {
+                        transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
+                                Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                        break;
+                    }
+
+                    Channel<?> received = Channel.fromData(lApi, data);
+                    Channel<?> deleted = channelManager.onDelete(received.getId());
+
+                    if(deleted == null) {
+                        //ChannelManager did not contain this channel -> error
+                        transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                new LApiError(LApiError.ErrorCode.UNKNOWN_CHANNEL, null)));
+                        break;
+                    }
+
+                    transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
+                            Snowflake.fromString(guildId), deleted, received));
+                }
                     break;
 
                 case CHANNEL_PINS_UPDATE:
@@ -1285,6 +1428,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         if(cmd != null) {
             queueWorking.set(true);
             sendCommand(cmd.getType(), cmd.getObject());
+        }else{
+            queueWorking.set(false);
         }
     }
 

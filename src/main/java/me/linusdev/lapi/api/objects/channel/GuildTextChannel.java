@@ -188,4 +188,20 @@ public class GuildTextChannel extends Channel<GuildTextChannel> implements Guild
         data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
         data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
     }
+
+    @Override
+    public String toString() {
+        return "GuildTextChannel{" +
+                "name='" + name + '\'' +
+                ", topic='" + topic + '\'' +
+                ", nsfw=" + nsfw +
+                ", guildId=" + guildId +
+                ", position=" + position +
+                ", permissionOverwrites=" + permissionOverwrites +
+                ", parentId=" + parentId +
+                ", rateLimitPerUser=" + rateLimitPerUser +
+                ", lastMessageId=" + lastMessageId +
+                ", lastPinTimestamp=" + lastPinTimestamp +
+                '}';
+    }
 }

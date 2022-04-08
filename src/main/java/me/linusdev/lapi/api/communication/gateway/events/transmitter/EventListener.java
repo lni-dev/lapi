@@ -18,6 +18,9 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
@@ -103,6 +106,12 @@ public interface EventListener {
      * This event will only happen once.
      */
     default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
+
+    default void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {}
+
+    default void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {}
+
+    default void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {}
 
     default void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {}
 

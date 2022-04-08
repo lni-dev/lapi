@@ -17,7 +17,6 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.Data;
-import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
@@ -679,6 +678,16 @@ public class LApiImpl implements LApi {
     @Override
     public boolean isCopyOldMemberOnUpdateEventEnabled() {
         return config.isFlagSet(ConfigFlag.COPY_MEMBER_ON_UPDATE_EVENT);
+    }
+
+    @Override
+    public boolean isCacheChannelsEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_CHANNELS);
+    }
+
+    @Override
+    public boolean isCopyOldChannelOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT);
     }
 
     //api-internal getter

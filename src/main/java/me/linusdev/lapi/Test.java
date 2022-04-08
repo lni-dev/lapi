@@ -25,6 +25,9 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.command.RequestGuildMembersCommand;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
@@ -154,7 +157,7 @@ public class Test implements EventListener{
         for(CachedGuildImpl guild : event.getGuildPool()){
             System.out.println(guild);
             RequestGuildMembersCommand cmd = RequestGuildMembersCommand.createQueryGuildMembersCommand(lApi, guild.getId(),
-                    "Lin", true, "fjdsijfdsjfojdsofjdslk");
+                    "Lin", true, "guild-" + guild.getName());
             cmd.send();
         }
 
@@ -163,6 +166,21 @@ public class Test implements EventListener{
     @Override
     public void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {
         System.out.println("onLApiReady");
+    }
+
+    @Override
+    public void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {
+        System.out.println("onChannelCreate: " + event.getChannel());
+    }
+
+    @Override
+    public void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {
+        System.out.println("onChannelUpdate: " + event.getChannel());
+    }
+
+    @Override
+    public void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {
+        System.out.println("onChannelDelete: " + event.getChannel());
     }
 
     @Override

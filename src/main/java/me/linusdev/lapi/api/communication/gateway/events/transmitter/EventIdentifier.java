@@ -16,6 +16,9 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
@@ -100,6 +103,49 @@ public enum EventIdentifier{
      */
     LAPI_READY,
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                           CHANNEL                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onChannelCreate(LApi, ChannelCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    CHANNEL_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onChannelUpdate(LApi, ChannelUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    CHANNEL_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onChannelDelete(LApi, ChannelDeleteEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    CHANNEL_DELETE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

@@ -18,7 +18,9 @@ package me.linusdev.lapi.api.config;
 
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -151,6 +153,23 @@ public enum ConfigFlag implements SimpleDatable {
      *
      */
     COPY_MEMBER_ON_UPDATE_EVENT(1 << 13),
+
+
+    /**
+     * <p>
+     *     Caches all {@link Channel channels} retrieved by the
+     *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_CHANNELS(1 << 14),
+
+    /**
+     * <p>
+     *     Copies {@link Channel} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     */
+    COPY_CHANNEL_ON_UPDATE_EVENT(1 << 15),
 
     ;
 

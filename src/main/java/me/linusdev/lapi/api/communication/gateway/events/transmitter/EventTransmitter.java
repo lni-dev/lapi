@@ -18,6 +18,9 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
@@ -39,7 +42,6 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateU
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -219,6 +221,72 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onLApiReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onChannelCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onChannelCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onChannelUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onChannelUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onChannelDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onChannelDelete(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

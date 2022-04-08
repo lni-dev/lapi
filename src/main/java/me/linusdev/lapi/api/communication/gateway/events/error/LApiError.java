@@ -24,6 +24,7 @@ public class LApiError {
         UNKNOWN_GUILD,
         UNKNOWN_ROLE,
         UNKNOWN_MEMBER,
+        UNKNOWN_CHANNEL,
     }
 
     private final @Nullable ErrorCode code;
