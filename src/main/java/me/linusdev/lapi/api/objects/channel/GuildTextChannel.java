@@ -17,6 +17,8 @@
 package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.data.converter.Converter;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
@@ -24,6 +26,7 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.GuildTextChannelAbstract;
 import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,24 +36,24 @@ import java.util.ArrayList;
  * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-text-channel" target="_top">Exmaple GuildImpl Text Channel</a>
  * @see GuildTextChannelAbstract
  */
-public class GuildTextChannel extends Channel implements GuildTextChannelAbstract {
+public class GuildTextChannel extends Channel<GuildTextChannel> implements GuildTextChannelAbstract {
 
-    private @NotNull String name;
-    private @Nullable String topic;
-    private boolean nsfw;
-    private @Nullable Snowflake guildId;
-    private @Nullable Integer position;
-    private @NotNull PermissionOverwrites permissionOverwrites;
-    private @Nullable Snowflake parentId;
-    private int rateLimitPerUser;
-    private @Nullable Snowflake lastMessageId;
-    private @Nullable String lastPinTimestamp;
+    protected @NotNull String name;
+    protected @Nullable String topic;
+    protected boolean nsfw;
+    protected final @Nullable Snowflake guildId;
+    protected @Nullable Integer position;
+    protected @NotNull PermissionOverwrites permissionOverwrites;
+    protected @Nullable Snowflake parentId;
+    protected int rateLimitPerUser;
+    protected @Nullable Snowflake lastMessageId;
+    protected @Nullable ISO8601Timestamp lastPinTimestamp;
 
     public GuildTextChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
                             @NotNull String name, @Nullable String topic, boolean nsfw,
                             @Nullable Snowflake guildId, @Nullable Integer position, @NotNull PermissionOverwrites permissionOverwrites,
                             @Nullable Snowflake parentId, int rateLimitPerUser, @Nullable Snowflake lastMessageId,
-                            @Nullable String lastPinTimestamp) {
+                            @Nullable ISO8601Timestamp lastPinTimestamp) {
         super(lApi, id, type);
 
         this.name = name;
@@ -90,7 +93,7 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
         this.parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
         this.rateLimitPerUser = ((Number) data.getOrDefault(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
         this.lastMessageId = Snowflake.fromString((String) data.getOrDefault(LAST_MESSAGE_ID_KEY, null));
-        this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);
+        this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
 
     }
 
@@ -122,7 +125,7 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
     }
 
     @Override
-    public int getPosition() {
+    public @Nullable Integer getPosition() {
         return position;
     }
 
@@ -147,7 +150,42 @@ public class GuildTextChannel extends Channel implements GuildTextChannelAbstrac
     }
 
     @Override
-    public @Nullable String getLastPinTimestamp() {
+    public @Nullable ISO8601Timestamp getLastPinTimestamp() {
         return lastPinTimestamp;
+    }
+
+    @Override
+    public @NotNull GuildTextChannel copy() {
+        return new GuildTextChannel(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copy(name),
+                Copyable.copy(topic),
+                nsfw,
+                Copyable.copy(guildId),
+                position,
+                Copyable.copy(permissionOverwrites),
+                Copyable.copy(parentId),
+                rateLimitPerUser,
+                Copyable.copy(lastMessageId),
+                Copyable.copy(lastPinTimestamp)
+                );
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
+        data.processIfContained(NSFW_KEY, (Boolean bool) -> this.nsfw = bool);
+        //guildId should never change
+        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
+
+        ArrayList<Data> array = data.getAndConvertArrayList(PERMISSION_OVERWRITES_KEY, (Converter<Object, Data>) convertible -> (Data) convertible);
+        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+        data.processIfContained(RATE_LIMIT_PER_USER_KEY, (Number num) -> {if(num != null)this.rateLimitPerUser = num.intValue();});
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
     }
 }

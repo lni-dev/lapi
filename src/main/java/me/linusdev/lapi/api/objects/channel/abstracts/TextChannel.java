@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.channel.abstracts;
 
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.Nullable;
 
 public interface TextChannel {
@@ -44,5 +45,5 @@ public interface TextChannel {
      * todo link event and check output
      */
     @Nullable
-    String getLastPinTimestamp();
+    ISO8601Timestamp getLastPinTimestamp();
 }

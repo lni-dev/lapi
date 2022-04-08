@@ -17,6 +17,8 @@
 package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.data.converter.Converter;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
@@ -30,22 +32,22 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GuildVoiceChannel extends Channel implements GuildVoiceChannelAbstract {
+public class GuildVoiceChannel extends Channel<GuildVoiceChannel> implements GuildVoiceChannelAbstract {
 
-    private @NotNull String name;
-    private boolean nsfw;
-    private @NotNull Snowflake guildId;
-    private int position;
-    private @NotNull PermissionOverwrites permissionOverwrites;
-    private @Nullable Snowflake parentId;
-    private int bitRate;
-    private int userLimit;
-    private @Nullable String rtcRegion;
-    private @NotNull VideoQuality videoQualityMode;
+    protected @NotNull String name;
+    protected boolean nsfw;
+    protected @NotNull Snowflake guildId;
+    protected @Nullable Integer position;
+    protected @NotNull PermissionOverwrites permissionOverwrites;
+    protected @Nullable Snowflake parentId;
+    protected int bitRate;
+    protected int userLimit;
+    protected @Nullable String rtcRegion;
+    protected @NotNull VideoQuality videoQualityMode;
 
     public GuildVoiceChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
                              @NotNull String name, boolean nsfw, @NotNull Snowflake guildId,
-                             int position, @NotNull PermissionOverwrites permissionOverwrites, @Nullable Snowflake parentId,
+                             @Nullable Integer position, @NotNull PermissionOverwrites permissionOverwrites, @Nullable Snowflake parentId,
                              int bitRate, int userLimit, @Nullable String rtcRegion,
                              @NotNull VideoQuality videoQualityMode) {
         super(lApi, id, type);
@@ -68,14 +70,12 @@ public class GuildVoiceChannel extends Channel implements GuildVoiceChannelAbstr
 
         String name = (String) data.get(NAME_KEY);
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
-        int position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue(); //todo can position be missing?
+        Integer position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue();
 
         if (name == null) {
             throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in GuildVoiceChannel with id:" + getId()).addMissingFields(NAME_KEY);
         } else if (guildId == null) {
             throw new InvalidDataException(data, "field '" + GUILD_ID_KEY + "' missing or null in GuildVoiceChannel with id:" + getId()).addMissingFields(GUILD_ID_KEY);
-        } else if (position == -1) {
-            throw new InvalidDataException(data, "field '" + POSITION_KEY + "' missing or -1 in GuildVoiceChannel with id:" + getId()).addMissingFields(POSITION_KEY);
         }
 
         this.name = name;
@@ -112,7 +112,7 @@ public class GuildVoiceChannel extends Channel implements GuildVoiceChannelAbstr
     }
 
     @Override
-    public int getPosition() {
+    public @Nullable Integer getPosition() {
         return position;
     }
 
@@ -145,5 +145,40 @@ public class GuildVoiceChannel extends Channel implements GuildVoiceChannelAbstr
     @Override
     public @NotNull VideoQuality getVideoQualityMode() {
         return videoQualityMode;
+    }
+
+    @Override
+    public @NotNull GuildVoiceChannel copy() {
+        return new GuildVoiceChannel(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copy(name),
+                nsfw,
+                Copyable.copy(guildId),
+                position,
+                Copyable.copy(permissionOverwrites),
+                Copyable.copy(parentId),
+                bitRate,
+                userLimit,
+                Copyable.copy(rtcRegion),
+                videoQualityMode);
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        super.updateSelfByData(data);
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(NSFW_KEY, (Boolean bool) -> {if (bool != null) this.nsfw = bool;});
+        //guildId may not change
+        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
+
+        ArrayList<Data> array = data.getAndConvertArrayList(PERMISSION_OVERWRITES_KEY, (Converter<Object, Data>) convertible -> (Data) convertible);
+        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+        data.processIfContained(BITRATE_KEY, (Number num) -> {if(num != null) this.bitRate = num.intValue();});
+        data.processIfContained(USER_LIMIT_KEY, (Number num) -> {if(num != null) this.userLimit = num.intValue();});
+        data.processIfContained(RTC_REGION_KEY, (String str) -> this.rtcRegion = str);
+        data.processIfContained(VIDEO_QUALITY_MODE_KEY, (Number num) -> {if(num != null) this.videoQualityMode = VideoQuality.fromId(num);});
     }
 }

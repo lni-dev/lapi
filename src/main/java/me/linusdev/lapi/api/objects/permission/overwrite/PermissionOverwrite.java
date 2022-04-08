@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.permission.overwrite;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -35,7 +36,7 @@ import java.util.List;
  *
  *
  */
-public class PermissionOverwrite implements SnowflakeAble, Datable {
+public class PermissionOverwrite implements Copyable<PermissionOverwrite>, SnowflakeAble, Datable {
 
     public static final String ID_KEY = "id";
     public static final String TYPE_KEY = "type";
@@ -77,6 +78,7 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
      * @param deny {@link BigInteger} serialized into a string
      */
     public PermissionOverwrite(@NotNull Snowflake id, @Range(from=ROLE, to=MEMBER) int type, @NotNull String allow, @NotNull String deny){
+        this.data = null;
         this.id = id;
         this.type = type;
         this.allow = allow;
@@ -163,5 +165,10 @@ public class PermissionOverwrite implements SnowflakeAble, Datable {
         data.add(DENY_KEY, deny);
 
         return data;
+    }
+
+    @Override
+    public @NotNull PermissionOverwrite copy() {
+        return this;
     }
 }

@@ -27,7 +27,7 @@ public interface GuildChannel {
      * sorting position of the channel
      * todo give more information
      */
-    int getPosition();
+    @Nullable Integer getPosition();
 
     /**
      * explicit permission overwrites for members and roles

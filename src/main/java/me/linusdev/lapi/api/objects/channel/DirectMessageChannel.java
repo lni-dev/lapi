@@ -17,8 +17,10 @@
 package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.Recipient;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -32,14 +34,14 @@ import java.util.ArrayList;
 /**
  * <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-dm-channel">Example DM Channel</a>
  */
-public class DirectMessageChannel extends Channel implements DirectMessageChannelAbstract {
+public class DirectMessageChannel extends Channel<DirectMessageChannel> implements DirectMessageChannelAbstract {
 
-    private @NotNull Recipient[] recipients;
-    private @Nullable Snowflake lastMessageId;
-    private @Nullable String lastPinTimestamp;
+    protected @NotNull Recipient[] recipients;
+    protected @Nullable Snowflake lastMessageId;
+    protected @Nullable ISO8601Timestamp lastPinTimestamp;
 
     public DirectMessageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
-                                @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp) {
+                                @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable ISO8601Timestamp lastPinTimestamp) {
         super(lApi, id, type);
 
         this.recipients = recipients;
@@ -61,7 +63,7 @@ public class DirectMessageChannel extends Channel implements DirectMessageChanne
         for(Data d : recipients) this.recipients[i++] = new Recipient(lApi, d);
 
         this.lastMessageId = Snowflake.fromString((String) data.get(LAST_MESSAGE_ID_KEY));
-        this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);
+        this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
     }
 
 
@@ -86,7 +88,32 @@ public class DirectMessageChannel extends Channel implements DirectMessageChanne
     }
 
     @Override
-    public @Nullable String getLastPinTimestamp() {
+    public @Nullable ISO8601Timestamp getLastPinTimestamp() {
         return lastPinTimestamp;
+    }
+
+    @Override
+    public @NotNull DirectMessageChannel copy() {
+        return new DirectMessageChannel(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copyArrayFlat(recipients),
+                Copyable.copy(lastMessageId),
+                Copyable.copy(lastPinTimestamp)
+        );
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        super.updateSelfByData(data);
+        ArrayList<Object> rs = (ArrayList<Object>) data.get(RECIPIENTS_KEY);
+        if(rs != null) {
+            this.recipients = new Recipient[rs.size()];
+            int i = 0;
+            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(Data) d);
+        }
+
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
     }
 }

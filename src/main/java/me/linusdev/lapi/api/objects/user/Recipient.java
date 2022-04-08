@@ -83,7 +83,7 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable, 
     }
 
     @Override
-    public @NotNull String getAvatarHash() {
+    public @Nullable String getAvatarHash() {
         return avatarHash;
     }
 
