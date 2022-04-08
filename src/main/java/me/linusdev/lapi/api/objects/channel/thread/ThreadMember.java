@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.channel.thread;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  * A thread member is used to indicate whether a user has joined a thread or not.
  * @see <a href="https://discord.com/developers/docs/resources/channel#thread-member-object" target="_top"></a>
  */
-public class ThreadMember implements Datable {
+public class ThreadMember implements Copyable<ThreadMember>, Datable {
 
     public static final String ID_KEY = "id";
     public static final String USER_ID_KEY = "user_id";
@@ -136,5 +137,14 @@ public class ThreadMember implements Datable {
         data.add(FLAGS_KEY, flags);
 
         return data;
+    }
+
+    /**
+     *
+     * @return this, because everything in this class is final
+     */
+    @Override
+    public @NotNull ThreadMember copy() {
+        return this;
     }
 }

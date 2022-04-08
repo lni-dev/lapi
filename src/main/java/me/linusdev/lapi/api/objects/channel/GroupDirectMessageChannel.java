@@ -17,8 +17,10 @@
 package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.Recipient;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -29,17 +31,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GroupDirectMessageChannel extends Channel implements GroupDirectMessageChannelAbstract {
+public class GroupDirectMessageChannel extends Channel<GroupDirectMessageChannel> implements GroupDirectMessageChannelAbstract {
 
-    private @NotNull Recipient[] recipients;
-    private @Nullable Snowflake lastMessageId;
-    private @Nullable String lastPinTimestamp;
-    private @Nullable String iconHash;
-    private @NotNull Snowflake ownerId;
-    private @Nullable Snowflake applicationId;
+    protected @NotNull Recipient[] recipients;
+    protected @Nullable Snowflake lastMessageId;
+    protected @Nullable ISO8601Timestamp lastPinTimestamp;
+    protected @Nullable String iconHash;
+    protected @NotNull Snowflake ownerId;
+    protected @Nullable Snowflake applicationId;
 
     public GroupDirectMessageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type,
-                                     @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp,
+                                     @NotNull Recipient[] recipients, @Nullable Snowflake lastMessageId, @Nullable ISO8601Timestamp lastPinTimestamp,
                                      @Nullable String iconHash, @NotNull Snowflake ownerId, @Nullable Snowflake applicationId) {
         super(lApi, id, type);
 
@@ -65,7 +67,7 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
         for(Data d : recipients) this.recipients[i++] = new Recipient(lApi, d);
 
         this.lastMessageId = Snowflake.fromString((String) data.get(LAST_MESSAGE_ID_KEY));
-        this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);
+        this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
         this.iconHash = (String) data.get(ICON_KEY);
         this.ownerId = Snowflake.fromString((String) data.get(OWNER_ID_KEY));
         this.applicationId = Snowflake.fromString((String) data.get(APPLICATION_ID_KEY));
@@ -109,7 +111,39 @@ public class GroupDirectMessageChannel extends Channel implements GroupDirectMes
     }
 
     @Override
-    public @Nullable String getLastPinTimestamp() {
+    public @Nullable ISO8601Timestamp getLastPinTimestamp() {
         return lastPinTimestamp;
+    }
+
+    @Override
+    public @NotNull GroupDirectMessageChannel copy() {
+        return new GroupDirectMessageChannel(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copyArrayFlat(recipients),
+                Copyable.copy(lastMessageId),
+                Copyable.copy(lastPinTimestamp),
+                Copyable.copy(iconHash),
+                Copyable.copy(ownerId),
+                Copyable.copy(applicationId)
+        );
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        super.updateSelfByData(data);
+
+        ArrayList<Object> rs = (ArrayList<Object>) data.get(RECIPIENTS_KEY);
+        if(rs != null) {
+            this.recipients = new Recipient[rs.size()];
+            int i = 0;
+            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(Data) d);
+        }
+
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
+        data.processIfContained(ICON_KEY, (String str) -> this.iconHash = str);
+        data.processIfContained(OWNER_ID_KEY, (String str) -> this.ownerId = Snowflake.fromString(str));
+        data.processIfContained(APPLICATION_ID_KEY, (String str) -> this.applicationId = Snowflake.fromString(str));
     }
 }

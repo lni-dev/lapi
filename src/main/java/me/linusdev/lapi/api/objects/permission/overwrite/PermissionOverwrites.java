@@ -19,12 +19,16 @@ package me.linusdev.lapi.api.objects.permission.overwrite;
 import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class PermissionOverwrites implements SimpleDatable {
+public class PermissionOverwrites implements Copyable<PermissionOverwrites>, SimpleDatable {
     private ArrayList<PermissionOverwrite> overwrites;
+
+    private PermissionOverwrites() {}
 
     public PermissionOverwrites(PermissionOverwrite... overwrites){
         this.overwrites = new ArrayList<>(overwrites.length);
@@ -50,5 +54,13 @@ public class PermissionOverwrites implements SimpleDatable {
     @Override
     public Object simplify() {
         return overwrites;
+    }
+
+    @Override
+    public @NotNull PermissionOverwrites copy() {
+        PermissionOverwrites copy = new PermissionOverwrites();
+        //noinspection unchecked
+        copy.overwrites = (ArrayList<PermissionOverwrite>) this.overwrites.clone();
+        return copy;
     }
 }

@@ -17,6 +17,8 @@
 package me.linusdev.lapi.api.objects.channel.thread;
 
 import me.linusdev.data.Data;
+import me.linusdev.data.converter.Converter;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
@@ -25,27 +27,30 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.GuildChannel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GuildNewsThread extends Channel implements Thread, GuildChannel {
+import java.util.ArrayList;
 
-    private @NotNull String name;
-    private @NotNull Snowflake guildId;
-    private @NotNull Snowflake parentId;
-    private int rateLimitPerUser;
-    private @Nullable Snowflake lastMessageId;
-    private @Nullable String lastPinTimestamp;
-    private @NotNull Snowflake ownerId;
-    private @NotNull ThreadMetadata threadMetadata;
-    private int messageCount;
-    private int memberCount;
-    private @Nullable ThreadMember member;
-    private @Nullable Integer defaultAutoArchiveDuration;
-    private @Nullable String permissionsAsString;
+public class GuildNewsThread extends Channel<GuildNewsThread> implements Thread, GuildChannel {
+
+    protected @NotNull String name;
+    protected @NotNull Snowflake guildId;
+    protected @NotNull Snowflake parentId;
+    protected int rateLimitPerUser;
+    protected @Nullable Snowflake lastMessageId;
+    protected @Nullable ISO8601Timestamp lastPinTimestamp;
+    protected @NotNull Snowflake ownerId;
+    protected @NotNull ThreadMetadata threadMetadata;
+    protected int messageCount;
+    protected int memberCount;
+    protected @Nullable ThreadMember member;
+    protected @Nullable Integer defaultAutoArchiveDuration;
+    protected @Nullable String permissionsAsString;
 
     public GuildNewsThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name, @NotNull Snowflake guildId, @NotNull Snowflake parentId, int rateLimitPerUser,
-                             @Nullable Snowflake lastMessageId, @Nullable String lastPinTimestamp, @NotNull Snowflake ownerId, @NotNull ThreadMetadata threadMetadata, int messageCount, int memberCount,
+                             @Nullable Snowflake lastMessageId, @Nullable ISO8601Timestamp lastPinTimestamp, @NotNull Snowflake ownerId, @NotNull ThreadMetadata threadMetadata, int messageCount, int memberCount,
                            @Nullable ThreadMember member, @Nullable Integer defaultAutoArchiveDuration, @Nullable String permissionsAsString) {
         super(lApi, id, type);
 
@@ -93,7 +98,7 @@ public class GuildNewsThread extends Channel implements Thread, GuildChannel {
         this.parentId = parentId;
         this.rateLimitPerUser = ((Number) data.getOrDefault(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
         this.lastMessageId = Snowflake.fromString((String) data.getOrDefault(LAST_MESSAGE_ID_KEY, null));
-        this.lastPinTimestamp = (String) data.get(LAST_PIN_TIMESTAMP_KEY);
+        this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
         this.ownerId = ownerId;
         this.threadMetadata = new ThreadMetadata(threadMetadataData);
         this.memberCount = ((Number) data.getOrDefault(MEMBER_COUNT_KEY, 0)).intValue();
@@ -114,7 +119,7 @@ public class GuildNewsThread extends Channel implements Thread, GuildChannel {
     }
 
     @Override
-    public @Nullable String getLastPinTimestamp() {
+    public @Nullable ISO8601Timestamp getLastPinTimestamp() {
         return lastPinTimestamp;
     }
 
@@ -174,7 +179,7 @@ public class GuildNewsThread extends Channel implements Thread, GuildChannel {
     }
 
     @Override
-    public int getPosition() {
+    public @Nullable Integer getPosition() {
         throw new UnsupportedOperationException("Threads do not have a Position!");
     }
 
@@ -186,5 +191,60 @@ public class GuildNewsThread extends Channel implements Thread, GuildChannel {
     @Override
     public boolean getNsfw() {
         throw new UnsupportedOperationException("Threads do not have an nsfw tag. It's always the same as the parent channel!");
+    }
+
+    @Override
+    public @NotNull GuildNewsThread copy() {
+        return new GuildNewsThread(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copy(name),
+                Copyable.copy(guildId),
+                Copyable.copy(parentId),
+                rateLimitPerUser,
+                Copyable.copy(lastMessageId),
+                Copyable.copy(lastPinTimestamp),
+                Copyable.copy(ownerId),
+                Copyable.copy(threadMetadata),
+                messageCount,
+                memberCount,
+                Copyable.copy(member),
+                defaultAutoArchiveDuration,
+                Copyable.copy(permissionsAsString)
+                );
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        super.updateSelfByData(data);
+
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        //guildId should never change
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+        data.processIfContained(RATE_LIMIT_PER_USER_KEY, (Number num) -> {if(num != null)this.rateLimitPerUser = num.intValue();});
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
+        data.processIfContained(OWNER_ID_KEY, (String str) -> this.ownerId = Snowflake.fromString(str));
+
+        Data d = (Data) data.get(THREAD_METADATA_KEY);
+        if (d != null) {
+            this.threadMetadata = new ThreadMetadata(d);
+        }
+
+        data.processIfContained(MESSAGE_COUNT_KEY, (Number num) -> {if(num != null)this.messageCount = num.intValue();});
+        data.processIfContained(MEMBER_COUNT_KEY, (Number num) -> {if(num != null)this.memberCount = num.intValue();});
+
+        d = (Data) data.get(MEMBER_KEY);
+        if (d != null) {
+            this.member = ThreadMember.fromData(d);
+        }
+
+        data.processIfContained(DEFAULT_AUTO_ARCHIVE_DURATION_KEY, (Number num) -> {
+            if(num != null)this.defaultAutoArchiveDuration = num.intValue();
+            else this.defaultAutoArchiveDuration = null;
+        });
+
+        data.processIfContained(PERMISSIONS_KEY, (String str) -> this.permissionsAsString = str);
     }
 }

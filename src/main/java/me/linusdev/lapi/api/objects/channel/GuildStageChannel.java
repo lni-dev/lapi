@@ -17,6 +17,8 @@
 package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Data;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -30,9 +32,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class GuildStageChannel extends GuildVoiceChannel implements GuildStageChannelAbstract {
 
-    private @Nullable String topic;
+    protected @Nullable String topic;
 
-    public GuildStageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name, boolean nsfw, @NotNull Snowflake guildId, int position, @NotNull PermissionOverwrites permissionOverwrites, @Nullable Snowflake parentId, int bitRate, int userLimit, @Nullable String rtcRegion, @NotNull VideoQuality videoQualityMode, @Nullable String topic) {
+    public GuildStageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull String name,
+                             boolean nsfw, @NotNull Snowflake guildId, @Nullable Integer position, @NotNull PermissionOverwrites permissionOverwrites, @Nullable Snowflake parentId, int bitRate, int userLimit, @Nullable String rtcRegion, @NotNull VideoQuality videoQualityMode, @Nullable String topic) {
         super(lApi, id, type, name, nsfw, guildId, position, permissionOverwrites, parentId, bitRate, userLimit, rtcRegion, videoQualityMode);
         this.topic = topic;
     }
@@ -45,5 +48,29 @@ public class GuildStageChannel extends GuildVoiceChannel implements GuildStageCh
     @Override
     public @Nullable String getTopic() {
         return topic;
+    }
+
+    @Override
+    public @NotNull GuildStageChannel copy() {
+        return new GuildStageChannel(lApi,
+                Copyable.copy(id),
+                type,
+                Copyable.copy(name),
+                nsfw,
+                Copyable.copy(guildId),
+                position,
+                Copyable.copy(permissionOverwrites),
+                Copyable.copy(parentId),
+                bitRate,
+                userLimit,
+                Copyable.copy(rtcRegion),
+                videoQualityMode,
+                Copyable.copy(topic));
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        super.updateSelfByData(data);
+        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
     }
 }

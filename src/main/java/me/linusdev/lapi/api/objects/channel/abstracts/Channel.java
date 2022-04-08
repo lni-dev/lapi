@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.objects.channel.abstracts;
 
 
 import me.linusdev.data.Data;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.channel.thread.GuildNewsThread;
@@ -35,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see <a href="https://discord.com/developers/docs/resources/channel#channels-resource" target="_top">Channels Resource</a>
  */
-public abstract class Channel implements SnowflakeAble {
+public abstract class Channel<T extends Channel<T>> implements CopyAndUpdatable<T>, SnowflakeAble {
 
     public final static String ID_KEY = "id";
     public final static String TYPE_KEY = "type";
@@ -66,13 +68,13 @@ public abstract class Channel implements SnowflakeAble {
     public final static String DEFAULT_AUTO_ARCHIVE_DURATION_KEY = "default_auto_archive_duration";
     public final static String PERMISSIONS_KEY = "permissions";
 
-    private final @NotNull LApi lApi;
-    private final @NotNull Snowflake id;
-    private final @NotNull ChannelType type;
+    protected final @NotNull LApi lApi;
+    protected final @NotNull Snowflake id;
+    protected final @NotNull ChannelType type;
 
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable Channel fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Channel<?> fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
         ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
         Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
@@ -105,13 +107,7 @@ public abstract class Channel implements SnowflakeAble {
 
         }
 
-        //TODO return a Channel, which contains the given data
-        return new Channel(lApi, id, type) {
-            @Override
-            public @Nullable Snowflake getGuildIdAsSnowflake() {
-                return null;
-            }
-        };
+        return new UnknownChannel(lApi, id, type, data);
     }
 
 
@@ -157,4 +153,9 @@ public abstract class Channel implements SnowflakeAble {
      * @return the guild id snowflake or {@code null} if this is not a guild channel
      */
     public abstract @Nullable Snowflake getGuildIdAsSnowflake();
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        data.processIfContained(TYPE_KEY, (Number num) -> ChannelType.fromId(num.intValue()));
+    }
 }

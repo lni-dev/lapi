@@ -20,6 +20,7 @@ package me.linusdev.lapi.api.objects.channel.thread;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see <a href="https://discord.com/developers/docs/resources/channel#thread-metadata-object" target="_top">Thread Metadata Object</a>
  */
-public class ThreadMetadata implements Datable {
+public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
 
     public static final String ARCHIVED_KEY = "archived";
     public static final String ARCHIVE_TIMESTAMP_KEY = "archive_timestamp";
@@ -123,5 +124,14 @@ public class ThreadMetadata implements Datable {
      */
     public @Nullable Boolean getInvitable() {
         return invitable;
+    }
+
+    /**
+     *
+     * @return this, because everything in this class is final
+     */
+    @Override
+    public @NotNull ThreadMetadata copy() {
+        return this;
     }
 }
