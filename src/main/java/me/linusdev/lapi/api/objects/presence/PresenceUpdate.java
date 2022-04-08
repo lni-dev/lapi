@@ -49,11 +49,11 @@ public class PresenceUpdate implements Datable {
     public static final String ACTIVITIES_KEY = "activities";
     public static final String CLIENT_STATUS_KEY = "client_status";
 
-    private final @NotNull PartialUser user;
-    private final @NotNull Snowflake guildId;
-    private final @NotNull StatusType status;
-    private final @NotNull ArrayList<Activity> activities;
-    private final @NotNull ClientStatus clientStatus;
+    private final @Nullable PartialUser user;
+    private final @Nullable Snowflake guildId;
+    private final @Nullable StatusType status;
+    private final @Nullable ArrayList<Activity> activities;
+    private final @Nullable ClientStatus clientStatus;
 
     /**
      *
@@ -63,7 +63,7 @@ public class PresenceUpdate implements Datable {
      * @param activities user's current activities
      * @param clientStatus user's platform-dependent status
      */
-    public PresenceUpdate(@NotNull PartialUser user, @NotNull Snowflake guildId, @NotNull StatusType status, @NotNull ArrayList<Activity> activities, @NotNull ClientStatus clientStatus) {
+    public PresenceUpdate(@Nullable PartialUser user, @Nullable Snowflake guildId, @Nullable StatusType status, @Nullable ArrayList<Activity> activities, @Nullable ClientStatus clientStatus) {
         this.user = user;
         this.guildId = guildId;
         this.status = status;
@@ -82,15 +82,8 @@ public class PresenceUpdate implements Datable {
                 (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
         Data clientStatusData = (Data) data.get(CLIENT_STATUS_KEY);
 
-        if(userData == null || guildId == null || status == null || activities == null || clientStatusData == null){
-            InvalidDataException.throwException(data, null, PresenceUpdate.class,
-                    new Object[]{userData, guildId, status, activities, clientStatusData},
-                    new String[]{USER_KEY, GUILD_ID_KEY, STATUS_KEY, ACTIVITIES_KEY, CLIENT_STATUS_KEY});
-            return null; //appeasing the IDE null-checks: this line will never be executed.
-        }
-
         return new PresenceUpdate(
-                new PartialUser(userData),
+                userData == null ? null : new PartialUser(userData),
                 Snowflake.fromString(guildId),
                 StatusType.fromValue(status),
                 activities,
@@ -101,35 +94,35 @@ public class PresenceUpdate implements Datable {
     /**
      * the user presence is being updated for
      */
-    public @NotNull PartialUser getUser() {
+    public @Nullable PartialUser getUser() {
         return user;
     }
 
     /**
      * id of the guild
      */
-    public @NotNull Snowflake getGuildId() {
+    public @Nullable Snowflake getGuildId() {
         return guildId;
     }
 
     /**
      * either "idle", "dnd", "online", or "offline"
      */
-    public @NotNull StatusType getStatus() {
+    public @Nullable StatusType getStatus() {
         return status;
     }
 
     /**
      * user's current activities
      */
-    public @NotNull ArrayList<Activity> getActivities() {
+    public @Nullable ArrayList<Activity> getActivities() {
         return activities;
     }
 
     /**
      * user's platform-dependent status
      */
-    public @NotNull ClientStatus getClientStatus() {
+    public @Nullable ClientStatus getClientStatus() {
         return clientStatus;
     }
 
@@ -137,11 +130,11 @@ public class PresenceUpdate implements Datable {
     public Data getData() {
         Data data = new Data(5);
 
-        data.add(USER_KEY, user);
-        data.add(GUILD_ID_KEY, guildId);
-        data.add(STATUS_KEY, status);
-        data.add(ACTIVITIES_KEY, activities);
-        data.add(CLIENT_STATUS_KEY, clientStatus);
+        data.addIfNotNull(USER_KEY, user);
+        data.addIfNotNull(GUILD_ID_KEY, guildId);
+        data.addIfNotNull(STATUS_KEY, status);
+        data.addIfNotNull(ACTIVITIES_KEY, activities);
+        data.addIfNotNull(CLIENT_STATUS_KEY, clientStatus);
 
         return data;
     }
