@@ -70,7 +70,7 @@ public class GuildVoiceChannel extends Channel<GuildVoiceChannel> implements Gui
 
         String name = (String) data.get(NAME_KEY);
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
-        Integer position = ((Number) data.getOrDefault(POSITION_KEY, -1)).intValue();
+        Number position = ((Number) data.get(POSITION_KEY));
 
         if (name == null) {
             throw new InvalidDataException(data, "field '" + NAME_KEY + "' missing or null in GuildVoiceChannel with id:" + getId()).addMissingFields(NAME_KEY);
@@ -81,7 +81,7 @@ public class GuildVoiceChannel extends Channel<GuildVoiceChannel> implements Gui
         this.name = name;
         this.nsfw = (boolean) data.getOrDefault(NSFW_KEY, false);
         this.guildId = guildId;
-        this.position = position;
+        this.position = position == null ? null : position.intValue();
         this.permissionOverwrites = new PermissionOverwrites((ArrayList<Data>) data.getOrDefault(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
         this.parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
         this.bitRate = ((Number) data.getOrDefault(BITRATE_KEY, -1)).intValue();
