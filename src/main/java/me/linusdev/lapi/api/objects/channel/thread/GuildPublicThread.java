@@ -30,7 +30,7 @@ import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GuildPublicThread extends Channel<GuildPublicThread> implements Thread, GuildChannel {
+public class GuildPublicThread extends Channel<GuildPublicThread> implements Thread<GuildPublicThread>, GuildChannel {
 
     protected @NotNull String name;
     protected @NotNull Snowflake guildId;

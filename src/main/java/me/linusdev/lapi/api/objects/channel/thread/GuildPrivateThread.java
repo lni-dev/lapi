@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This class has not been tested, since I do not have a boosted server
  */
-public class GuildPrivateThread extends Channel<GuildPrivateThread> implements Thread, GuildChannel {
+public class GuildPrivateThread extends Channel<GuildPrivateThread> implements Thread<GuildPrivateThread>, GuildChannel {
 
     protected @NotNull String name;
     protected @NotNull Snowflake guildId;

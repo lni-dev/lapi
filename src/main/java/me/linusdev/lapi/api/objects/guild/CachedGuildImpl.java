@@ -24,12 +24,12 @@ import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
-import me.linusdev.lapi.api.manager.guild.ThreadsManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
@@ -68,7 +68,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable Integer memberCount;
     protected @Nullable MemberManager memberManager;
     protected @Nullable ListManager<Channel<?>> channelManager;
-    protected @Nullable ThreadsManager threadsManager;
+    protected @Nullable ListManager<Thread<?>> threadsManager;
     protected @Nullable PresencesManager presencesManager;
     protected @Nullable StageInstance[] stageInstances;
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
@@ -432,6 +432,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
     public @Nullable ListManager<Channel<?>> getChannelManager() {
         return channelManager;
+    }
+
+    public @Nullable ListManager<Thread<?>> getThreadsManager() {
+        return threadsManager;
     }
 
     @NotNull

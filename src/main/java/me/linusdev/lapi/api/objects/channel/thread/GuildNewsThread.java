@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
-public class GuildNewsThread extends Channel<GuildNewsThread> implements Thread, GuildChannel {
+public class GuildNewsThread extends Channel<GuildNewsThread> implements Thread<GuildNewsThread>, GuildChannel {
 
     protected @NotNull String name;
     protected @NotNull Snowflake guildId;

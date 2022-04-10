@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild;
+package me.linusdev.lapi.api.manager.guild.thread;
 
-public class ThreadsManager {
+import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+
+public interface ThreadManager extends ThreadPool, Manager {
+
 }
