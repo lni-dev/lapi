@@ -25,7 +25,6 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -101,8 +100,8 @@ public class ThreadManagerImpl implements ThreadManager{
     /**
      * Received when a thread is updated. (not when last_message_id changes)
      * @param data {@link Data} to {@link Updatable#updateSelfByData(Data) update}
-     * @return
-     * @throws InvalidDataException
+     * @return updated {@link Thread} or {@code null} if no thread with id given in data was found.
+     * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
      */
     public Thread<?> onUpdate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
@@ -120,6 +119,33 @@ public class ThreadManagerImpl implements ThreadManager{
 
         thread.updateSelfByData(data);
         return thread;
+    }
+
+    /**
+     * Received, when a thread relevant to the current user is deleted.
+     * The {@link Data} only contains the id, guild_id, parent_id, and type fields.
+     * @param data {@link Data} containing just the id, guild_id, parent_id, and type fields.
+     * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
+     * @throws InvalidDataException if id field is missing in given data
+     */
+    public Thread<?> onDelete(@NotNull Data data) throws InvalidDataException {
+        if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
+
+        String threadId = (String) data.get(Channel.ID_KEY);
+
+        if(threadId == null) throw new InvalidDataException(data, "missing thread id", null, Channel.ID_KEY);
+
+        Thread<?> removed = threads.remove(threadId);
+
+        if(removed != null) {
+            ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(removed.getParentId());
+            if(threadsInChannel != null) {
+                //should never be null, but is checked anyway just in case
+                threadsInChannel.remove(threadId);
+            }
+        }
+
+        return removed;
     }
 
     @Override
