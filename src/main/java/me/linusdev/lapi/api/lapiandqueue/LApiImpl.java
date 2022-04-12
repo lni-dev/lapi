@@ -690,6 +690,21 @@ public class LApiImpl implements LApi {
         return config.isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT);
     }
 
+    @Override
+    public boolean isCacheThreadsEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_THREADS);
+    }
+
+    @Override
+    public boolean isCacheArchivedThreadsEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_ARCHIVED_THREADS);
+    }
+
+    @Override
+    public boolean isCopyOldThreadOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT);
+    }
+
     //api-internal getter
 
     /**

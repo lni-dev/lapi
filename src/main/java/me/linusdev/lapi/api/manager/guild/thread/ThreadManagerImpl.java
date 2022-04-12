@@ -18,16 +18,28 @@ package me.linusdev.lapi.api.manager.guild.thread;
 
 import me.linusdev.data.Data;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
+import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ *
+ * When a thread is archived, we receive a {@link GatewayEvent#THREAD_UPDATE THREAD_UPDATE} event.
+ *
+ *
+ *
+ */
 public class ThreadManagerImpl implements ThreadManager{
 
     public static final String NEWLY_CREATED_KEY = "newly_created";
@@ -103,7 +115,7 @@ public class ThreadManagerImpl implements ThreadManager{
      * @return updated {@link Thread} or {@code null} if no thread with id given in data was found.
      * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
      */
-    public Thread<?> onUpdate(@NotNull Data data) throws InvalidDataException {
+    public Update<Thread<?>, Thread<?>> onUpdate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -117,8 +129,20 @@ public class ThreadManagerImpl implements ThreadManager{
             return null;
         }
 
+        if(!lApi.isCacheArchivedThreadsEnabled()) {
+            threads.remove(threadId);
+            ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(thread.getParentId());
+            if(threadsInChannel != null) threadsInChannel.remove(threadId);
+        }
+
+        if(!lApi.isCopyOldThreadOnUpdateEventEnabled()) {
+            thread.updateSelfByData(data);
+            return new Update<>(null, thread);
+        }
+
+        Thread<?> copy = thread.copy();
         thread.updateSelfByData(data);
-        return thread;
+        return new Update<>(copy, thread);
     }
 
     /**
@@ -146,6 +170,27 @@ public class ThreadManagerImpl implements ThreadManager{
         }
 
         return removed;
+    }
+
+    public ListUpdate<Thread<?>> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) {
+        if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
+
+        ArrayList<Thread<?>> added = new ArrayList<>();
+
+        for(Thread<?> thread : threadListSyncData.getThreads()) {
+            threads.computeIfAbsent(thread.getId(), k -> {
+
+                ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.computeIfAbsent(thread.getParentId(),
+                        s -> new ConcurrentHashMap<>(1));
+
+                threadsInChannel.put(thread.getId(), thread);
+                added.add(thread);
+
+                return thread;
+            });
+        }
+
+        return new ListUpdate<>(null, null, added.isEmpty() ? null : added, null);
     }
 
     @Override

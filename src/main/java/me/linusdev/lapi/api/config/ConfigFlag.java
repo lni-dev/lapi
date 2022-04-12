@@ -21,6 +21,8 @@ import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -170,6 +172,31 @@ public enum ConfigFlag implements SimpleDatable {
      * </p>
      */
     COPY_CHANNEL_ON_UPDATE_EVENT(1 << 15),
+
+    /**
+     * <p>
+     *     Caches all {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} retrieved by the
+     *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_THREADS(1 << 16),
+
+    /**
+     * <p>
+     *     Does not remove {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} where
+     *     {@link ThreadMetadata#isArchived()} is {@code true}
+     * </p>
+     * TODO: check if we receive archived threads in the GUILD_CREATE events.
+     */
+    CACHE_ARCHIVED_THREADS(1 << 17),
+
+    /**
+     * <p>
+     *     Copies {@link Thread} objects, when they receive an update, so
+     *     you can check the difference between the old object and the updated one.
+     * </p>
+     */
+    COPY_THREAD_ON_UPDATE_EVENT(1 << 18),
 
     ;
 

@@ -760,4 +760,20 @@ public interface LApi extends HasLApi {
      * @see ConfigFlag#COPY_CHANNEL_ON_UPDATE_EVENT
      */
     boolean isCopyOldChannelOnUpdateEventEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_THREADS
+     */
+    boolean isCacheThreadsEnabled();
+
+    /**
+     * @see ConfigFlag#CACHE_ARCHIVED_THREADS
+     */
+    boolean isCacheArchivedThreadsEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_THREAD_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldThreadOnUpdateEventEnabled();
+
 }
