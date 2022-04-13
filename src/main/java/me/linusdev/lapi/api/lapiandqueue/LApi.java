@@ -767,9 +767,9 @@ public interface LApi extends HasLApi {
     boolean isCacheThreadsEnabled();
 
     /**
-     * @see ConfigFlag#CACHE_ARCHIVED_THREADS
+     * @see ConfigFlag#REMOVE_ARCHIVED_THREADS
      */
-    boolean isCacheArchivedThreadsEnabled();
+    boolean isRemoveArchivedThreadsEnabled();
 
     /**
      * @see ConfigFlag#COPY_THREAD_ON_UPDATE_EVENT

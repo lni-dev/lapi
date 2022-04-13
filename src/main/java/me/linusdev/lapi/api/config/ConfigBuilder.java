@@ -34,6 +34,8 @@ import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadManagerImpl;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -80,6 +82,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
     private ManagerFactory<MemberManager> memberManagerFactory = null;
     private ManagerFactory<ListManager<Channel<?>>> channelManagerFactory = null;
+    private ManagerFactory<ThreadManager> threadsManagerFactory = null;
 
 
     /**
@@ -370,6 +373,23 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new ThreadManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link ThreadManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild} to cache threads.
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param threadsManagerFactory the {@link ManagerFactory ManagerFactory&lt;ThreadManager&gt;}
+     * @return this
+     */
+    public ConfigBuilder setThreadsManagerFactory(ManagerFactory<ThreadManager> threadsManagerFactory) {
+        this.threadsManagerFactory = threadsManagerFactory;
+        return this;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -462,7 +482,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)),
                 Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
                 Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
-                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled))
+                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(threadsManagerFactory, lApi -> new ThreadManagerImpl(lApi))
         );
     }
 

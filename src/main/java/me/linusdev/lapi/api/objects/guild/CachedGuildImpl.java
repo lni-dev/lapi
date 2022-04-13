@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.PresencesManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -68,7 +69,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable Integer memberCount;
     protected @Nullable MemberManager memberManager;
     protected @Nullable ListManager<Channel<?>> channelManager;
-    protected @Nullable ListManager<Thread<?>> threadsManager;
+    protected @Nullable ThreadManager threadsManager;
     protected @Nullable PresencesManager presencesManager;
     protected @Nullable StageInstance[] stageInstances;
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
@@ -142,6 +143,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheChannelsEnabled()) {
             this.channelManager = lApi.getConfig().getChannelManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheThreadsEnabled()) {
+            this.threadsManager = lApi.getConfig().getThreadsManagerFactory().newInstance(lApi);
         }
 
     }
@@ -387,6 +392,25 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
                     channelManager.init(1);
                 }
             }
+        }
+
+        if(threadsManager != null){
+            if(!threadsManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> threadsData = (ArrayList<Object>) data.get(THREADS_KEY);
+                if(threadsData != null){
+                    threadsManager.init(threadsData.size());
+                    for(Object o : threadsData){
+                        Data threadData = (Data) o;
+                        //add guildId to channel data
+                        threadData.add(Channel.GUILD_ID_KEY, id.asString());
+                        //TODO: unchecked cast
+                        threadsManager.add((Thread<?>) Channel.fromData(lApi, (Data) o));
+                    }
+                } else {
+                    threadsManager.init(1);
+                }
+            }
 
         }
 
@@ -434,7 +458,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         return channelManager;
     }
 
-    public @Nullable ListManager<Thread<?>> getThreadsManager() {
+    public @Nullable ThreadManager getThreadsManager() {
         return threadsManager;
     }
 

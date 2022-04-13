@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -46,12 +47,13 @@ public class Config {
     private final @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory;
     private final @NotNull ManagerFactory<MemberManager> memberManagerFactory;
     private final @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory;
+    private final @NotNull ManagerFactory<ThreadManager> threadsManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
-                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory){
+                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory){
         this.flags = flags;
         this.token = token;
 
@@ -64,6 +66,7 @@ public class Config {
         this.voiceStateManagerFactory = voiceStateManagerFactory;
         this.memberManagerFactory = memberManagerFactory;
         this.channelManagerFactory = channelManagerFactory;
+        this.threadsManagerFactory = threadsManagerFactory;
     }
 
     /**
@@ -116,5 +119,9 @@ public class Config {
 
     public @NotNull ManagerFactory<ListManager<Channel<?>>> getChannelManagerFactory() {
         return channelManagerFactory;
+    }
+
+    public @NotNull ManagerFactory<ThreadManager> getThreadsManagerFactory() {
+        return threadsManagerFactory;
     }
 }

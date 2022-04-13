@@ -16,12 +16,26 @@
 
 package me.linusdev.lapi.api.manager.guild.thread;
 
-import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+public class ThreadUpdate extends Update<Thread<?>, Thread<?>> {
 
-public interface ThreadManager extends ThreadPool, Manager {
-    void add(Thread<?> thread);
+    private final boolean gotArchived;
+
+    public ThreadUpdate(@Nullable Thread<?> copy, @NotNull Thread<?> thread, boolean gotArchived) {
+        super(copy, thread);
+        this.gotArchived = gotArchived;
+    }
+
+    /**
+     * Only working properly if {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_THREADS CACHE_THREADS} is enabled.
+     *
+     * @return {@code true} if the thread got archived.
+     */
+    public boolean gotArchived() {
+        return gotArchived;
+    }
 }

@@ -245,4 +245,9 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
 
         data.processIfContained(PERMISSIONS_KEY, (String str) -> this.permissionsAsString = str);
     }
+
+    @Override
+    public String toString() {
+        return "GuildPublicThread: " + name;
+    }
 }
