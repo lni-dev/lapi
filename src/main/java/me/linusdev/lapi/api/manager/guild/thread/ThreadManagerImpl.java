@@ -71,7 +71,6 @@ public class ThreadManagerImpl implements ThreadManager{
         ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.computeIfAbsent(thread.getParentId(),
                 s -> new ConcurrentHashMap<>(channelHashMapInitialCapacity));
         threadsInChannel.put(thread.getParentId(), thread);
-        System.out.println(thread);
     }
 
     /**
