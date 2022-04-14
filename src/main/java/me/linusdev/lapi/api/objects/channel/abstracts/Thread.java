@@ -18,10 +18,12 @@ package me.linusdev.lapi.api.objects.channel.abstracts;
 
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,9 +77,9 @@ public interface Thread<T extends Thread<T>> extends TextChannel, SnowflakeAble,
     int getMemberCount();
 
     /**
-     * amount of seconds a user has to wait before sending another message (0-21600);
-     * bots, as well as users with the permission manage_messages or manage_channel, are unaffected
-     * //todo @link Permission
+     * amount of seconds a user has to wait before sending another message (0-21600).<br>
+     * bots, as well as users with the permission {@link Permission#MANAGE_MESSAGES MANAGE_MESSAGES}
+     * or {@link Permission#MANAGE_CHANNELS MANAGE_CHANNELS}, are unaffected
      */
     int getRateLimitPerUser();
 
@@ -90,6 +92,14 @@ public interface Thread<T extends Thread<T>> extends TextChannel, SnowflakeAble,
      * thread member object for the current user, if they have joined the thread, only included on certain API endpoints
      */
     @Nullable ThreadMember getMember();
+
+    /**
+     *
+     * @param newMember the new {@link ThreadMember} or {@code null}
+     * @return the previous {@link ThreadMember}
+     */
+    @ApiStatus.Internal
+    @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember);
 
     /**
      * default duration that the clients (not the API) will use for newly created threads,

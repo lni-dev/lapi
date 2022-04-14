@@ -247,4 +247,11 @@ public class GuildNewsThread extends Channel<GuildNewsThread> implements Thread<
 
         data.processIfContained(PERMISSIONS_KEY, (String str) -> this.permissionsAsString = str);
     }
+
+    @Override
+    public @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember) {
+        ThreadMember old = member;
+        member = newMember;
+        return old;
+    }
 }

@@ -247,6 +247,13 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
     }
 
     @Override
+    public @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember) {
+        ThreadMember old = member;
+        member = newMember;
+        return old;
+    }
+
+    @Override
     public String toString() {
         return "GuildPublicThread: " + name;
     }

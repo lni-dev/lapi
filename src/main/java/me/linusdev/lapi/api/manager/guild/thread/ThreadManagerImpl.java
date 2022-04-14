@@ -20,16 +20,18 @@ import me.linusdev.data.Data;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
+import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadMembersUpdateData;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -73,13 +75,7 @@ public class ThreadManagerImpl implements ThreadManager{
         threadsInChannel.put(thread.getParentId(), thread);
     }
 
-    /**
-     * Received when a new Thread is created (then newly_created field exists) or
-     * when the current user is added to this (private) thread.
-     * @param data thread data
-     * @return {@link Thread} contained in this manager
-     * @throws InvalidDataException if data parameter is invalid
-     */
+    @Override
     public @NotNull Thread<?> onCreate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
         Channel<?> threadChannel = Channel.fromData(lApi, data);
@@ -122,13 +118,8 @@ public class ThreadManagerImpl implements ThreadManager{
         }
     }
 
-    /**
-     * Received when a thread is updated. (not when last_message_id changes)
-     * @param data {@link Data} to {@link Updatable#updateSelfByData(Data) update}
-     * @return updated {@link Thread} or {@code null} if no thread with id given in data was found.
-     * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
-     */
-    public ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException {
+    @Override
+    public @Nullable ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -181,7 +172,7 @@ public class ThreadManagerImpl implements ThreadManager{
      * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
      * @throws InvalidDataException if id field is missing in given data
      */
-    public Thread<?> onDelete(@NotNull Data data) throws InvalidDataException {
+    public @Nullable Thread<?> onDelete(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -201,25 +192,121 @@ public class ThreadManagerImpl implements ThreadManager{
         return removed;
     }
 
-    public ListUpdate<Thread<?>> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) {
+    @Override
+    public synchronized @NotNull ListUpdate<Thread<?>> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) throws InvalidDataException{
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
-        ArrayList<Thread<?>> added = new ArrayList<>();
+        if(lApi.isDoNotRemoveArchivedThreadsEnabled() || threads.isEmpty()) {
+            @NotNull ArrayList<Thread<?>> finalAdded = threads.isEmpty() ? new ArrayList<>(threadListSyncData.getThreads().size()) : new ArrayList<>();
+            for(Thread<?> thread : threadListSyncData.getThreads()) {
+                threads.computeIfAbsent(thread.getId(), s -> {
+                    ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.computeIfAbsent(thread.getParentId(),
+                            k -> new ConcurrentHashMap<>(channelHashMapInitialCapacity));
+                    threadsInChannel.put(thread.getId(), thread);
+                    finalAdded.add(thread);
+                    return thread;
+                });
 
-        for(Thread<?> thread : threadListSyncData.getThreads()) {
-            threads.computeIfAbsent(thread.getId(), k -> {
-
-                ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.computeIfAbsent(thread.getParentId(),
-                        s -> new ConcurrentHashMap<>(1));
-
-                threadsInChannel.put(thread.getId(), thread);
-                added.add(thread);
-
-                return thread;
-            });
+            }
+            return new ListUpdate<>(null, null, finalAdded, null);
         }
 
-        return new ListUpdate<>(null, null, added.isEmpty() ? null : added, null);
+        @Nullable ArrayList<Thread<?>> added = null;
+        @Nullable ArrayList<Thread<?>> removed = null;
+
+        @NotNull HashMap<String, List<Thread<?>>> processed = new HashMap<>();
+        if(threadListSyncData.getChannelIds() != null){
+            processed = new HashMap<>(threadListSyncData.getChannelIds().size());
+            for(Snowflake channelId : threadListSyncData.getChannelIds())
+                processed.put(channelId.asString(), new LinkedList<>());
+        }
+
+        for(Thread<?> thread : threadListSyncData.getThreads()) {
+            //We shouldn't receive archived Threads, but let's check it anyway
+            if(!lApi.isDoNotRemoveArchivedThreadsEnabled() && thread.getThreadMetadata().isArchived()) continue;
+
+            processed.computeIfAbsent(thread.getParentId(), s -> new LinkedList<>())
+                    .add(thread);
+        }
+
+
+        for(Map.Entry<String, List<Thread<?>>> entry : processed.entrySet()) {
+            String channelId = entry.getKey();
+            List<Thread<?>> list = entry.getValue();
+
+            ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(channelId);
+
+            if(threadsInChannel == null) {
+                //All Threads in this channel are new
+                threadsInChannel = new ConcurrentHashMap<>(list.size());
+                channels.put(channelId, threadsInChannel);
+
+                for(Thread<?> thread : list) {
+                    threads.put(thread.getId(), thread);
+                    threadsInChannel.put(thread.getId(), thread);
+                    if(added == null) added = new ArrayList<>();
+                    added.add(thread);
+                }
+            } else {
+
+                for(Thread<?> cachedThread : threadsInChannel.values()) {
+
+                    //check whether the cached thread, is also inside the retrieved list
+                    //if it is, remove it from the retrieved list, so in the end it will only contain, the
+                    //threads, which we have to add to the cache.
+                    boolean found = false;
+                    for(int i = 0; i < list.size(); i++) {
+                        Thread<?> thread = list.get(i);
+                        if(cachedThread.getId().equals(thread.getId())) {
+                            list.remove(i);
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    //If it was not in the retrieved list, remove it from the cache
+                    if(!found) {
+                        threadsInChannel.remove(cachedThread.getId());
+                        threads.remove(cachedThread.getId());
+                        if(removed == null) removed = new ArrayList<>();
+                        removed.add(cachedThread);
+                    }
+
+                    //Add the remaining threads to the cache
+                    for(Thread<?> thread : list) {
+                        threads.put(thread.getId(), thread);
+                        threadsInChannel.put(thread.getId(), thread);
+                        if(added == null) added = new ArrayList<>();
+                        added.add(thread);
+                    }
+                }
+            }
+        }
+
+        return new ListUpdate<>(null, null, added, removed);
+    }
+
+    @Override
+    public @Nullable Update<Thread<?>, ThreadMember> onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException {
+        if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
+
+        ThreadMember threadMember = ThreadMember.fromData(data);
+        String threadId = threadMember.getId();
+
+        if(threadId == null)
+            throw new InvalidDataException(data, "thread id is null, we do not know which thread this thread-member object belongs to.");
+
+        Thread<?> thread = threads.get(threadId);
+
+        if(thread == null) {
+            return null;
+        }
+
+        return new Update<>(thread.updateMember(threadMember), thread);
+    }
+
+    public void onThreadMembersUpdate(@NotNull ThreadMembersUpdateData threadMembersUpdateData) {
+        //TODO: implement
     }
 
     @Override

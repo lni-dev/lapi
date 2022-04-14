@@ -22,6 +22,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,6 +62,7 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
      * @return {@link ThreadMember}
      * @throws InvalidDataException if {@link #JOIN_TIMESTAMP_KEY} or {@link #FLAGS_KEY} are missing or null
      */
+    @Contract("null -> null; !null -> !null")
     public static @Nullable ThreadMember fromData(@Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
