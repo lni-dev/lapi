@@ -696,8 +696,8 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public boolean isRemoveArchivedThreadsEnabled() {
-        return config.isFlagSet(ConfigFlag.REMOVE_ARCHIVED_THREADS);
+    public boolean isDoNotRemoveArchivedThreadsEnabled() {
+        return config.isFlagSet(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS);
     }
 
     @Override

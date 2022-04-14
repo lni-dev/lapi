@@ -164,7 +164,7 @@ public class ThreadManagerImpl implements ThreadManager{
         Thread<?> copy = lApi.isCopyOldThreadOnUpdateEventEnabled() ? thread.copy() : null;
         thread.updateSelfByData(data);
 
-        if(lApi.isRemoveArchivedThreadsEnabled() && thread.getThreadMetadata().isArchived()) {
+        if(!lApi.isDoNotRemoveArchivedThreadsEnabled() && thread.getThreadMetadata().isArchived()) {
             //remove thread if it was archived
             threads.remove(threadId);
             ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(thread.getParentId());

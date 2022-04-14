@@ -183,11 +183,11 @@ public enum ConfigFlag implements SimpleDatable {
 
     /**
      * <p>
-     *     Does remove {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} where
+     *     Does not remove {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} where
      *     {@link ThreadMetadata#isArchived()} is {@code true} from the {@link CachedGuildImpl}.
      * </p>
      */
-    REMOVE_ARCHIVED_THREADS(1 << 17),
+    DO_NOT_REMOVE_ARCHIVED_THREADS(1 << 17),
 
     /**
      * <p>

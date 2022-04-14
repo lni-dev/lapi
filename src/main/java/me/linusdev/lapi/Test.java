@@ -113,7 +113,7 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.CACHE_CHANNELS)
                 .enable(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.CACHE_THREADS)
-                .enable(ConfigFlag.CACHE_ARCHIVED_THREADS)
+                .disable(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS)
                 .enable(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
