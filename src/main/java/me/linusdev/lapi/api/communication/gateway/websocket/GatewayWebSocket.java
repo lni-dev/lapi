@@ -558,8 +558,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         String guildId = (String) data.get(Channel.GUILD_ID_KEY);
 
                         if(guildId == null) {
-                            //This may be a non guild channel
-                            //TODO: cache non guild threads
+                            //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, null,
                                     new Update<>(null, Thread.fromData(lApi, data))));
                             break;
@@ -600,8 +599,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         String guildId = (String) data.get(Channel.GUILD_ID_KEY);
 
                         if(guildId == null) {
-                            //This may be a non guild channel
-                            //TODO: cache non guild threads
+                            //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, null,
                                     new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
                             break;
@@ -642,8 +640,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         String guildId = (String) data.get(Channel.GUILD_ID_KEY);
 
                         if(guildId == null) {
-                            //This may be a non guild channel
-                            //TODO: cache non guild threads
+                            //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, null,
                                    Thread.fromData(lApi, data)));
                             break;
@@ -718,8 +715,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         String guildId = (String) data.get(Channel.GUILD_ID_KEY);
 
                         if(guildId == null) {
-                            //This may be a non guild channel
-                            //TODO: cache non guild threads
+                            //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadMemberUpdate(lApi, new ThreadMemberUpdateEvent(lApi, payload, null,
                                     new ThreadMemberUpdate(null, null, ThreadMember.fromData(data))));
                             break;
