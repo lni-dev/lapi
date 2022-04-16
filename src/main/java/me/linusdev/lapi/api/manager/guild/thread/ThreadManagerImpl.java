@@ -319,4 +319,21 @@ public class ThreadManagerImpl implements ThreadManager{
     public @NotNull LApi getLApi() {
         return lApi;
     }
+
+    @Override
+    public @Nullable Thread<?> getThread(@NotNull String id) {
+        if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
+        return threads.get(id);
+    }
+
+    @Override
+    public @Nullable Thread<?> getThread(@NotNull String channelId, @NotNull String id) {
+        if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
+
+        ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(channelId);
+
+        if(threadsInChannel == null) return null;
+
+        return threadsInChannel.get(id);
+    }
 }

@@ -16,5 +16,19 @@
 
 package me.linusdev.lapi.api.manager.guild.thread;
 
+import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 public interface ThreadPool {
+
+    @Nullable Thread<?> getThread(@NotNull String id);
+
+    @Nullable Thread<?> getThread(@NotNull String channelId, @NotNull String id);
+
+    default @Nullable Thread<?> getThread(@NotNull Snowflake id) {
+        return getThread(id.asString());
+    }
+
 }
