@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.manager.guild.thread;
 import me.linusdev.data.Data;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
+import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadMembersUpdateData;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.manager.Manager;
@@ -38,7 +39,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link Thread} contained in this manager
      * @throws InvalidDataException if data parameter is invalid
      */
-    @NotNull Thread<?> onCreate(@NotNull Data data) throws InvalidDataException;
+    @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull Data data) throws InvalidDataException;
 
     /**
      * Received when a thread is updated. (not when last_message_id changes)
@@ -46,7 +47,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link ThreadUpdate} or {@code null} if this thread is not cached. (Which is totally valid and not an error!)
      * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
      */
-    @Nullable ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException;
+    @NotNull ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException;
 
     /**
      * Received, when a thread relevant to the current user is deleted.
@@ -71,9 +72,16 @@ public interface ThreadManager extends ThreadPool, Manager {
     /**
      *
      * @param data retrieved {@link Data}
-     * @return {@link Update} containing the old {@link ThreadMember} object and the updated {@link Thread}.
+     * @return {@link ThreadMemberUpdate} containing the new and old {@link ThreadMember} object and the updated {@link Thread}.
      * Or {@code null} if no thread with given id (in data) is cached.
      * @throws InvalidDataException see {@link ThreadMember#fromData(Data)}
      */
-    @Nullable Update<Thread<?>, ThreadMember> onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException;
+    @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException;
+
+    /**
+     *
+     * @param threadMembersUpdateData received from Discord
+     * @throws InvalidDataException specified by implementation
+     */
+    void onThreadMembersUpdate(@NotNull ThreadMembersUpdateData threadMembersUpdateData) throws InvalidDataException;
 }

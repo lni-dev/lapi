@@ -553,6 +553,15 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case THREAD_MEMBERS_UPDATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        //TODO: remove
+                        System.out.println(data.getJsonString());
+                    }
+
                     break;
 
                 case GUILD_CREATE: {

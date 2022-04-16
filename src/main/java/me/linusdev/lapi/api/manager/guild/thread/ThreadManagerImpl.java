@@ -76,7 +76,7 @@ public class ThreadManagerImpl implements ThreadManager{
     }
 
     @Override
-    public @NotNull Thread<?> onCreate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
         Channel<?> threadChannel = Channel.fromData(lApi, data);
 
@@ -98,7 +98,7 @@ public class ThreadManagerImpl implements ThreadManager{
             threadsInChannel.put(threadId, thread);
             threads.put(threadId, thread);
 
-            return thread;
+            return new Update<>(thread, true);
 
         } else {
             //might already be in the map
@@ -114,12 +114,12 @@ public class ThreadManagerImpl implements ThreadManager{
                 threadInMap.updateSelfByData(data);
             }
 
-            return threadInMap;
+            return new Update<>(null, threadInMap);
         }
     }
 
     @Override
-    public @Nullable ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -130,7 +130,7 @@ public class ThreadManagerImpl implements ThreadManager{
 
         if(thread == null) {
             //there is no cached thread with this id.
-            //check if the thread is not archived -> it probably just go unarchived -> add it
+            //check if the thread is not archived -> it probably just got unarchived -> add it
 
             Channel<?> channel = Channel.fromData(lApi, data);
 
@@ -145,10 +145,10 @@ public class ThreadManagerImpl implements ThreadManager{
                 ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.computeIfAbsent(thread.getParentId(),
                         s -> new ConcurrentHashMap<>(channelHashMapInitialCapacity));
                 threadsInChannel.put(threadId, thread);
-                return new ThreadUpdate(null, thread, false);
+                return new ThreadUpdate(null, thread, false, true);
             }
 
-            return null;
+            return new ThreadUpdate(null, thread, false, false);
         }
 
         boolean wasArchived = thread.getThreadMetadata().isArchived();
@@ -162,7 +162,7 @@ public class ThreadManagerImpl implements ThreadManager{
             if(threadsInChannel != null) threadsInChannel.remove(threadId);
         }
 
-        return new ThreadUpdate(copy, thread, !wasArchived && thread.getThreadMetadata().isArchived());
+        return new ThreadUpdate(copy, thread, !wasArchived && thread.getThreadMetadata().isArchived(), true);
     }
 
     /**
@@ -287,26 +287,27 @@ public class ThreadManagerImpl implements ThreadManager{
     }
 
     @Override
-    public @Nullable Update<Thread<?>, ThreadMember> onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         ThreadMember threadMember = ThreadMember.fromData(data);
         String threadId = threadMember.getId();
 
         if(threadId == null)
-            throw new InvalidDataException(data, "thread id is null, we do not know which thread this thread-member object belongs to.");
+            throw new InvalidDataException(data, "thread id is null.");
 
         Thread<?> thread = threads.get(threadId);
 
         if(thread == null) {
-            return null;
+            return new ThreadMemberUpdate(null, null, threadMember);
         }
 
-        return new Update<>(thread.updateMember(threadMember), thread);
+        return new ThreadMemberUpdate(thread, thread.updateMember(threadMember), threadMember);
     }
 
-    public void onThreadMembersUpdate(@NotNull ThreadMembersUpdateData threadMembersUpdateData) {
-        //TODO: implement
+    @Override
+    public void onThreadMembersUpdate(@NotNull ThreadMembersUpdateData threadMembersUpdateData) throws InvalidDataException {
+        //TODO: Maybe add a cache for thread members
     }
 
     @Override

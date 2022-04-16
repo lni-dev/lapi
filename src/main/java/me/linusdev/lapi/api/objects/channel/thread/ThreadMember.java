@@ -37,10 +37,10 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
     public static final String JOIN_TIMESTAMP_KEY = "join_timestamp";
     public static final String FLAGS_KEY = "flags";
 
-    private final @Nullable Snowflake id;
-    private final @Nullable Snowflake userId;
-    private final @NotNull ISO8601Timestamp joinTimestamp;
-    private final int flags;
+    protected final @Nullable Snowflake id;
+    protected final @Nullable Snowflake userId;
+    protected final @NotNull ISO8601Timestamp joinTimestamp;
+    protected final int flags;
 
     /**
      *

@@ -19,7 +19,10 @@ package me.linusdev.lapi.api.communication.gateway.events.thread;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.Converter;
+import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#thread-members-update-thread-members-update-event-fields" target="_top">Thread Members Update Event Fields</a>
  */
-public class ThreadMembersUpdateData implements Datable {
+public class ThreadMembersUpdateData implements Datable, HasLApi {
 
     public static final String ID_KEY = "id";
     public static final String GUILD_ID_KEY = "guild_id";
@@ -38,14 +41,16 @@ public class ThreadMembersUpdateData implements Datable {
     public static final String ADDED_MEMBERS_KEY = "added_members";
     public static final String REMOVED_MEMBER_IDS_KEY = "removed_member_ids";
 
+    private final @NotNull LApi lApi;
     private final @NotNull Snowflake id;
     private final @NotNull Snowflake guildId;
     private final int memberCount;
-    private final @Nullable ArrayList<Data> addedMembers;
+    private final @Nullable ArrayList<ExtraThreadMember> addedMembers;
     private final @Nullable ArrayList<Snowflake> removedMemberIds;
 
-    public ThreadMembersUpdateData(@NotNull Snowflake id, @NotNull Snowflake guildId, int memberCount,
-                                   @Nullable ArrayList<Data> addedMembers, @Nullable ArrayList<Snowflake> removedMemberIds) {
+    public ThreadMembersUpdateData(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull Snowflake guildId, int memberCount,
+                                   @Nullable ArrayList<ExtraThreadMember> addedMembers, @Nullable ArrayList<Snowflake> removedMemberIds) {
+        this.lApi = lApi;
         this.id = id;
         this.guildId = guildId;
         this.memberCount = memberCount;
@@ -53,16 +58,16 @@ public class ThreadMembersUpdateData implements Datable {
         this.removedMemberIds = removedMemberIds;
     }
 
-    @Contract("null -> null; !null -> !null")
-    public static @Nullable ThreadMembersUpdateData fromData(@Nullable Data data) throws InvalidDataException {
+    @Contract("_, null -> null; _, !null -> !null")
+    public static @Nullable ThreadMembersUpdateData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
         Number memberCount = (Number) data.get(MEMBER_COUNT_KEY);
 
-        ArrayList<Data> addedMembers = data.getAndConvertArrayList(ADDED_MEMBERS_KEY,
-                (Converter<Object, Data>) convertible -> (Data) convertible);
+        ArrayList<ExtraThreadMember> addedMembers = data.getAndConvertArrayList(ADDED_MEMBERS_KEY,
+                (ExceptionConverter<Data, ExtraThreadMember, InvalidDataException>) convertible -> ExtraThreadMember.fromData(lApi, convertible));
 
         ArrayList<Snowflake> removedMemberIds = data.getAndConvertArrayList(REMOVED_MEMBER_IDS_KEY,
                 (Converter<String, Snowflake>) Snowflake::fromString);
@@ -74,7 +79,7 @@ public class ThreadMembersUpdateData implements Datable {
             return null; //will never be executed
         }
 
-        return new ThreadMembersUpdateData(
+        return new ThreadMembersUpdateData(lApi,
                 Snowflake.fromString(id),
                 Snowflake.fromString(guildId),
                 memberCount.intValue(), addedMembers, removedMemberIds);
@@ -113,7 +118,7 @@ public class ThreadMembersUpdateData implements Datable {
      * In this gateway event, the thread member objects will also include the guild member
      * and nullable presence objects for each added thread member
      */
-    public @Nullable ArrayList<Data> getAddedMembers() {
+    public @Nullable ArrayList<ExtraThreadMember> getAddedMembers() {
         return addedMembers;
     }
 
@@ -142,5 +147,10 @@ public class ThreadMembersUpdateData implements Datable {
         data.addIfNotNull(REMOVED_MEMBER_IDS_KEY, removedMemberIds);
 
         return data;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
     }
 }
