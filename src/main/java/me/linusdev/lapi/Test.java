@@ -45,6 +45,7 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
@@ -146,6 +147,11 @@ public class Test implements EventListener{
 
 
     @Override
+    public void onUncaughtException(Throwable uncaught) {
+        EventListener.super.onUncaughtException(uncaught);
+    }
+
+    @Override
     public void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload) {
         System.out.println("onUnknownEvent");
     }
@@ -186,6 +192,36 @@ public class Test implements EventListener{
     @Override
     public void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {
         System.out.println("onChannelDelete: " + event.getChannel());
+    }
+
+    @Override
+    public void onThreadCreate(@NotNull LApi lApi, @NotNull ThreadCreateEvent event) {
+        System.out.println("onThreadCreate: " + event.getThread());
+    }
+
+    @Override
+    public void onThreadUpdate(@NotNull LApi lApi, @NotNull ThreadUpdateEvent event) {
+        System.out.println("onThreadUpdate");
+    }
+
+    @Override
+    public void onThreadDelete(@NotNull LApi lApi, @NotNull ThreadDeleteEvent event) {
+        System.out.println("onThreadDelete");
+    }
+
+    @Override
+    public void onThreadListSync(@NotNull LApi lApi, @NotNull ThreadListSyncEvent event) {
+        System.out.println("onThreadListSync");
+    }
+
+    @Override
+    public void onThreadMemberUpdate(@NotNull LApi lApi, @NotNull ThreadMemberUpdateEvent event) {
+        System.out.println("onThreadMemberUpdate");
+    }
+
+    @Override
+    public void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {
+        System.out.println("onThreadMembersUpdate");
     }
 
     @Override

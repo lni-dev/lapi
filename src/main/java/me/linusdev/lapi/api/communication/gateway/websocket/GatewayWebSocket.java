@@ -63,6 +63,7 @@ import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadMemberUpdate;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadUpdate;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -70,6 +71,7 @@ import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -708,7 +710,45 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case THREAD_MEMBER_UPDATE:
-                    //TODO: event, manager
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild threads
+                            transmitter.onThreadMemberUpdate(lApi, new ThreadMemberUpdateEvent(lApi, payload, null,
+                                    new ThreadMemberUpdate(null, null, ThreadMember.fromData(data))));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onThreadMemberUpdate(lApi, new ThreadMemberUpdateEvent(lApi, payload, null,
+                                    new ThreadMemberUpdate(null, null, ThreadMember.fromData(data))));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) {
+                            transmitter.onThreadMemberUpdate(lApi, new ThreadMemberUpdateEvent(lApi, payload, null,
+                                    new ThreadMemberUpdate(null, null, ThreadMember.fromData(data))));
+                            break;
+                        }
+
+                        ThreadMemberUpdate update = threadManager.onThreadMemberUpdate(data);
+                        transmitter.onThreadMemberUpdate(lApi, new ThreadMemberUpdateEvent(lApi, payload, null,
+                                update));
+                    }
                     break;
 
                 case THREAD_MEMBERS_UPDATE:
@@ -716,7 +756,24 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         Data data = (Data) payload.getPayloadData();
                         if (data == null)
                             throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
-                        //TODO: event, manager
+
+                        ThreadMembersUpdateData threadMembersUpdateData = ThreadMembersUpdateData.fromData(lApi, data);
+                        transmitter.onThreadMembersUpdate(lApi, new ThreadMembersUpdateEvent(lApi, payload, threadMembersUpdateData.getGuildIdAsSnowflake(),
+                                threadMembersUpdateData));
+
+                        if(guildManager == null) break;
+
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(threadMembersUpdateData.getGuildId());
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) break;
+                        threadManager.onThreadMembersUpdate(threadMembersUpdateData);
                     }
 
                     break;
