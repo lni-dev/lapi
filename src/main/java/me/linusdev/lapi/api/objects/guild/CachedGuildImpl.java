@@ -402,10 +402,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
                     threadsManager.init(threadsData.size());
                     for(Object o : threadsData){
                         Data threadData = (Data) o;
+
                         //add guildId to channel data
                         threadData.add(Channel.GUILD_ID_KEY, id.asString());
-                        //TODO: unchecked cast
-                        threadsManager.add((Thread<?>) Channel.fromData(lApi, (Data) o));
+
+                        threadsManager.add(Thread.fromData(lApi, (Data) o));
                     }
                 } else {
                     threadsManager.init(1);
@@ -414,7 +415,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         }
 
-        //TODO: threads, ...
+        //TODO: presences, stages, scheduled events
     }
 
     @Override
@@ -458,7 +459,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         return channelManager;
     }
 
-    public @Nullable ThreadManager getThreadsManager() {
+    public @Nullable ThreadManager getThreadManager() {
         return threadsManager;
     }
 

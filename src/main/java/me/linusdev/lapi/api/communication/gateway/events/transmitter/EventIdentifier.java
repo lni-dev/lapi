@@ -35,6 +35,7 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -146,6 +147,78 @@ public enum EventIdentifier{
      * </ul>
      */
     CHANNEL_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onThreadCreate(LApi, ThreadCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onThreadUpdate(LApi, ThreadUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onThreadDelete(LApi, ThreadDeleteEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onThreadListSync(LApi, ThreadListSyncEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_LIST_SYNC,
+
+    /**
+     * identifier for {@link EventListener#onThreadMemberUpdate(LApi, ThreadMemberUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_MEMBER_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onThreadMembersUpdate(LApi, ThreadMembersUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    THREAD_MEMBERS_UPDATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

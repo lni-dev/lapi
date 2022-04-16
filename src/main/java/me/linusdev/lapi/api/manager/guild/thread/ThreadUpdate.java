@@ -26,6 +26,13 @@ public class ThreadUpdate extends Update<Thread<?>, Thread<?>> {
     private final boolean gotArchived;
     private final boolean cached;
 
+    /**
+     *
+     * @param copy copy of the old thread
+     * @param thread the updated thread
+     * @param gotArchived {@code true} if the thread just got archived. {@code false} otherwise, also if unknown.
+     * @param cached whether this thread is cached in a {@link ThreadManager}
+     */
     public ThreadUpdate(@Nullable Thread<?> copy, @NotNull Thread<?> thread, boolean gotArchived, boolean cached) {
         super(copy, thread);
         this.gotArchived = gotArchived;
@@ -35,7 +42,7 @@ public class ThreadUpdate extends Update<Thread<?>, Thread<?>> {
     /**
      * Only working properly if {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_THREADS CACHE_THREADS} is enabled.
      *
-     * @return {@code true} if the thread got archived.
+     * @return {@code true} means the thread was just archived. {@code false} means unknown!
      */
     public boolean gotArchived() {
         return gotArchived;

@@ -38,6 +38,7 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
@@ -287,6 +288,138 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onChannelDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadCreate(@NotNull LApi lApi, @NotNull ThreadCreateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadUpdate(@NotNull LApi lApi, @NotNull ThreadUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadDelete(@NotNull LApi lApi, @NotNull ThreadDeleteEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadListSync(@NotNull LApi lApi, @NotNull ThreadListSyncEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadListSync(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_LIST_SYNC);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadListSync(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadMemberUpdate(@NotNull LApi lApi, @NotNull ThreadMemberUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadMemberUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBER_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadMemberUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onThreadMembersUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBERS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onThreadMembersUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

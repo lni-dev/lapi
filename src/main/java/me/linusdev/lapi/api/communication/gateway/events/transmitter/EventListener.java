@@ -38,6 +38,7 @@ import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCr
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.log.LogInstance;
@@ -112,6 +113,18 @@ public interface EventListener {
     default void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {}
 
     default void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {}
+
+    default void onThreadCreate(@NotNull LApi lApi, @NotNull ThreadCreateEvent event) {}
+
+    default void onThreadUpdate(@NotNull LApi lApi, @NotNull ThreadUpdateEvent event) {}
+
+    default void onThreadDelete(@NotNull LApi lApi, @NotNull ThreadDeleteEvent event) {}
+
+    default void onThreadListSync(@NotNull LApi lApi, @NotNull ThreadListSyncEvent event) {}
+
+    default void onThreadMemberUpdate(@NotNull LApi lApi, @NotNull ThreadMemberUpdateEvent event) {}
+
+    default void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {}
 
     default void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {}
 

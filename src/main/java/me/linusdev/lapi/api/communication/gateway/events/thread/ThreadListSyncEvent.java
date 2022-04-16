@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.gateway.events.thread;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
+import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
@@ -30,10 +31,13 @@ import java.util.List;
 
 public class ThreadListSyncEvent extends Event {
 
-    private final @NotNull ListUpdate<Thread<?>> update;
+    private final @NotNull ThreadListSyncData threadListSyncData;
+    private final @Nullable ListUpdate<Thread<?>> update;
 
-    public ThreadListSyncEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull ListUpdate<Thread<?>> update) {
+    public ThreadListSyncEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId,
+                               @NotNull ThreadListSyncData threadListSyncData, @Nullable ListUpdate<Thread<?>> update) {
         super(lApi, payload, guildId);
+        this.threadListSyncData = threadListSyncData;
         this.update = update;
     }
 
@@ -42,8 +46,9 @@ public class ThreadListSyncEvent extends Event {
      * (see {@link ThreadManager#onThreadListSync(ThreadListSyncData)})
      * @see #getRemoved()
      * @see #getAdded()
+     * @return {@link ListUpdate} or {@code null} if {@link ConfigFlag#CACHE_THREADS CACHE_THREADS} is not enabled.
      */
-    public @NotNull ListUpdate<Thread<?>> getUpdate() {
+    public @Nullable ListUpdate<Thread<?>> getUpdate() {
         return update;
     }
 
@@ -51,6 +56,7 @@ public class ThreadListSyncEvent extends Event {
      * All threads that have been removed from the cache due to this list sync event
      */
     public @Nullable List<Thread<?>> getRemoved() {
+        if(update == null) return null;
         return update.getRemoved();
     }
 
@@ -58,6 +64,7 @@ public class ThreadListSyncEvent extends Event {
      * All threads that have been added to the cache due to this list sync event
      */
     public @Nullable List<Thread<?>> getAdded() {
+        if(update == null) return null;
         return update.getAdded();
     }
 }

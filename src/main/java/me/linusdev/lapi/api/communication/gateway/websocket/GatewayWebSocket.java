@@ -46,6 +46,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStic
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.identify.ConnectionProperties;
@@ -61,11 +62,14 @@ import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
+import me.linusdev.lapi.api.manager.guild.thread.ThreadUpdate;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -368,6 +372,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             }
 
             @Nullable GuildManager guildManager = lApi.getGuildManager();
+            //TODO: add @Notnull Data data = innerPayload;
+
+            //TODO: After transmitter.onLApiError, we should still send the normal event to the transmitter if possible
 
             switch (type) {
                 case HELLO:
@@ -535,21 +542,173 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case CHANNEL_PINS_UPDATE:
+
+                    //TODO: implement
+
                     break;
 
                 case THREAD_CREATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild threads
+                            transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, null,
+                                    new Update<>(null, Thread.fromData(lApi, data))));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    new Update<>(null, Thread.fromData(lApi, data))));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) {
+                            transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    new Update<>(null, Thread.fromData(lApi, data))));
+                            break;
+                        }
+
+                        Update<Thread<?>, Thread<?>> update = threadManager.onCreate(data);
+                        transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                update));
+                    }
                     break;
 
                 case THREAD_UPDATE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild threads
+                            transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, null,
+                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) {
+                            transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                            break;
+                        }
+
+                        ThreadUpdate update = threadManager.onUpdate(data);
+                        transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
+                                update));
+                    }
                     break;
 
                 case THREAD_DELETE:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+
+                        if(guildId == null) {
+                            //This may be a non guild channel
+                            //TODO: cache non guild threads
+                            transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, null,
+                                   Thread.fromData(lApi, data)));
+                            break;
+                        }
+
+                        if(guildManager == null) {
+                            transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    Thread.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) {
+                            transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
+                                    Thread.fromData(lApi, data)));
+                            break;
+                        }
+
+                        Thread<?> deleted = threadManager.onDelete(data);
+                        transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
+                                deleted == null ? Thread.fromData(lApi, data) : deleted));
+                    }
                     break;
 
                 case THREAD_LIST_SYNC:
+                    {
+                        Data data = (Data) payload.getPayloadData();
+                        if (data == null)
+                            throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
+
+                        ThreadListSyncData threadListSyncData = ThreadListSyncData.fromData(lApi, data);
+
+                        if(guildManager == null) {
+                            transmitter.onThreadListSync(lApi, new ThreadListSyncEvent(lApi, payload, threadListSyncData.getGuildIdAsSnowflake(),
+                                    threadListSyncData, null));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(threadListSyncData.getGuildId());
+                        if(guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            break;
+                        }
+
+                        ThreadManager threadManager = guild.getThreadManager();
+                        if(threadManager == null) {
+                            transmitter.onThreadListSync(lApi, new ThreadListSyncEvent(lApi, payload, threadListSyncData.getGuildIdAsSnowflake(),
+                                    threadListSyncData, null));
+                            break;
+                        }
+
+                        ListUpdate<Thread<?>> update = threadManager.onThreadListSync(threadListSyncData);
+                        transmitter.onThreadListSync(lApi, new ThreadListSyncEvent(lApi, payload, threadListSyncData.getGuildIdAsSnowflake(),
+                                threadListSyncData, update));
+                    }
                     break;
 
                 case THREAD_MEMBER_UPDATE:
+                    //TODO: event, manager
                     break;
 
                 case THREAD_MEMBERS_UPDATE:
@@ -557,9 +716,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         Data data = (Data) payload.getPayloadData();
                         if (data == null)
                             throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
-
-                        //TODO: remove
-                        System.out.println(data.getJsonString());
+                        //TODO: event, manager
                     }
 
                     break;

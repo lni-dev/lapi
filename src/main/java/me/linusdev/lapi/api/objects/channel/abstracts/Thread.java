@@ -16,7 +16,10 @@
 
 package me.linusdev.lapi.api.objects.channel.abstracts;
 
+import me.linusdev.data.Data;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
@@ -24,6 +27,7 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +35,15 @@ import org.jetbrains.annotations.Nullable;
  * <a href="https://discord.com/developers/docs/topics/threads" target="_top"> discord documentation</a>
  */
 public interface Thread<T extends Thread<T>> extends TextChannel, SnowflakeAble, CopyAndUpdatable<T> {
+
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable Thread<?> fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+        if(data == null) return null;
+        Channel<?> channel = Channel.fromData(lApi, data);
+        if(!(channel instanceof Thread))
+            throw new InvalidDataException(data, "wrong channel type: " + channel.getType() + ". Expected thread.");
+        return (Thread<?>) channel;
+    }
 
     /**
      * the name of the channel (1-100 characters)
