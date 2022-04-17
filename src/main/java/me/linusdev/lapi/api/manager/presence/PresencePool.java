@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild;
+package me.linusdev.lapi.api.manager.presence;
 
-public class PresencesManager {
+public interface PresencePool {
 }

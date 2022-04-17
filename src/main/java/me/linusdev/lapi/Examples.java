@@ -39,7 +39,7 @@ public class Examples {
     public static void main(String... args) throws LApiException, IOException, ParseException, InterruptedException {
 
         Config config = ConfigBuilder.getDefault("TOKEN").build();
-        LApi lApi = ConfigBuilder.getDefault("TOKEN").buildLapi();
+        LApi lApi = ConfigBuilder.getDefault("TOKEN").buildLApi();
 
         lApi.getEventTransmitter().addListener(new EventListener() {
             @Override

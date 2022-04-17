@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("PointlessBitwiseExpression")
@@ -197,6 +198,21 @@ public enum ConfigFlag implements SimpleDatable {
      */
     COPY_THREAD_ON_UPDATE_EVENT(1 << 18),
 
+    /**
+     * <p>
+     *     Caches all {@link PresenceUpdate presences} retrieved by the
+     *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_PRESENCES(1 << 19),
+
+    /**
+     * <p>
+     *    Copies {@link PresenceUpdate} objects, when they receive an update, so
+     *    you can check the difference between the old object and the updated one.
+     * </p>
+     */
+    COPY_PRESENCE_ON_UPDATE_EVENT(1 << 20),
     ;
 
     private final long value;

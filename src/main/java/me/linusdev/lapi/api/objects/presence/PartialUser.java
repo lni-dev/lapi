@@ -31,16 +31,24 @@ public class PartialUser implements Datable {
     public PartialUser(@NotNull Data data) throws InvalidDataException {
         this.data = data;
 
-        String id = (String) data.get(User.ID_KEY);
+        Object id = (Object) data.get(User.ID_KEY);
+        if(id instanceof Number) id = String.valueOf(id);
         if(id == null) throw new InvalidDataException(data, "Id may not be null", null, User.ID_KEY);
-        this.id = Snowflake.fromString(id);
+        this.id = Snowflake.fromString((String) id);
     }
 
     /**
-     * 	the user's id
+     * 	the user's id {@link Snowflake}
      */
-    public @NotNull Snowflake getId() {
+    public @NotNull Snowflake getIdAsSnowflake() {
         return id;
+    }
+
+    /**
+     * 	the user's id a {@link String}
+     */
+    public @NotNull String getId() {
+        return id.asString();
     }
 
     /**

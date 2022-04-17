@@ -22,6 +22,8 @@ import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +43,7 @@ import java.util.ArrayList;
  *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#presence-update" target="_top">Presence Update</a>
  */
-public class PresenceUpdate implements Datable {
+public class PresenceUpdate implements Datable, CopyAndUpdatable<PresenceUpdate> {
 
     public static final String USER_KEY = "user";
     public static final String GUILD_ID_KEY = "guild_id";
@@ -51,9 +53,9 @@ public class PresenceUpdate implements Datable {
 
     private final @Nullable PartialUser user;
     private final @Nullable Snowflake guildId;
-    private final @Nullable StatusType status;
-    private final @Nullable ArrayList<Activity> activities;
-    private final @Nullable ClientStatus clientStatus;
+    private @Nullable StatusType status;
+    private @Nullable ArrayList<Activity> activities;
+    private @Nullable ClientStatus clientStatus;
 
     /**
      *
@@ -138,4 +140,28 @@ public class PresenceUpdate implements Datable {
 
         return data;
     }
+
+    @Override
+    public @NotNull PresenceUpdate copy() {
+        return new PresenceUpdate(user,
+                Copyable.copy(guildId),
+                status,
+                activities == null ? null : (ArrayList<Activity>) activities.clone(),
+                Copyable.copy(clientStatus));
+    }
+
+    @Override
+    public void updateSelfByData(Data data) throws InvalidDataException {
+        //user is not updated
+        //guildId is not updated
+        data.processIfContained(STATUS_KEY, (String str) -> status = StatusType.fromValue(str));
+
+        ArrayList<Activity> activities = data.getAndConvertArrayList(ACTIVITIES_KEY,
+                (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
+
+        if(activities != null) this.activities = activities;
+
+        data.processIfContained(CLIENT_STATUS_KEY, (Data d) -> this.clientStatus = ClientStatus.fromData(d));
+    }
+
 }

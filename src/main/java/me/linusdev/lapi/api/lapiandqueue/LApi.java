@@ -776,4 +776,14 @@ public interface LApi extends HasLApi {
      */
     boolean isCopyOldThreadOnUpdateEventEnabled();
 
+    /**
+     * @see ConfigFlag#CACHE_PRESENCES
+     */
+    boolean isCachePresencesEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_PRESENCE_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldPresenceOnUpdateEventEnabled();
+
 }

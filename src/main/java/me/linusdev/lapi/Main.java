@@ -20,28 +20,19 @@ package me.linusdev.lapi;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.Reaction;
-import me.linusdev.lapi.api.objects.message.component.Component;
-import me.linusdev.lapi.api.objects.message.component.ComponentType;
-import me.linusdev.lapi.api.objects.message.component.actionrow.ActionRow;
-import me.linusdev.lapi.api.objects.message.component.button.Button;
-import me.linusdev.lapi.api.objects.message.component.button.ButtonStyle;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.api.templates.attachment.AttachmentTemplate;
-import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MentionType;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.api.templates.message.builder.TimestampStyle;
@@ -51,7 +42,6 @@ import me.linusdev.lapi.log.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +54,7 @@ public class Main {
         Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
 
-        final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLapi();
+        final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLApi();
 
         User currentUser = api.getCurrentUserRetriever().queueAndWait();
 

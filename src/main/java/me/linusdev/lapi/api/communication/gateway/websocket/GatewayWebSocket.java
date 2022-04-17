@@ -1306,8 +1306,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             }
         } catch (Throwable error) {
-                logger.error(error);
-                if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error);
+            logger.error(error);
+            if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error);
         }
     }
 

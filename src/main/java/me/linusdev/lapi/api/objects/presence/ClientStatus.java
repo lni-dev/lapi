@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.presence;
 import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,7 @@ import java.util.Objects;
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#client-status-object">Client Status Object</a>
  */
-public class ClientStatus implements Datable {
+public class ClientStatus implements Datable, Copyable<ClientStatus> {
     public static final String DESKTOP_KEY = "desktop";
     public static final String MOBILE_KEY = "mobile";
     public static final String WEB_KEY = "web";
@@ -104,5 +105,10 @@ public class ClientStatus implements Datable {
         data.addIfNotNull(WEB_KEY, web);
 
         return data;
+    }
+
+    @Override
+    public @NotNull ClientStatus copy() {
+        return new ClientStatus(desktop, mobile, web);
     }
 }

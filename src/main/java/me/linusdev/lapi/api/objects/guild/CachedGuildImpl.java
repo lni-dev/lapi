@@ -23,11 +23,11 @@ import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
-import me.linusdev.lapi.api.manager.guild.PresencesManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
@@ -37,6 +37,7 @@ import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.local.Locale;
 import me.linusdev.lapi.api.objects.permission.Permissions;
+import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
@@ -70,7 +71,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable MemberManager memberManager;
     protected @Nullable ListManager<Channel<?>> channelManager;
     protected @Nullable ThreadManager threadsManager;
-    protected @Nullable PresencesManager presencesManager;
+    protected @Nullable PresenceManager presenceManager;
     protected @Nullable StageInstance[] stageInstances;
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
 
@@ -147,6 +148,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheThreadsEnabled()) {
             this.threadsManager = lApi.getConfig().getThreadsManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCachePresencesEnabled()) {
+            this.presenceManager = lApi.getConfig().getPresenceManagerFactory().newInstance(lApi);
         }
 
     }
@@ -410,6 +415,25 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
                     }
                 } else {
                     threadsManager.init(1);
+                }
+            }
+
+        }
+
+        if(presenceManager != null){
+            if(!presenceManager.isInitialized()) {
+                @SuppressWarnings("unchecked")
+                ArrayList<Object> presencesData = (ArrayList<Object>) data.get(PRESENCES_KEY);
+                if(presencesData != null){
+                    presenceManager.init(presencesData.size());
+                    for(Object o : presencesData){
+                        Data presenceData = (Data) o;
+                        //add guildId to presence data
+                        presenceData.add(PresenceUpdate.GUILD_ID_KEY, id.asString());
+                        presenceManager.add(presenceData);
+                    }
+                } else {
+                    presenceManager.init(1);
                 }
             }
 

@@ -20,7 +20,6 @@ import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.command.RequestGuildMembersCommand;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
@@ -56,7 +55,6 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
-import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
@@ -72,7 +70,6 @@ import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
 import me.linusdev.lapi.api.objects.message.embed.InvalidEmbedException;
 import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.api.templates.attachment.AttachmentTemplate;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.helper.Helper;
@@ -82,7 +79,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -116,6 +112,8 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.CACHE_THREADS)
                 .disable(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS)
                 .enable(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT)
+                .enable(ConfigFlag.CACHE_PRESENCES)
+                .enable(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
                             .setApiVersion(ApiVersion.V9)
@@ -137,7 +135,7 @@ public class Test implements EventListener{
                                     System.out.println("Fatal");
                                 }
                             });
-                }).buildLapi();
+                }).buildLApi();
 
         lApi.getEventTransmitter().addListener(new Test());
 

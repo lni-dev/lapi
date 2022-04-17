@@ -39,6 +39,8 @@ import me.linusdev.lapi.api.manager.guild.thread.ThreadManagerImpl;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
+import me.linusdev.lapi.api.manager.presence.PresenceManager;
+import me.linusdev.lapi.api.manager.presence.PresenceManagerImpl;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -59,7 +61,7 @@ import java.util.function.Supplier;
 /**
  * This class can build a {@link Config} or a {@link LApi}
  * @see #build()
- * @see #buildLapi()
+ * @see #buildLApi()
  * @see #getDefault(String)
  */
 @SuppressWarnings("UnusedReturnValue")
@@ -82,7 +84,8 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
     private ManagerFactory<MemberManager> memberManagerFactory = null;
     private ManagerFactory<ListManager<Channel<?>>> channelManagerFactory = null;
-    private ManagerFactory<ThreadManager> threadsManagerFactory = null;
+    private ManagerFactory<ThreadManager> threadManagerFactory = null;
+    private ManagerFactory<PresenceManager> presenceManagerFactory = null;
 
 
     /**
@@ -121,7 +124,7 @@ public class ConfigBuilder implements Datable {
      *     all intents enabled and will receive all events.
      * </p>
      * <p>
-     *    You can directly {@link #buildLapi() build a LApi} with the returned config builder
+     *    You can directly {@link #buildLApi() build a LApi} with the returned config builder
      * </p>
      * <p>
      *     See method source code for all details.
@@ -381,11 +384,28 @@ public class ConfigBuilder implements Datable {
      * <p>
      *     Set to {@code null} to reset to default
      * </p>
-     * @param threadsManagerFactory the {@link ManagerFactory ManagerFactory&lt;ThreadManager&gt;}
+     * @param threadManagerFactory the {@link ManagerFactory ManagerFactory&lt;ThreadManager&gt;}
      * @return this
      */
-    public ConfigBuilder setThreadsManagerFactory(ManagerFactory<ThreadManager> threadsManagerFactory) {
-        this.threadsManagerFactory = threadsManagerFactory;
+    public ConfigBuilder setThreadManagerFactory(ManagerFactory<ThreadManager> threadManagerFactory) {
+        this.threadManagerFactory = threadManagerFactory;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new PresenceManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link PresenceManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild} to cache presences.
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param presenceManagerFactory the {@link ManagerFactory ManagerFactory&lt;PresenceManager&gt;}
+     * @return this
+     */
+    public ConfigBuilder setPresenceManagerFactory(ManagerFactory<PresenceManager> presenceManagerFactory) {
+        this.presenceManagerFactory = presenceManagerFactory;
         return this;
     }
 
@@ -462,7 +482,7 @@ public class ConfigBuilder implements Datable {
      *     builds a {@link Config}
      * </p>
      * <p>
-     *     It's much easier to use {@link #buildLapi()}
+     *     It's much easier to use {@link #buildLApi()}
      * </p>
      * @return {@link Config}
      */
@@ -483,7 +503,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
                 Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
                 Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled)),
-                Objects.requireNonNullElse(threadsManagerFactory, lApi -> new ThreadManagerImpl(lApi))
+                Objects.requireNonNullElse(threadManagerFactory, lApi -> new ThreadManagerImpl(lApi)),
+                Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi))
         );
     }
 
@@ -493,7 +514,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      * @return {@link LApi}
      */
-    public @NotNull LApi buildLapi() throws LApiException, IOException, ParseException, InterruptedException {
+    public @NotNull LApi buildLApi() throws LApiException, IOException, ParseException, InterruptedException {
         return new LApiImpl(build());
     }
 
