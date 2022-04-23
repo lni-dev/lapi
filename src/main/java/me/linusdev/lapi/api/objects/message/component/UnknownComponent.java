@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message.component;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ public class UnknownComponent implements Component{
 
     private final @NotNull ComponentType type;
     private final int typeInt;
-    private final @NotNull Data data;
+    private final @NotNull SOData data;
 
     /**
      *
@@ -35,7 +35,7 @@ public class UnknownComponent implements Component{
      * @param type {@link ComponentType#UNKNOWN}
      * @param typeInt type as int
      */
-    public UnknownComponent(@NotNull Data data, @NotNull ComponentType type, int typeInt){
+    public UnknownComponent(@NotNull SOData data, @NotNull ComponentType type, int typeInt){
         this.data = data;
         this.type = type;
         this.typeInt = typeInt;
@@ -47,7 +47,7 @@ public class UnknownComponent implements Component{
      * @return {@link UnknownComponent}
      * @throws InvalidDataException if {@link #TYPE_KEY} is null or missing
      */
-    public static @NotNull UnknownComponent fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull UnknownComponent fromData(@NotNull SOData data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
 
         if(type == null){
@@ -77,7 +77,7 @@ public class UnknownComponent implements Component{
      * Data of this component, to read all fields
      */
     @Override
-    public @NotNull Data getData() {
+    public @NotNull SOData getData() {
         return data;
     }
 }

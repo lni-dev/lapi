@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.application;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -57,7 +57,7 @@ public class PartialApplication implements ApplicationAbstract {
      * @return {@link Application} or {@code null} if data was {@code null}
      * @throws InvalidDataException if (id == null) == true
      */
-    public static @Nullable PartialApplication fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable PartialApplication fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if (data == null) return null;
 
         String id = (String) data.get(Application.ID_KEY);
@@ -93,8 +93,8 @@ public class PartialApplication implements ApplicationAbstract {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(Application.ID_KEY, id);
         data.addIfNotNull(Application.FLAGS_KEY, flags);

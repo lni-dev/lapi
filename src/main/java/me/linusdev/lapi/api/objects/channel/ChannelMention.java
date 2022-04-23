@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.enums.ChannelType;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -57,10 +57,10 @@ public class ChannelMention implements Datable {
      * @param data {@link Data} to create this {@link ChannelMention}
      * @throws InvalidDataException if a required field is missing
      */
-    public ChannelMention(@NotNull Data data) throws InvalidDataException {
+    public ChannelMention(@NotNull SOData data) throws InvalidDataException {
         Snowflake id = Snowflake.fromString((String) data.get(ID_KEY));
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
-        int type = ((Number) data.get(TYPE_KEY, -1)).intValue();
+        int type = ((Number) data.getOrDefaultBoth(TYPE_KEY, -1)).intValue();
         String name = (String) data.get(NAME_KEY);
 
         if(id == null || guildId == null || type == -1 || name == null) {
@@ -124,8 +124,8 @@ public class ChannelMention implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(ID_KEY, id);
         data.add(GUILD_ID_KEY, guildId);

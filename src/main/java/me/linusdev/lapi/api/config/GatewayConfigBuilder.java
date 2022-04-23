@@ -16,10 +16,9 @@
 
 package me.linusdev.lapi.api.config;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
@@ -77,8 +76,8 @@ public class GatewayConfigBuilder implements Datable {
      * @see #fromData(Data)
      */
     @Override
-    public Data getData() {
-        Data data = new Data(9);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(API_VERSION_KEY, apiVersion);
         data.addIfNotNull(ENCODING_KEY, encoding);
@@ -100,7 +99,7 @@ public class GatewayConfigBuilder implements Datable {
      * @return this
      * @see #getData()
      */
-    public GatewayConfigBuilder fromData(@NotNull Data data) throws InvalidDataException {
+    public GatewayConfigBuilder fromData(@NotNull SOData data) throws InvalidDataException {
         Number apiVersion = (Number) data.get(API_VERSION_KEY);
         String encoding = (String) data.get(ENCODING_KEY);
         String compression = (String) data.get(COMPRESSION_KEY);
@@ -108,9 +107,8 @@ public class GatewayConfigBuilder implements Datable {
         Number largeThreshold = (Number) data.get(LARGE_THRESHOLD_KEY);
         Number shardId = (Number) data.get(SHARD_ID_KEY);
         Number numShards = (Number) data.get(NUM_SHARDS_KEY);
-        Data presence = (Data) data.get(STARTUP_PRESENCE_KEY);
-        ArrayList<GatewayIntent> intents = data.getAndConvertArrayList(INTENTS_KEY,
-                (Converter<String, GatewayIntent>) GatewayIntent::fromName);
+        SOData presence = (SOData) data.get(STARTUP_PRESENCE_KEY);
+        ArrayList<GatewayIntent> intents = data.getListAndConvert(INTENTS_KEY, GatewayIntent::fromName);
 
         this.apiVersion = apiVersion == null ? this.apiVersion : ApiVersion.fromInt(apiVersion.intValue());
         this.encoding = encoding == null ? this.encoding : GatewayEncoding.fromValue(encoding);

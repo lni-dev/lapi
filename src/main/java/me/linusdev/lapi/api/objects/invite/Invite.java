@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.invite;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -111,21 +111,21 @@ public class Invite implements Datable, HasLApi {
      * @return {@link Invite}
      * @throws InvalidDataException if {@link #CODE_KEY} or {@link #CHANNEL_KEY} are missing or {@code null}
      */
-    public static @Nullable Invite fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Invite fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String code = (String) data.get(CODE_KEY);
-        Data guildData = (Data) data.get(GUILD_KEY);
-        Data channelData = (Data) data.get(CHANNEL_KEY);
-        Data inviterData = (Data) data.get(INVITER_KEY);
+        SOData guildData = (SOData) data.get(GUILD_KEY);
+        SOData channelData = (SOData) data.get(CHANNEL_KEY);
+        SOData inviterData = (SOData) data.get(INVITER_KEY);
         Number targetType = (Number) data.get(TARGET_TYPE_KEY);
-        Data targetUserData = (Data) data.get(TARGET_USER_KEY);
-        Data targetApplication = (Data) data.get(TARGET_APPLICATION_KEY);
+        SOData targetUserData = (SOData) data.get(TARGET_USER_KEY);
+        SOData targetApplication = (SOData) data.get(TARGET_APPLICATION_KEY);
         Number approximatePresenceCount = (Number) data.get(APPROXIMATE_PRESENCE_COUNT_KEY);
         Number approximateMemberCount = (Number) data.get(APPROXIMATE_MEMBER_COUNT_KEY);
         String expiresAt = (String) data.get(EXPIRES_AT_KEY);
-        Data stageInstance = (Data) data.get(STAGE_INSTANCE_KEY);
-        Data guildScheduledEvent = (Data) data.get(GUILD_SCHEDULED_EVENT_KEY);
+        SOData stageInstance = (SOData) data.get(STAGE_INSTANCE_KEY);
+        SOData guildScheduledEvent = (SOData) data.get(GUILD_SCHEDULED_EVENT_KEY);
 
         //This extends the Invite object
         InviteMetadata inviteMetadata = InviteMetadata.fromData(data);
@@ -246,8 +246,8 @@ public class Invite implements Datable, HasLApi {
      * @return {@link Data} for this {@link Invite}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(12);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(12);
 
         data.add(CODE_KEY, code);
         if(guild != null) data.add(GUILD_KEY, guild);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.emoji;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -124,7 +125,7 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
      * @return {@link EmojiObject}
      * @throws InvalidDataException if {@link #ID_KEY} and {@link #NAME_KEY} are both {@code null} or missing
      */
-    public static @NotNull EmojiObject fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull EmojiObject fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
 
@@ -133,15 +134,15 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
             throw new InvalidDataException(data, "Cannot create a Emoji, where " + ID_KEY + " and " + NAME_KEY + " are missing or null.");
 
         Role[] roles = null;
-        ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+        List<Object> rolesData = data.getList(ROLES_KEY);
 
         if(rolesData != null){
             roles = new Role[rolesData.size()];
             int i = 0;
-            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (Data) o);
+            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (SOData) o);
         }
 
-        Data userData = (Data) data.get(USER_KEY);
+        SOData userData = (SOData) data.get(USER_KEY);
         User user = userData == null ? null : User.fromData(lApi, userData);
 
         return new EmojiObject(lApi, Snowflake.fromString(id), name, roles, user,
@@ -250,8 +251,8 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
      * This is probably useless, but it's here anyways
      */
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(8);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);
@@ -277,7 +278,7 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
      */
     @ApiStatus.Internal
     @Override
-    public boolean checkIfChanged(@NotNull Data emojiData){
+    public boolean checkIfChanged(@NotNull SOData emojiData){
 
         //id won't be checked here, because it should never change
         //user won't be checked here, because it should not change
@@ -287,7 +288,7 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
         }
 
         if(roles != null){
-            ArrayList<Data> rolesData = (ArrayList<Data>) emojiData.get(ROLES_KEY);
+            List<Object> rolesData = emojiData.getList(ROLES_KEY);
             if(rolesData == null)
                 return true;
 
@@ -295,8 +296,8 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
             if(rolesData.size() > roles.length) return true;
 
             first: for(Role role : roles){
-                for(Data roleData : rolesData){
-                    if(role.getId().equals(roleData.get(Role.ID_KEY))){
+                for(Object roleData : rolesData){
+                    if(role.getId().equals(((SOData)roleData).get(Role.ID_KEY))){
                         continue first;
                     }
                 }
@@ -322,19 +323,19 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         //id will never change and won't be updated here
 
         //user should never change, but it will still be updated here.
-        this.user = User.fromData(lApi, (Data) data.get(USER_KEY));
+        this.user = User.fromData(lApi, (SOData) data.get(USER_KEY));
 
         this.name = (String) data.get(NAME_KEY);
 
-        ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+        List<Object> rolesData = data.getList(ROLES_KEY);
         if(rolesData != null){
             roles = new Role[rolesData.size()];
             int i = 0;
-            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (Data) o);
+            for(Object o : rolesData) roles[i++] = Role.fromData(lApi, (SOData) o);
         }
 
         this.requireColons = (Boolean) data.get(REQUIRE_COLONS_KEY);

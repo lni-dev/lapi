@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.thread;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -65,15 +65,15 @@ public class ExtraThreadMember extends ThreadMember implements HasLApi {
      * @return {@link ExtraThreadMember}
      */
     @Contract(value = "_, null -> null; _, !null -> !null", pure = true)
-    public static @Nullable ExtraThreadMember fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ExtraThreadMember fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         String userId = (String) data.get(USER_ID_KEY);
         String joinTimestamp = (String) data.get(JOIN_TIMESTAMP_KEY);
         Number flags = (Number) data.get(FLAGS_KEY);
-        Data memberData = (Data) data.get(MEMBER_KEY);
-        Data presenceData = (Data) data.get(PRESENCE_KEY);
+        SOData memberData = (SOData) data.get(MEMBER_KEY);
+        SOData presenceData = (SOData) data.get(PRESENCE_KEY);
 
         if(joinTimestamp == null || flags == null || memberData == null){
             InvalidDataException.throwException(data, null, ThreadMember.class,
@@ -106,8 +106,8 @@ public class ExtraThreadMember extends ThreadMember implements HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = super.getData();
+    public SOData getData() {
+        SOData data = super.getData();
 
         data.add(MEMBER_KEY, member);
         data.add(PRESENCE_KEY, presence);

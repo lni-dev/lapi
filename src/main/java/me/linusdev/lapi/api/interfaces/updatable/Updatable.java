@@ -16,8 +16,7 @@
 
 package me.linusdev.lapi.api.interfaces.updatable;
 
-import jdk.jshell.spi.ExecutionControl;
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 
@@ -25,7 +24,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
  * Objects implementing this can be updated by {@link LApi}
  */
 public interface Updatable {
-    void updateSelfByData(Data data) throws InvalidDataException;
+    void updateSelfByData(SOData data) throws InvalidDataException;
 
     /**
      * checks whether given {@link Data} could represent this object.<br>
@@ -34,7 +33,7 @@ public interface Updatable {
      * @param data to compare with
      * @return {@code true} if given {@link Data} could represent this object, {@code false} otherwise
      */
-    default boolean checkIfChanged(Data data) {
+    default boolean checkIfChanged(SOData data) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -73,7 +73,7 @@ public class Field implements Datable {
      * @return {@link Field}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #VALUE_KEY} are missing
      */
-    public static @NotNull Field fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Field fromData(@NotNull SOData data) throws InvalidDataException {
         final String name = (String) data.get(NAME_KEY);
         final String value = (String) data.get(VALUE_KEY);
         final Boolean inline = (Boolean) data.get(INLINE_KEY);
@@ -113,8 +113,8 @@ public class Field implements Datable {
      * Creates a {@link Data} from this {@link Field}, useful to convert it to JSON
      */
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(NAME_KEY, name);
         data.add(VALUE_KEY, value);

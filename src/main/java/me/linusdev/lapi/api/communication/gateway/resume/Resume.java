@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.resume;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -46,8 +46,8 @@ public class Resume implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(TOKEN_KEY, token);
         data.add(SESSION_ID_KEY, sessionId);

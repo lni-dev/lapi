@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
@@ -46,7 +46,7 @@ public class VoiceRegionManager implements HasLApi {
      * This will wait the current Thread until the voice regions are retrieved from Discord!
      */
     public void update() throws LApiException, IOException, ParseException, InterruptedException {
-        ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<Data, VoiceRegion>(lApi,
+        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<SOData, VoiceRegion>(lApi,
                 new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
         ArrayList<VoiceRegion> list = retriever.completeHere().get();
 
@@ -75,7 +75,7 @@ public class VoiceRegionManager implements HasLApi {
      * retrieves and saves all voice regions into the array, ignores current content of the array
      */
     public void init() {
-        ArrayRetriever<Data, VoiceRegion> retriever = new ArrayRetriever<>(lApi,
+        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<>(lApi,
                 new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
         retriever.queue(list -> regions = list);

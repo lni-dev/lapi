@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.list;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
@@ -43,11 +44,11 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
     private @Nullable ConcurrentHashMap<String, T> objects;
 
     private final @NotNull String idKey;
-    private final @NotNull LApiImplConverter<Data, T, InvalidDataException> converter;
+    private final @NotNull LApiImplConverter<SOData, T, InvalidDataException> converter;
     private final @NotNull Supplier<Boolean> doCopy;
 
     public ListManager(@NotNull LApiImpl lApi, @NotNull String idKey,
-                       @NotNull LApiImplConverter<Data, T, InvalidDataException> converter,
+                       @NotNull LApiImplConverter<SOData, T, InvalidDataException> converter,
                        @NotNull Supplier<Boolean> doCopy) {
         this.lApi = lApi;
         this.idKey = idKey;
@@ -78,7 +79,7 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
      * @return added {@link T}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */
-    public @NotNull T onAdd(@NotNull Data data) throws InvalidDataException {
+    public @NotNull T onAdd(@NotNull SOData data) throws InvalidDataException {
         if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         T obj = converter.convert(lApi, data);
         objects.put(obj.getId(), obj);
@@ -91,7 +92,7 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
      * @return {@link Update}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */
-    public @Nullable Update<T, T> onUpdate(@NotNull Data data) throws InvalidDataException {
+    public @Nullable Update<T, T> onUpdate(@NotNull SOData data) throws InvalidDataException {
         if(objects == null) throw new UnsupportedOperationException("init not yet called!");
 
         String id = (String) data.get(idKey);
@@ -133,14 +134,14 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
      * @return {@link ListUpdate}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */
-    public ListUpdate<T> onUpdate(ArrayList<Data> data) throws InvalidDataException {
+    public ListUpdate<T> onUpdate(List<SOData> data) throws InvalidDataException {
         if(objects == null) throw new UnsupportedOperationException("init not yet called!");
         ArrayList<T> old = null;
         ArrayList<T> updated = null;
         ArrayList<T> added = null;
         ArrayList<T> removed = null;
 
-        for(Data d : data){
+        for(SOData d : data){
             String id = (String) d.get(idKey);
             if(id == null) throw new InvalidDataException(d, "id missing.", null, idKey);
 
@@ -169,7 +170,7 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
         //check if an emoji was removed
         if(objects.size() != data.size() - (added != null ? added.size() : 0)){
             first: for(T obj : objects.values()){
-                for(Data d : data){
+                for(SOData d : data){
                     if(obj.getId().equals(d.get(EmojiObject.ID_KEY))){
                         continue first;
                     }

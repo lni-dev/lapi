@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.user;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -57,9 +57,9 @@ public class UserMention implements Datable, HasLApi {
      * @return {@link UserMention}
      * @throws InvalidDataException see {@link User#fromData(LApi, Data)}
      */
-    public static @NotNull UserMention fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull UserMention fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
 
-        Data memberData = (Data) data.get(MEMBER_KEY);
+        SOData memberData = (SOData) data.get(MEMBER_KEY);
 
         return new UserMention(lApi, User.fromData(lApi, data), Member.fromData(lApi, memberData));
     }
@@ -83,8 +83,8 @@ public class UserMention implements Datable, HasLApi {
      * @return {@link Data} for this {@link UserMention}
      */
     @Override
-    public Data getData() {
-        Data data = user.getData();
+    public SOData getData() {
+        SOData data = user.getData();
 
         if(member != null) data.add(MEMBER_KEY, member);
 

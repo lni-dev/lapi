@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +90,7 @@ public class Image implements Datable {
      * @return {@link Image} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #URL_KEY} is missing in given data
      */
-    public static @Nullable Image fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Image fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String url = (String) data.get(URL_KEY);
 
@@ -136,8 +136,8 @@ public class Image implements Datable {
      * Creates a {@link Data} from this {@link Image}, useful to convert it to JSON
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(1);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(URL_KEY, url);
         if(proxyUrl != null) data.add(PROXY_URL_KEY, proxyUrl);

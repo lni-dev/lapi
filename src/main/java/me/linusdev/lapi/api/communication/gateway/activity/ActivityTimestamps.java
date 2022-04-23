@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public class ActivityTimestamps implements Datable {
      * @return {@link ActivityTimestamps}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ActivityTimestamps fromData(@Nullable Data data){
+    public static @Nullable ActivityTimestamps fromData(@Nullable SOData data){
         if(data == null) return null;
 
         Number start = (Number) data.get(START_KEY);
@@ -74,8 +74,8 @@ public class ActivityTimestamps implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.addIfNotNull(START_KEY, start);
         data.addIfNotNull(END_KEY, end);

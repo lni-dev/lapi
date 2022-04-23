@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.presence;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.Contract;
@@ -55,7 +55,7 @@ public class ClientStatus implements Datable, Copyable<ClientStatus> {
      * @return {@link ClientStatus}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ClientStatus fromData(@Nullable Data data) {
+    public static @Nullable ClientStatus fromData(@Nullable SOData data) {
         if(data == null) return null;
         return new ClientStatus(
                 StatusType.fromValue((String) data.get(DESKTOP_KEY)),
@@ -97,8 +97,8 @@ public class ClientStatus implements Datable, Copyable<ClientStatus> {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(1);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.addIfNotNull(DESKTOP_KEY, desktop);
         data.addIfNotNull(MOBILE_KEY, mobile);

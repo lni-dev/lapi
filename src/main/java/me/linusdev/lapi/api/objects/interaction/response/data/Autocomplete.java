@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.interaction.response.data;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionChoice;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +42,8 @@ public class Autocomplete implements Datable, Template {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(1);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(1);
         data.add(CHOICES_KEY, choices);
         return data;
     }

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild.voice;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
@@ -114,11 +114,11 @@ public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLAp
      * @throws InvalidDataException if data is invalid
      */
     @SuppressWarnings("ConstantConditions")
-    public static @NotNull VoiceState fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull VoiceState fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String guildId = (String) data.get(GUILD_ID_KEY);
         String channelId = (String) data.get(CHANNEL_ID_KEY);
         String userId = (String) data.get(USER_ID_KEY);
-        Data member = (Data) data.get(MEMBER_KEY);
+        SOData member = (SOData) data.get(MEMBER_KEY);
         String sessionId = (String) data.get(SESSION_ID_KEY);
         Boolean deaf = (Boolean) data.get(DEAF_KEY);
         Boolean mute = (Boolean) data.get(MUTE_KEY);
@@ -143,13 +143,13 @@ public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLAp
     }
 
     @Override
-    public void updateSelfByData(@NotNull Data data) throws InvalidDataException {
+    public void updateSelfByData(@NotNull SOData data) throws InvalidDataException {
         //guildId will only be updated if it is null
         if(guildId == null) data.processIfContained(GUILD_ID_KEY, (String str) -> this.guildId = Snowflake.fromString(str));
         data.processIfContained(CHANNEL_ID_KEY, (String str) -> this.channelId = Snowflake.fromString(str));
         //userId will not be updated
         //member will only be updated if it is null
-        if(member == null) member = Member.fromData(lApi, (Data) data.get(MEMBER_KEY));
+        if(member == null) member = Member.fromData(lApi, (SOData) data.get(MEMBER_KEY));
 
         data.processIfContained(SESSION_ID_KEY, (String str) -> this.sessionId = str);
         data.processIfContained(DEAF_KEY, (Boolean bool) -> this.deaf = bool);
@@ -281,8 +281,8 @@ public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLAp
      * @return {@link Data} for this {@link VoiceState}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(10);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(12);
 
         data.addIfNotNull(GUILD_ID_KEY, guildId);
         data.add(CHANNEL_ID_KEY, channelId);

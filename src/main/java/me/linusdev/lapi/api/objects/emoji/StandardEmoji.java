@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.emoji;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -1933,8 +1933,8 @@ public enum StandardEmoji implements Emoji {
      * a {@link Data} for this Standard Emoji. Useful for generating JSON
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(2);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(EmojiObject.ID_KEY, null);
         data.add(EmojiObject.NAME_KEY, getUnicodeString());

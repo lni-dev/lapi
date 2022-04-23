@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.integration;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -79,7 +79,7 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
      * @return {@link IntegrationApplication}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #DESCRIPTION_KEY} or {@link #SUMMARY_KEY} is missing or {@code null}
      */
-    public static @Nullable IntegrationApplication fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable IntegrationApplication fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -87,7 +87,7 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
         String iconHash = (String) data.get(ICON_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
         String summary = (String) data.get(SUMMARY_KEY);
-        Data bot = (Data) data.get(BOT_KEY);
+        SOData bot = (SOData) data.get(BOT_KEY);
 
         if(id == null || name == null || description == null || summary == null){
             InvalidDataException.throwException(data, null, IntegrationApplication.class,
@@ -164,9 +164,9 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
     }
 
     @Override
-    public Data getData() {
+    public SOData getData() {
 
-        Data data = new Data(6);
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

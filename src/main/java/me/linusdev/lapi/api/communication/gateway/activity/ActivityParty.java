@@ -16,9 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.Converter;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -52,11 +51,11 @@ public class ActivityParty implements Datable {
      * @param data {@link Data}
      * @return {@link ActivityParty}
      */
-    public static @Nullable ActivityParty fromData(@Nullable Data data){
+    public static @Nullable ActivityParty fromData(@Nullable SOData data){
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
-        ArrayList<Integer> size = data.getAndConvertArrayList(SIZE_KEY, (Converter<Object, Integer>) convertible -> (Integer) convertible);
+        ArrayList<Integer> size = data.getListAndConvert(SIZE_KEY, convertible -> (Integer) convertible);
 
         return new ActivityParty(id, size == null ? null : size.get(0), size == null ? null : size.get(1));
     }
@@ -83,8 +82,8 @@ public class ActivityParty implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.addIfNotNull(ID_KEY, id);
         if(currentSize != null && maxSize != null) data.add(SIZE_KEY, new int[]{currentSize, maxSize});

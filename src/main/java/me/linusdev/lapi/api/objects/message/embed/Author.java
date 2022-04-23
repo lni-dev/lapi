@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -100,7 +100,7 @@ public class Author implements Datable {
      * @return {@link Author} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #NAME_KEY} is missing in given data
      */
-    public static @Nullable Author fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Author fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         final String name = (String) data.get(NAME_KEY);
         final String url = (String) data.get(URL_KEY);
@@ -144,8 +144,8 @@ public class Author implements Datable {
      * Creates a {@link Data} from this {@link Author}, useful to convert it to JSON
      */
     @Override
-    public Data getData() {
-        Data data = new Data(1);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(NAME_KEY, name);
         if(url != null) data.add(URL_KEY, url);

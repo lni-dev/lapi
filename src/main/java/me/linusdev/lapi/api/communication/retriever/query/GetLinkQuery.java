@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.query;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.lapihttprequest.Method;
@@ -355,10 +355,10 @@ public class GetLinkQuery implements Query{
 
     private final LApi lApi;
     private final Links link;
-    private final Data queryData;
+    private final SOData queryData;
     private final PlaceHolder[] placeHolders;
 
-    public GetLinkQuery(@NotNull LApi lApi, @NotNull Links link, @Nullable Data queryData, PlaceHolder... placeHolders){
+    public GetLinkQuery(@NotNull LApi lApi, @NotNull Links link, @Nullable SOData queryData, PlaceHolder... placeHolders){
         this.lApi = lApi;
         this.link = link;
         this.queryData = queryData;

@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.command;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -108,7 +108,7 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #APPLICATION_ID_KEY}, {@link #NAME_KEY}, {@link #DESCRIPTION_KEY} or {@link #VERSION_KEY} are missing or {@code null}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ApplicationCommand fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ApplicationCommand fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -117,7 +117,7 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
         String guildId = (String) data.get(GUILD_ID_KEY);
         String name = (String) data.get(NAME_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
-        ArrayList<ApplicationCommandOption> options = data.getAndConvertArrayList(OPTIONS_KEY, (ExceptionConverter<Data, ApplicationCommandOption, InvalidDataException>)
+        ArrayList<ApplicationCommandOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (ExceptionConverter<SOData, ApplicationCommandOption, InvalidDataException>)
                 convertible -> ApplicationCommandOption.fromData(lApi, convertible));
         Boolean defaultPermission = (Boolean) data.get(DEFAULT_PERMISSIONS_KEY);
         String version = (String) data.get(VERSION_KEY);
@@ -225,8 +225,8 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(9);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.add(ID_KEY, id);
         data.addIfNotNull(TYPE_KEY, type);

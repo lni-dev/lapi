@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
@@ -73,8 +73,8 @@ public class LApiGuildManagerImpl implements GuildManager {
     @Override
     public GatewayWebSocket.OnGuildCreateReturn onGuildCreate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
         if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
-        Data guildData = (Data) payload.getPayloadData();
+        if(payload.getPayloadData() == null) throw new InvalidDataException((SOData) payload.getPayloadData(), "GuildImpl data is missing!");
+        SOData guildData = (SOData) payload.getPayloadData();
 
         String guildId = (String) guildData.get(GuildImpl.ID_KEY);
         CachedGuildImpl guild = guilds.get(guildId);
@@ -104,8 +104,8 @@ public class LApiGuildManagerImpl implements GuildManager {
     @Override
     public CachedGuildImpl onGuildDelete(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
         if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
-        UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
+        if(payload.getPayloadData() == null) throw new InvalidDataException((SOData) payload.getPayloadData(), "GuildImpl data is missing!");
+        UnavailableGuild uGuild = UnavailableGuild.fromData((SOData) payload.getPayloadData());
 
         if(uGuild.getUnavailable() == null) {
             //The unavailable field is not set, this means
@@ -119,7 +119,7 @@ public class LApiGuildManagerImpl implements GuildManager {
 
         //The unavailable field is set, this means, the guild is unavailable
         CachedGuildImpl guild = guilds.get(uGuild.getId());
-        guild.updateSelfByData((Data) payload.getPayloadData());
+        guild.updateSelfByData((SOData) payload.getPayloadData());
         //GuildUnavailableEvent is invoked by GatewayWebSocket
         return guild;
     }
@@ -127,11 +127,11 @@ public class LApiGuildManagerImpl implements GuildManager {
     @Override
     public Update<CachedGuildImpl, Guild> onGuildUpdate(@NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
         if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
-        if(payload.getPayloadData() == null) throw new InvalidDataException((Data) payload.getPayloadData(), "GuildImpl data is missing!");
-        UnavailableGuild uGuild = UnavailableGuild.fromData((Data) payload.getPayloadData());
+        if(payload.getPayloadData() == null) throw new InvalidDataException((SOData) payload.getPayloadData(), "GuildImpl data is missing!");
+        UnavailableGuild uGuild = UnavailableGuild.fromData((SOData) payload.getPayloadData());
 
         CachedGuildImpl guild = guilds.get(uGuild.getId());
-        return new Update<CachedGuildImpl, Guild>(guild, (Data) payload.getPayloadData());
+        return new Update<CachedGuildImpl, Guild>(guild, (SOData) payload.getPayloadData());
     }
 
     @Override

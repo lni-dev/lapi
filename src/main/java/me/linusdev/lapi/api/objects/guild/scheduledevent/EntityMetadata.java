@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild.scheduledevent;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -44,7 +44,7 @@ public class EntityMetadata implements Datable {
      * @param data {@link Data}
      * @return {@link EntityMetadata}
      */
-    public static @Nullable EntityMetadata fromData(@Nullable Data data){
+    public static @Nullable EntityMetadata fromData(@Nullable SOData data){
         if(data == null) return null;
 
         return new EntityMetadata((String) data.get(LOCATION_KEY));
@@ -62,8 +62,8 @@ public class EntityMetadata implements Datable {
      * @return {@link Data} for this {@link EntityMetadata}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(1);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(1);
 
         if(location != null) data.add(LOCATION_KEY, location);
 

@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
@@ -92,7 +91,7 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("InvalidDataException while trying to retrieve " + query.toString());
             log.error(invalidDataException);
-            log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().getJsonString().toString(), "Data: ");
+            log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().toJsonString().toString(), "Data: ");
             container = new Container<T>(null, new Error(invalidDataException));
 
         } catch (Throwable t) {

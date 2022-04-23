@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.member;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -47,7 +47,7 @@ public class MemberManagerImpl implements MemberManager{
     }
 
     @Override
-    public @NotNull Member addMember(@NotNull Data data) throws InvalidDataException {
+    public @NotNull Member addMember(@NotNull SOData data) throws InvalidDataException {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
         Member member = Member.fromData(lApi, data);
         User user = member.getUser();
@@ -59,13 +59,13 @@ public class MemberManagerImpl implements MemberManager{
     }
 
     @Override
-    public @NotNull Member onMemberAdd(@NotNull Data data) throws InvalidDataException {
+    public @NotNull Member onMemberAdd(@NotNull SOData data) throws InvalidDataException {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
         return addMember(data);
     }
 
     @Override
-    public @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException {
+    public @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull SOData data) throws InvalidDataException {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
 
         Member member = members.get(userId);
@@ -90,7 +90,7 @@ public class MemberManagerImpl implements MemberManager{
     }
 
     @Override
-    public void onGuildMemberChunk(@NotNull Data data) {
+    public void onGuildMemberChunk(@NotNull SOData data) {
         if(members == null) throw new UnsupportedOperationException("init() not yet called");
         //TODO: implement
     }

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.response.body;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -28,14 +28,14 @@ import org.jetbrains.annotations.NotNull;
 public abstract class ResponseBody implements HasLApi {
 
     protected final @NotNull LApi lApi;
-    protected final @NotNull Data data;
+    protected final @NotNull SOData data;
 
     /**
      *
      * @param lApi {@link LApi}
      * @param data the retrieved {@link Data}
      */
-    public ResponseBody(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public ResponseBody(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.data = data;
         this.lApi = lApi;
     }
@@ -43,7 +43,7 @@ public abstract class ResponseBody implements HasLApi {
     /**
      * the retrieved {@link Data}
      */
-    public @NotNull Data getData() {
+    public @NotNull SOData getData() {
         return data;
     }
 

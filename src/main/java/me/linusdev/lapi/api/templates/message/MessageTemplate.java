@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.templates.message;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.message.MessageReference;
@@ -93,8 +93,8 @@ public class MessageTemplate implements Template {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(1);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(CONTENT_KEY, content);
         if(tts) data.add(TTS_KEY, true);

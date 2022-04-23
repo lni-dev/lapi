@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message.component.button;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -112,11 +112,11 @@ public class Button implements Component, HasLApi {
      * @return {@link Button}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #STYLE_KEY}
      */
-    public static @NotNull Button fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Button fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
         Number style = (Number)  data.get(STYLE_KEY);
         String label = (String) data.get(LABEL_KEY);
-        Data emoji = (Data) data.get(EMOJI_KEY);
+        SOData emoji = (SOData) data.get(EMOJI_KEY);
         String customId = (String) data.get(CUSTOM_ID_KEY);
         String url = (String) data.get(URL_KEY);
         Boolean disabled = (Boolean) data.get(DISABLED_KEY);
@@ -193,8 +193,8 @@ public class Button implements Component, HasLApi {
      * @return {@link Data} representing this {@link Button}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(7);
 
         data.add(TYPE_KEY, type);
         data.add(STYLE_KEY, style);

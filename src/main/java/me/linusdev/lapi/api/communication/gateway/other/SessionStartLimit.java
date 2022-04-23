@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.other;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +58,7 @@ public class SessionStartLimit implements Datable {
      * @throws InvalidDataException if {@link #TOTAL_KEY}, {@link #REMAINING_KEY}, {@link #RESET_AFTER_KEY} or {@link #MAX_CONCURRENCY_KEY} are missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable SessionStartLimit fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable SessionStartLimit fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         Number total = (Number) data.get(TOTAL_KEY);
@@ -105,8 +105,8 @@ public class SessionStartLimit implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(TOTAL_KEY, total);
         data.add(REMAINING_KEY, remaining);

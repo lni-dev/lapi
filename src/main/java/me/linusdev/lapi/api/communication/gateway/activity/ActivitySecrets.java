@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -50,7 +50,7 @@ public class ActivitySecrets implements Datable {
      * @param data {@link Data}
      * @return {@link ActivitySecrets}
      */
-    public static @Nullable ActivitySecrets fromData(@Nullable Data data){
+    public static @Nullable ActivitySecrets fromData(@Nullable SOData data){
         if(data == null) return null;
         String join = (String) data.get(JOIN_KEY);
         String spectate = (String) data.get(SPECTATE_KEY);
@@ -81,8 +81,8 @@ public class ActivitySecrets implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data =SOData.newOrderedDataWithKnownSize(3);
 
         data.addIfNotNull(JOIN_KEY, join);
         data.addIfNotNull(SPECTATE_KEY, spectate);

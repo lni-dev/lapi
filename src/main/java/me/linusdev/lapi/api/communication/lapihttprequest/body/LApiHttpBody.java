@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.lapihttprequest.body;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ import java.util.ArrayList;
  */
 public class LApiHttpBody {
 
-    private @Nullable Data jsonPart;
+    private @Nullable SOData jsonPart;
     private final @NotNull FilePart[] fileParts;
 
     //TODO single file (especially image) body
@@ -38,7 +38,7 @@ public class LApiHttpBody {
      * @param fileParts the file-parts for this Body
      * @param jsonPart the json-part of this Body, may be {@code null}
      */
-    public LApiHttpBody(@Nullable Data jsonPart, FilePart[] fileParts){
+    public LApiHttpBody(@Nullable SOData jsonPart, FilePart[] fileParts){
         this.jsonPart = jsonPart;
         this.fileParts = fileParts;
     }
@@ -48,7 +48,7 @@ public class LApiHttpBody {
      *
      * @param jsonPart the json-part of this Body, may be {@code null}
      */
-    public LApiHttpBody(@Nullable Data jsonPart){
+    public LApiHttpBody(@Nullable SOData jsonPart){
         this(jsonPart, new FilePart[0]);
     }
 
@@ -72,7 +72,7 @@ public class LApiHttpBody {
      * @param jsonPart {@link Data} for this Body
      * @return this
      */
-    public LApiHttpBody setJSONPart(Data jsonPart){
+    public LApiHttpBody setJSONPart(SOData jsonPart){
         this.jsonPart = jsonPart;
         return this;
     }
@@ -80,7 +80,7 @@ public class LApiHttpBody {
     /**
      * The json-part for this Body
      */
-    public @Nullable Data getJsonPart() {
+    public @Nullable SOData getJsonPart() {
         return jsonPart;
     }
 

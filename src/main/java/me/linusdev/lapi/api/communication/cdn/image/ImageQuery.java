@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.cdn.image;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
@@ -82,7 +82,7 @@ public class ImageQuery implements Query {
         uri = new PlaceHolder(PlaceHolder.FILE_ENDING, fileType.getFileEndings()[0]).place(uri);
 
         if(desiredSize != NO_DESIRED_SIZE) {
-            Data queryParamsData = new Data(1);
+            SOData queryParamsData = SOData.newOrderedDataWithKnownSize(2);
             queryParamsData.add(SIZE_QUERY_PARAM_KEY, desiredSize);
             return new LApiHttpRequest(uri, getMethod(), null, queryParamsData);
         }

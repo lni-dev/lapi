@@ -16,9 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.presence;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import org.jetbrains.annotations.Contract;
@@ -67,12 +66,11 @@ public class PresenceUpdate implements Datable {
      * @throws InvalidDataException if {@link #ACTIVITIES_KEY}, {@link #STATUS_KEY} or {@link #AFK_KEY} is missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable PresenceUpdate fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable PresenceUpdate fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         Number since = (Number) data.get(SINCE_KEY);
-        ArrayList<Activity> activities = data.getAndConvertArrayList(ACTIVITIES_KEY,
-                (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
+        ArrayList<Activity> activities = data.getListAndConvertWithException(ACTIVITIES_KEY, Activity::fromData);
         String status = (String) data.get(STATUS_KEY);
         Boolean afk = (Boolean) data.get(AFK_KEY);
 
@@ -118,8 +116,8 @@ public class PresenceUpdate implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(SINCE_KEY, since);
         data.add(ACTIVITIES_KEY, activities);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.retriever.response.body;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -39,7 +39,7 @@ public class ListThreadsResponseBody extends ResponseBody{
     public static final String MEMBERS_KEY = "members";
     public static final String HAS_MORE_KEY = "has_more";
 
-    private final @NotNull ArrayList<Thread> threads;
+    private final @NotNull ArrayList<Thread<?>> threads;
     private @NotNull ArrayList<ThreadMember> members;
     private final boolean hasMore;
 
@@ -50,18 +50,18 @@ public class ListThreadsResponseBody extends ResponseBody{
      * @throws InvalidDataException if {@link #THREADS_KEY}, {@link #MEMBERS_KEY} or {@link #HAS_MORE_KEY} are null or missing
      */
     @SuppressWarnings("ConstantConditions")
-    public ListThreadsResponseBody(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public ListThreadsResponseBody(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         super(lApi, data);
-        threads = data.getAndConvertArrayList(THREADS_KEY,
-                (ExceptionConverter<Data, Thread, InvalidDataException>) convertible -> (Thread) Channel.fromData(lApi, convertible));
+        threads = data.getListAndConvertWithException(THREADS_KEY,
+                (ExceptionConverter<SOData, Thread<?>, InvalidDataException>) convertible -> (Thread<?>) Channel.fromData(lApi, convertible));
 
-        members = data.getAndConvertArrayList(MEMBERS_KEY, (ExceptionConverter<Data, ThreadMember, InvalidDataException>) ThreadMember::fromData);
+        members = data.getListAndConvertWithException(MEMBERS_KEY, ThreadMember::fromData);
 
-        hasMore = data.getAndConvert(HAS_MORE_KEY,
+        hasMore = data.getAndConvertWithException(HAS_MORE_KEY,
                 (ExceptionConverter<Boolean, Boolean, InvalidDataException>) convertible -> {
             if(convertible == null) throw new InvalidDataException(data, "has_more may not be missing or null!").addMissingFields(HAS_MORE_KEY);
             return convertible;
-        });
+        }, null);
 
         if(threads == null || members == null){
             InvalidDataException.throwException(data, null, ListThreadsResponseBody.class,
@@ -73,7 +73,7 @@ public class ListThreadsResponseBody extends ResponseBody{
     /**
      * the active threads
      */
-    public @NotNull ArrayList<Thread> getThreads() {
+    public @NotNull ArrayList<Thread<?>> getThreads() {
         return threads;
     }
 

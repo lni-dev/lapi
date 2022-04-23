@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.thread;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
@@ -76,7 +76,7 @@ public class ThreadManagerImpl implements ThreadManager{
     }
 
     @Override
-    public @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull SOData data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
         Channel<?> threadChannel = Channel.fromData(lApi, data);
 
@@ -119,7 +119,7 @@ public class ThreadManagerImpl implements ThreadManager{
     }
 
     @Override
-    public @NotNull ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull ThreadUpdate onUpdate(@NotNull SOData data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -172,7 +172,7 @@ public class ThreadManagerImpl implements ThreadManager{
      * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
      * @throws InvalidDataException if id field is missing in given data
      */
-    public @Nullable Thread<?> onDelete(@NotNull Data data) throws InvalidDataException {
+    public @Nullable Thread<?> onDelete(@NotNull SOData data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         String threadId = (String) data.get(Channel.ID_KEY);
@@ -287,7 +287,7 @@ public class ThreadManagerImpl implements ThreadManager{
     }
 
     @Override
-    public @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull SOData data) throws InvalidDataException {
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
         ThreadMember threadMember = ThreadMember.fromData(data);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.voice.region;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import org.jetbrains.annotations.NotNull;
@@ -53,8 +53,8 @@ public class VoiceRegion implements Datable, Updatable {
      * @return Data representing this Voice Region
      */
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);
@@ -66,11 +66,11 @@ public class VoiceRegion implements Datable, Updatable {
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         name = (String) data.get(NAME_KEY, name);
-        custom = (boolean) data.get(CUSTOM_KEY, custom);
-        deprecated = (boolean) data.get(DEPRECATED_KEY, deprecated);
-        optimal = (boolean) data.get(OPTIMAL_KEY, optimal);
+        custom = (boolean) data.getOrDefaultBoth(CUSTOM_KEY, custom);
+        deprecated = (boolean) data.getOrDefaultBoth(DEPRECATED_KEY, deprecated);
+        optimal = (boolean) data.getOrDefaultBoth(OPTIMAL_KEY, optimal);
     }
 
     /**
@@ -128,8 +128,8 @@ public class VoiceRegion implements Datable, Updatable {
         return name == null;
     }
 
-    public static VoiceRegion fromData(Data data){
-        return new VoiceRegion((String) data.get(ID_KEY), (String) data.get(NAME_KEY), (boolean) data.get(CUSTOM_KEY, false),
-                (boolean) data.get(DEPRECATED_KEY, false), (boolean) data.get(OPTIMAL_KEY, false));
+    public static VoiceRegion fromData(SOData data){
+        return new VoiceRegion((String) data.get(ID_KEY), (String) data.get(NAME_KEY), (boolean) data.getOrDefaultBoth(CUSTOM_KEY, false),
+                (boolean) data.getOrDefaultBoth(DEPRECATED_KEY, false), (boolean) data.getOrDefaultBoth(OPTIMAL_KEY, false));
     }
 }

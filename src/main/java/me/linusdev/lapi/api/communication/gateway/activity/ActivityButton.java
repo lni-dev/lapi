@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.message.component.ComponentLimits;
 import org.jetbrains.annotations.Contract;
@@ -59,7 +59,7 @@ public class ActivityButton implements Datable {
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #URL_KEY} are missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ActivityButton fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable ActivityButton fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String label = (String) data.get(LABEL_KEY);
@@ -91,8 +91,8 @@ public class ActivityButton implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(LABEL_KEY, label);
         data.add(URL_KEY, url);

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.voicestate;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -64,7 +64,7 @@ public class VoiceStatesManagerImpl implements VoiceStateManager {
     }
 
     @Override
-    public @NotNull Update<VoiceState, VoiceState> update(@NotNull Data voiceStateData) throws InvalidDataException {
+    public @NotNull Update<VoiceState, VoiceState> update(@NotNull SOData voiceStateData) throws InvalidDataException {
         String userId = (String) voiceStateData.get(VoiceState.USER_ID_KEY);
 
         if (userId == null)

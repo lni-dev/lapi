@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +64,7 @@ public class Footer implements Datable {
      * @return {@link Footer} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #TEXT_KEY} is missing in given data
      */
-    public static @Nullable Footer fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Footer fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String text = (String) data.get(TEXT_KEY);
 
@@ -120,8 +120,8 @@ public class Footer implements Datable {
      * Creates a {@link Data} from this {@link Footer}, useful to convert it to JSON
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(1);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(TEXT_KEY, text);
         if(iconUrl != null) data.add(ICON_URL_KEY, iconUrl);

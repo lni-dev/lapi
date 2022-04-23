@@ -16,8 +16,6 @@
 
 package me.linusdev.lapi.api.communication.gateway.command;
 
-import me.linusdev.data.Data;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

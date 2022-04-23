@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.command;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
@@ -71,13 +71,13 @@ public class ApplicationCommandInteractionDataOption implements Datable {
      * @return {@link ApplicationCommandInteractionDataOption}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */
-    public static @Nullable ApplicationCommandInteractionDataOption fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ApplicationCommandInteractionDataOption fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String name = (String) data.get(NAME_KEY);
         Number type = (Number) data.get(TYPE_KEY);
         Object value = data.get(VALUE_KEY);
-        ArrayList<ApplicationCommandInteractionDataOption> options = data.getAndConvertArrayList(OPTIONS_KEY, (ExceptionConverter<Data, ApplicationCommandInteractionDataOption, InvalidDataException>)
+        ArrayList<ApplicationCommandInteractionDataOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (ExceptionConverter<SOData, ApplicationCommandInteractionDataOption, InvalidDataException>)
                 convertible -> ApplicationCommandInteractionDataOption.fromData(lApi, convertible));
         Boolean focused = (Boolean) data.get(FOCUSED_KEY);
 
@@ -169,8 +169,8 @@ public class ApplicationCommandInteractionDataOption implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.add(NAME_KEY, name);
         data.add(TYPE_KEY, type);

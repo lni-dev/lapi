@@ -16,14 +16,13 @@
 
 package me.linusdev.lapi.api.objects.guild.member;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
-import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -35,7 +34,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">GuildImpl Member Object</a>
@@ -102,13 +101,13 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
      * @throws InvalidDataException if {@link #ROLES_KEY}, {@link #JOINED_AT_KEY}, {@link #DEAF_KEY} or {@link #MUTE_KEY} are null or missing
      */
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable Member fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Member fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
-        Data userData = (Data) data.get(USER_KEY);
+        SOData userData = (SOData) data.get(USER_KEY);
         String nick = (String) data.get(NICK_KEY);
         String avatarHash = (String) data.get(AVATAR_KEY);
-        ArrayList<Object> rolesList = (ArrayList<Object>) data.get(ROLES_KEY);
+        List<Object> rolesList = data.getList(ROLES_KEY);
         String joinedAt = (String) data.get(JOINED_AT_KEY);
         String premiumSince = (String) data.get(PREMIUM_SINCE_KEY);
         Boolean deaf = (Boolean) data.get(DEAF_KEY);
@@ -234,8 +233,8 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
      * Generate {@link Data} of this {@link Member}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(4);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(10);
 
         if(user != null) data.add(USER_KEY, user);
         if(nick != null) data.add(NICK_KEY, nick);
@@ -272,12 +271,12 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
 
-        if(user == null) this.user = User.fromData(lApi, (Data) data.get(USER_KEY));
+        if(user == null) this.user = User.fromData(lApi, (SOData) data.get(USER_KEY));
         data.processIfContained(NICK_KEY, (String str) -> this.nick = str);
         data.processIfContained(AVATAR_KEY, (String str) -> this.avatarHash = str);
-        data.processIfContained(ROLES_KEY, (ArrayList<Object> array) -> {
+        data.processIfContained(ROLES_KEY, (List<Object> array) -> {
             this.roles = new Snowflake[array.size()];
 
             int i = 0;

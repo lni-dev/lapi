@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.abstracts;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.application.Application;
@@ -149,7 +149,7 @@ public interface Message extends Datable, SnowflakeAble {
      * @return {@link MessageImplementation Message}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    static @Nullable MessageImplementation fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    static @Nullable MessageImplementation fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         return new MessageImplementation(lApi, data);
     }

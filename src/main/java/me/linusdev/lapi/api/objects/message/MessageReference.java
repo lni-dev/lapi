@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +58,7 @@ public class MessageReference implements Datable {
      * @param data {@link Data}
      * @return {@link MessageReference} or {@code null} if data was {@code null}
      */
-    public static @Nullable MessageReference fromData(@Nullable Data data){
+    public static @Nullable MessageReference fromData(@Nullable SOData data){
         if(data == null) return null;
 
         String messageId = (String) data.get(MESSAGE_ID_KEY);
@@ -133,8 +133,8 @@ public class MessageReference implements Datable {
      * @return {@link Data} for this {@link MessageReference}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         if(messageId != null) data.add(MESSAGE_ID_KEY, messageId);
         if(channelId != null) data.add(CHANNEL_ID_KEY, channelId);

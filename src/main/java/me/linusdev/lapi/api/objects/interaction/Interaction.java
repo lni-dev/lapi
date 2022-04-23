@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.interaction;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -99,19 +99,19 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #APPLICATION_ID_KEY}, {@link #TYPE_KEY}, {@link #TOKEN_KEY} or {@link #VERSION_KEY} are missing or {@code null}
      */
     @Contract("_, null -> null; _, !null -> !null;")
-    public static @Nullable Interaction fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Interaction fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         String applicationId = (String) data.get(APPLICATION_ID_KEY);
         Number type = (Number) data.get(TYPE_KEY);
-        Data interactionData = (Data) data.get(DATA_KEY);
+        SOData interactionData = (SOData) data.get(DATA_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
         String channelId = (String) data.get(CHANNEL_ID_KEY);
-        Data member = (Data) data.get(MEMBER_KEY);
-        Data user = (Data) data.get(USER_KEY);
+        SOData member = (SOData) data.get(MEMBER_KEY);
+        SOData user = (SOData) data.get(USER_KEY);
         String token = (String) data.get(TOKEN_KEY);
         Number version = (Number) data.get(VERSION_KEY);
-        Data message = (Data) data.get(MESSAGE_KEY);
+        SOData message = (SOData) data.get(MESSAGE_KEY);
 
         if(id == null || applicationId == null || type == null || token == null || version == null){
             InvalidDataException.throwException(data, null, Interaction.class,
@@ -228,8 +228,8 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(11);
 
         data.add(ID_KEY, id);
         data.add(APPLICATION_ID_KEY, applicationId);

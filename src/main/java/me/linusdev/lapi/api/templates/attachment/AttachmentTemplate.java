@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.templates.attachment;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.UnsupportedFileTypeException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
@@ -100,8 +100,8 @@ public class AttachmentTemplate implements Attachment, FilePart {
      * {@link Data}, that contains information used to upload this attachment to Discord
      */
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(PartialAttachment.FILENAME_KEY, filename);
         data.add(PartialAttachment.DESCRIPTION_KEY, description);

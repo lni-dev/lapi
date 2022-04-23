@@ -16,13 +16,10 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.PlaceHolder;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +58,7 @@ public class MessageRetriever extends DataRetriever<MessageImplementation> {
     }
 
     @Override
-    protected @Nullable MessageImplementation processData(@NotNull Data data) throws InvalidDataException {
+    protected @Nullable MessageImplementation processData(@NotNull SOData data) throws InvalidDataException {
         return new MessageImplementation(lApi, data);
     }
 }

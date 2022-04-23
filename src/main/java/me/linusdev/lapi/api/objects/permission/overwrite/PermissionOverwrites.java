@@ -16,14 +16,16 @@
 
 package me.linusdev.lapi.api.objects.permission.overwrite;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class PermissionOverwrites implements Copyable<PermissionOverwrites>, SimpleDatable {
     private ArrayList<PermissionOverwrite> overwrites;
@@ -35,19 +37,19 @@ public class PermissionOverwrites implements Copyable<PermissionOverwrites>, Sim
         Collections.addAll(this.overwrites, overwrites);
     }
 
-    public PermissionOverwrites(ArrayList<Data> overwrites) throws InvalidDataException {
+    public PermissionOverwrites(List<Object> overwrites) throws InvalidDataException {
         PermissionOverwrite[] array = new PermissionOverwrite[overwrites.size()];
 
         int i = 0;
-        for(Data data : overwrites){
-            array[i++] = new PermissionOverwrite(data);
+        for(Object o : overwrites){
+            array[i++] = new PermissionOverwrite((SOData) o);
         }
 
         this.overwrites = new ArrayList<>(array.length);
         Collections.addAll(this.overwrites, array);
     }
 
-    public ArrayList<PermissionOverwrite> getOverwrites() {
+    public List<PermissionOverwrite> getOverwrites() {
         return overwrites;
     }
 
@@ -60,6 +62,7 @@ public class PermissionOverwrites implements Copyable<PermissionOverwrites>, Sim
     public @NotNull PermissionOverwrites copy() {
         PermissionOverwrites copy = new PermissionOverwrites();
         //noinspection unchecked
+
         copy.overwrites = (ArrayList<PermissionOverwrite>) this.overwrites.clone();
         return copy;
     }

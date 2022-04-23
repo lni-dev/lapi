@@ -17,8 +17,8 @@
 package me.linusdev.lapi.api.objects.channel.thread;
 
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
@@ -56,7 +56,7 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
      * @throws InvalidDataException if {@link #ARCHIVED_KEY}, {@link #ARCHIVE_TIMESTAMP_KEY}, {@link #AUTO_ARCHIVE_DURATION_KEY} or {@link #LOCKED_KEY} are missing or null
      */
     @SuppressWarnings("ConstantConditions")
-    public ThreadMetadata(@NotNull Data data) throws InvalidDataException {
+    public ThreadMetadata(@NotNull SOData data) throws InvalidDataException {
 
         Boolean archived = (Boolean) data.get(ARCHIVED_KEY);
         String archiveTimestamp = (String) data.get(ARCHIVE_TIMESTAMP_KEY);
@@ -79,8 +79,8 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(ARCHIVED_KEY, this.archived);
         data.add(ARCHIVE_TIMESTAMP_KEY, this.archiveTimestamp);

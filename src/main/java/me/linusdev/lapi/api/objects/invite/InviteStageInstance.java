@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.invite;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.objects.guild.member.Member;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/invite#invite-stage-instance-object" target="_top">Invite Stage Instance Object</a>
@@ -67,11 +67,10 @@ public class InviteStageInstance implements Datable, HasLApi {
      * @return {@link InviteStageInstance}
      * @throws InvalidDataException if {@link #MEMBERS_KEY}, {@link #PARTICIPANT_COUNT_KEY}, {@link #SPEAKER_COUNT_KEY} or {@link #TOPIC_KEY} are missing or {@code null}
      */
-    public static @Nullable InviteStageInstance fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable InviteStageInstance fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
-        @SuppressWarnings("unchecked")
-        ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
+        List<Object> membersData = data.getList(MEMBERS_KEY);
         Number participantsCount = (Number) data.get(PARTICIPANT_COUNT_KEY);
         Number speakerCount = (Number) data.get(SPEAKER_COUNT_KEY);
         String topic = (String) data.get(TOPIC_KEY);
@@ -86,7 +85,7 @@ public class InviteStageInstance implements Datable, HasLApi {
         Member[] members = new Member[membersData.size()];
         int i = 0;
         for(Object o : membersData)
-            members[i++] = Member.fromData(lApi, (Data) o);
+            members[i++] = Member.fromData(lApi, (SOData) o);
 
         return new InviteStageInstance(lApi, members, participantsCount.intValue(), speakerCount.intValue(), topic);
     }
@@ -125,8 +124,8 @@ public class InviteStageInstance implements Datable, HasLApi {
      * @return {@link Data} for this {@link InviteStageInstance}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(MEMBERS_KEY, members);
         data.add(PARTICIPANT_COUNT_KEY, participantsCount);

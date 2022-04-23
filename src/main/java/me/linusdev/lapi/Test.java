@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
@@ -235,7 +235,7 @@ public class Test implements EventListener{
     @Override
     public void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {
         System.out.println("onGuildUpdate");
-        System.out.println(((Data)event.getPayload().getPayloadData()).getJsonString());
+        System.out.println(((SOData)event.getPayload().getPayloadData()).toJsonString());
     }
 
     @Override
@@ -391,9 +391,9 @@ public class Test implements EventListener{
     @Override
     public void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {
         System.out.println("onVoiceStateUpdate");
-        System.out.println("updated: " + event.getVoiceState().getData().getJsonString());
+        System.out.println("updated: " + event.getVoiceState().getData().toJsonString());
         if(!event.isNewVoiceState()){
-            System.out.println("old: " + event.getOldVoiceState().getData().getJsonString());
+            System.out.println("old: " + event.getOldVoiceState().getData().toJsonString());
         }
 
     }

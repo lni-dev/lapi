@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.lapiandqueue;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
@@ -370,10 +370,10 @@ public class LApiImpl implements LApi {
 
     public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
 
-        Data queryStringsData = null;
+        SOData queryStringsData = null;
 
         if(anchorMessageId != null || limit != null){
-            queryStringsData = new Data(2);
+            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
 
             if(anchorMessageId != null) {
                 if (anchorType == AnchorType.AROUND) queryStringsData.add(GetLinkQuery.AROUND_KEY, anchorMessageId);
@@ -388,7 +388,7 @@ public class LApiImpl implements LApi {
 
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_MESSAGES, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
+        return new ArrayRetriever<SOData, MessageImplementation>(this, query, MessageImplementation::new);
     }
 
     public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
@@ -400,10 +400,10 @@ public class LApiImpl implements LApi {
     }
 
     public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable String afterUserId, @Nullable Integer limit){
-        Data queryStringsData = null;
+        SOData queryStringsData = null;
 
         if(afterUserId != null || limit != null) {
-            queryStringsData = new Data(2);
+            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
             if (afterUserId != null) queryStringsData.add(GetLinkQuery.AFTER_KEY, afterUserId);
             if (limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
         }
@@ -427,13 +427,13 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_INVITES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, Invite>(this, query, Invite::fromData);
+        return new ArrayRetriever<SOData, Invite>(this, query, Invite::fromData);
     }
 
     public @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_PINNED_MESSAGES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, MessageImplementation>(this, query, MessageImplementation::new);
+        return new ArrayRetriever<SOData, MessageImplementation>(this, query, MessageImplementation::new);
     }
 
     public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
@@ -445,7 +445,7 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
         GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<Data, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+        return new ArrayRetriever<SOData, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     @SuppressWarnings("removal")
@@ -458,9 +458,9 @@ public class LApiImpl implements LApi {
 
     public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
 
-        Data queryStringsData = null;
+        SOData queryStringsData = null;
         if(before != null || limit != null) {
-            queryStringsData = new Data(2);
+            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
             queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
             queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
         }
@@ -475,9 +475,9 @@ public class LApiImpl implements LApi {
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
-        Data queryStringsData = null;
+        SOData queryStringsData = null;
         if(before != null || limit != null) {
-            queryStringsData = new Data(2);
+            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
             queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
             queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
         }
@@ -492,9 +492,9 @@ public class LApiImpl implements LApi {
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
-        Data queryStringsData = null;
+        SOData queryStringsData = null;
         if(before != null || limit != null) {
-            queryStringsData = new Data(2);
+            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
             queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
             queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
         }

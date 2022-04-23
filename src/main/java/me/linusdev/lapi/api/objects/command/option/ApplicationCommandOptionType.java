@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.command.option;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -71,16 +71,16 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
             BOOLEAN = new ApplicationCommandOptionType<>(5, (lApi, convertible) -> (Boolean) convertible);
 
     public static final ApplicationCommandOptionType<Object, User, InvalidDataException>
-            USER = new ApplicationCommandOptionType<>(6, (lApi, convertible) -> User.fromData(lApi, (Data) convertible));
+            USER = new ApplicationCommandOptionType<>(6, (lApi, convertible) -> User.fromData(lApi, (SOData) convertible));
 
     /**
      * Includes all channel types + categories
      */
     public static final ApplicationCommandOptionType<Object, Channel, InvalidDataException>
-            CHANNEL = new ApplicationCommandOptionType<>(7, (lApi, convertible) -> Channel.fromData(lApi, (Data) convertible));
+            CHANNEL = new ApplicationCommandOptionType<>(7, (lApi, convertible) -> Channel.fromData(lApi, (SOData) convertible));
 
     public static final ApplicationCommandOptionType<Object, Role, InvalidDataException>
-            ROLE = new ApplicationCommandOptionType<>(8, (lApi, convertible) -> Role.fromData(lApi, (Data) convertible));
+            ROLE = new ApplicationCommandOptionType<>(8, (lApi, convertible) -> Role.fromData(lApi, (SOData) convertible));
 
     /**
      * Includes users and roles

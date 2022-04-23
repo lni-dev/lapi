@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -40,7 +40,7 @@ public class GuildStageChannel extends GuildVoiceChannel implements GuildStageCh
         this.topic = topic;
     }
 
-    public GuildStageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public GuildStageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
         this.topic = (String) data.get(Channel.TOPIC_KEY, null);
     }
@@ -69,7 +69,7 @@ public class GuildStageChannel extends GuildVoiceChannel implements GuildStageCh
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         super.updateSelfByData(data);
         data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
     }

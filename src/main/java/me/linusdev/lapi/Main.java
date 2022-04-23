@@ -129,7 +129,7 @@ public class Main {
                 if(error.getThrowable() instanceof InvalidDataException){
                     InvalidDataException e = (InvalidDataException) error.getThrowable();
                     System.out.println(e.getMissingFields());
-                    System.out.println(e.getData().getJsonString().toString());
+                    System.out.println(e.getData().toJsonString().toString());
                 }
                 return;
             }
@@ -156,7 +156,7 @@ public class Main {
         api.getActiveThreadsRetriever("912377387868639282").queue((threadResponseBody, error) -> {
             if(error != null){
                 System.out.println("Error");
-                System.out.println(((InvalidDataException) error.getThrowable()).getData().getJsonString());
+                System.out.println(((InvalidDataException) error.getThrowable()).getData().toJsonString());
                 return;
             }
             System.out.println("getListActiveThreadsRetriever...");
@@ -198,7 +198,7 @@ public class Main {
                 error.getThrowable().printStackTrace();
                 if(error.getThrowable() instanceof InvalidDataException){
                     System.out.println("Invalid Data:");
-                    System.out.println(((InvalidDataException) error.getThrowable()).getData().getJsonString());
+                    System.out.println(((InvalidDataException) error.getThrowable()).getData().toJsonString());
                 }
                 return;
             }
@@ -221,7 +221,7 @@ public class Main {
         api.getChannelMessageRetriever("912377387868639282", "913107065285800026").queue(message -> {
             String content = message.getContent();
             Reaction reaction = message.getReactions()[1];
-            System.out.println(reaction.getData().getJsonString());
+            System.out.println(reaction.getData().toJsonString());
             System.out.println(content);
         });
 

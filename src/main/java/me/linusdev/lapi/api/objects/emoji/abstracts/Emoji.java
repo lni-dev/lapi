@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.emoji.abstracts;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -105,8 +105,8 @@ public interface Emoji extends Datable {
             }
 
             @Override
-            public Data getData() {
-                Data data = new Data(3);
+            public SOData getData() {
+                SOData data = SOData.newOrderedDataWithKnownSize(3);
                 data.add(ID_KEY, id);
                 data.add(NAME_KEY, name);
                 data.add(ANIMATED_KEY, animated);

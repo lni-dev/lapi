@@ -16,19 +16,15 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.parser.exceptions.ParseException;
+
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 /**
  * This class is used to retrieve a {@link Channel}.
@@ -43,7 +39,7 @@ public class ChannelRetriever extends DataRetriever<Channel>{
     }
 
     @Override
-    protected @Nullable Channel processData(@NotNull Data data) throws InvalidDataException {
+    protected @Nullable Channel processData(@NotNull SOData data) throws InvalidDataException {
         return Channel.fromData(lApi, data);
     }
 }

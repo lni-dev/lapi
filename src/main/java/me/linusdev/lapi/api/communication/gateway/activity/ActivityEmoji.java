@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -57,7 +57,7 @@ public class ActivityEmoji implements Emoji, Datable {
      * @throws InvalidDataException if {@link #NAME_KEY} is missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ActivityEmoji fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable ActivityEmoji fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String name = (String) data.get(NAME_KEY);
@@ -107,8 +107,8 @@ public class ActivityEmoji implements Emoji, Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(NAME_KEY, name);
         data.addIfNotNull(ID_KEY, id);

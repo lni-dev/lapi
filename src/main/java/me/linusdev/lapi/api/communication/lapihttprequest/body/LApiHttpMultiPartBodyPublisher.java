@@ -107,7 +107,7 @@ public class LApiHttpMultiPartBodyPublisher implements HttpRequest.BodyPublisher
         this.boundaryBytes = ("--" + boundaryString + END_OF_LINE).getBytes(StandardCharsets.UTF_8);
 
         if(body.getJsonPart() != null) {
-            this.json = new JsonParser().getJsonString(body.getJsonPart()).toString();
+            this.json = body.getJsonPart().toJsonString().toString();
             this.json = this.json.replace("\n", END_OF_LINE);
             if (!this.json.endsWith(END_OF_LINE)) {
                 this.json = this.json + END_OF_LINE;

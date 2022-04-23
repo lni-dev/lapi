@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.sticker;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +57,7 @@ public class StickerItem implements Datable {
      * @return {@link StickerItem}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY} or {@link #FORMAT_TYPE_KEY} are missing
      */
-    public static @NotNull StickerItem fromData(Data data) throws InvalidDataException {
+    public static @NotNull StickerItem fromData(SOData data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
         Number type = (Number) data.get(FORMAT_TYPE_KEY);
@@ -104,8 +104,8 @@ public class StickerItem implements Datable {
      * @return {@link Data} for this {@link StickerItem}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

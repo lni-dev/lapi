@@ -16,9 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,19 +45,19 @@ public class WelcomeScreen implements Datable {
         this.welcomeChannels = welcomeChannels;
     }
 
-    public static @Nullable WelcomeScreen fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable WelcomeScreen fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String description = (String) data.get(DESCRIPTION_KEY);
-        ArrayList<WelcomeScreenChannelStructure> channels = data.getAndConvertArrayList(WELCOME_CHANNELS_KEY, (ExceptionConverter<Data, WelcomeScreenChannelStructure, InvalidDataException>) WelcomeScreenChannelStructure::fromData);
+        ArrayList<WelcomeScreenChannelStructure> channels = data.getListAndConvertWithException(WELCOME_CHANNELS_KEY, WelcomeScreenChannelStructure::fromData);
 
 
         return new WelcomeScreen(description, channels == null ? new WelcomeScreenChannelStructure[0] : channels.toArray(new WelcomeScreenChannelStructure[0]));
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(DESCRIPTION_KEY, description);
         data.add(WELCOME_CHANNELS_KEY, welcomeChannels);

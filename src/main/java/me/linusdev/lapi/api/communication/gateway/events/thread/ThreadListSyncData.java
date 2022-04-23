@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.thread;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -70,24 +70,23 @@ public class ThreadListSyncData implements Datable, HasLApi {
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ThreadListSyncData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ThreadListSyncData fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if (data == null) return null;
 
         String guildId = (String) data.get(GUILD_ID_KEY);
 
-        ArrayList<Snowflake> channelIds = data.getAndConvertArrayList(CHANNEL_IDS_KEY,
+        ArrayList<Snowflake> channelIds = data.getListAndConvertWithException(CHANNEL_IDS_KEY,
                 (ExceptionConverter<String, Snowflake, InvalidDataException>) Snowflake::fromString);
 
-        ArrayList<Thread<?>> threads = data.getAndConvertArrayList(THREADS_KEY,
-                (ExceptionConverter<Data, Thread<?>, InvalidDataException>) convertible -> {
+        ArrayList<Thread<?>> threads = data.getListAndConvertWithException(THREADS_KEY,
+                (ExceptionConverter<SOData, Thread<?>, InvalidDataException>) convertible -> {
                     Channel<?> channel = Channel.fromData(lApi, convertible);
                     if(!(channel instanceof Thread))
                         throw new InvalidDataException(convertible, "wrong type: " + channel.getType() + ". expected Thread!");
                     return (Thread<?>) channel;
                 });
 
-        ArrayList<ThreadMember> members = data.getAndConvertArrayList(MEMBERS_KEY,
-                (ExceptionConverter<Data, ThreadMember, InvalidDataException>) ThreadMember::fromData);
+        ArrayList<ThreadMember> members = data.getListAndConvertWithException(MEMBERS_KEY, ThreadMember::fromData);
 
         if(guildId == null || threads == null || members == null) {
             InvalidDataException.throwException(data, null, ThreadListSyncData.class,
@@ -137,8 +136,8 @@ public class ThreadListSyncData implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(GUILD_ID_KEY, guildId);
         data.addIfNotNull(CHANNEL_IDS_KEY, channelIds);

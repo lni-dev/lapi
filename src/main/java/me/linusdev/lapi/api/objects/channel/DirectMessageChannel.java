@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-dm-channel">Example DM Channel</a>
@@ -50,17 +51,17 @@ public class DirectMessageChannel extends Channel<DirectMessageChannel> implemen
 
     }
 
-    public DirectMessageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public DirectMessageChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
 
-        ArrayList<Data> recipients = (ArrayList<Data>) data.get(RECIPIENTS_KEY);
+        List<SOData> recipients = (List<SOData>) data.get(RECIPIENTS_KEY);
 
         if(recipients == null)
             throw new InvalidDataException(data, "field '" + RECIPIENTS_KEY + "' missing or null in " + this.getClass().getSimpleName() + " with id:" + getId()).addMissingFields(RECIPIENTS_KEY);
 
         this.recipients = new Recipient[recipients.size()];
         int i = 0;
-        for(Data d : recipients) this.recipients[i++] = new Recipient(lApi, d);
+        for(SOData d : recipients) this.recipients[i++] = new Recipient(lApi, d);
 
         this.lastMessageId = Snowflake.fromString((String) data.get(LAST_MESSAGE_ID_KEY));
         this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
@@ -104,13 +105,13 @@ public class DirectMessageChannel extends Channel<DirectMessageChannel> implemen
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         super.updateSelfByData(data);
-        ArrayList<Object> rs = (ArrayList<Object>) data.get(RECIPIENTS_KEY);
+        List<Object> rs = data.getList(RECIPIENTS_KEY);
         if(rs != null) {
             this.recipients = new Recipient[rs.size()];
             int i = 0;
-            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(Data) d);
+            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(SOData) d);
         }
 
         data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));

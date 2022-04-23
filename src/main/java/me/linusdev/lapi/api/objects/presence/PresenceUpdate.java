@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.presence;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
@@ -74,15 +74,14 @@ public class PresenceUpdate implements Datable, CopyAndUpdatable<PresenceUpdate>
     }
 
     @Contract("null -> null; !null -> !null")
-    public static @Nullable PresenceUpdate fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable PresenceUpdate fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
-        Data userData = (Data) data.get(USER_KEY);
+        SOData userData = (SOData) data.get(USER_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
         String status = (String) data.get(STATUS_KEY);
-        ArrayList<Activity> activities = data.getAndConvertArrayList(ACTIVITIES_KEY,
-                (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
-        Data clientStatusData = (Data) data.get(CLIENT_STATUS_KEY);
+        ArrayList<Activity> activities = data.getListAndConvertWithException(ACTIVITIES_KEY, Activity::fromData);
+        SOData clientStatusData = (SOData) data.get(CLIENT_STATUS_KEY);
 
         return new PresenceUpdate(
                 userData == null ? null : new PartialUser(userData),
@@ -129,8 +128,8 @@ public class PresenceUpdate implements Datable, CopyAndUpdatable<PresenceUpdate>
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.addIfNotNull(USER_KEY, user);
         data.addIfNotNull(GUILD_ID_KEY, guildId);
@@ -151,17 +150,16 @@ public class PresenceUpdate implements Datable, CopyAndUpdatable<PresenceUpdate>
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         //user is not updated
         //guildId is not updated
         data.processIfContained(STATUS_KEY, (String str) -> status = StatusType.fromValue(str));
 
-        ArrayList<Activity> activities = data.getAndConvertArrayList(ACTIVITIES_KEY,
-                (ExceptionConverter<Data, Activity, InvalidDataException>) Activity::fromData);
+        ArrayList<Activity> activities = data.getListAndConvertWithException(ACTIVITIES_KEY, Activity::fromData);
 
         if(activities != null) this.activities = activities;
 
-        data.processIfContained(CLIENT_STATUS_KEY, (Data d) -> this.clientStatus = ClientStatus.fromData(d));
+        data.processIfContained(CLIENT_STATUS_KEY, (SOData d) -> this.clientStatus = ClientStatus.fromData(d));
     }
 
 }

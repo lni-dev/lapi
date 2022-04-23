@@ -16,8 +16,9 @@
 
 package me.linusdev.lapi.api.communication.lapihttprequest;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.Entry;
+import me.linusdev.data.entry.Entry;
+import me.linusdev.data.so.SOData;
+import me.linusdev.data.so.SOEntryImpl;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpMultiPartBodyPublisher;
@@ -42,7 +43,7 @@ public class LApiHttpRequest {
     private final String uri;
     private final Method method;
     private final LApiHttpBody body;
-    private final Data queryStrings;
+    private final SOData queryStrings;
     private final ArrayList<LApiHttpHeader> headers;
     private Duration timeout;
 
@@ -53,7 +54,7 @@ public class LApiHttpRequest {
      * @param body of the request
      * @throws IllegalRequestMethodException
      */
-    public LApiHttpRequest(@NotNull String uri, @NotNull Method method, @Nullable LApiHttpBody body, @Nullable Data queryStrings) throws IllegalRequestMethodException {
+    public LApiHttpRequest(@NotNull String uri, @NotNull Method method, @Nullable LApiHttpBody body, @Nullable SOData queryStrings) throws IllegalRequestMethodException {
         this.uri = uri;
         this.method = method;
         this.body = body;
@@ -98,7 +99,7 @@ public class LApiHttpRequest {
         if(queryStrings != null) {
             //TODO some characters might have to be escaped
             boolean first = true;
-            for (Entry entry : queryStrings) {
+            for (Entry<String, Object> entry : queryStrings) {
                 if(first){
                     uri.append("?");
                     first = false;
@@ -135,7 +136,7 @@ public class LApiHttpRequest {
                 builder.method(method.getMethod(), publisher);
             }else if(body.hasJsonPart()){
                 builder.header(CONTENT_TYPE_HEADER, "application/json");
-                builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(body.getJsonPart().getJsonString().toString()));
+                builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(body.getJsonPart().toJsonString().toString()));
             }else{
                 //TODO add the support of single file bodies
                 throw new UnsupportedOperationException();

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild.scheduledevent;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -126,7 +126,7 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
      * @return {@link GuildScheduledEvent}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #NAME_KEY}, {@link #SCHEDULED_START_TIME_KEY}, {@link #PRIVACY_LEVEL_KEY}, {@link #STATUS_KEY} or {@link #ENTITY_TYPE_KEY} are null or missing
      */
-    public static @Nullable GuildScheduledEvent fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable GuildScheduledEvent fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -141,8 +141,8 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
         Number status = (Number) data.get(STATUS_KEY);
         Number entityType = (Number) data.get(ENTITY_TYPE_KEY);
         String entityId = (String) data.get(ENTITY_ID_KEY);
-        Data entityMetadata = (Data) data.get(ENTITY_METADATA_KEY);
-        Data creator = (Data) data.get(CREATOR_KEY);
+        SOData entityMetadata = (SOData) data.get(ENTITY_METADATA_KEY);
+        SOData creator = (SOData) data.get(CREATOR_KEY);
         Number userCount = (Number) data.get(USER_COUNT_KEY);
 
         if(id == null || guildId == null || name == null || scheduledStartTime == null ||
@@ -299,8 +299,8 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
      * @return {@link Data} for this {@link GuildScheduledEvent}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(0);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(15);
 
         data.add(ID_KEY, id);
         data.add(GUILD_ID_KEY, guildId);

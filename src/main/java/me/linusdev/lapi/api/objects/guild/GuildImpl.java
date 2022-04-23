@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
@@ -145,7 +145,7 @@ public class GuildImpl implements Guild {
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable GuildImpl fromData(@NotNull LApiImpl lApi, @Nullable Data data){
+    public static @Nullable GuildImpl fromData(@NotNull LApiImpl lApi, @Nullable SOData data){
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -293,9 +293,9 @@ public class GuildImpl implements Guild {
     }
 
     @Override
-    public Data getData() {
+    public SOData getData() {
 
-        Data data = new Data(1);
+        SOData data = SOData.newOrderedDataWithKnownSize(1);
         //TODO
         return data;
     }

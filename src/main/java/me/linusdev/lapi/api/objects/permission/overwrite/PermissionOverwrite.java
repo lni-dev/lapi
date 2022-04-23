@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.permission.overwrite;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
@@ -67,7 +67,7 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
     private @NotNull final String deny;
 
 
-    private @Nullable Data data;
+    private @Nullable SOData data;
 
 
     /**
@@ -90,7 +90,7 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
      * @param data to read from
      * @throws InvalidDataException if given {@link Data} does not match a {@link PermissionOverwrite}
      */
-    public PermissionOverwrite(@NotNull Data data) throws InvalidDataException {
+    public PermissionOverwrite(@NotNull SOData data) throws InvalidDataException {
         this.data = data;
         this.id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
         this.type = ((Number)data.getOrDefault(TYPE_KEY, -1)).intValue();
@@ -155,9 +155,9 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
     }
 
     @Override
-    public Data getData() {
+    public SOData getData() {
         if(data != null) return data;
-        data = new Data(4);
+        data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(ID_KEY, id);
         data.add(TYPE_KEY, type);

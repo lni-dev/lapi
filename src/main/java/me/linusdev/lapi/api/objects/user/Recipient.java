@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.user;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -51,7 +51,7 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable, 
         this.avatarHash = avatarHash;
     }
 
-    public Recipient(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public Recipient(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.lApi = lApi;
         this.username = (String) data.getOrDefault(USERNAME_KEY, null);
         this.discriminator = (String) data.getOrDefault(DISCRIMINATOR_KEY, null);
@@ -88,8 +88,8 @@ public class Recipient implements BasicUserInformation, SnowflakeAble, Datable, 
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(USERNAME_KEY, username);
         data.add(DISCRIMINATOR_KEY, discriminator);

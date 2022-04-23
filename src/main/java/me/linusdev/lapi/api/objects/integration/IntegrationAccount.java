@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.integration;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ public class IntegrationAccount implements Datable {
      */
     @Contract("!null -> !null")
     @SuppressWarnings("ConstantConditions")
-    public static @Nullable IntegrationAccount fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable IntegrationAccount fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -86,8 +86,8 @@ public class IntegrationAccount implements Datable {
      * @return {@link Data}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

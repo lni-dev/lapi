@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.application.team;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -67,11 +67,11 @@ public class TeamMember implements Datable, HasLApi {
      * @return {@link TeamMember}
      * @throws InvalidDataException if {@link #MEMBERSHIP_STATE_KEY}, {@link #PERMISSIONS_KEY}, {@link #TEAM_ID_KEY} or {@link #USER_KEY} are missing or null
      */
-    public static @NotNull TeamMember fromData(final @NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull TeamMember fromData(final @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number memberShipStateNumber = (Number) data.get(MEMBERSHIP_STATE_KEY);
         ArrayList<Objects> permissionArray = (ArrayList<Objects>) data.get(PERMISSIONS_KEY);
         String teamId = (String) data.get(TEAM_ID_KEY);
-        Data userData = (Data) data.get(USER_KEY);
+        SOData userData = (SOData) data.get(USER_KEY);
 
         if(memberShipStateNumber == null || permissionArray == null || teamId == null || userData == null){
             InvalidDataException exception = new InvalidDataException(data, "Invalid Data in " + TeamMember.class.getSimpleName());
@@ -131,8 +131,8 @@ public class TeamMember implements Datable, HasLApi {
      * Generate {@link Data} from this {@link TeamMember}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(MEMBERSHIP_STATE_KEY, membershipState);
         data.add(PERMISSIONS_KEY, permissions);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.role;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ public class RoleTags implements Datable, Copyable<RoleTags> {
      * @param data {@link Data}
      * @return {@link RoleTags}
      */
-    public static @Nullable RoleTags fromData(@Nullable Data data){
+    public static @Nullable RoleTags fromData(@Nullable SOData data){
         if(data == null) return null;
         String botId = (String) data.get(BOT_ID_KEY);
         String integrationId = (String) data.get(INTEGRATION_ID_KEY);
@@ -109,8 +109,8 @@ public class RoleTags implements Datable, Copyable<RoleTags> {
      * @return {@link Data} for this {@link RoleTags}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(BOT_ID_KEY, botId);
         data.add(INTEGRATION_ID_KEY, integrationId);

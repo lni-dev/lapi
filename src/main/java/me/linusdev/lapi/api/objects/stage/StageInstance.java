@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.stage;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import org.jetbrains.annotations.NotNull;
@@ -109,8 +109,8 @@ public class StageInstance implements Datable, SnowflakeAble {
      * @return {@link Data} for this {@link StageInstance}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(6);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(ID_KEY, id);
         data.add(GUILD_ID_KEY, guildId);

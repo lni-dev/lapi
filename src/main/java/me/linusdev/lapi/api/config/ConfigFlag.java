@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.config;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -221,7 +221,7 @@ public enum ConfigFlag implements SimpleDatable {
         this.value = value;
     }
 
-    public static long fromData(@NotNull Data data){
+    public static long fromData(@NotNull SOData data){
         long flags = 0;
 
         for(ConfigFlag flag : ConfigFlag.values()){
@@ -239,9 +239,9 @@ public enum ConfigFlag implements SimpleDatable {
      * @param flags long with set bits
      * @return {@link Data} representing given flags
      */
-    public static @NotNull Data toData(long flags){
+    public static @NotNull SOData toData(long flags){
         ConfigFlag[] values = ConfigFlag.values();
-        Data data = new Data(values.length);
+        SOData data = SOData.newOrderedDataWithKnownSize(values.length);
 
         for(ConfigFlag flag : values) {
             if(flag == NOTHING) continue;

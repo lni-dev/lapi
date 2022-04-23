@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.integration;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -88,7 +88,7 @@ public class Integration implements Datable, SnowflakeAble, HasLApi {
     }
 
     @Contract("_, !null -> !null; _, null -> null")
-    public static @Nullable Integration fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Integration fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -100,12 +100,12 @@ public class Integration implements Datable, SnowflakeAble, HasLApi {
         Boolean enabledEmoticons = (Boolean) data.get(ENABLE_EMOTICONS_KEY);
         Number expireBehavior = (Number) data.get(EXPIRE_BEHAVIOR_KEY);
         Number expireGracePeriod = (Number) data.get(EXPIRE_GRACE_PERIOD_KEY);
-        Data user = (Data) data.get(USER_KEY);
-        Data account = (Data) data.get(ACCOUNT_KEY);
+        SOData user = (SOData) data.get(USER_KEY);
+        SOData account = (SOData) data.get(ACCOUNT_KEY);
         String syncedAt = (String) data.get(SYNCED_AT_KEY);
         Number subscriberCount = (Number) data.get(SUBSCRIBER_COUNT_KEY);
         Boolean revoked = (Boolean) data.get(REVOKED_KEY);
-        Data application = (Data) data.get(APPLICATION_KEY);
+        SOData application = (SOData) data.get(APPLICATION_KEY);
 
         if(id == null || name == null || type == null || enabled == null || account == null){
             InvalidDataException.throwException(data, null, Integration.class,
@@ -228,8 +228,8 @@ public class Integration implements Datable, SnowflakeAble, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(15);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

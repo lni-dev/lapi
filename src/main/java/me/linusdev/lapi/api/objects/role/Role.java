@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.role;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -121,7 +121,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
      */
     @Contract("_, null -> null; _, !null -> !null")
     @SuppressWarnings("ConstantConditions")
-    public static @Nullable Role fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Role fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
@@ -133,7 +133,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
         String permissions = (String) data.get(PERMISSIONS_KEY);
         Boolean managed = (Boolean) data.get(MANAGED_KEY);
         Boolean mentionable = (Boolean) data.get(MENTIONABLE_KEY);
-        Data tagsData = (Data) data.get(TAGS_KEY);
+        SOData tagsData = (SOData) data.get(TAGS_KEY);
 
         if(id == null || name == null || color == null
                 || hoist == null || position == null || permissions == null || managed == null || mentionable == null){
@@ -264,8 +264,8 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
      * @return {@link Data} for this {@link Role}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(11);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(11);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);
@@ -288,7 +288,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         try{
             data.processIfContained(NAME_KEY, (String name) -> this.name = Objects.requireNonNull(name));
             data.processIfContained(COLOR_KEY, (Number color) -> this.color = Objects.requireNonNull(color).intValue());
@@ -302,7 +302,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
             });
             data.processIfContained(MANAGED_KEY, (Boolean managed) -> this.managed = Objects.requireNonNull(managed));
             data.processIfContained(MENTIONABLE_KEY, (Boolean mentionable) -> this.mentionable = Objects.requireNonNull(mentionable));
-            data.processIfContained(TAGS_KEY, (Data d) -> this.tags = RoleTags.fromData(Objects.requireNonNull(d)));
+            data.processIfContained(TAGS_KEY, (SOData d) -> this.tags = RoleTags.fromData(Objects.requireNonNull(d)));
 
         }catch (NullPointerException e){
             throw new InvalidDataException(data, "NotNull field is set to null!", e);

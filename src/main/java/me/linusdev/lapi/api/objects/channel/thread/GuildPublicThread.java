@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel.thread;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -66,15 +66,15 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
         this.permissionsAsString = permissionsAsString;
     }
 
-    public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public GuildPublicThread(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
 
         String name = (String) data.get(NAME_KEY);
         Snowflake guildId = Snowflake.fromString((String) data.get(GUILD_ID_KEY));
         Snowflake parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
         Snowflake ownerId = Snowflake.fromString((String) data.get(OWNER_ID_KEY));
-        Data threadMetadataData = (Data) data.get(THREAD_METADATA_KEY);
-        Data member = (Data) data.get(MEMBER_KEY);
+        SOData threadMetadataData = (SOData) data.get(THREAD_METADATA_KEY);
+        SOData member = (SOData) data.get(MEMBER_KEY);
         Integer defaultAutoArchiveDuration = (Integer) data.get(DEFAULT_AUTO_ARCHIVE_DURATION_KEY);
         String permissionsAsString = (String) data.get(PERMISSIONS_KEY);
 
@@ -93,13 +93,13 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
         this.name = name;
         this.guildId = guildId;
         this.parentId = parentId;
-        this.rateLimitPerUser = ((Number) data.getOrDefault(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
+        this.rateLimitPerUser = ((Number) data.getOrDefaultBoth(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
         this.lastMessageId = Snowflake.fromString((String) data.getOrDefault(LAST_MESSAGE_ID_KEY, null));
         this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
         this.ownerId = ownerId;
         this.threadMetadata = new ThreadMetadata(threadMetadataData);
-        this.memberCount = ((Number) data.getOrDefault(MEMBER_COUNT_KEY, 0)).intValue();
-        this.messageCount = ((Number) data.getOrDefault(MESSAGE_COUNT_KEY, 0)).intValue();
+        this.memberCount = ((Number) data.getOrDefaultBoth(MEMBER_COUNT_KEY, 0)).intValue();
+        this.messageCount = ((Number) data.getOrDefaultBoth(MESSAGE_COUNT_KEY, 0)).intValue();
         this.member = ThreadMember.fromData(member);
         this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
         this.permissionsAsString = permissionsAsString;
@@ -213,7 +213,7 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         super.updateSelfByData(data);
 
         data.processIfContained(NAME_KEY, (String str) -> this.name = str);
@@ -225,7 +225,7 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
         data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
         data.processIfContained(OWNER_ID_KEY, (String str) -> this.ownerId = Snowflake.fromString(str));
 
-        Data d = (Data) data.get(THREAD_METADATA_KEY);
+        SOData d = (SOData) data.get(THREAD_METADATA_KEY);
         if (d != null) {
             this.threadMetadata = new ThreadMetadata(d);
         }
@@ -233,7 +233,7 @@ public class GuildPublicThread extends Channel<GuildPublicThread> implements Thr
         data.processIfContained(MESSAGE_COUNT_KEY, (Number num) -> {if(num != null)this.messageCount = num.intValue();});
         data.processIfContained(MEMBER_COUNT_KEY, (Number num) -> {if(num != null)this.memberCount = num.intValue();});
 
-        d = (Data) data.get(MEMBER_KEY);
+        d = (SOData) data.get(MEMBER_KEY);
         if (d != null) {
             this.member = ThreadMember.fromData(d);
         }

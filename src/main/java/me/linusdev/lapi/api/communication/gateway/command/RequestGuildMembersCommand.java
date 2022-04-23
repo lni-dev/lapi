@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.command;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -45,7 +45,7 @@ public class RequestGuildMembersCommand extends GatewayCommand implements HasLAp
      * @param lApi {@link LApi}
      * @param data {@link Data} with required fields
      */
-    RequestGuildMembersCommand(@NotNull LApi lApi, @Nullable Data data) {
+    RequestGuildMembersCommand(@NotNull LApi lApi, @Nullable SOData data) {
         super(GatewayCommandType.REQUEST_GUILD_MEMBERS, data);
         this.lApi = lApi;
     }
@@ -77,7 +77,7 @@ public class RequestGuildMembersCommand extends GatewayCommand implements HasLAp
 
         if(query == null && userIds == null) throw new IllegalArgumentException("one of query or userIds must not be null!");
 
-        Data data = new Data(6);
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(GUILD_ID_KEY, guildId);
         data.add(QUERY_KEY, query);
@@ -116,7 +116,7 @@ public class RequestGuildMembersCommand extends GatewayCommand implements HasLAp
 
         if(query == null && userIds == null) throw new IllegalArgumentException("one of query or userIds must not be null!");
 
-        Data data = new Data(6);
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(GUILD_ID_KEY, guildId);
         data.add(QUERY_KEY, query);

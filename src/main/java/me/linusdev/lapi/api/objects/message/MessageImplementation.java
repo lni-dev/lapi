@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.application.Application;
@@ -73,23 +73,23 @@ public class MessageImplementation extends AbstractMessage {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    public MessageImplementation(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public MessageImplementation(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         super(lApi, data);
 
         String guildId = (String) data.get(GUILD_ID_KEY);
-        Data member = (Data) data.get(MEMBER_KEY);
+        SOData member = (SOData) data.get(MEMBER_KEY);
         ArrayList<Object> mentionChannelsData = (ArrayList<Object>) data.get(MENTION_CHANNELS_KEY);
         ArrayList<Object> reactionsData = (ArrayList<Object>) data.get(REACTIONS_KEY);
         Object nonce = (Object) data.get(NONCE_KEY);
         String webhookId = (String) data.get(WEBHOOK_ID_KEY);
-        Data activity = (Data) data.get(ACTIVITY_KEY);
-        Data application = (Data) data.get(APPLICATION_KEY);
+        SOData activity = (SOData) data.get(ACTIVITY_KEY);
+        SOData application = (SOData) data.get(APPLICATION_KEY);
         String applicationId = (String) data.get(APPLICATION_ID_KEY);
-        Data messageReference = (Data) data.get(MESSAGE_REFERENCE_KEY);
+        SOData messageReference = (SOData) data.get(MESSAGE_REFERENCE_KEY);
         Number flags = (Number) data.get(FLAGS_KEY);
-        Data referencedMessage = (Data) data.get(REFERENCED_MESSAGE_KEY);
-        Data interaction = (Data) data.get(INTERACTION_KEY);
-        Data thread = (Data) data.get(THREAD_KEY);
+        SOData referencedMessage = (SOData) data.get(REFERENCED_MESSAGE_KEY);
+        SOData interaction = (SOData) data.get(INTERACTION_KEY);
+        SOData thread = (SOData) data.get(THREAD_KEY);
         ArrayList<Object> components = (ArrayList<Object>) data.get(COMPONENTS_KEY);
         ArrayList<Object> stickerItems = (ArrayList<Object>) data.get(STICKER_ITEMS_KEY);
         ArrayList<Object> stickers = (ArrayList<Object>) data.get(STICKERS_KEY);
@@ -102,7 +102,7 @@ public class MessageImplementation extends AbstractMessage {
             this.mentionChannels = new ChannelMention[mentionChannelsData.size()];
             int i = 0;
             for(Object o : mentionChannelsData)
-                this.mentionChannels[i++] = new ChannelMention((Data) o);
+                this.mentionChannels[i++] = new ChannelMention((SOData) o);
         }else {
             this.mentionChannels = null;
         }
@@ -111,7 +111,7 @@ public class MessageImplementation extends AbstractMessage {
             this.reactions = new Reaction[reactionsData.size()];
             int i = 0;
             for(Object o : reactionsData)
-                this.reactions[i++] = Reaction.fromData(lApi, (Data) o);
+                this.reactions[i++] = Reaction.fromData(lApi, (SOData) o);
         }else {
             this.reactions = null;
         }
@@ -132,7 +132,7 @@ public class MessageImplementation extends AbstractMessage {
             this.components = new Component[components.size()];
             int i = 0;
             for(Object o : components)
-                this.components[i++] = Component.fromData(lApi, (Data) o);
+                this.components[i++] = Component.fromData(lApi, (SOData) o);
         }else {
             this.components = null;
         }
@@ -141,7 +141,7 @@ public class MessageImplementation extends AbstractMessage {
             this.stickerItems = new StickerItem[stickerItems.size()];
             int i = 0;
             for(Object o : stickerItems)
-                this.stickerItems[i++] = StickerItem.fromData((Data) o);
+                this.stickerItems[i++] = StickerItem.fromData((SOData) o);
         }else {
             this.stickerItems = null;
         }
@@ -150,7 +150,7 @@ public class MessageImplementation extends AbstractMessage {
             this.stickers = new Sticker[stickers.size()];
             int i = 0;
             for(Object o : stickers)
-                this.stickers[i++] = Sticker.fromData(lApi, (Data) o);
+                this.stickers[i++] = Sticker.fromData(lApi, (SOData) o);
         }else {
             this.stickers = null;
         }
@@ -253,8 +253,8 @@ public class MessageImplementation extends AbstractMessage {
      * @return {@link Data} for this {@link MessageImplementation}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = super.getData();
+    public @NotNull SOData getData() {
+        SOData data = super.getData();
 
         if(guildId != null) data.add(GUILD_ID_KEY, guildId);
         if(member != null) data.add(MEMBER_KEY, member);

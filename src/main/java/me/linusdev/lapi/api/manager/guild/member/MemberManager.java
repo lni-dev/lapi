@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.member;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.manager.Manager;
@@ -27,12 +27,12 @@ import org.jetbrains.annotations.Nullable;
 
 public interface MemberManager extends Manager, HasLApi, MemberPool {
 
-    @NotNull Member addMember(@NotNull Data data) throws InvalidDataException;
+    @NotNull Member addMember(@NotNull SOData data) throws InvalidDataException;
 
-    @NotNull Member onMemberAdd(@NotNull Data data) throws InvalidDataException;
-    @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull Data data) throws InvalidDataException;
+    @NotNull Member onMemberAdd(@NotNull SOData data) throws InvalidDataException;
+    @Nullable Update<Member, Member> onMemberUpdate(@NotNull String userId, @NotNull SOData data) throws InvalidDataException;
     @Nullable Member onMemberRemove(@NotNull String userId);
 
-    void onGuildMemberChunk(@NotNull Data data);
+    void onGuildMemberChunk(@NotNull SOData data);
 
 }

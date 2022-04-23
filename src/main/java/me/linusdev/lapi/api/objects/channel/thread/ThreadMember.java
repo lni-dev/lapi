@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.channel.thread;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -63,7 +63,7 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
      * @throws InvalidDataException if {@link #JOIN_TIMESTAMP_KEY} or {@link #FLAGS_KEY} are missing or null
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ThreadMember fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable ThreadMember fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
@@ -130,8 +130,8 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
      * @return {@link Data} for this {@link ThreadMember}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(ID_KEY, id);
         data.add(USER_ID_KEY, userId);

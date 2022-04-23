@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -69,10 +69,10 @@ public class Reaction implements Datable, HasLApi {
      * @return {@link Reaction}
      * @throws InvalidDataException if {@link #COUNT_KEY}, {@link #ME_KEY} or {@link #EMOJI_KEY} field are missing
      */
-    public static @NotNull Reaction fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Reaction fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number count = (Number) data.get(COUNT_KEY);
         Boolean mee = (Boolean) data.get(ME_KEY);
-        Data emojiData = (Data) data.get(EMOJI_KEY);
+        SOData emojiData = (SOData) data.get(EMOJI_KEY);
 
         if(count == null || mee == null || emojiData == null){
             InvalidDataException exception = new InvalidDataException(data, "One or more required fields are null or missing in " + Reaction.class.getSimpleName());
@@ -110,8 +110,8 @@ public class Reaction implements Datable, HasLApi {
     }
 
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(3);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(COUNT_KEY, count);
         data.add(ME_KEY, mee);

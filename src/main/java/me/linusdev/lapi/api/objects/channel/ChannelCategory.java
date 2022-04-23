@@ -16,8 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.converter.Converter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -30,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -61,7 +61,7 @@ public class ChannelCategory extends Channel<ChannelCategory> implements GuildCh
 
     }
 
-    public ChannelCategory(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public ChannelCategory(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
 
         String name = (String) data.get(NAME_KEY);
@@ -75,10 +75,10 @@ public class ChannelCategory extends Channel<ChannelCategory> implements GuildCh
         }
 
         this.name = name;
-        this.nsfw = (boolean) data.getOrDefault(NSFW_KEY, false);
+        this.nsfw = (boolean) data.getOrDefaultBoth(NSFW_KEY, false);
         this.guildId = guildId;
         this.position = position == null ? null : position.intValue();
-        this.permissionOverwrites = new PermissionOverwrites((ArrayList<Data>) data.getOrDefault(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
+        this.permissionOverwrites = new PermissionOverwrites(data.getList(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
         this.parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
     }
 
@@ -127,7 +127,7 @@ public class ChannelCategory extends Channel<ChannelCategory> implements GuildCh
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         super.updateSelfByData(data);
 
         data.processIfContained(NAME_KEY, (String str) -> this.name = str);
@@ -135,7 +135,7 @@ public class ChannelCategory extends Channel<ChannelCategory> implements GuildCh
         //guildId should never change
         data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
 
-        ArrayList<Data> array = data.getAndConvertArrayList(PERMISSION_OVERWRITES_KEY, (Converter<Object, Data>) convertible -> (Data) convertible);
+        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
         if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
 
         data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));

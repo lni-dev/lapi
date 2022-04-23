@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.sticker;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -150,8 +150,8 @@ public class StickerPack implements Datable {
      * @return {@link Data} for this {@link StickerPack}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(6);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(7);
 
         data.add(ID_KEY, id);
         data.add(STICKERS_KEY, stickers);

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.update;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
@@ -72,7 +72,7 @@ public class Update<OBJ extends Updatable, COPY> {
      * @param <C> class that implements {@link Updatable} and {@link me.linusdev.lapi.api.interfaces.copyable.Copyable Copyable}
      * @throws InvalidDataException thrown by {@link Updatable#updateSelfByData(Data)}
      */
-    public <C extends CopyAndUpdatable<COPY>> Update(@NotNull C obj, @NotNull Data data) throws InvalidDataException {
+    public <C extends CopyAndUpdatable<COPY>> Update(@NotNull C obj, @NotNull SOData data) throws InvalidDataException {
         this.copy = obj.copy();
         //noinspection unchecked
         this.obj = (OBJ) obj;

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -52,7 +52,7 @@ public class Provider implements Datable {
      * @param data to create {@link Provider}
      * @return {@link Provider} or {@code null} if data is {@code null}
      */
-    public static @Nullable Provider fromData(@Nullable Data data){
+    public static @Nullable Provider fromData(@Nullable SOData data){
         if(data == null) return null;
         String name = (String) data.get(NAME_KEY);
         String url = (String) data.get(URL_KEY);
@@ -78,8 +78,8 @@ public class Provider implements Datable {
      * Creates a {@link Data} from this {@link Provider}, useful to convert it to JSON
      */
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         if(name != null) data.add(NAME_KEY, name);
         if(url != null) data.add(URL_KEY, url);

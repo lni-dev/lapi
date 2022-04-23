@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.identify;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +55,7 @@ public class ConnectionProperties implements Datable {
      * @throws InvalidDataException if {@link #OS_KEY}, {@link #BROWSER_KEY} or {@link #DEVICE_KEY} are missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ConnectionProperties fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable ConnectionProperties fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String os = (String) data.get(OS_KEY);
         String browser = (String) data.get(BROWSER_KEY);
@@ -93,8 +93,8 @@ public class ConnectionProperties implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(OS_KEY, os);
         data.add(BROWSER_KEY, browser);

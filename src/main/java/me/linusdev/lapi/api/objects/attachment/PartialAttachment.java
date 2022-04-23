@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.attachment;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
@@ -69,7 +69,7 @@ public class PartialAttachment implements Attachment {
         this.ephemeral = ephemeral;
     }
 
-    public PartialAttachment(Data data) throws InvalidDataException {
+    public PartialAttachment(SOData data) throws InvalidDataException {
        String id = (String) data.get(ID_KEY);
 
        if(id == null) throw new InvalidDataException(data, "Id is missing in PartialAttachment").addMissingFields(ID_KEY);
@@ -157,8 +157,8 @@ public class PartialAttachment implements Attachment {
     }
 
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(1);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(10);
 
         data.add(ID_KEY, id);
         if(filename != null)     data.add(FILENAME_KEY, filename);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#guild-members-chunk-guild-members-chunk-event-fields" target="_top">Guild Members Chunk Event Fields</a>
@@ -50,7 +51,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
     private final @NotNull ArrayList<Member> members;
     private final int chunkIndex;
     private final int chunkCount;
-    private final @Nullable ArrayList<Object> notFound;
+    private final @Nullable List<Object> notFound;
     private final @Nullable ArrayList<PresenceUpdate> presences;
     private final @Nullable Nonce nonce;
 
@@ -65,7 +66,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
      * @param nonce      the nonce used in the {@link GatewayCommandType#REQUEST_GUILD_MEMBERS Guild Members Request}
      */
     public GuildMemberChunkEventData(@NotNull LApi lApi, @NotNull Snowflake guildId, @NotNull ArrayList<Member> members,
-                                     int chunkIndex, int chunkCount, @Nullable ArrayList<Object> notFound,
+                                     int chunkIndex, int chunkCount, @Nullable List<Object> notFound,
                                      @Nullable ArrayList<PresenceUpdate> presences, @Nullable Nonce nonce) {
         this.lApi = lApi;
         this.guildId = guildId;
@@ -77,17 +78,16 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
         this.nonce = nonce;
     }
 
-    @SuppressWarnings("unchecked")
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable GuildMemberChunkEventData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable GuildMemberChunkEventData fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if (data == null) return null;
 
         String guildId = (String) data.get(GUILD_ID_KEY);
-        ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
+        List<Object> membersData = data.getList(MEMBERS_KEY);
         Number chunkIndex = (Number) data.get(CHUNK_INDEX_KEY);
         Number chunkCount = (Number) data.get(CHUNK_COUNT_KEY);
-        ArrayList<Object> notFound = (ArrayList<Object>) data.get(NOT_FOUND_KEY);
-        ArrayList<Object> presencesData = (ArrayList<Object>) data.get(PRESENCES_KEY);
+        List<Object> notFound = data.getList(NOT_FOUND_KEY);
+        List<Object> presencesData = data.getList(PRESENCES_KEY);
         Nonce nonce = Nonce.fromStringOrInteger(data.get(NONCE_KEY));
 
         if (guildId == null || membersData == null || chunkIndex == null || chunkCount == null) {
@@ -100,7 +100,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
         ArrayList<Member> members = new ArrayList<>(membersData.size());
 
         for (int i = 0; i < membersData.size(); i++) {
-            members.add(Member.fromData(lApi, (Data) membersData.get(i)));
+            members.add(Member.fromData(lApi, (SOData) membersData.get(i)));
             membersData.set(i, null); //release memory
         }
 
@@ -110,7 +110,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
             presences = new ArrayList<>(presencesData.size());
 
             for (int i = 0; i < presencesData.size(); i++) {
-                Data psData = (Data) presencesData.get(i);
+                SOData psData = (SOData) presencesData.get(i);
                 psData.add(PresenceUpdate.GUILD_ID_KEY, guildId); //add guild_id field, because it is missing here
                 presences.add(PresenceUpdate.fromData(psData));
                 presencesData.set(i, null); //release memory
@@ -162,7 +162,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
      * The type of this array is not specified in Discord's docs. probably a {@link String} though.
      * if passing an invalid id to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
      */
-    public @Nullable ArrayList<Object> getNotFound() {
+    public @Nullable List<Object> getNotFound() {
         return notFound;
     }
 
@@ -181,8 +181,8 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(7);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(7);
 
         data.add(GUILD_ID_KEY, guildId);
         data.add(MEMBERS_KEY, members);

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -28,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
 
 public class UnknownChannel extends Channel<UnknownChannel> {
 
-    protected @NotNull Data data;
+    protected @NotNull SOData data;
 
-    public UnknownChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) {
+    public UnknownChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) {
         super(lApi, id, type);
         this.data = data;
     }
@@ -44,7 +44,7 @@ public class UnknownChannel extends Channel<UnknownChannel> {
         );
     }
 
-    public @NotNull Data getData() {
+    public @NotNull SOData getData() {
         return data;
     }
 
@@ -54,7 +54,7 @@ public class UnknownChannel extends Channel<UnknownChannel> {
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         super.updateSelfByData(data);
         this.data = data;
     }

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.application;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/application#application-object" target="_top">Application Object</a>
@@ -128,22 +129,22 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
      * @return {@link Application} or {@code null} if data was {@code null}
      * @throws InvalidDataException if (id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null) == true
      */
-    public static @Nullable Application fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Application fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
         String icon = (String) data.get(ICON_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
-        ArrayList<Object> rpcOriginsList = (ArrayList<Object>) data.get(RPC_ORIGINS_KEY);
+        List<Object> rpcOriginsList = data.getList(RPC_ORIGINS_KEY);
         Boolean botPublic = (Boolean) data.get(BOT_PUBLIC_KEY);
         Boolean botRequireCodeGrant = (Boolean) data.get(BOT_REQUIRE_CODE_GRANT_KEY);
         String tosUrl = (String) data.get(TERMS_OF_SERVICE_URL_KEY);
         String ppUrl = (String) data.get(PRIVACY_POLICY_URL_KEY);
-        Data ownerData = (Data) data.get(OWNER_KEY);
+        SOData ownerData = (SOData) data.get(OWNER_KEY);
         String summary = (String) data.get(SUMMARY_KEY);
         String verifyKey = (String) data.get(VERIFY_KEY_KEY);
-        Data teamData = (Data) data.get(TEAM_KEY);
+        SOData teamData = (SOData) data.get(TEAM_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
         String primarySkuId = (String) data.get(PRIMARY_SKU_ID_KEY);
         String slug = (String) data.get(SLUG_KEY);
@@ -329,8 +330,8 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
     }
 
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(8);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(17);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

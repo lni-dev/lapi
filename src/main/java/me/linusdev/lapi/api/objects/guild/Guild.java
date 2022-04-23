@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -99,7 +99,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     public static final String GUILD_SCHEDULED_EVENTS_KEY = "guild_scheduled_events";
 
 
-    static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable Data data){
+    static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable SOData data){
         if(data == null) return null;
         //TODO
         return null;
@@ -320,5 +320,5 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     }
 
     @Override
-    Data getData();
+    SOData getData();
 }

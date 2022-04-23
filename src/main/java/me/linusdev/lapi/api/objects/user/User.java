@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.user;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -157,7 +157,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #USERNAME_KEY}, {@link #DISCRIMINATOR_KEY} are missing or null
      */
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable User fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable User fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
         String username = (String) data.get(USERNAME_KEY);
@@ -358,8 +358,8 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      * @return {@link Data} for this {@link User}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(15);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(15);
 
         data.add(ID_KEY, id);
         data.add(USERNAME_KEY, username);

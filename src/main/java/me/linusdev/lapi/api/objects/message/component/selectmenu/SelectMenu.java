@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message.component.selectmenu;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -29,7 +29,7 @@ import me.linusdev.lapi.api.objects.message.component.button.Button;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <h2 style="margin-bottom:0;padding-bottom:0">
@@ -103,10 +103,10 @@ public class SelectMenu implements Component, HasLApi {
      * @return {@link SelectMenu}
      * @throws InvalidDataException if {@link #TYPE_KEY}, {@link #CUSTOM_ID_KEY} or {@link #OPTION_KEY} are missing or null
      */
-    public static @NotNull SelectMenu fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull SelectMenu fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
         String customId = (String) data.get(CUSTOM_ID_KEY);
-        ArrayList<Object> optionsData = (ArrayList<Object>) data.get(OPTION_KEY);
+        List<Object> optionsData = data.getList(OPTION_KEY);
         String placeholder = (String) data.get(PLACEHOLDER_KEY);
         Number min_values = (Number) data.get(MIN_VALUES_KEY);
         Number max_values = (Number) data.get(MAX_VALUES_KEY);
@@ -122,7 +122,7 @@ public class SelectMenu implements Component, HasLApi {
         SelectOption[] options = new SelectOption[optionsData.size()];
         int i = 0;
         for(Object o : optionsData)
-            options[i++] = SelectOption.fromData(lApi, (Data) o);
+            options[i++] = SelectOption.fromData(lApi, (SOData) o);
 
 
         return new SelectMenu(lApi, ComponentType.fromValue(type.intValue()), customId, options, placeholder,
@@ -190,8 +190,8 @@ public class SelectMenu implements Component, HasLApi {
      * @return {@link Data} for this {@link SelectMenu}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(7);
 
         data.add(TYPE_KEY, type);
         data.add(CUSTOM_ID_KEY, customId);

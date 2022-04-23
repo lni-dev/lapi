@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.templates.abstracts;
 
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
 
@@ -39,4 +40,7 @@ public interface Template extends Datable {
     default LApiHttpBody getBody(){
         return new LApiHttpBody(getData(), getFileParts());
     }
+
+    @Override
+    SOData getData();
 }

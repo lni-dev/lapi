@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.invite;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +63,7 @@ public class InviteMetadata {
      * @return {@link InviteMetadata}
      * @throws InvalidDataException if {@link #USES_KEY}  {@link #MAX_USES_KEY}, {@link #MAX_AGE_KEY}, {@link #TEMPORARY_KEY} or {@link #CREATED_AT_KEY} are missing ir {@code null}
      */
-    public static @Nullable InviteMetadata fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable InviteMetadata fromData(@Nullable SOData data) throws InvalidDataException {
         if (data == null) return null;
         Number uses = (Number) data.get(USES_KEY);
         Number maxUses = (Number) data.get(MAX_USES_KEY);
@@ -122,7 +122,7 @@ public class InviteMetadata {
      * @param data {@link Data} to extend
      * @return extended {@link Data}
      */
-    public @NotNull Data extendData(@NotNull Data data) {
+    public @NotNull SOData extendData(@NotNull SOData data) {
 
         data.add(USES_KEY, uses);
         data.add(MAX_USES_KEY, maxUses);

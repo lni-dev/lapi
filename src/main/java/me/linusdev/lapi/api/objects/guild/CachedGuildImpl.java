@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
@@ -51,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, HasLApi, SnowflakeAble, CopyAndUpdatable<Guild>, Updatable {
 
@@ -157,10 +158,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable CachedGuildImpl fromData(@NotNull LApiImpl lApi, @Nullable Data data){
+    public static @Nullable CachedGuildImpl fromData(@NotNull LApiImpl lApi, @Nullable SOData data){
         if(data == null) return null;
         String id = (String) data.get(ID_KEY);
-        Boolean unavailable = (Boolean) data.getOrDefaultIfNull(UNAVAILABLE_KEY, false);
+        Boolean unavailable = (Boolean) data.getOrDefaultBoth(UNAVAILABLE_KEY, false);
 
 
         CachedGuildImpl guild = new CachedGuildImpl(lApi, Snowflake.fromString(id), unavailable, false);
@@ -224,13 +225,13 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     }
 
     @Override
-    public Data getData() {
+    public SOData getData() {
         //TODO
         return null;
     }
 
     @Override
-    public void updateSelfByData(@Nullable Data data) throws InvalidDataException {
+    public void updateSelfByData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return;
         this.awaitingEvent = false;
         this.unavailable = (Boolean) data.getOrDefault(UNAVAILABLE_KEY, false);
@@ -270,7 +271,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         data.processIfContained(MAX_VIDEO_CHANNEL_USERS_KEY, (Long max) -> this.maxVideoChannelUsers = max == null ? null : max.intValue());
         data.processIfContained(APPROXIMATE_MEMBER_COUNT_KEY, (Long count) -> this.approximateMemberCount = count == null ? null : count.intValue());
         data.processIfContained(APPROXIMATE_PRESENCE_COUNT_KEY, (Long count) -> this.approximatePresenceCount = count == null ? null : count.intValue());
-        data.processIfContained(WELCOME_SCREEN_KEY, (Data screen) -> {
+        data.processIfContained(WELCOME_SCREEN_KEY, (SOData screen) -> {
             try {
                 this.welcomeScreen = WelcomeScreen.fromData(screen);
             } catch (InvalidDataException e) {
@@ -285,11 +286,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(roleManager != null){
             if(!roleManager.isInitialized()) {
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> rolesData = (ArrayList<Object>) data.get(ROLES_KEY);
+                List<Object> rolesData = data.getList(ROLES_KEY);
                 if(rolesData != null){
                     roleManager.init(rolesData.size());
                     for(Object o : rolesData){
-                        roleManager.addRole(Role.fromData(lApi, (Data) o));
+                        roleManager.addRole(Role.fromData(lApi, (SOData) o));
                     }
                 } else {
                     roleManager.init(1);
@@ -302,11 +303,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(emojiManager != null){
             if(!emojiManager.isInitialized()){
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> emojisData = (ArrayList<Object>) data.get(EMOJIS_KEY);
+                List<Object> emojisData = data.getList(EMOJIS_KEY);
                 if(emojisData != null){
                     emojiManager.init(emojisData.size());
                     for(Object o : emojisData){
-                        emojiManager.add(EmojiObject.fromData(lApi, (Data) o));
+                        emojiManager.add(EmojiObject.fromData(lApi, (SOData) o));
                     }
                 } else {
                     emojiManager.init(1);
@@ -317,7 +318,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         data.processIfContained(FEATURES_KEY, o -> {
             @SuppressWarnings("unchecked")
-            ArrayList<Object> arr = (ArrayList<Object>) o;
+            List<Object> arr = (List<Object>) o;
             if(this.features != null) this.features.clear();
             else this.features = new ArrayList<>(arr.size());
 
@@ -329,11 +330,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(stickerManager != null){
             if(!stickerManager.isInitialized()){
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> stickersData = (ArrayList<Object>) data.get(STICKERS_KEY);
+                List<Object> stickersData = data.getList(STICKERS_KEY);
                 if(stickersData != null){
                     stickerManager.init(stickersData.size());
                     for(Object o : stickersData){
-                        stickerManager.add(Sticker.fromData(lApi, (Data) o));
+                        stickerManager.add(Sticker.fromData(lApi, (SOData) o));
                     }
                 } else {
                     stickerManager.init(1);
@@ -349,14 +350,14 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(voiceStatesManager != null) {
             if(!voiceStatesManager.isInitialized()) {
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> voiceStatesData = (ArrayList<Object>) data.get(VOICE_STATES_KEY);
+                List<Object> voiceStatesData = data.getList(VOICE_STATES_KEY);
                 if(voiceStatesData != null) {
                     voiceStatesManager.init(voiceStatesData.size());
                     for(Object o : voiceStatesData){
                         //the data won't contain a guild_id field, because this data was contained, in the GUILD_CREATE event
                         //of this guild. -> add it here
                         //TODO: Maybe do the same with member field
-                        Data d = (Data) o;
+                        SOData d = (SOData) o;
                         d.add(VoiceState.GUILD_ID_KEY, this.id.asString());
                         voiceStatesManager.add(VoiceState.fromData(lApi, d));
                     }
@@ -369,11 +370,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(memberManager != null){
             if(!memberManager.isInitialized()) {
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
+                List<Object> membersData = data.getList(MEMBERS_KEY);
                 if(membersData != null){
                     memberManager.init(membersData.size());
                     for(Object o : membersData){
-                        memberManager.addMember((Data) o);
+                        memberManager.addMember((SOData) o);
                     }
                 } else {
                     memberManager.init(1);
@@ -383,15 +384,14 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(channelManager != null){
             if(!channelManager.isInitialized()) {
-                @SuppressWarnings("unchecked")
-                ArrayList<Object> channelsData = (ArrayList<Object>) data.get(CHANNELS_KEY);
+                List<Object> channelsData = data.getList(CHANNELS_KEY);
                 if(channelsData != null){
                     channelManager.init(channelsData.size());
                     for(Object o : channelsData){
-                        Data channelData = (Data) o;
+                        SOData channelData = (SOData) o;
                         //add guildId to channel data
                         channelData.add(Channel.GUILD_ID_KEY, id.asString());
-                        channelManager.add(Channel.fromData(lApi, (Data) o));
+                        channelManager.add(Channel.fromData(lApi, (SOData) o));
                     }
                 } else {
                     channelManager.init(1);
@@ -402,16 +402,16 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         if(threadsManager != null){
             if(!threadsManager.isInitialized()) {
                 @SuppressWarnings("unchecked")
-                ArrayList<Object> threadsData = (ArrayList<Object>) data.get(THREADS_KEY);
+                List<Object> threadsData = data.getList(THREADS_KEY);
                 if(threadsData != null){
                     threadsManager.init(threadsData.size());
                     for(Object o : threadsData){
-                        Data threadData = (Data) o;
+                        SOData threadData = (SOData) o;
 
                         //add guildId to channel data
                         threadData.add(Channel.GUILD_ID_KEY, id.asString());
 
-                        threadsManager.add(Thread.fromData(lApi, (Data) o));
+                        threadsManager.add(Thread.fromData(lApi, (SOData) o));
                     }
                 } else {
                     threadsManager.init(1);
@@ -422,12 +422,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(presenceManager != null){
             if(!presenceManager.isInitialized()) {
-                @SuppressWarnings("unchecked")
-                ArrayList<Object> presencesData = (ArrayList<Object>) data.get(PRESENCES_KEY);
+                List<Object> presencesData = data.getList(PRESENCES_KEY);
                 if(presencesData != null){
                     presenceManager.init(presencesData.size());
                     for(Object o : presencesData){
-                        Data presenceData = (Data) o;
+                        SOData presenceData = (SOData) o;
                         //add guildId to presence data
                         presenceData.add(PresenceUpdate.GUILD_ID_KEY, id.asString());
                         presenceManager.add(presenceData);

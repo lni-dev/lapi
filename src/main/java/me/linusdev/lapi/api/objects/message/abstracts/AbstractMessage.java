@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.abstracts;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -97,12 +97,12 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    protected AbstractMessage(LApi lApi, @NotNull Data data) throws InvalidDataException{
+    protected AbstractMessage(LApi lApi, @NotNull SOData data) throws InvalidDataException{
         this.lApi = lApi;
 
         String id = (String) data.get(ID_KEY);
         String channelId = (String) data.get(CHANNEL_ID_KEY);
-        Data author = (Data) data.get(AUTHOR_KEY);
+        SOData author = (SOData) data.get(AUTHOR_KEY);
         String content = (String) data.get(CONTENT_KEY);
         String timestamp = (String) data.get(TIMESTAMP_KEY);
         String editedTimestamp = (String) data.get(EDITED_TIMESTAMP_KEY);
@@ -136,22 +136,22 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
         this.mentions = new UserMention[mentionsData.size()];
         int i = 0;
         for(Object o : mentionsData)
-            this.mentions[i++] = UserMention.fromData(lApi, (Data) o);
+            this.mentions[i++] = UserMention.fromData(lApi, (SOData) o);
 
         this.mentionRoles = new Role[mentionRolesData.size()];
         i = 0;
         for(Object o : mentionRolesData)
-            this.mentionRoles[i++] = Role.fromData(lApi, (Data) o);
+            this.mentionRoles[i++] = Role.fromData(lApi, (SOData) o);
 
         this.attachments = new Attachment[attachmentsData.size()];
         i = 0;
         for(Object o : attachmentsData)
-            this.attachments[i++] = new Attachment((Data) o);
+            this.attachments[i++] = new Attachment((SOData) o);
 
         this.embeds = new Embed[embedsData.size()];
         i = 0;
         for(Object o : embedsData)
-            this.embeds[i++] = Embed.fromData((Data) o);
+            this.embeds[i++] = Embed.fromData((SOData) o);
 
         this.pinned = pinned;
         this.type = MessageType.fromValue(type.intValue());
@@ -245,8 +245,8 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
      * @return {@link Data} for this {@link AbstractMessage}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(0);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(20);
 
         data.add(ID_KEY, id);
         data.add(CHANNEL_ID_KEY, channelId);

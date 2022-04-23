@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.guild.member;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 public class GuildMemberUpdateEvent extends Event implements GuildEvent {
 
     private final @Nullable Update<Member, Member> update;
-    private final @Nullable Data data;
+    private final @Nullable SOData data;
 
     public GuildMemberUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
                                   @Nullable Snowflake guildId, @NotNull Update<Member, Member> update) {
@@ -41,7 +41,7 @@ public class GuildMemberUpdateEvent extends Event implements GuildEvent {
     }
 
     public GuildMemberUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
-                                  @Nullable Snowflake guildId, @NotNull Data data) {
+                                  @Nullable Snowflake guildId, @NotNull SOData data) {
         super(lApi, payload, guildId);
 
         this.data = data;
@@ -51,7 +51,7 @@ public class GuildMemberUpdateEvent extends Event implements GuildEvent {
     /**
      * Only available if {@link me.linusdev.lapi.api.config.ConfigFlag#CACHE_MEMBERS CACHE_MEMBERS} is disabled.
      */
-    public @Nullable Data getUpdateData() {
+    public @Nullable SOData getUpdateData() {
         return data;
     }
 

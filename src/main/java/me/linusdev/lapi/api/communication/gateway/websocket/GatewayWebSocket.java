@@ -16,10 +16,10 @@
 
 package me.linusdev.lapi.api.communication.gateway.websocket;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
 import me.linusdev.data.parser.JsonParser;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
@@ -126,7 +126,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
-        Data data = new JsonParser().readDataFromReader(reader);
+        SOData data = new JsonParser().parseReader(reader);
         return GatewayPayload.fromData(data);
     };
 
@@ -376,7 +376,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * @throws InvalidDataException
      */
     @SuppressWarnings("DuplicateBranchesInSwitch")
-    protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable Data innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+    protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable SOData innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
         try {
             if (type == null) {
                 transmitter.onUnknownEvent(lApi, null, payload);
@@ -393,7 +393,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             //Handle events, that do require a innerPayload Data here:
             @Nullable GuildManager guildManager = lApi.getGuildManager();
             if (innerPayload == null) throw new InvalidDataException(null, "Data is missing in GatewayPayload where data is required!");
-            @NotNull Data data = innerPayload;
+            @NotNull SOData data = innerPayload;
 
             switch (type) {
                 case READY:
@@ -833,7 +833,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_EMOJIS_UPDATE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        ArrayList<Data> emojisData = (ArrayList<Data>) data.get(EMOJIS_KEY);
+                        ArrayList<SOData> emojisData = data.getListAndConvert(EMOJIS_KEY, convertible -> (SOData) convertible);
 
 
                         if (guildId == null || emojisData == null)
@@ -872,7 +872,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_STICKERS_UPDATE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        ArrayList<Data> stickersData = (ArrayList<Data>) data.get(STICKERS_KEY);
+                        ArrayList<SOData> stickersData = data.getListAndConvert(STICKERS_KEY, convertible -> (SOData) convertible);
 
 
                         if (guildId == null || stickersData == null)
@@ -914,7 +914,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_MEMBER_ADD:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Data userData = (Data) data.get(Member.USER_KEY);
+                        SOData userData = (SOData) data.get(Member.USER_KEY);
                         if(userData == null || guildId == null)
                             throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
 
@@ -955,7 +955,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_MEMBER_REMOVE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Data userData = (Data) data.get(Member.USER_KEY);
+                        SOData userData = (SOData) data.get(Member.USER_KEY);
                         if(userData == null || guildId == null)
                             throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
 
@@ -994,7 +994,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_MEMBER_UPDATE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Data userData = (Data) data.get(Member.USER_KEY);
+                        SOData userData = (SOData) data.get(Member.USER_KEY);
                         if(userData == null || guildId == null)
                             throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
 
@@ -1057,7 +1057,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_ROLE_CREATE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Data roleData = (Data) data.get(ROLE_KEY);
+                        SOData roleData = (SOData) data.get(ROLE_KEY);
 
                         if (guildId == null || roleData == null)
                             throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
@@ -1089,7 +1089,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_ROLE_UPDATE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Data roleData = (Data) data.get(ROLE_KEY);
+                        SOData roleData = (SOData) data.get(ROLE_KEY);
 
                         if (guildId == null || roleData == null)
                             throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
@@ -1329,7 +1329,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 //ready event. we need to save the session id
                 if(payload.getPayloadData() == null)
                     throw new InvalidDataException(null, "READY event data was null!");
-                ReadyEvent event = ReadyEvent.fromData(lApi, payload, (Data) payload.getPayloadData());
+                ReadyEvent event = ReadyEvent.fromData(lApi, payload, (SOData) payload.getPayloadData());
 
                 this.sessionId = event.getSessionId();
                 this.canResume.set(true);
@@ -1350,7 +1350,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         + GatewayOpcode.DISPATCH + " but without a type... payload:\n" + payload.toJsonString());
             }
 
-            handleReceivedEvent(payload.getType(), (Data) payload.getPayloadData(), payload);
+            handleReceivedEvent(payload.getType(), (SOData) payload.getPayloadData(), payload);
 
         } else if (opcode == GatewayOpcode.HEARTBEAT) {
             //Discord requested us to send a Heartbeat
@@ -1377,7 +1377,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             //the payload data is a json with contains the heartbeat_interval
             Object data = payload.getPayloadData();
 
-            Number heartbeatInterval = (Number) ((Data) data).get(HEARTBEAT_INTERVAL_KEY);
+            Number heartbeatInterval = (Number) ((SOData) data).get(HEARTBEAT_INTERVAL_KEY);
             if (heartbeatInterval == null) {
                 disconnect("No " + HEARTBEAT_INTERVAL_KEY + " received");
                 return;
@@ -1487,7 +1487,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * @throws InvalidDataException if the given data was invalid
      */
     @SuppressWarnings("ConstantConditions")
-    public void resume(Data data) throws InvalidDataException {
+    public void resume(SOData data) throws InvalidDataException {
         if(webSocket != null) throw new UnsupportedOperationException("resume(Data) is exclusive to start()");
 
         String sessionId = (String) data.get(SESSION_ID_KEY);
@@ -1826,8 +1826,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(6);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(SESSION_ID_KEY, sessionId);
         data.add(CAN_RESUME_KEY, canResume.get());

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.presence;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.user.User;
@@ -25,10 +25,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class PartialUser implements Datable {
 
-    private final @NotNull Data data;
+    private final @NotNull SOData data;
     private final @NotNull Snowflake id;
 
-    public PartialUser(@NotNull Data data) throws InvalidDataException {
+    public PartialUser(@NotNull SOData data) throws InvalidDataException {
         this.data = data;
 
         Object id = (Object) data.get(User.ID_KEY);
@@ -55,7 +55,7 @@ public class PartialUser implements Datable {
      * raw {@link Data} of the retrieved user object.
      */
     @Override
-    public @NotNull Data getData() {
+    public @NotNull SOData getData() {
         return data;
     }
 }

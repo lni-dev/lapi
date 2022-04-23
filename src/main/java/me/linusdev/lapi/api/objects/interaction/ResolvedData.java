@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.interaction;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -78,22 +78,22 @@ public class ResolvedData implements Datable, HasLApi {
      * @return {@link ResolvedData}
      * @throws InvalidDataException see {@link User#fromData(LApi, Data)}, {@link Member#fromData(LApi, Data)}, {@link Role#fromData(LApi, Data)}, {@link Channel#fromData(LApi, Data)}, {@link MessageImplementation#MessageImplementation(LApi, Data)}
      */
-    public static @Nullable ResolvedData fromData(@NotNull LApi lApi, Data data) throws InvalidDataException {
+    public static @Nullable ResolvedData fromData(@NotNull LApi lApi, SOData data) throws InvalidDataException {
         if(data == null) return null;
-        ArrayList<User> users = data.getAndConvertArrayList(USERS_KEY,
-                (ExceptionConverter<Data, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible));
+        ArrayList<User> users = data.getListAndConvertWithException(USERS_KEY,
+                (ExceptionConverter<SOData, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible));
 
-        ArrayList<Member> members = data.getAndConvertArrayList(MEMBERS_KEY,
-                (ExceptionConverter<Data, Member, InvalidDataException>) convertible -> Member.fromData(lApi, convertible));
+        ArrayList<Member> members = data.getListAndConvertWithException(MEMBERS_KEY,
+                (ExceptionConverter<SOData, Member, InvalidDataException>) convertible -> Member.fromData(lApi, convertible));
 
-        ArrayList<Role> roles = data.getAndConvertArrayList(ROLES_KEY,
-                (ExceptionConverter<Data, Role, InvalidDataException>) convertible -> Role.fromData(lApi, convertible));
+        ArrayList<Role> roles = data.getListAndConvertWithException(ROLES_KEY,
+                (ExceptionConverter<SOData, Role, InvalidDataException>) convertible -> Role.fromData(lApi, convertible));
 
-        ArrayList<Channel> channels = data.getAndConvertArrayList(CHANNELS_KEY,
-                (ExceptionConverter<Data, Channel, InvalidDataException>) convertible -> Channel.fromData(lApi, convertible));
+        ArrayList<Channel> channels = data.getListAndConvertWithException(CHANNELS_KEY,
+                (ExceptionConverter<SOData, Channel, InvalidDataException>) convertible -> Channel.fromData(lApi, convertible));
 
-        ArrayList<Message> messages = data.getAndConvertArrayList(MESSAGES_KEY,
-                (ExceptionConverter<Data, Message, InvalidDataException>) convertible -> new MessageImplementation(lApi, convertible));
+        ArrayList<Message> messages = data.getListAndConvertWithException(MESSAGES_KEY,
+                (ExceptionConverter<SOData, Message, InvalidDataException>) convertible -> new MessageImplementation(lApi, convertible));
 
 
         return new ResolvedData(lApi, users, members, roles, channels, messages);
@@ -135,8 +135,8 @@ public class ResolvedData implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.addIfNotNull(USERS_KEY, users);
         data.addIfNotNull(MEMBERS_KEY, members);

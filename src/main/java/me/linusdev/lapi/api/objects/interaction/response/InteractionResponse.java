@@ -16,10 +16,9 @@
 
 package me.linusdev.lapi.api.objects.interaction.response;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,8 +65,8 @@ public class InteractionResponse implements Datable, Template {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(TYPE_KEY, type);
         data.addIfNotNull(DATA_KEY, this.data);

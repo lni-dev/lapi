@@ -16,10 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.other;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.Converter;
-import me.linusdev.data.parser.JsonParser;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
@@ -106,14 +104,14 @@ public class GatewayPayload implements GatewayPayloadAbstract, Datable {
      * @throws InvalidDataException if {@link #OPCODE_KEY} is missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable GatewayPayload fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable GatewayPayload fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         Number op = (Number) data.get(OPCODE_KEY);
         Object d = data.get(DATA_KEY);
         Number s = (Number) data.get(SEQUENCE_KEY);
         String t = (String) data.get(TYPE_KEY);
 
-        ArrayList<String> trace = data.getAndConvertArrayList(_TRACE_KEY, (Converter<Object, String>) convertible -> (String) convertible);
+        ArrayList<String> trace = data.getListAndConvert(_TRACE_KEY, convertible -> (String) convertible);
 
         if(op == null) {
             InvalidDataException.throwException(data, null, GatewayPayload.class, new Object[]{op}, new String[]{OPCODE_KEY});
@@ -158,7 +156,7 @@ public class GatewayPayload implements GatewayPayloadAbstract, Datable {
 
     @Override
     public @Nullable String toJsonString() {
-        return new JsonParser().getJsonString(getData()).toString();
+        return getData().toJsonString().toString();
     }
 
     public String[] get_trace() {
@@ -166,8 +164,8 @@ public class GatewayPayload implements GatewayPayloadAbstract, Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(OPCODE_KEY, opcode);
         data.add(DATA_KEY, this.data);

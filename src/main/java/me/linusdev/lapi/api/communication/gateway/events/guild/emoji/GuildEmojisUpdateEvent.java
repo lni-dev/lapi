@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.guild.emoji;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
@@ -34,12 +34,12 @@ import java.util.ArrayList;
 
 public class GuildEmojisUpdateEvent extends Event implements GuildEvent {
 
-    protected final @NotNull ArrayList<Data> emojisData;
+    protected final @NotNull ArrayList<SOData> emojisData;
     protected final @Nullable ListUpdate<EmojiObject> update;
     private final @Nullable ListPool<EmojiObject> emojiPool;
 
     public GuildEmojisUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
-                                  @Nullable Snowflake guildId, @NotNull ArrayList<Data> emojisData, @Nullable ListUpdate<EmojiObject> update,
+                                  @Nullable Snowflake guildId, @NotNull ArrayList<SOData> emojisData, @Nullable ListUpdate<EmojiObject> update,
                                   @Nullable ListPool<EmojiObject> emojiPool) {
         super(lApi, payload, guildId);
         this.emojisData = emojisData;
@@ -73,7 +73,7 @@ public class GuildEmojisUpdateEvent extends Event implements GuildEvent {
     public @NotNull ArrayList<EmojiObject> getEmojis() throws InvalidDataException {
         ArrayList<EmojiObject> emojis = new ArrayList<>(emojisData.size());
 
-        for(Data d : emojisData){
+        for(SOData d : emojisData){
             emojis.add(EmojiObject.fromData(lApi, d));
         }
 

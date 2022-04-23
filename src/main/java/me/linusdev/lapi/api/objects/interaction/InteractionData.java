@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.interaction;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -94,18 +94,18 @@ public class InteractionData implements Datable, HasLApi {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable InteractionData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable InteractionData fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
         Number type = (Number) data.get(TYPE_KEY);
-        ResolvedData resolved = data.getAndConvert(RESOLVED_KEY, (ExceptionConverter<Data, ResolvedData, InvalidDataException>) convertible -> ResolvedData.fromData(lApi, convertible));
-        ArrayList<ApplicationCommandInteractionDataOption> options = data.getAndConvertArrayList(OPTIONS_KEY, (ExceptionConverter<Data, ApplicationCommandInteractionDataOption, InvalidDataException>)
+        ResolvedData resolved = data.getAndConvertWithException(RESOLVED_KEY, (ExceptionConverter<SOData, ResolvedData, InvalidDataException>) convertible -> ResolvedData.fromData(lApi, convertible), null);
+        ArrayList<ApplicationCommandInteractionDataOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (ExceptionConverter<SOData, ApplicationCommandInteractionDataOption, InvalidDataException>)
                 convertible -> ApplicationCommandInteractionDataOption.fromData(lApi, convertible));
         String customId = (String) data.get(CUSTOM_ID_KEY);
         Number componentType = (Number) data.get(COMPONENT_TYPE_KEY);
-        ArrayList<SelectOption> values = data.getAndConvertArrayList(VALUES_KEY, (ExceptionConverter<Data, SelectOption, InvalidDataException>) convertible -> SelectOption.fromData(lApi, convertible));
+        ArrayList<SelectOption> values = data.getListAndConvertWithException(VALUES_KEY, (ExceptionConverter<SOData, SelectOption, InvalidDataException>) convertible -> SelectOption.fromData(lApi, convertible));
         String targetId = (String) data.get(TARGET_ID_KEY);
 
 
@@ -201,8 +201,8 @@ public class InteractionData implements Datable, HasLApi {
 
 
     @Override
-    public Data getData() {
-        Data data = new Data(9);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(ID_KEY, id);
         data.addIfNotNull(NAME_KEY, name);

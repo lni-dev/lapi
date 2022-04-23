@@ -70,7 +70,7 @@ public class Error {
         public ErrorMessageException(@NotNull ErrorMessage errorMessage) {
             super("ErrorMessage from Discord: code: " + errorMessage.getCode()
                     + ", message: " + errorMessage.getMessage() +
-                    (errorMessage.getErrors() != null ? ", errors:" + errorMessage.getErrors().getJsonString() : ""));
+                    (errorMessage.getErrors() != null ? ", errors:" + errorMessage.getErrors().toJsonString() : ""));
             this.errorMessage = errorMessage;
         }
 

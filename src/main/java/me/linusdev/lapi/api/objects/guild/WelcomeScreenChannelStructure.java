@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +59,7 @@ public class WelcomeScreenChannelStructure implements Datable {
      * @throws InvalidDataException if {@link #CHANNEL_ID_KEY} or {@link #DESCRIPTION_KEY} is missing or {@code null}
      */
     @SuppressWarnings("ConstantConditions")
-    public static @NotNull WelcomeScreenChannelStructure fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull WelcomeScreenChannelStructure fromData(@NotNull SOData data) throws InvalidDataException {
         String channelId = (String) data.get(CHANNEL_ID_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
         String emojiId = (String) data.get(EMOJI_ID_KEY);
@@ -107,8 +107,8 @@ public class WelcomeScreenChannelStructure implements Datable {
      * @return {@link Data} for this {@link WelcomeScreenChannelStructure}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(CHANNEL_ID_KEY, channelId);
         data.add(DESCRIPTION_KEY, description);

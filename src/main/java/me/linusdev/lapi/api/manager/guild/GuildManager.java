@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.manager.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;

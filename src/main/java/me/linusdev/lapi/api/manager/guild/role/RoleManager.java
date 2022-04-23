@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.role;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.manager.Manager;
@@ -33,7 +33,7 @@ public interface RoleManager extends RolePool, Manager {
      * {@link me.linusdev.lapi.api.config.ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT COPY_ROLE_ON_UPDATE_EVENT} is set.
      * @throws InvalidDataException if given updateData is Invalid.
      */
-    @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException;
+    @Nullable Update<Role, Role> updateRole(@NotNull SOData updateData) throws InvalidDataException;
 
     /**
      * Adds given {@link Role} to this {@link RoleManager}

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.other;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -49,12 +49,12 @@ public class GetGatewayResponse implements Datable {
     }
 
     @Contract("null -> null; !null -> !null")
-    public static @Nullable GetGatewayResponse fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable GetGatewayResponse fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String url = (String) data.get(URL_KEY);
         Number shards = (Number) data.get(SHARDS_KEY);
-        Data sessionStartLimit = (Data) data.get(SESSION_START_LIMIT_KEY);
+        SOData sessionStartLimit = (SOData) data.get(SESSION_START_LIMIT_KEY);
 
         if(url == null || shards == null || sessionStartLimit == null){
             InvalidDataException.throwException(data, null, GetGatewayResponse.class,
@@ -88,8 +88,8 @@ public class GetGatewayResponse implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(URL_KEY, url);
         data.add(SHARDS_KEY, shards);

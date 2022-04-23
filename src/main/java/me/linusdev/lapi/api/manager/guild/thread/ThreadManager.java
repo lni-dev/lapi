@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.thread;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadMembersUpdateData;
@@ -39,7 +39,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link Thread} contained in this manager
      * @throws InvalidDataException if data parameter is invalid
      */
-    @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull Data data) throws InvalidDataException;
+    @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull SOData data) throws InvalidDataException;
 
     /**
      * Received when a thread is updated. (not when last_message_id changes)
@@ -47,7 +47,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link ThreadUpdate} or {@code null} if this thread is not cached. (Which is totally valid and not an error!)
      * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
      */
-    @NotNull ThreadUpdate onUpdate(@NotNull Data data) throws InvalidDataException;
+    @NotNull ThreadUpdate onUpdate(@NotNull SOData data) throws InvalidDataException;
 
     /**
      * Received, when a thread relevant to the current user is deleted.
@@ -56,7 +56,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
      * @throws InvalidDataException if id field is missing in given data
      */
-    @Nullable Thread<?> onDelete(@NotNull Data data) throws InvalidDataException;
+    @Nullable Thread<?> onDelete(@NotNull SOData data) throws InvalidDataException;
 
     /**
      *
@@ -76,7 +76,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * Or {@code null} if no thread with given id (in data) is cached.
      * @throws InvalidDataException see {@link ThreadMember#fromData(Data)}
      */
-    @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull Data data) throws InvalidDataException;
+    @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull SOData data) throws InvalidDataException;
 
     /**
      *

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.user.connection;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/user#connection-object" target="_top">Connection Object</a>
@@ -88,12 +89,12 @@ public class Connection implements Datable, HasLApi {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #TYPE_KEY}, {@link #VERIFIED_KEY}, {@link #FRIEND_SYNC_KEY}, {@link #SHOW_ACTIVITY_KEY}, {@link #VISIBILITY_KEY}
      */
     @SuppressWarnings("unchecked cast")
-    public static @NotNull Connection fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Connection fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String name = (String) data.get(NAME_KEY);
         String type = (String) data.get(TYPE_KEY);
         Boolean revoked = (Boolean) data.get(REVOKED_KEY);
-        ArrayList<Object> integrationsData = (ArrayList<Object>) data.get(INTEGRATIONS_KEY);
+        List<Object> integrationsData = data.getList(INTEGRATIONS_KEY);
         Boolean verified = (Boolean) data.get(VERIFIED_KEY);
         Boolean friendSync = (Boolean) data.get(FRIEND_SYNC_KEY);
         Boolean showActivity = (Boolean) data.get(SHOW_ACTIVITY_KEY);
@@ -111,7 +112,7 @@ public class Connection implements Datable, HasLApi {
             integrations = new Integration[integrationsData.size()];
             int i = 0;
             for(Object o : integrationsData){
-                integrations[i++] = Integration.fromData(lApi, (Data) o);
+                integrations[i++] = Integration.fromData(lApi, (SOData) o);
             }
         }
 
@@ -187,8 +188,8 @@ public class Connection implements Datable, HasLApi {
      * @return {@link Data} for this {@link Connection}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(9);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.add(ID_KEY, id);
         data.add(NAME_KEY, name);

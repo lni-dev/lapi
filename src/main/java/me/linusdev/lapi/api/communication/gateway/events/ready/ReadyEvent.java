@@ -16,10 +16,10 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.ready;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
@@ -88,25 +88,25 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
      * @throws InvalidDataException if {@link #VERSION_KEY}, {@link #USER_KEY}, {@link #GUILDS_KEY}, {@link #SESSION_ID_KEY} or {@link #APPLICATION_KEY} are missing or {@code null}
      */
     @Contract("_, _, null -> null; _, _, !null -> !null")
-    public static @Nullable ReadyEvent fromData(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ReadyEvent fromData(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         Number version = (Number) data.get(VERSION_KEY);
-        User user = data.getAndConvert(USER_KEY,
-                (ExceptionConverter<Data, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible));
+        User user = data.getAndConvertWithException(USER_KEY,
+                (ExceptionConverter<SOData, User, InvalidDataException>) convertible -> User.fromData(lApi, convertible), null);
 
-        ArrayList<UnavailableGuild> guilds = data.getAndConvertArrayList(GUILDS_KEY,
-                (ExceptionConverter<Data, UnavailableGuild, InvalidDataException>) UnavailableGuild::fromData);
+        ArrayList<UnavailableGuild> guilds = data.getListAndConvertWithException(GUILDS_KEY,
+                (ExceptionConverter<SOData, UnavailableGuild, InvalidDataException>) UnavailableGuild::fromData);
 
         String sessionId = (String) data.get(SESSION_ID_KEY);
 
-        ArrayList<Integer> shard = data.getAndConvertArrayList(SHARD_KEY, (Converter<Number, Integer>) convertible -> {
+        ArrayList<Integer> shard = data.getListAndConvert(SHARD_KEY, (Converter<Number, Integer>) convertible -> {
             if(convertible == null) return null;
             return convertible.intValue();
         });
 
-        PartialApplication application = data.getAndConvert(APPLICATION_KEY,
-                (ExceptionConverter<Data, PartialApplication, InvalidDataException>) convertible -> PartialApplication.fromData(lApi, convertible));
+        PartialApplication application = data.getAndConvertWithException(APPLICATION_KEY,
+                (ExceptionConverter<SOData, PartialApplication, InvalidDataException>) convertible -> PartialApplication.fromData(lApi, convertible), null);
 
         if(version == null || user == null || guilds == null || sessionId == null || application == null){
             InvalidDataException.throwException(data, null, ReadyEvent.class,
@@ -169,8 +169,8 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(6);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add(VERSION_KEY, version);
         data.add(USER_KEY, user);

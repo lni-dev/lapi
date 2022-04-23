@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.interaction;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -72,13 +72,13 @@ public class MessageInteraction implements Datable, HasLApi {
      * @return {@link MessageInteraction} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #TYPE_KEY}, {@link #NAME_KEY} or {@link #USER_KEY} are null or missing
      */
-    public static @Nullable MessageInteraction fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable MessageInteraction fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         Number type = (Number) data.get(TYPE_KEY);
         String name = (String) data.get(NAME_KEY);
-        Data user = (Data) data.get(USER_KEY);
+        SOData user = (SOData) data.get(USER_KEY);
 
         if(id == null || type == null || name == null || user == null){
             InvalidDataException.throwException(data, null, MessageInteraction.class,
@@ -131,8 +131,8 @@ public class MessageInteraction implements Datable, HasLApi {
      * Generates {@link Data} from this {@link MessageInteraction}
      */
     @Override
-    public @NotNull Data getData() {
-        Data data = new Data(0);
+    public @NotNull SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.add(ID_KEY, id);
         data.add(TYPE_KEY, type);

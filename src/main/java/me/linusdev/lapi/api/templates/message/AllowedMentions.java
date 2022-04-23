@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.templates.message;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,8 +93,8 @@ public class AllowedMentions implements Datable {
      * @return {@link Data} for this {@link AllowedMentions}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         //an empty parse array, means no mentions are allowed
         data.addIfNotNull(PARSE_KEY, parse);

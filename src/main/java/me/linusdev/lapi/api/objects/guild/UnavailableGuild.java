@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.guild;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
@@ -36,7 +36,7 @@ public class UnavailableGuild implements Datable {
     }
 
     @Contract("!null -> !null; null -> null")
-    public static @Nullable UnavailableGuild fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable UnavailableGuild fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         String id = (String) data.get(GuildImpl.ID_KEY);
         Boolean unavailable = (Boolean) data.get(GuildImpl.UNAVAILABLE_KEY);
@@ -62,8 +62,8 @@ public class UnavailableGuild implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
         data.add(GuildImpl.ID_KEY, id);
         data.add(GuildImpl.UNAVAILABLE_KEY, unavailable);
         return data;

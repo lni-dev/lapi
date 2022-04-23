@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;

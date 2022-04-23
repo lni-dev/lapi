@@ -16,10 +16,10 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
@@ -113,7 +113,7 @@ public class Activity implements Datable {
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable Activity fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Activity fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String name = (String) data.get(NAME_KEY);
@@ -122,30 +122,28 @@ public class Activity implements Datable {
         Number createdAt = (Number) data.get(CREATED_AT_KEY);
 
         ActivityTimestamps timestamps = data.getAndConvert(TIMESTAMPS_KEY,
-                (Converter<Data, ActivityTimestamps>) ActivityTimestamps::fromData);
+                (Converter<SOData, ActivityTimestamps>) ActivityTimestamps::fromData);
 
         String applicationId = (String) data.get(APPLICATION_ID_KEY);
         String details = (String) data.get(DETAILS_KEY);
         String state = (String) data.get(STATE_KEY);
 
-        ActivityEmoji emoji = data.getAndConvert(EMOJI_KEY,
-                (ExceptionConverter<Data, ActivityEmoji, InvalidDataException>) ActivityEmoji::fromData);
+        ActivityEmoji emoji = data.getAndConvertWithException(EMOJI_KEY, ActivityEmoji::fromData, null);
 
         ActivityParty party = data.getAndConvert(PARTY_KEY,
-                (Converter<Data, ActivityParty>) ActivityParty::fromData);
+                (Converter<SOData, ActivityParty>) ActivityParty::fromData);
 
         ActivityAssets assets = data.getAndConvert(ASSETS_KEY,
-                (Converter<Data, ActivityAssets>) ActivityAssets::fromData);
+                (Converter<SOData, ActivityAssets>) ActivityAssets::fromData);
 
         ActivitySecrets secrets = data.getAndConvert(SECRETS_KEY,
-                (Converter<Data, ActivitySecrets>) ActivitySecrets::fromData);
+                (Converter<SOData, ActivitySecrets>) ActivitySecrets::fromData);
 
         Boolean instance = (Boolean) data.get(INSTANCE_KEY);
 
         Number flags = (Number) data.get(FLAGS_KEY);
 
-        ArrayList<ActivityButton> buttons = data.getAndConvertArrayList(BUTTONS_KEY,
-                (ExceptionConverter<Data, ActivityButton, InvalidDataException>) ActivityButton::fromData);
+        ArrayList<ActivityButton> buttons = data.getListAndConvertWithException(BUTTONS_KEY, ActivityButton::fromData);
 
         if(name == null || type == null){
             InvalidDataException.throwException(data, null, Activity.class,
@@ -274,8 +272,8 @@ public class Activity implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(15);
 
         data.add(NAME_KEY, name);
         data.add(TYPE_KEY, type);

@@ -16,10 +16,9 @@
 
 package me.linusdev.lapi.api.communication.gateway.identify;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.presence.PresenceUpdate;
 import org.jetbrains.annotations.Contract;
@@ -83,22 +82,19 @@ public class Identify implements Datable {
      * @throws InvalidDataException if {@link #TOKEN_KEY}, {@link #PROPERTIES_KEY}, {@link #INTENTS_KEY} is missing or {@code null}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable Identify fromData(@Nullable Data data) throws InvalidDataException {
+    public static @Nullable Identify fromData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String token = (String) data.get(TOKEN_KEY);
 
-        ConnectionProperties properties = data.getAndConvert(PROPERTIES_KEY,
-                (ExceptionConverter<Data, ConnectionProperties, InvalidDataException>) ConnectionProperties::fromData);
+        ConnectionProperties properties = data.getAndConvertWithException(PROPERTIES_KEY, ConnectionProperties::fromData, null);
 
         Boolean compress = (Boolean) data.get(COMPRESS_KEY);
         Number largeThreshold = (Number) data.get(LARGE_THRESHOLD_KEY);
 
-        ArrayList<Integer> shard = data.getAndConvertArrayList(SHARD_KEY,
-                (Converter<Object, Integer>) convertible -> (Integer) convertible);
+        ArrayList<Integer> shard = data.getListAndConvert(SHARD_KEY, convertible -> (Integer) convertible);
 
-        PresenceUpdate presence = data.getAndConvert(PRESENCE_KEY,
-                (ExceptionConverter<Data, PresenceUpdate, InvalidDataException>) PresenceUpdate::fromData);
+        PresenceUpdate presence = data.getAndConvertWithException(PRESENCE_KEY, PresenceUpdate::fromData, null);
 
         Number intents = (Number) data.get(INTENTS_KEY);
 
@@ -172,8 +168,8 @@ public class Identify implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(7);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(7);
 
         data.add(TOKEN_KEY, token);
         data.add(PROPERTIES_KEY, properties);

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.presence;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -44,7 +44,7 @@ public class PresenceManagerImpl implements PresenceManager{
     }
 
     @Override
-    public void add(@NotNull Data presenceData) throws InvalidDataException {
+    public void add(@NotNull SOData presenceData) throws InvalidDataException {
         if(presences == null) throw new UnsupportedOperationException("init() not yet called.");
         PresenceUpdate presence = PresenceUpdate.fromData(presenceData);
         if(presence.getUser() == null) throw new InvalidDataException(presenceData, "Presence without user id...");
@@ -52,7 +52,7 @@ public class PresenceManagerImpl implements PresenceManager{
     }
 
     @Override
-    public @NotNull Update<PresenceUpdate, PresenceUpdate> onUpdate(@NotNull Data data) throws InvalidDataException {
+    public @NotNull Update<PresenceUpdate, PresenceUpdate> onUpdate(@NotNull SOData data) throws InvalidDataException {
         if(presences == null) throw new UnsupportedOperationException("init() not yet called.");
         PresenceUpdate presence = PresenceUpdate.fromData(data);
         if(presence.getUser() == null) throw new InvalidDataException(data, "Presence without user id...");

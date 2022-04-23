@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.sticker;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -108,7 +108,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
      * @return {@link Sticker}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #TAGS_KEY}, {@link #TYPE_KEY} or {@link #FORMAT_TYPE_KEY} is null or missing
      */
-    public static @NotNull Sticker fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Sticker fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String id = (String) data.get(ID_KEY);
         String packId = (String) data.get(PACK_ID_KEY);
         String name = (String) data.get(NAME_KEY);
@@ -119,7 +119,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
         Number formatType = (Number) data.get(FORMAT_TYPE_KEY);
         Boolean available = (Boolean) data.get(AVAILABLE_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
-        Data user = (Data) data.get(USER_KEY);
+        SOData user = (SOData) data.get(USER_KEY);
         Number sortValue = (Number) data.get(SORT_VALUE_KEY);
 
         if(id == null || name == null || tags == null || type == null || formatType == null){
@@ -251,8 +251,8 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
      * @return {@link Data} for this {@link Sticker}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(7);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(12);
 
         data.add(ID_KEY, id);
         if(packId != null) data.add(PACK_ID_KEY, packId);
@@ -281,7 +281,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         data.processIfContained(PACK_ID_KEY, (String o) -> this.packId = Snowflake.fromString( o));
         data.processIfContained(NAME_KEY, (String o) -> this.name =  o);
         data.processIfContained(DESCRIPTION_KEY, (String o) -> this.description = o);
@@ -296,7 +296,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
     }
 
     @Override
-    public boolean checkIfChanged(Data data) {
+    public boolean checkIfChanged(SOData data) {
 
         Number t = (Number) data.get(TYPE_KEY);
         if(t == null) return true;

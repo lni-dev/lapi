@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.command.option;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.Contract;
@@ -56,7 +56,7 @@ public class ApplicationCommandOptionChoice implements Datable {
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #VALUE_KEY} are missing or {@code null}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ApplicationCommandOptionChoice fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ApplicationCommandOptionChoice fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String name = (String) data.get(NAME_KEY);
@@ -88,8 +88,8 @@ public class ApplicationCommandOptionChoice implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(NAME_KEY, name);
         data.add(VALUE_KEY, value);

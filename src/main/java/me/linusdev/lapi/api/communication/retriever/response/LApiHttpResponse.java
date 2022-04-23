@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.response;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
@@ -47,7 +47,7 @@ public class LApiHttpResponse {
 
     private @Nullable Boolean isArray = null;
     private @Nullable ErrorMessage error;
-    private @Nullable Data data;
+    private @Nullable SOData data;
     private boolean noContent = false;
 
     public LApiHttpResponse(HttpResponse<InputStream> source) throws IOException, ParseException {
@@ -79,7 +79,7 @@ public class LApiHttpResponse {
      * @throws IOException from {@link PushbackReader}
      * @throws ParseException from {@link JsonParser}
      */
-    public @NotNull Data getData() throws IOException, ParseException {
+    public @NotNull SOData getData() throws IOException, ParseException {
         return getData(null);
     }
 
@@ -91,7 +91,7 @@ public class LApiHttpResponse {
      * @throws IOException from {@link PushbackReader}
      * @throws ParseException from {@link JsonParser}
      */
-    public @NotNull Data getData(@Nullable String arrayKey) throws IOException, ParseException {
+    public @NotNull SOData getData(@Nullable String arrayKey) throws IOException, ParseException {
         if(data != null) return data;
         if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
         if(reader == null) throw new IllegalStateException("Reader is null."); //<- this should never happen
@@ -99,12 +99,13 @@ public class LApiHttpResponse {
         reader.unread(c);
         if (c == -1){
             noContent = true;
-            data = new Data(1);
+            data = SOData.newOrderedDataWithKnownSize(1);
             return data;
         }
 
         JsonParser jsonParser = new JsonParser();
-        data = jsonParser.readDataFromReader(reader, arrayKey != null, arrayKey);
+        if(arrayKey != null) jsonParser.setArrayWrapperKey(arrayKey);
+        data = jsonParser.parseReader(reader);
         return data;
     }
 
@@ -128,7 +129,7 @@ public class LApiHttpResponse {
         if (c == -1) {
             isArray = false;
             noContent = true;
-            data = new Data(1);
+            data = SOData.newOrderedDataWithKnownSize(1);
             return false;
         }
 
@@ -188,7 +189,7 @@ public class LApiHttpResponse {
     @Override
     public String toString() {
 
-        Data data = new Data(6);
+        SOData data = SOData.newOrderedDataWithKnownSize(6);
 
         data.add("responseCode", responseCode);
         data.add("responseCodeAsInt", responseCodeAsInt);
@@ -197,6 +198,6 @@ public class LApiHttpResponse {
         data.add("error", error);
         data.add("data", this.data);
 
-        return data.getJsonString().toString();
+        return data.toJsonString().toString();
     }
 }

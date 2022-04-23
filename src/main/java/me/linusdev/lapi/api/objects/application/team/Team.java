@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.application.team;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/topics/teams#data-models-team-object" target="_top">Team Object</a>
@@ -91,10 +91,10 @@ public class Team implements Datable, HasLApi {
      * @return {@link Team}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #MEMBERS_KEY}, {@link #NAME_KEY} or {@link #OWNER_USER_ID_KEY} are missing
      */
-    public static @NotNull Team fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Team fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String icon = (String) data.get(ICON_KEY);
         String id = (String) data.get(ID_KEY);
-        ArrayList<Object> membersData = (ArrayList<Object>) data.get(MEMBERS_KEY);
+        List<Object> membersData = data.getList(MEMBERS_KEY);
         String name = (String) data.get(NAME_KEY);
         String ownerUserId = (String) data.get(OWNER_USER_ID_KEY);
 
@@ -111,7 +111,7 @@ public class Team implements Datable, HasLApi {
         TeamMember[] members = new TeamMember[membersData.size()];
         int i = 0;
         for(Object o : membersData)
-            members[i++] = TeamMember.fromData(lApi, (Data) o);
+            members[i++] = TeamMember.fromData(lApi, (SOData) o);
 
         return new Team(lApi, icon, Snowflake.fromString(id), members, name, Snowflake.fromString(ownerUserId));
     }
@@ -166,8 +166,8 @@ public class Team implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.add(ICON_KEY, icon);
         data.add(ID_KEY, id);

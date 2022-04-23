@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.component;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
@@ -88,7 +88,7 @@ public interface Component extends Datable {
      * @return {@link ActionRow}, {@link Button}, {@link SelectMenu} or {@link UnknownComponent}. Depending on {@link #getType()} stored in given data
      * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
      */
-    public static @NotNull Component fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull Component fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
 
         if(type == null){

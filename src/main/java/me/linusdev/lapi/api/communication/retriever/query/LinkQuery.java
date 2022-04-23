@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.query;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
@@ -35,10 +35,10 @@ public class LinkQuery implements Query, HasLApi {
     private final @NotNull LApi lApi;
     private final @NotNull AbstractLink link;
     private final @Nullable LApiHttpBody body;
-    private final @Nullable Data queryStringsData;
+    private final @Nullable SOData queryStringsData;
     private final @NotNull PlaceHolder[] placeHolders;
 
-    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable Data queryStringsData, PlaceHolder... placeHolders){
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable SOData queryStringsData, PlaceHolder... placeHolders){
         this.lApi = lApi;
         this.link = link;
         this.body = body;

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.response.body;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,23 +27,23 @@ public class ErrorMessage {
     public static final String MESSAGE_KEY = "message";
 
     private final @NotNull Long code;
-    private final @Nullable Data errors;
+    private final @Nullable SOData errors;
     private final @Nullable String message;
 
-    public ErrorMessage(@NotNull Long code, @Nullable Data errors, @Nullable String message) {
+    public ErrorMessage(@NotNull Long code, @Nullable SOData errors, @Nullable String message) {
         this.code = code;
         this.errors = errors;
         this.message = message;
     }
 
-    public static @Nullable ErrorMessage fromData(@Nullable Data data) {
+    public static @Nullable ErrorMessage fromData(@Nullable SOData data) {
         if(data == null) return null;
 
         Long code = (Long) data.get(CODE_KEY);
 
         if(code == null) return null;
 
-        Data errors = (Data) data.get(ERRORS_KEY);
+        SOData errors = (SOData) data.get(ERRORS_KEY);
         String message = (String) data.get(MESSAGE_KEY);
 
         return new ErrorMessage(code, errors, message);
@@ -53,7 +53,7 @@ public class ErrorMessage {
         return code;
     }
 
-    public @Nullable Data getErrors() {
+    public @Nullable SOData getErrors() {
         return errors;
     }
 

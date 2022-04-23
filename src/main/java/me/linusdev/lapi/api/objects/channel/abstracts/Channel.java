@@ -16,10 +16,8 @@
 
 package me.linusdev.lapi.api.objects.channel.abstracts;
 
-
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
-import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.channel.thread.GuildNewsThread;
@@ -74,10 +72,10 @@ public abstract class Channel<T extends Channel<T>> implements CopyAndUpdatable<
 
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable Channel<?> fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable Channel<?> fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        ChannelType type = ChannelType.fromId(((Number) data.getOrDefault(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
-        Snowflake id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
+        ChannelType type = ChannelType.fromId(((Number) data.getOrDefaultBoth(TYPE_KEY, ChannelType.UNKNOWN.getId())).intValue());
+        Snowflake id = Snowflake.fromString((String) data.getOrDefaultBoth(ID_KEY, null));
 
         switch (type){
             case UNKNOWN:
@@ -117,7 +115,7 @@ public abstract class Channel<T extends Channel<T>> implements CopyAndUpdatable<
         this.type = type;
     }
 
-    public Channel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data){
+    public Channel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data){
         this(lApi, id, type);
     }
 
@@ -155,7 +153,7 @@ public abstract class Channel<T extends Channel<T>> implements CopyAndUpdatable<
     public abstract @Nullable Snowflake getGuildIdAsSnowflake();
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         data.processIfContained(TYPE_KEY, (Number num) -> ChannelType.fromId(num.intValue()));
     }
 }

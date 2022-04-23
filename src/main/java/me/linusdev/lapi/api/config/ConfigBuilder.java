@@ -16,10 +16,10 @@
 
 package me.linusdev.lapi.api.config;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
@@ -419,14 +419,14 @@ public class ConfigBuilder implements Datable {
      * @see #getData()
      */
     @Contract("_ -> this")
-    public ConfigBuilder fromData(@NotNull Data data) throws InvalidDataException {
+    public ConfigBuilder fromData(@NotNull SOData data) throws InvalidDataException {
         String token = (String) data.get(TOKEN_KEY);
         Object flags = data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS);
-        Data gateway = (Data) data.get(GATEWAY_CONFIG_KEY);
+        SOData gateway = (SOData) data.get(GATEWAY_CONFIG_KEY);
 
         if(flags != null) {
-            if (flags instanceof Data) {
-                this.flags = ConfigFlag.fromData((Data) flags);
+            if (flags instanceof SOData) {
+                this.flags = ConfigFlag.fromData((SOData) flags);
             } else if (flags instanceof Number) {
                 this.flags = ((Number) flags).longValue();
             }
@@ -451,7 +451,7 @@ public class ConfigBuilder implements Datable {
         if(!Files.exists(configFile)) throw new FileNotFoundException(configFile + " does not exist.");
         Reader reader = Files.newBufferedReader(configFile);
         JsonParser parser = new JsonParser();
-        fromData(parser.readDataFromReader(reader));
+        fromData(parser.parseReader(reader));
         return this;
     }
 
@@ -471,7 +471,7 @@ public class ConfigBuilder implements Datable {
         if(Files.exists(configFile)) Files.delete(configFile);
         Files.createFile(configFile);
         Writer writer = Files.newBufferedWriter(configFile);
-        writer.write(getData().getJsonString().toString());
+        writer.write(getData().toJsonString().toString());
         writer.close();
 
         return this;
@@ -524,9 +524,9 @@ public class ConfigBuilder implements Datable {
      * @see #fromData(Data)
      */
     @Override
-    public Data getData() {
+    public SOData getData() {
 
-        Data data = new Data(2);
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
 
         data.add(TOKEN_KEY, token);
         data.add(FLAGS_KEY, ConfigFlag.toData(flags));

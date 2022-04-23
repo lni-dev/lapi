@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.component.selectmenu;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -70,11 +70,11 @@ public class SelectOption implements Datable, HasLApi {
      * @return {@link SelectOption}
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #VALUE_KEY} are missing
      */
-    public static @NotNull SelectOption fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull SelectOption fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         String label = (String) data.get(LABEL_KEY);
         String value = (String) data.get(VALUE_KEY);
         String description = (String) data.get(DESCRIPTION_KEY);
-        Data emoji = (Data) data.get(EMOJI_KEY);
+        SOData emoji = (SOData) data.get(EMOJI_KEY);
         Boolean default_ = (Boolean) data.get(DEFAULT_KEY);
 
         if(label == null || value == null){
@@ -133,8 +133,8 @@ public class SelectOption implements Datable, HasLApi {
      * @return {@link Data} for this {@link SelectOption}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.add(LABEL_KEY, label);
         data.add(VALUE_KEY, value);

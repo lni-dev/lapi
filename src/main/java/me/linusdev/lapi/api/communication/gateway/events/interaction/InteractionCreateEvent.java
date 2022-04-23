@@ -16,11 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.interaction;
 
-import me.linusdev.data.Data;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
-import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.interaction.InteractionData;

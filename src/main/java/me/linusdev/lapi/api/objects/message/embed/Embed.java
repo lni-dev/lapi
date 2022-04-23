@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
@@ -109,21 +109,21 @@ public class Embed implements Datable {
      * @throws InvalidDataException if given data was invalid. for more information see {@link Footer},
      * {@link Image}, {@link Thumbnail}, {@link Video}, {@link Provider}, {@link Author}, {@link Field}
      */
-    public static @NotNull Embed fromData(@NotNull Data data) throws InvalidDataException {
+    public static @NotNull Embed fromData(@NotNull SOData data) throws InvalidDataException {
         @Nullable final Number color = (Number) data.get(COLOR_KEY);
-        @Nullable final Data footerData = (Data) data.get(FOOTER_KEY);
-        @Nullable final Data imageData = (Data) data.get(IMAGE_KEY);
-        @Nullable final Data thumbnailData = (Data) data.get(THUMBNAIL_KEY);
-        @Nullable final Data videoData = (Data) data.get(VIDEO_KEY);
-        @Nullable final Data providerData = (Data) data.get(PROVIDER_KEY);
-        @Nullable final Data authorData = (Data) data.get(AUTHOR_KEY);
-        @Nullable final List<Data> fieldsData = (ArrayList<Data>) data.get(FIELDS_KEY);
+        @Nullable final SOData footerData = (SOData) data.get(FOOTER_KEY);
+        @Nullable final SOData imageData = (SOData) data.get(IMAGE_KEY);
+        @Nullable final SOData thumbnailData = (SOData) data.get(THUMBNAIL_KEY);
+        @Nullable final SOData videoData = (SOData) data.get(VIDEO_KEY);
+        @Nullable final SOData providerData = (SOData) data.get(PROVIDER_KEY);
+        @Nullable final SOData authorData = (SOData) data.get(AUTHOR_KEY);
+        @Nullable final List<SOData> fieldsData = data.getListAndConvert(FIELDS_KEY, convertible -> (SOData) convertible);
 
         Field[] fields = null;
         if(fieldsData != null){
             fields = new Field[fieldsData.size()];
             int i = 0;
-            for(Data field : fieldsData)
+            for(SOData field : fieldsData)
                 fields[i++] = Field.fromData(field);
 
         }
@@ -240,8 +240,8 @@ public class Embed implements Datable {
      * Creates a {@link Data} from this {@link Embed}, useful to convert it to JSON
      */
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(13);
 
         if(title != null) data.add(TITLE_KEY, title);
         if(type != null) data.add(TYPE_KEY, type);

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.activity;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +56,7 @@ public class ActivityAssets implements Datable {
      * @return {@link ActivityAssets}
      */
     @Contract("null -> null; !null -> !null")
-    public static @Nullable ActivityAssets fromData(@Nullable Data data){
+    public static @Nullable ActivityAssets fromData(@Nullable SOData data){
         if(data == null) return null;
         String largeImage = (String) data.get(LARGE_IMAGE_KEY);
         String largeText = (String) data.get(LARGE_TEXT_KEY);
@@ -95,8 +95,8 @@ public class ActivityAssets implements Datable {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(4);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(4);
 
         data.addIfNotNull(LARGE_IMAGE_KEY, largeImage);
         data.addIfNotNull(LARGE_TEXT_KEY, largeText);

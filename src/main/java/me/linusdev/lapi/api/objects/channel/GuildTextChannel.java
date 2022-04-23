@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.converter.Converter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -31,6 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/channel#channel-object-example-guild-text-channel" target="_top">Exmaple GuildImpl Text Channel</a>
@@ -69,7 +70,7 @@ public class GuildTextChannel extends Channel<GuildTextChannel> implements Guild
 
     }
 
-    public GuildTextChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public GuildTextChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
 
         String name = (String) data.get(NAME_KEY);
@@ -86,12 +87,12 @@ public class GuildTextChannel extends Channel<GuildTextChannel> implements Guild
 
         this.name = name;
         this.topic = (String) data.get(TOPIC_KEY);
-        this.nsfw = (boolean) data.getOrDefault(NSFW_KEY, false);
+        this.nsfw = (boolean) data.getOrDefaultBoth(NSFW_KEY, false);
         this.guildId = guildId;
         this.position = position == null ? null : position.intValue();
-        this.permissionOverwrites = new PermissionOverwrites((ArrayList<Data>) data.getOrDefault(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
+        this.permissionOverwrites = new PermissionOverwrites(data.getList(PERMISSION_OVERWRITES_KEY, new ArrayList<>()));
         this.parentId = Snowflake.fromString((String) data.get(PARENT_ID_KEY));
-        this.rateLimitPerUser = ((Number) data.getOrDefault(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
+        this.rateLimitPerUser = ((Number) data.getOrDefaultBoth(RATE_LIMIT_PER_USER_KEY, 0)).intValue();
         this.lastMessageId = Snowflake.fromString((String) data.getOrDefault(LAST_MESSAGE_ID_KEY, null));
         this.lastPinTimestamp = ISO8601Timestamp.fromString((String) data.get(LAST_PIN_TIMESTAMP_KEY));
 
@@ -173,14 +174,14 @@ public class GuildTextChannel extends Channel<GuildTextChannel> implements Guild
     }
 
     @Override
-    public void updateSelfByData(Data data) throws InvalidDataException {
+    public void updateSelfByData(SOData data) throws InvalidDataException {
         data.processIfContained(NAME_KEY, (String str) -> this.name = str);
         data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
         data.processIfContained(NSFW_KEY, (Boolean bool) -> this.nsfw = bool);
         //guildId should never change
         data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
 
-        ArrayList<Data> array = data.getAndConvertArrayList(PERMISSION_OVERWRITES_KEY, (Converter<Object, Data>) convertible -> (Data) convertible);
+        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
         if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
 
         data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));

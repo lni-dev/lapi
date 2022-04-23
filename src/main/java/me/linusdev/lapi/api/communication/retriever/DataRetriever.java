@@ -16,15 +16,14 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ import java.util.function.BiConsumer;
 public abstract class DataRetriever<T> extends Retriever<T>{
 
     protected LApiHttpResponse response;
-    protected @NotNull Data data;
+    protected @NotNull SOData data;
 
     /**
      * @param lApi  {@link LApi}
@@ -60,7 +59,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
         return processData(data);
     }
 
-    protected abstract @Nullable T processData(@NotNull Data data) throws InvalidDataException;
+    protected abstract @Nullable T processData(@NotNull SOData data) throws InvalidDataException;
 
     /**
      *
@@ -92,7 +91,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
 
                 try {
                     Files.deleteIfExists(file);
-                    Files.writeString(file, data.getJsonString());
+                    Files.writeString(file, data.toJsonString());
                     if(after != null) after.accept(t, null);
 
                 } catch (IOException e) {

@@ -16,9 +16,9 @@
 
 package me.linusdev.lapi.api.objects.command.option;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -93,7 +93,7 @@ public class ApplicationCommandOption implements Datable, HasLApi {
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ApplicationCommandOption fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ApplicationCommandOption fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         Number type = (Number) data.get(TYPE_KEY);
@@ -101,13 +101,13 @@ public class ApplicationCommandOption implements Datable, HasLApi {
         String description = (String) data.get(DESCRIPTION_KEY);
         Boolean required = (Boolean) data.get(REQUIRED_KEY);
 
-        ArrayList<ApplicationCommandOptionChoice> choices = data.getAndConvertArrayList(CHOICES_KEY, (ExceptionConverter<Data, ApplicationCommandOptionChoice, InvalidDataException>)
+        ArrayList<ApplicationCommandOptionChoice> choices = data.getListAndConvertWithException(CHOICES_KEY, (ExceptionConverter<SOData, ApplicationCommandOptionChoice, InvalidDataException>)
                 convertible -> ApplicationCommandOptionChoice.fromData(lApi, convertible));
 
-        ArrayList<ApplicationCommandOption> options = data.getAndConvertArrayList(OPTIONS_KEY, (ExceptionConverter<Data, ApplicationCommandOption, InvalidDataException>)
+        ArrayList<ApplicationCommandOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (ExceptionConverter<SOData, ApplicationCommandOption, InvalidDataException>)
                 convertible -> ApplicationCommandOption.fromData(lApi, convertible));
 
-        ArrayList<ChannelType> channelTypes = data.getAndConvertArrayList(CHANNEL_TYPES_KEY, (ExceptionConverter<Number, ChannelType, InvalidDataException>)
+        ArrayList<ChannelType> channelTypes = data.getListAndConvertWithException(CHANNEL_TYPES_KEY, (ExceptionConverter<Number, ChannelType, InvalidDataException>)
                 convertible -> ChannelType.fromId(convertible.intValue()));
 
         Number minValue = (Number) data.get(MIN_VALUE_KEY);
@@ -201,8 +201,8 @@ public class ApplicationCommandOption implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(0);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(10);
 
         data.add(TYPE_KEY, type);
         data.add(NAME_KEY, name);

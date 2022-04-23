@@ -16,14 +16,11 @@
 
 package me.linusdev.lapi.api.manager.guild.voicestate;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.manager.Manager;
-import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
-import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public interface VoiceStateManager extends VoiceStatePool, Manager {
@@ -32,5 +29,5 @@ public interface VoiceStateManager extends VoiceStatePool, Manager {
 
     VoiceState add(VoiceState voiceState);
 
-    @NotNull Update<VoiceState, VoiceState> update(@NotNull Data voiceStateData) throws InvalidDataException;
+    @NotNull Update<VoiceState, VoiceState> update(@NotNull SOData voiceStateData) throws InvalidDataException;
 }

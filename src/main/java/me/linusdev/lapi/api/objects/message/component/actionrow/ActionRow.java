@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.message.component.actionrow;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -26,7 +26,7 @@ import me.linusdev.lapi.api.objects.message.component.ComponentLimits;
 import me.linusdev.lapi.api.objects.message.component.ComponentType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -72,9 +72,9 @@ public class ActionRow implements Datable, Component, HasLApi {
      * @return {@link ActionRow}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #COMPONENTS_KEY} are missing
      */
-    public static @NotNull ActionRow fromData(@NotNull LApi lApi, @NotNull Data data) throws InvalidDataException {
+    public static @NotNull ActionRow fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         Number type = (Number) data.get(TYPE_KEY);
-        ArrayList<Object> componentsData = (ArrayList<Object>) data.get(COMPONENTS_KEY);
+        List<Object> componentsData = data.getList(COMPONENTS_KEY);
 
         if(type == null || componentsData == null){
             InvalidDataException.throwException(data, null, ActionRow.class,
@@ -85,7 +85,7 @@ public class ActionRow implements Datable, Component, HasLApi {
         Component[] components = new Component[componentsData.size()];
         int i = 0;
         for(Object o : componentsData){
-            Data d = (Data) o;
+            SOData d = (SOData) o;
             components[i++] = Component.fromData(lApi, d);
         }
 
@@ -109,8 +109,8 @@ public class ActionRow implements Datable, Component, HasLApi {
      * @return {@link Data} representing this {@link ActionRow}
      */
     @Override
-    public Data getData() {
-        Data data = new Data(2);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(TYPE_KEY, type);
         data.add(COMPONENTS_KEY, components);

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.guild.role;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -76,7 +76,7 @@ public class RoleManagerImpl implements RoleManager, HasLApi {
     }
 
     @Override
-    public @Nullable Update<Role, Role> updateRole(@NotNull Data updateData) throws InvalidDataException {
+    public @Nullable Update<Role, Role> updateRole(@NotNull SOData updateData) throws InvalidDataException {
         if(roles == null) throw new UnsupportedOperationException("init() not yet called");
         String id = (String) updateData.get(Role.ID_KEY);
         Role role = this.roles.get(id);

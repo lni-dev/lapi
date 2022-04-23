@@ -16,18 +16,13 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 /**
  *
@@ -37,7 +32,7 @@ import java.io.IOException;
  */
 public class ConvertingRetriever<R> extends DataRetriever<R>{
 
-    private final Converter<Data, R> converter;
+    private final Converter<SOData, R> converter;
 
     /**
      *
@@ -45,13 +40,13 @@ public class ConvertingRetriever<R> extends DataRetriever<R>{
      * @param query {@link Query} for the HttpRequest
      * @param converter {@link Converter} to convert from {@link Data} to {@link R}
      */
-    public ConvertingRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<Data, R> converter) {
+    public ConvertingRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<SOData, R> converter) {
         super(lApi, query);
         this.converter = converter;
     }
 
     @Override
-    protected @Nullable R processData(@NotNull Data data) throws InvalidDataException {
+    protected @Nullable R processData(@NotNull SOData data) throws InvalidDataException {
         return converter.convert(lApi, data);
     }
 }

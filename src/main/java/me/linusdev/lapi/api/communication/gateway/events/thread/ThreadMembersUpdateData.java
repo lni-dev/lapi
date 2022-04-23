@@ -16,10 +16,10 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.thread;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
 import me.linusdev.data.converter.Converter;
 import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -59,18 +59,17 @@ public class ThreadMembersUpdateData implements Datable, HasLApi {
     }
 
     @Contract("_, null -> null; _, !null -> !null")
-    public static @Nullable ThreadMembersUpdateData fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    public static @Nullable ThreadMembersUpdateData fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
         String guildId = (String) data.get(GUILD_ID_KEY);
         Number memberCount = (Number) data.get(MEMBER_COUNT_KEY);
 
-        ArrayList<ExtraThreadMember> addedMembers = data.getAndConvertArrayList(ADDED_MEMBERS_KEY,
-                (ExceptionConverter<Data, ExtraThreadMember, InvalidDataException>) convertible -> ExtraThreadMember.fromData(lApi, convertible));
+        ArrayList<ExtraThreadMember> addedMembers = data.getListAndConvertWithException(ADDED_MEMBERS_KEY,
+                (ExceptionConverter<SOData, ExtraThreadMember, InvalidDataException>) convertible -> ExtraThreadMember.fromData(lApi, convertible));
 
-        ArrayList<Snowflake> removedMemberIds = data.getAndConvertArrayList(REMOVED_MEMBER_IDS_KEY,
-                (Converter<String, Snowflake>) Snowflake::fromString);
+        ArrayList<Snowflake> removedMemberIds = data.getListAndConvert(REMOVED_MEMBER_IDS_KEY, Snowflake::fromString);
 
         if(id == null || guildId == null || memberCount == null) {
             InvalidDataException.throwException(data, null, ThreadMembersUpdateData.class,
@@ -137,8 +136,8 @@ public class ThreadMembersUpdateData implements Datable, HasLApi {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(5);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(5);
 
         data.add(ID_KEY, id);
         data.add(GUILD_ID_KEY, guildId);

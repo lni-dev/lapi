@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.lapiandqueue;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;

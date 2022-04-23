@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager.presence;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.manager.Manager;
@@ -25,6 +25,6 @@ import org.jetbrains.annotations.NotNull;
 
 public interface PresenceManager extends PresencePool, Manager {
 
-    void add(@NotNull Data presenceData) throws InvalidDataException;
-    @NotNull Update<PresenceUpdate, PresenceUpdate> onUpdate(@NotNull Data data) throws InvalidDataException;
+    void add(@NotNull SOData presenceData) throws InvalidDataException;
+    @NotNull Update<PresenceUpdate, PresenceUpdate> onUpdate(@NotNull SOData data) throws InvalidDataException;
 }

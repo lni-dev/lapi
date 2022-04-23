@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.attachment;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -40,7 +40,7 @@ public class Attachment extends PartialAttachment {
      *
      * @throws InvalidDataException if a required field is missing
      */
-    public Attachment(Data data) throws InvalidDataException {
+    public Attachment(SOData data) throws InvalidDataException {
         super(data);
 
         //make sure @NotNull stuff is not null!
@@ -104,7 +104,7 @@ public class Attachment extends PartialAttachment {
     }
 
     @Override
-    public @NotNull Data getData() {
+    public @NotNull SOData getData() {
         return super.getData();
     }
 

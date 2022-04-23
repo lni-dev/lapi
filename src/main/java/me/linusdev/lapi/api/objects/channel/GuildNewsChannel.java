@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
@@ -37,7 +37,7 @@ public class GuildNewsChannel extends GuildTextChannel{
         super(lApi, id, type, name, topic, nsfw, guildId, position, permissionOverwrites, parentId, rateLimitPerUser, lastMessageId, lastPinTimestamp);
     }
 
-    public GuildNewsChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull Data data) throws InvalidDataException {
+    public GuildNewsChannel(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull ChannelType type, @NotNull SOData data) throws InvalidDataException {
         super(lApi, id, type, data);
     }
 

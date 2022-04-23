@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.interaction.response.data;
 
-import me.linusdev.data.Data;
 import me.linusdev.data.Datable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.message.component.Component;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
@@ -71,8 +71,8 @@ public class Modal implements Datable, Template {
     }
 
     @Override
-    public Data getData() {
-        Data data = new Data(3);
+    public SOData getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
         data.add(CUSTOM_ID_KEY, customId);
         data.add(TITLE_KEY, title);
         data.add(COMPONENTS_KEY, components);

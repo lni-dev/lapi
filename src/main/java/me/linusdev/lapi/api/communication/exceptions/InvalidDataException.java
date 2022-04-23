@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.exceptions;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,21 +36,21 @@ public class InvalidDataException extends LApiException{
     /**
      * @see #getData()
      */
-    private final @Nullable Data data;
+    private final @Nullable SOData data;
 
-    public InvalidDataException(@Nullable Data data) {
+    public InvalidDataException(@Nullable SOData data) {
         this.data = data;
         this.missingFields = new ArrayList<>();
     }
 
-    public InvalidDataException(@Nullable Data data, String message) {
+    public InvalidDataException(@Nullable SOData data, String message) {
         super(message);
         this.data = data;
         this.missingFields = new ArrayList<>();
 
     }
 
-    public InvalidDataException(@Nullable Data data, String message, Throwable cause, String... missingFields) {
+    public InvalidDataException(@Nullable SOData data, String message, Throwable cause, String... missingFields) {
         super(message, cause);
         this.data = data;
         this.missingFields = new ArrayList<>();
@@ -78,7 +78,7 @@ public class InvalidDataException extends LApiException{
     /**
      * @return The {@link Data} where the fields are missing
      */
-    public @Nullable Data getData() {
+    public @Nullable SOData getData() {
         return data;
     }
 
@@ -90,7 +90,7 @@ public class InvalidDataException extends LApiException{
             msg += s + ", ";
         }
 
-        msg += data != null ? "in data: \n" + data.getJsonString() + "\n": "";
+        msg += data != null ? "in data: \n" + data.toJsonString() + "\n": "";
 
         return msg;
     }
@@ -104,7 +104,7 @@ public class InvalidDataException extends LApiException{
      * @param keys array of keys corresponding to the Objects, will be added as {@link #addMissingFields(String...)} if Object with same index in checkIfNull array is null
      * @throws InvalidDataException always
      */
-    public static void throwException(@NotNull Data data, @Nullable String message, @NotNull Class clazz, Object[] checkIfNull, @NotNull String[] keys) throws InvalidDataException {
+    public static void throwException(@NotNull SOData data, @Nullable String message, @NotNull Class<?> clazz, Object[] checkIfNull, @NotNull String[] keys) throws InvalidDataException {
         message = (message == null ? "" : message) + " Invalid Data while creating " + clazz.getSimpleName() + ".";
         InvalidDataException exception = new InvalidDataException(data, message);
 

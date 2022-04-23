@@ -16,19 +16,16 @@
 
 package me.linusdev.lapi.api.communication.retriever;
 
-import me.linusdev.data.Data;
-import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used to retrieve any Array and convert it to an {@link ArrayList} of type {@link R}
@@ -52,8 +49,8 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
 
     @Override
     @Nullable
-    protected ArrayList<R> processData(@NotNull Data data) throws InvalidDataException {
-        ArrayList<Object> dataArray = (ArrayList<Object>) data.get("array");
+    protected ArrayList<R> processData(@NotNull SOData data) throws InvalidDataException {
+        List<Object> dataArray = data.getList("array");
         ArrayList<R> resultArray = new ArrayList<>(dataArray.size());
 
         for(Object o : dataArray)

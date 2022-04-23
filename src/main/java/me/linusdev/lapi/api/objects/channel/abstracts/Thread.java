@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel.abstracts;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public interface Thread<T extends Thread<T>> extends TextChannel, SnowflakeAble, CopyAndUpdatable<T> {
 
     @Contract("_, null -> null; _, !null -> !null")
-    static @Nullable Thread<?> fromData(@NotNull LApi lApi, @Nullable Data data) throws InvalidDataException {
+    static @Nullable Thread<?> fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
         Channel<?> channel = Channel.fromData(lApi, data);
         if(!(channel instanceof Thread))

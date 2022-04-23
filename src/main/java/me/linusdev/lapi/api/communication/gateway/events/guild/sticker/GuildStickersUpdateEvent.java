@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.guild.sticker;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
@@ -34,12 +34,12 @@ import java.util.ArrayList;
 
 public class GuildStickersUpdateEvent extends Event implements GuildEvent {
 
-    protected final @NotNull ArrayList<Data> stickersData;
+    protected final @NotNull ArrayList<SOData> stickersData;
     protected final @Nullable ListUpdate<Sticker> update;
     private final @Nullable ListPool<Sticker> stickerPool;
 
     public GuildStickersUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
-                                    @Nullable Snowflake guildId, @NotNull ArrayList<Data> stickersData,
+                                    @Nullable Snowflake guildId, @NotNull ArrayList<SOData> stickersData,
                                     @Nullable ListUpdate<Sticker> update,
                                     @Nullable ListPool<Sticker> stickerPool) {
         super(lApi, payload, guildId);
@@ -74,7 +74,7 @@ public class GuildStickersUpdateEvent extends Event implements GuildEvent {
     public @NotNull ArrayList<Sticker> getStickers() throws InvalidDataException {
         ArrayList<Sticker> stickers = new ArrayList<>(stickersData.size());
 
-        for(Data d : stickersData){
+        for(SOData d : stickersData){
             stickers.add(Sticker.fromData(lApi, d));
         }
 

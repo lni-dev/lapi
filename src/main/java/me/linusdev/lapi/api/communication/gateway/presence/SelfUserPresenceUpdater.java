@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.presence;
 
-import me.linusdev.data.Data;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.activity.ActivityType;
@@ -67,7 +67,7 @@ public class SelfUserPresenceUpdater {
      * @return {@link SelfUserPresenceUpdater}
      * @throws InvalidDataException if data is invalid
      */
-    public static @NotNull SelfUserPresenceUpdater fromPresenceUpdateData(@Nullable Data data) throws InvalidDataException {
+    public static @NotNull SelfUserPresenceUpdater fromPresenceUpdateData(@Nullable SOData data) throws InvalidDataException {
         if(data == null) return new SelfUserPresenceUpdater(false);
 
         PresenceUpdate presence = PresenceUpdate.fromData(data);
