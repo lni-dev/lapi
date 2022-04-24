@@ -26,5 +26,14 @@ import org.jetbrains.annotations.NotNull;
 public interface PresenceManager extends PresencePool, Manager {
 
     void add(@NotNull SOData presenceData) throws InvalidDataException;
+
+    /**
+     *
+     * {@link Update#isNew()} will be {@code true}, if the presence was not contained in this {@link PresenceManager}
+     *
+     * @param data {@link SOData} for the {@link PresenceUpdate}
+     * @return {@link Update} containing the updated presence and a copy of the old presence if possible.
+     * @throws InvalidDataException see implementation
+     */
     @NotNull Update<PresenceUpdate, PresenceUpdate> onUpdate(@NotNull SOData data) throws InvalidDataException;
 }

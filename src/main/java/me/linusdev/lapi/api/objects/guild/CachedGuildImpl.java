@@ -438,7 +438,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         }
 
-        //TODO: presences, stages, scheduled events
+        //TODO: stages, scheduled events
     }
 
     @Override
@@ -484,6 +484,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
     public @Nullable ThreadManager getThreadManager() {
         return threadsManager;
+    }
+
+    public @Nullable PresenceManager getPresenceManager() {
+        return presenceManager;
     }
 
     @NotNull

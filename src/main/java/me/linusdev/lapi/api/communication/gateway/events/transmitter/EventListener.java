@@ -35,6 +35,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStic
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
@@ -177,6 +178,8 @@ public interface EventListener {
     default void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {}
 
     default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
+
+    default void onPresenceUpdate(@NotNull LApi lApi, @NotNull PresenceUpdateEvent event) {}
 
     default void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {}
 

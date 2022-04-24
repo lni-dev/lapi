@@ -35,6 +35,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStic
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
@@ -863,6 +864,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildMessageCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onPresenceUpdate(@NotNull LApi lApi, @NotNull PresenceUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onPresenceUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(PRESENCE_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onPresenceUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

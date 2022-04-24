@@ -32,6 +32,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStic
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
@@ -465,6 +466,26 @@ public enum EventIdentifier{
      * identifier for {@link EventListener#onInteractionCreate(LApi, InteractionCreateEvent)}.<br>
      */
     INTERACTION_CREATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                            PRESENCE                           *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onPresenceUpdate(LApi, PresenceUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_PRESENCES}
+     *     </li>
+     * </ul>
+     */
+    PRESENCE_UPDATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

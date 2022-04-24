@@ -45,6 +45,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpd
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
@@ -68,6 +69,7 @@ import me.linusdev.lapi.api.manager.guild.thread.ThreadUpdate;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
+import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
@@ -81,6 +83,7 @@ import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
+import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -1197,12 +1200,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case INTEGRATION_DELETE:
                     break;
 
-                case INTERACTION_CREATE: {
-                    Interaction interaction = Interaction.fromData(lApi, data);
-                    InteractionCreateEvent event = new InteractionCreateEvent(lApi, payload, interaction.getGuildIdAsSnowflake(), interaction);
-                    transmitter.onInteractionCreate(lApi, event);
-                }
-                break;
+                case INTERACTION_CREATE:
+                    {
+                        Interaction interaction = Interaction.fromData(lApi, data);
+                        InteractionCreateEvent event = new InteractionCreateEvent(lApi, payload, interaction.getGuildIdAsSnowflake(), interaction);
+                        transmitter.onInteractionCreate(lApi, event);
+                    }
+                    break;
 
                 case INVITE_CREATE:
                     break;
@@ -1211,8 +1215,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case MESSAGE_CREATE:
-                    MessageImplementation msg = Message.fromData(lApi, innerPayload);
-                    transmitter.onMessageCreate(lApi, new MessageCreateEvent(lApi, payload, msg));
+                    {
+                        MessageImplementation msg = Message.fromData(lApi, innerPayload);
+                        transmitter.onMessageCreate(lApi, new MessageCreateEvent(lApi, payload, msg));
+                    }
                     break;
 
                 case MESSAGE_UPDATE:
@@ -1237,6 +1243,49 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case PRESENCE_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+
+                        if (guildId == null){
+                            transmitter.onPresenceUpdate(lApi, new PresenceUpdateEvent(lApi,
+                                    payload,
+                                    new Update<>(null, PresenceUpdate.fromData(data))));
+                            break;
+                        }
+
+                        if (guildManager == null) {
+                            transmitter.onPresenceUpdate(lApi, new PresenceUpdateEvent(lApi,
+                                    payload,
+                                    new Update<>(null, PresenceUpdate.fromData(data))));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onPresenceUpdate(lApi, new PresenceUpdateEvent(lApi,
+                                    payload,
+                                    new Update<>(null, PresenceUpdate.fromData(data))));
+                            break;
+                        }
+
+                        PresenceManager presenceManager = guild.getPresenceManager();
+
+                        if (presenceManager == null) {
+                            transmitter.onPresenceUpdate(lApi, new PresenceUpdateEvent(lApi,
+                                    payload,
+                                    new Update<>(null, PresenceUpdate.fromData(data))));
+                            break;
+                        }
+
+                        Update<PresenceUpdate, PresenceUpdate> update = presenceManager.onUpdate(data);
+                        transmitter.onPresenceUpdate(lApi, new PresenceUpdateEvent(lApi,
+                                payload,
+                                update));
+                    }
                     break;
 
                 case STAGE_INSTANCE_CREATE:
