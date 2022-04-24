@@ -43,6 +43,7 @@ import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManagerImpl;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -86,6 +87,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<ListManager<Channel<?>>> channelManagerFactory = null;
     private ManagerFactory<ThreadManager> threadManagerFactory = null;
     private ManagerFactory<PresenceManager> presenceManagerFactory = null;
+    private ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory = null;
 
 
     /**
@@ -410,6 +412,23 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), lApi::isCopyOldStageInstanceOnUpdateEventEnabled))}
+     * <p>
+     *     Factory for the {@link ListManager ListManager&lt;StageInstance&gt;} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param stageInstanceManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;StageInstance&gt;&gt;}
+     * @return this
+     */
+    public ConfigBuilder setStageInstanceManagerFactory(ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory) {
+        this.stageInstanceManagerFactory = stageInstanceManagerFactory;
+        return this;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -504,8 +523,9 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
                 Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled)),
                 Objects.requireNonNullElse(threadManagerFactory, lApi -> new ThreadManagerImpl(lApi)),
-                Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi))
-        );
+                Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi)),
+                Objects.requireNonNullElse(stageInstanceManagerFactory,
+                        lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), lApi::isCopyOldStageInstanceOnUpdateEventEnabled)));
     }
 
     /**

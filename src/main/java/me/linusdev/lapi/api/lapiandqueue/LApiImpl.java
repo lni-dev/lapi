@@ -715,6 +715,16 @@ public class LApiImpl implements LApi {
         return config.isFlagSet(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT);
     }
 
+    @Override
+    public boolean isCacheStageInstancesEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_STAGE_INSTANCES);
+    }
+
+    @Override
+    public boolean isCopyOldStageInstanceOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_STAGE_INSTANCE_ON_UPDATE_EVENT);
+    }
+
     //api-internal getter
 
     /**

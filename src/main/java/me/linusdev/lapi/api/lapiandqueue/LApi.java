@@ -786,4 +786,14 @@ public interface LApi extends HasLApi {
      */
     boolean isCopyOldPresenceOnUpdateEventEnabled();
 
+    /**
+     * @see ConfigFlag#CACHE_STAGE_INSTANCES
+     */
+    boolean isCacheStageInstancesEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_STAGE_INSTANCE_ON_UPDATE_EVENT
+     */
+    boolean isCopyOldStageInstanceOnUpdateEventEnabled();
+
 }

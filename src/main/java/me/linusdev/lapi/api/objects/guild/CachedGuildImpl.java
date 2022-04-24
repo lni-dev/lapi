@@ -73,7 +73,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable ListManager<Channel<?>> channelManager;
     protected @Nullable ThreadManager threadsManager;
     protected @Nullable PresenceManager presenceManager;
-    protected @Nullable StageInstance[] stageInstances;
+    protected @Nullable ListManager<StageInstance> stageInstanceManager;
     protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
 
 
@@ -153,6 +153,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCachePresencesEnabled()) {
             this.presenceManager = lApi.getConfig().getPresenceManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheStageInstancesEnabled()) {
+            this.stageInstanceManager = lApi.getConfig().getStageInstanceManagerFactory().newInstance(lApi);
         }
 
     }
