@@ -96,7 +96,7 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link Member} or {@code null} if data was {@code null}
      * @throws InvalidDataException if {@link #ROLES_KEY}, {@link #JOINED_AT_KEY}, {@link #DEAF_KEY} or {@link #MUTE_KEY} are null or missing
      */
@@ -230,7 +230,7 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     }
 
     /**
-     * Generate {@link Data} of this {@link Member}
+     * Generate {@link SOData} of this {@link Member}
      */
     @Override
     public @NotNull SOData getData() {

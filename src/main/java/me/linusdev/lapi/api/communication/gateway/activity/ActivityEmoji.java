@@ -52,7 +52,7 @@ public class ActivityEmoji implements Emoji, Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivityEmoji}
      * @throws InvalidDataException if {@link #NAME_KEY} is missing or {@code null}
      */

@@ -68,7 +68,7 @@ public class Update<OBJ extends Updatable, COPY> {
     /**
      *
      * @param obj the <b>not updated</b> object, which must implement {@link Updatable} and {@link me.linusdev.lapi.api.interfaces.copyable.Copyable Copyable}
-     * @param data the {@link Data} to update the object. (calls {@link Updatable#updateSelfByData(Data)})
+     * @param data the {@link SOData} to update the object. (calls {@link Updatable#updateSelfByData(Data)})
      * @param <C> class that implements {@link Updatable} and {@link me.linusdev.lapi.api.interfaces.copyable.Copyable Copyable}
      * @throws InvalidDataException thrown by {@link Updatable#updateSelfByData(Data)}
      */

@@ -84,7 +84,7 @@ public interface Component extends Datable {
 
     /**
      *
-     * @param data {@link Data} to create Component
+     * @param data {@link SOData} to create Component
      * @return {@link ActionRow}, {@link Button}, {@link SelectMenu} or {@link UnknownComponent}. Depending on {@link #getType()} stored in given data
      * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
      */

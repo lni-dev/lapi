@@ -34,7 +34,7 @@ public class Attachment extends PartialAttachment {
 
     /**
      *
-     * Creates a {@link Attachment} from an {@link Data}
+     * Creates a {@link Attachment} from an {@link SOData}
      *
      * Required fields: {@link #ID_KEY}, {@link #FILENAME_KEY}, {@link #URL_KEY}, {@link #PROXY_URL_KEY}, {@link #SIZE_KEY}
      *

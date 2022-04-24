@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
@@ -48,7 +49,7 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param query the {@link Query} used to retrieve the {@link Data}
+     * @param query the {@link Query} used to retrieve the {@link SOData}
      */
     public Retriever(@NotNull LApi lApi, @NotNull Query query){
         this.lApi = lApi;

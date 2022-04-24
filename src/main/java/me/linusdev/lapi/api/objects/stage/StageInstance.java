@@ -106,7 +106,7 @@ public class StageInstance implements Datable, SnowflakeAble {
 
     /**
      *
-     * @return {@link Data} for this {@link StageInstance}
+     * @return {@link SOData} for this {@link StageInstance}
      */
     @Override
     public SOData getData() {

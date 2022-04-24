@@ -414,7 +414,7 @@ public class ConfigBuilder implements Datable {
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return this
      * @see #getData()
      */
@@ -520,8 +520,8 @@ public class ConfigBuilder implements Datable {
 
     /**
      *
-     * @return {@link Data} corresponding to this {@link ConfigBuilder}
-     * @see #fromData(Data)
+     * @return {@link SOData} corresponding to this {@link ConfigBuilder}
+     * @see #fromData(SOData)
      */
     @Override
     public SOData getData() {

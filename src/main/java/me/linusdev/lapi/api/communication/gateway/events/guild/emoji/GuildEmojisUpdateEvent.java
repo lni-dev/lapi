@@ -67,7 +67,7 @@ public class GuildEmojisUpdateEvent extends Event implements GuildEvent {
     /**
      * {@link ArrayList} of {@link EmojiObject emojis}, which has been retrieved from Discord in the update event
      * @return {@link ArrayList} of {@link EmojiObject emojis}
-     * @throws InvalidDataException if a {@link Data} was invalid
+     * @throws InvalidDataException if a {@link SOData} was invalid
      */
     @Contract(value="-> new",pure = true)
     public @NotNull ArrayList<EmojiObject> getEmojis() throws InvalidDataException {

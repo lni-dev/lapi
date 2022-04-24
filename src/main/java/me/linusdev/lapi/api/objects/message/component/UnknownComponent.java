@@ -43,7 +43,7 @@ public class UnknownComponent implements Component{
 
     /**
      *
-     * @param data {@link Data} for this Component
+     * @param data {@link SOData} for this Component
      * @return {@link UnknownComponent}
      * @throws InvalidDataException if {@link #TYPE_KEY} is null or missing
      */

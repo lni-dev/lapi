@@ -63,7 +63,7 @@ public class TeamMember implements Datable, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link TeamMember}
      * @throws InvalidDataException if {@link #MEMBERSHIP_STATE_KEY}, {@link #PERMISSIONS_KEY}, {@link #TEAM_ID_KEY} or {@link #USER_KEY} are missing or null
      */
@@ -128,7 +128,7 @@ public class TeamMember implements Datable, HasLApi {
     }
 
     /**
-     * Generate {@link Data} from this {@link TeamMember}
+     * Generate {@link SOData} from this {@link TeamMember}
      */
     @Override
     public SOData getData() {

@@ -52,7 +52,7 @@ public class PartialUser implements Datable {
     }
 
     /**
-     * raw {@link Data} of the retrieved user object.
+     * raw {@link SOData} of the retrieved user object.
      */
     @Override
     public @NotNull SOData getData() {

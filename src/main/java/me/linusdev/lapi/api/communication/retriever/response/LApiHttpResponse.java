@@ -74,8 +74,8 @@ public class LApiHttpResponse {
 
     /**
      *
-     * @return body-json as {@link Data}. An Empty {@link Data} will be returned,
-     * if there is {@link #noContent() no content}. This {@link Data} will be the exact same for subsequent calls.
+     * @return body-json as {@link SOData}. An Empty {@link SOData} will be returned,
+     * if there is {@link #noContent() no content}. This {@link SOData} will be the exact same for subsequent calls.
      * @throws IOException from {@link PushbackReader}
      * @throws ParseException from {@link JsonParser}
      */
@@ -86,8 +86,8 @@ public class LApiHttpResponse {
     /**
      *
      * @param arrayKey to parse pure JSON array
-     * @return body-json as {@link Data}. An Empty {@link Data} will be returned,
-     * if there is {@link #noContent() no content}. This {@link Data} will be the exact same for subsequent calls.
+     * @return body-json as {@link SOData}. An Empty {@link SOData} will be returned,
+     * if there is {@link #noContent() no content}. This {@link SOData} will be the exact same for subsequent calls.
      * @throws IOException from {@link PushbackReader}
      * @throws ParseException from {@link JsonParser}
      */

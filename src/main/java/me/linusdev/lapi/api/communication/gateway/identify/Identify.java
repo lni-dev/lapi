@@ -77,7 +77,7 @@ public class Identify implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link Identify}
      * @throws InvalidDataException if {@link #TOKEN_KEY}, {@link #PROPERTIES_KEY}, {@link #INTENTS_KEY} is missing or {@code null}
      */

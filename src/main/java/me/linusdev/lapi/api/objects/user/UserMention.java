@@ -53,9 +53,9 @@ public class UserMention implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link UserMention}
-     * @throws InvalidDataException see {@link User#fromData(LApi, Data)}
+     * @throws InvalidDataException see {@link User#fromData(LApi, SOData)}
      */
     public static @NotNull UserMention fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
 
@@ -80,7 +80,7 @@ public class UserMention implements Datable, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link UserMention}
+     * @return {@link SOData} for this {@link UserMention}
      */
     @Override
     public SOData getData() {

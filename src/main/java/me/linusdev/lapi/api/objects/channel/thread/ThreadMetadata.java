@@ -52,7 +52,7 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @throws InvalidDataException if {@link #ARCHIVED_KEY}, {@link #ARCHIVE_TIMESTAMP_KEY}, {@link #AUTO_ARCHIVE_DURATION_KEY} or {@link #LOCKED_KEY} are missing or null
      */
     @SuppressWarnings("ConstantConditions")

@@ -67,7 +67,7 @@ public class ApplicationCommandInteractionDataOption implements Datable {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ApplicationCommandInteractionDataOption}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */

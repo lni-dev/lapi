@@ -50,7 +50,7 @@ public class ConnectionProperties implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ConnectionProperties}
      * @throws InvalidDataException if {@link #OS_KEY}, {@link #BROWSER_KEY} or {@link #DEVICE_KEY} are missing or {@code null}
      */

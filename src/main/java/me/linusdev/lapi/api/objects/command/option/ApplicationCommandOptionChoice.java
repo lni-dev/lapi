@@ -51,7 +51,7 @@ public class ApplicationCommandOptionChoice implements Datable {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ApplicationCommandOptionChoice}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #VALUE_KEY} are missing or {@code null}
      */

@@ -28,7 +28,7 @@ public interface RoleManager extends RolePool, Manager {
 
     /**
      *
-     * @param updateData the updated {@link Data} for the role to update.
+     * @param updateData the updated {@link SOData} for the role to update.
      * @return {@link Update} contain the updated {@link Role}. {@link Update#getCopy() a copy of the role before it was updated} will be contained if
      * {@link me.linusdev.lapi.api.config.ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT COPY_ROLE_ON_UPDATE_EVENT} is set.
      * @throws InvalidDataException if given updateData is Invalid.

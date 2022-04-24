@@ -1930,7 +1930,7 @@ public enum StandardEmoji implements Emoji {
     }
 
     /**
-     * a {@link Data} for this Standard Emoji. Useful for generating JSON
+     * a {@link SOData} for this Standard Emoji. Useful for generating JSON
      */
     @Override
     public @NotNull SOData getData() {

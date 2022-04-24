@@ -87,8 +87,8 @@ public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>
     }
 
     /**
-     * Updates {@link T} with the same id as given {@link Data}. If no such {@link T} exists, {@code null} is returned.
-     * @param data data of {@link T} to {@link CopyAndUpdatable#updateSelfByData(Data) updated}
+     * Updates {@link T} with the same id as given {@link SOData}. If no such {@link T} exists, {@code null} is returned.
+     * @param data data of {@link T} to {@link CopyAndUpdatable#updateSelfByData(SOData) updated}
      * @return {@link Update}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */

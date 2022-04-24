@@ -75,7 +75,7 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link IntegrationApplication}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #DESCRIPTION_KEY} or {@link #SUMMARY_KEY} is missing or {@code null}
      */

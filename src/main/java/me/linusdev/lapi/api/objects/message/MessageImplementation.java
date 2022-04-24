@@ -69,7 +69,7 @@ public class MessageImplementation extends AbstractMessage {
 
 
     /**
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
@@ -250,7 +250,7 @@ public class MessageImplementation extends AbstractMessage {
 
     /**
      *
-     * @return {@link Data} for this {@link MessageImplementation}
+     * @return {@link SOData} for this {@link MessageImplementation}
      */
     @Override
     public @NotNull SOData getData() {

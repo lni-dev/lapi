@@ -147,7 +147,7 @@ public class StickerPack implements Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link StickerPack}
+     * @return {@link SOData} for this {@link StickerPack}
      */
     @Override
     public @NotNull SOData getData() {

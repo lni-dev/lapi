@@ -86,9 +86,9 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
     }
 
     /**
-     * This creates a {@link PermissionOverwrite} from given {@link Data}
+     * This creates a {@link PermissionOverwrite} from given {@link SOData}
      * @param data to read from
-     * @throws InvalidDataException if given {@link Data} does not match a {@link PermissionOverwrite}
+     * @throws InvalidDataException if given {@link SOData} does not match a {@link PermissionOverwrite}
      */
     public PermissionOverwrite(@NotNull SOData data) throws InvalidDataException {
         this.data = data;

@@ -246,7 +246,7 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
     }
 
     /**
-     * Generates a {@link Data} from this {@link EmojiObject}
+     * Generates a {@link SOData} from this {@link EmojiObject}
      * <br><br>
      * This is probably useless, but it's here anyways
      */
@@ -268,13 +268,13 @@ public class EmojiObject implements SnowflakeAble, CopyAndUpdatable<EmojiObject>
 
     /**
      *
-     * This will compare this emoji with given {@link Data}.
+     * This will compare this emoji with given {@link SOData}.
      * {@link #ID_KEY ID} and {@link #USER_KEY USER} will not be checked,
      * because these fields should not change in the first place
      *
-     * @param emojiData the {@link Data}, which should be compared to this emoji
+     * @param emojiData the {@link SOData}, which should be compared to this emoji
      * @return {@code false} if given data could represent this emoji,
-     * {@code true} if given {@link Data} would change this emoji.
+     * {@code true} if given {@link SOData} would change this emoji.
      */
     @ApiStatus.Internal
     @Override

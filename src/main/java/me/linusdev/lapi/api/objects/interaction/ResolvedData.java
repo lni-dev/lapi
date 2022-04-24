@@ -74,9 +74,9 @@ public class ResolvedData implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ResolvedData}
-     * @throws InvalidDataException see {@link User#fromData(LApi, Data)}, {@link Member#fromData(LApi, Data)}, {@link Role#fromData(LApi, Data)}, {@link Channel#fromData(LApi, Data)}, {@link MessageImplementation#MessageImplementation(LApi, Data)}
+     * @throws InvalidDataException see {@link User#fromData(LApi, SOData)}, {@link Member#fromData(LApi, SOData)}, {@link Role#fromData(LApi, SOData)}, {@link Channel#fromData(LApi, SOData)}, {@link MessageImplementation#MessageImplementation(LApi, SOData)}
      */
     public static @Nullable ResolvedData fromData(@NotNull LApi lApi, SOData data) throws InvalidDataException {
         if(data == null) return null;

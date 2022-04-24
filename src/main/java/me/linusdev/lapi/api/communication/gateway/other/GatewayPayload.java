@@ -99,7 +99,7 @@ public class GatewayPayload implements GatewayPayloadAbstract, Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link GatewayPayload}
      * @throws InvalidDataException if {@link #OPCODE_KEY} is missing or {@code null}
      */

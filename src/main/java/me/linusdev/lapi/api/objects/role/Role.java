@@ -115,7 +115,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link Role}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #COLOR_KEY}, {@link #HOIST_KEY}, {@link #POSITION_KEY}, {@link #PERMISSIONS_KEY}, {@link #MANAGED_KEY} or {@link #MENTIONABLE_KEY} are missing or {@code null}
      */
@@ -261,7 +261,7 @@ public class Role implements Datable, SnowflakeAble, HasLApi, Updatable, CopyAnd
 
     /**
      *
-     * @return {@link Data} for this {@link Role}
+     * @return {@link SOData} for this {@link Role}
      */
     @Override
     public SOData getData() {

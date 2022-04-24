@@ -54,7 +54,7 @@ public class ActivityButton implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivityButton}
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #URL_KEY} are missing or {@code null}
      */

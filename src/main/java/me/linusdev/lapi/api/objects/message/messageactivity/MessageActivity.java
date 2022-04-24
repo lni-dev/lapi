@@ -52,7 +52,7 @@ public class MessageActivity implements Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link MessageActivity}
      * @throws InvalidDataException if {@link #TYPE_KEY} field is missing
      */
@@ -82,7 +82,7 @@ public class MessageActivity implements Datable {
     }
 
     /**
-     * Generates a {@link Data} from this {@link MessageActivity}
+     * Generates a {@link SOData} from this {@link MessageActivity}
      */
     @Override
     public @NotNull SOData getData() {

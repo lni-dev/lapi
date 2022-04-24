@@ -42,7 +42,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
 
     /**
      * @param lApi  {@link LApi}
-     * @param query the {@link Query} used to retrieve the {@link Data}
+     * @param query the {@link Query} used to retrieve the {@link SOData}
      */
     public DataRetriever(@NotNull LApi lApi, @NotNull Query query) {
         super(lApi, query);
@@ -63,7 +63,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
 
     /**
      *
-     * This will write the {@link Data data}, that was retrieved.<br>
+     * This will write the {@link SOData data}, that was retrieved.<br>
      * As for the {@link ArrayRetriever}, the retrieved json-array will be wrapped in a json-object
      *
      * @param file Path to the file to save to

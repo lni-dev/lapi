@@ -103,7 +103,7 @@ public class Embed implements Datable {
     }
 
     /**
-     * creates a {@link Embed} from {@link Data}
+     * creates a {@link Embed} from {@link SOData}
      * @param data to create {@link Embed}
      * @return {@link Embed}
      * @throws InvalidDataException if given data was invalid. for more information see {@link Footer},
@@ -237,7 +237,7 @@ public class Embed implements Datable {
 
 
     /**
-     * Creates a {@link Data} from this {@link Embed}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Embed}, useful to convert it to JSON
      */
     @Override
     public SOData getData() {

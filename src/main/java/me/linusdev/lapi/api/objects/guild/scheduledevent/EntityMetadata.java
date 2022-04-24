@@ -41,7 +41,7 @@ public class EntityMetadata implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link EntityMetadata}
      */
     public static @Nullable EntityMetadata fromData(@Nullable SOData data){
@@ -59,7 +59,7 @@ public class EntityMetadata implements Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link EntityMetadata}
+     * @return {@link SOData} for this {@link EntityMetadata}
      */
     @Override
     public SOData getData() {

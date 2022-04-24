@@ -87,7 +87,7 @@ public class Team implements Datable, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link Team}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #MEMBERS_KEY}, {@link #NAME_KEY} or {@link #OWNER_USER_ID_KEY} are missing
      */

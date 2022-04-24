@@ -50,7 +50,7 @@ public class RoleTags implements Datable, Copyable<RoleTags> {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link RoleTags}
      */
     public static @Nullable RoleTags fromData(@Nullable SOData data){
@@ -106,7 +106,7 @@ public class RoleTags implements Datable, Copyable<RoleTags> {
 
     /**
      *
-     * @return {@link Data} for this {@link RoleTags}
+     * @return {@link SOData} for this {@link RoleTags}
      */
     @Override
     public SOData getData() {

@@ -109,7 +109,7 @@ public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLAp
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link VoiceState}
      * @throws InvalidDataException if data is invalid
      */
@@ -278,7 +278,7 @@ public class VoiceState implements CopyAndUpdatable<VoiceState>, Datable, HasLAp
 
     /**
      *
-     * @return {@link Data} for this {@link VoiceState}
+     * @return {@link SOData} for this {@link VoiceState}
      */
     @Override
     public SOData getData() {

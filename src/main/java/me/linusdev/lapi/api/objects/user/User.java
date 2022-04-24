@@ -152,7 +152,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link User}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #USERNAME_KEY}, {@link #DISCRIMINATOR_KEY} are missing or null
      */
@@ -355,7 +355,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
 
     /**
      *
-     * @return {@link Data} for this {@link User}
+     * @return {@link SOData} for this {@link User}
      */
     @Override
     public @NotNull SOData getData() {

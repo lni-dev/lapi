@@ -44,7 +44,7 @@ public class ActivityTimestamps implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivityTimestamps}
      */
     @Contract("null -> null; !null -> !null")

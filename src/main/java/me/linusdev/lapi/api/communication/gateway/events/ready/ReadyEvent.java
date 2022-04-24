@@ -83,7 +83,7 @@ public class ReadyEvent extends Event implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ReadyEvent}
      * @throws InvalidDataException if {@link #VERSION_KEY}, {@link #USER_KEY}, {@link #GUILDS_KEY}, {@link #SESSION_ID_KEY} or {@link #APPLICATION_KEY} are missing or {@code null}
      */

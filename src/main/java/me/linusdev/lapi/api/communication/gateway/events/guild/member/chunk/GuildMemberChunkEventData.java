@@ -59,7 +59,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
      * @param lApi       {@link LApi}
      * @param guildId    the id of the guild
      * @param members    set of guild members
-     * @param chunkIndex the chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count)
+     * @param chunkIndex the chunk index in the expected chunks for this response (0 &lt;= chunk_index &lt; chunk_count)
      * @param chunkCount the total number of expected chunks for this response
      * @param notFound   if passing an invalid id to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, it will be returned here
      * @param presences  if passing true to {@link GatewayCommandType#REQUEST_GUILD_MEMBERS REQUEST_GUILD_MEMBERS}, presences of the returned members will be here
@@ -145,7 +145,7 @@ public class GuildMemberChunkEventData implements Datable, HasLApi {
     }
 
     /**
-     * the chunk index in the expected chunks for this response (0 <= chunk_index < chunk_count)
+     * the chunk index in the expected chunks for this response (0 &lt;= chunk_index &lt; chunk_count)
      */
     public int getChunkIndex() {
         return chunkIndex;

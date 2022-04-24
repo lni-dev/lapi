@@ -97,7 +97,7 @@ public class AttachmentTemplate implements Attachment, FilePart {
     }
 
     /**
-     * {@link Data}, that contains information used to upload this attachment to Discord
+     * {@link SOData}, that contains information used to upload this attachment to Discord
      */
     @Override
     public SOData getData() {

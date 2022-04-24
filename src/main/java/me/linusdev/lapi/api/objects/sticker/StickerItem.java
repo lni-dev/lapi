@@ -53,7 +53,7 @@ public class StickerItem implements Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link StickerItem}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY} or {@link #FORMAT_TYPE_KEY} are missing
      */
@@ -101,7 +101,7 @@ public class StickerItem implements Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link StickerItem}
+     * @return {@link SOData} for this {@link StickerItem}
      */
     @Override
     public SOData getData() {

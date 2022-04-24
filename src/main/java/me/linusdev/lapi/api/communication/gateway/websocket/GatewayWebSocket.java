@@ -374,7 +374,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      *     <li>{@link GatewayEvent#RECONNECT}</li>
      * </ul>
      * @param type {@link GatewayEvent type} of the event
-     * @param innerPayload the {@link Data} sent with this event
+     * @param innerPayload the {@link SOData} sent with this event
      * @param payload {@link GatewayPayloadAbstract}
      * @throws InvalidDataException
      */
@@ -1674,7 +1674,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     /**
      * Sends given command to Discord
      * @param command the command to send
-     * @param data the data of the command, most like to be a {@link Data}
+     * @param data the data of the command, most like to be a {@link SOData}
      */
     @ApiStatus.Internal
     public void sendCommand(GatewayCommandType command, Object data){

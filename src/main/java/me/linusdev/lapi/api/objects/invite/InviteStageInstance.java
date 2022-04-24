@@ -63,7 +63,7 @@ public class InviteStageInstance implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link InviteStageInstance}
      * @throws InvalidDataException if {@link #MEMBERS_KEY}, {@link #PARTICIPANT_COUNT_KEY}, {@link #SPEAKER_COUNT_KEY} or {@link #TOPIC_KEY} are missing or {@code null}
      */
@@ -121,7 +121,7 @@ public class InviteStageInstance implements Datable, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link InviteStageInstance}
+     * @return {@link SOData} for this {@link InviteStageInstance}
      */
     @Override
     public SOData getData() {

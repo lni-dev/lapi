@@ -61,7 +61,7 @@ public class PresenceUpdate implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link PresenceUpdate}
      * @throws InvalidDataException if {@link #ACTIVITIES_KEY}, {@link #STATUS_KEY} or {@link #AFK_KEY} is missing or {@code null}
      */

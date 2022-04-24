@@ -85,7 +85,7 @@ public class Thumbnail implements Datable {
     }
 
     /**
-     * creates a {@link Thumbnail} from {@link Data}
+     * creates a {@link Thumbnail} from {@link SOData}
      * @param data to create {@link Thumbnail}
      * @return {@link Thumbnail} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #URL_KEY} is missing in given data
@@ -133,7 +133,7 @@ public class Thumbnail implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Thumbnail}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Thumbnail}, useful to convert it to JSON
      */
     @Override
     public @NotNull SOData getData() {

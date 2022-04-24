@@ -48,7 +48,7 @@ public class Provider implements Datable {
     }
 
     /**
-     * creates a {@link Provider} from {@link Data}
+     * creates a {@link Provider} from {@link SOData}
      * @param data to create {@link Provider}
      * @return {@link Provider} or {@code null} if data is {@code null}
      */
@@ -75,7 +75,7 @@ public class Provider implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Provider}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Provider}, useful to convert it to JSON
      */
     @Override
     public SOData getData() {

@@ -55,7 +55,7 @@ public class MessageReference implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link MessageReference} or {@code null} if data was {@code null}
      */
     public static @Nullable MessageReference fromData(@Nullable SOData data){
@@ -130,7 +130,7 @@ public class MessageReference implements Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link MessageReference}
+     * @return {@link SOData} for this {@link MessageReference}
      */
     @Override
     public SOData getData() {

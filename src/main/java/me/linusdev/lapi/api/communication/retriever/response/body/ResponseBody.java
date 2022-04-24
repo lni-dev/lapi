@@ -33,7 +33,7 @@ public abstract class ResponseBody implements HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data the retrieved {@link Data}
+     * @param data the retrieved {@link SOData}
      */
     public ResponseBody(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.data = data;
@@ -41,7 +41,7 @@ public abstract class ResponseBody implements HasLApi {
     }
 
     /**
-     * the retrieved {@link Data}
+     * the retrieved {@link SOData}
      */
     public @NotNull SOData getData() {
         return data;

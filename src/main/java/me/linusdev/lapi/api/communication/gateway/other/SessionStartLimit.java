@@ -53,7 +53,7 @@ public class SessionStartLimit implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link SessionStartLimit}
      * @throws InvalidDataException if {@link #TOTAL_KEY}, {@link #REMAINING_KEY}, {@link #RESET_AFTER_KEY} or {@link #MAX_CONCURRENCY_KEY} are missing or {@code null}
      */

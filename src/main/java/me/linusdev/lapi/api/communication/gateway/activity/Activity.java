@@ -108,7 +108,7 @@ public class Activity implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link Activity}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */

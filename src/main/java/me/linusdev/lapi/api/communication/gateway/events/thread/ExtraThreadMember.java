@@ -61,7 +61,7 @@ public class ExtraThreadMember extends ThreadMember implements HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ExtraThreadMember}
      */
     @Contract(value = "_, null -> null; _, !null -> !null", pure = true)

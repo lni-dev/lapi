@@ -59,7 +59,7 @@ public class InviteMetadata {
     }
 
     /**
-     * @param data {@link Data} with required fields or {@code null}
+     * @param data {@link SOData} with required fields or {@code null}
      * @return {@link InviteMetadata}
      * @throws InvalidDataException if {@link #USES_KEY}  {@link #MAX_USES_KEY}, {@link #MAX_AGE_KEY}, {@link #TEMPORARY_KEY} or {@link #CREATED_AT_KEY} are missing ir {@code null}
      */
@@ -119,8 +119,8 @@ public class InviteMetadata {
     /**
      * this doesn't implement Datable, but instead has a function to extend an already existing Data by its values
      *
-     * @param data {@link Data} to extend
-     * @return extended {@link Data}
+     * @param data {@link SOData} to extend
+     * @return extended {@link SOData}
      */
     public @NotNull SOData extendData(@NotNull SOData data) {
 

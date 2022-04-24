@@ -89,7 +89,7 @@ public class InteractionData implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link InteractionData}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY} or {@link #TYPE_KEY} are missing or {@code null}
      */

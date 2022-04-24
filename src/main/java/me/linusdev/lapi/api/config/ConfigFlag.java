@@ -237,7 +237,7 @@ public enum ConfigFlag implements SimpleDatable {
     /**
      *
      * @param flags long with set bits
-     * @return {@link Data} representing given flags
+     * @return {@link SOData} representing given flags
      */
     public static @NotNull SOData toData(long flags){
         ConfigFlag[] values = ConfigFlag.values();

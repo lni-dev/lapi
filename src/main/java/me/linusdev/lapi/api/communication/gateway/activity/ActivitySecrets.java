@@ -47,7 +47,7 @@ public class ActivitySecrets implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivitySecrets}
      */
     public static @Nullable ActivitySecrets fromData(@Nullable SOData data){

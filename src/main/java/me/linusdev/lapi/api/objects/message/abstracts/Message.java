@@ -145,7 +145,7 @@ public interface Message extends Datable, SnowflakeAble {
     /**
      * see {@link MessageImplementation Message implemantion}
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link MessageImplementation Message}
      */
     @Contract("_, null -> null; _, !null -> !null")

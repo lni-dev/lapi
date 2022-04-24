@@ -58,7 +58,7 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link ThreadMember}
      * @throws InvalidDataException if {@link #JOIN_TIMESTAMP_KEY} or {@link #FLAGS_KEY} are missing or null
      */
@@ -127,7 +127,7 @@ public class ThreadMember implements Copyable<ThreadMember>, Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link ThreadMember}
+     * @return {@link SOData} for this {@link ThreadMember}
      */
     @Override
     public SOData getData() {

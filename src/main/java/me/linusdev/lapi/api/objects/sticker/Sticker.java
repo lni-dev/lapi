@@ -104,7 +104,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link Sticker}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #TAGS_KEY}, {@link #TYPE_KEY} or {@link #FORMAT_TYPE_KEY} is null or missing
      */
@@ -248,7 +248,7 @@ public class Sticker implements SnowflakeAble, CopyAndUpdatable<Sticker>, Databl
 
     /**
      *
-     * @return {@link Data} for this {@link Sticker}
+     * @return {@link SOData} for this {@link Sticker}
      */
     @Override
     public SOData getData() {

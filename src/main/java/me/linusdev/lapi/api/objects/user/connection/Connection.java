@@ -84,7 +84,7 @@ public class Connection implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required Keys
+     * @param data {@link SOData} with required Keys
      * @return {@link Connection}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #NAME_KEY}, {@link #TYPE_KEY}, {@link #VERIFIED_KEY}, {@link #FRIEND_SYNC_KEY}, {@link #SHOW_ACTIVITY_KEY}, {@link #VISIBILITY_KEY}
      */
@@ -185,7 +185,7 @@ public class Connection implements Datable, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link Connection}
+     * @return {@link SOData} for this {@link Connection}
      */
     @Override
     public SOData getData() {

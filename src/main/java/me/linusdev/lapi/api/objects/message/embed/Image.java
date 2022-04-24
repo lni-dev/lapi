@@ -85,7 +85,7 @@ public class Image implements Datable {
     }
 
     /**
-     * creates a {@link Image} from {@link Data}
+     * creates a {@link Image} from {@link SOData}
      * @param data to create {@link Image}
      * @return {@link Image} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #URL_KEY} is missing in given data
@@ -133,7 +133,7 @@ public class Image implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Image}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Image}, useful to convert it to JSON
      */
     @Override
     public @NotNull SOData getData() {

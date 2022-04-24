@@ -103,7 +103,7 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ApplicationCommand}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #APPLICATION_ID_KEY}, {@link #NAME_KEY}, {@link #DESCRIPTION_KEY} or {@link #VERSION_KEY} are missing or {@code null}
      */

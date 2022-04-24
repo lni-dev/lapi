@@ -107,7 +107,7 @@ public class Invite implements Datable, HasLApi {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link Invite}
      * @throws InvalidDataException if {@link #CODE_KEY} or {@link #CHANNEL_KEY} are missing or {@code null}
      */
@@ -243,7 +243,7 @@ public class Invite implements Datable, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link Invite}
+     * @return {@link SOData} for this {@link Invite}
      */
     @Override
     public SOData getData() {

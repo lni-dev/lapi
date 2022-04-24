@@ -52,7 +52,7 @@ public class ActivityAssets implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivityAssets}
      */
     @Contract("null -> null; !null -> !null")

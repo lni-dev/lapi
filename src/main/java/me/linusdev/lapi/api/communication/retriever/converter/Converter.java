@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.retriever.converter;
 
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 
@@ -24,7 +25,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
  *
  * This interface is used to convert from {@link C} to {@link R}.
  * The converting process can throw an {@link InvalidDataException}, because
- * {@link C the convertible} is usually a {@link me.linusdev.data.Data Data}.
+ * {@link C the convertible} is usually a {@link SOData}.
  *
  * @param <C> the convertible-type
  * @param <R> the result-type to convert to

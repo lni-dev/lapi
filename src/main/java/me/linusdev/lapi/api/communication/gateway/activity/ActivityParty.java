@@ -48,7 +48,7 @@ public class ActivityParty implements Datable {
 
     /**
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ActivityParty}
      */
     public static @Nullable ActivityParty fromData(@Nullable SOData data){

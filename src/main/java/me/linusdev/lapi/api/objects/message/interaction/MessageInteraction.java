@@ -68,7 +68,7 @@ public class MessageInteraction implements Datable, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link MessageInteraction} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #TYPE_KEY}, {@link #NAME_KEY} or {@link #USER_KEY} are null or missing
      */
@@ -128,7 +128,7 @@ public class MessageInteraction implements Datable, HasLApi {
     }
 
     /**
-     * Generates {@link Data} from this {@link MessageInteraction}
+     * Generates {@link SOData} from this {@link MessageInteraction}
      */
     @Override
     public @NotNull SOData getData() {

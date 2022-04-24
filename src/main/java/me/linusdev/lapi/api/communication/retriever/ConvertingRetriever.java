@@ -26,9 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  *
- * This retriever is used to retrieve a JSON as {@link Data} from Discord and convert to it {@link R}
+ * This retriever is used to retrieve a JSON as {@link SOData} from Discord and convert to it {@link R}
  *
- * @param <R> the result class, the {@link Data} should be converted to
+ * @param <R> the result class, the {@link SOData} should be converted to
  */
 public class ConvertingRetriever<R> extends DataRetriever<R>{
 
@@ -38,7 +38,7 @@ public class ConvertingRetriever<R> extends DataRetriever<R>{
      *
      * @param lApi {@link LApi}
      * @param query {@link Query} for the HttpRequest
-     * @param converter {@link Converter} to convert from {@link Data} to {@link R}
+     * @param converter {@link Converter} to convert from {@link SOData} to {@link R}
      */
     public ConvertingRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<SOData, R> converter) {
         super(lApi, query);

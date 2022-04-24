@@ -68,7 +68,7 @@ public class ActionRow implements Datable, Component, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link ActionRow}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #COMPONENTS_KEY} are missing
      */
@@ -106,7 +106,7 @@ public class ActionRow implements Datable, Component, HasLApi {
 
     /**
      *
-     * @return {@link Data} representing this {@link ActionRow}
+     * @return {@link SOData} representing this {@link ActionRow}
      */
     @Override
     public SOData getData() {

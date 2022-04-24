@@ -66,7 +66,7 @@ public class SelectOption implements Datable, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link SelectOption}
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #VALUE_KEY} are missing
      */
@@ -130,7 +130,7 @@ public class SelectOption implements Datable, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link SelectOption}
+     * @return {@link SOData} for this {@link SelectOption}
      */
     @Override
     public SOData getData() {

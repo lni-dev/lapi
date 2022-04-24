@@ -51,7 +51,7 @@ public class ClientStatus implements Datable, Copyable<ClientStatus> {
     }
 
     /**
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link ClientStatus}
      */
     @Contract("null -> null; !null -> !null")

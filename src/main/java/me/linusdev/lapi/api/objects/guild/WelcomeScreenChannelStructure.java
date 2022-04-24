@@ -54,7 +54,7 @@ public class WelcomeScreenChannelStructure implements Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link WelcomeScreenChannelStructure}
      * @throws InvalidDataException if {@link #CHANNEL_ID_KEY} or {@link #DESCRIPTION_KEY} is missing or {@code null}
      */
@@ -104,7 +104,7 @@ public class WelcomeScreenChannelStructure implements Datable {
 
     /**
      *
-     * @return {@link Data} for this {@link WelcomeScreenChannelStructure}
+     * @return {@link SOData} for this {@link WelcomeScreenChannelStructure}
      */
     @Override
     public SOData getData() {

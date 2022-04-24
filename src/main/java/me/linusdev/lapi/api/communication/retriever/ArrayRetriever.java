@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * This class is used to retrieve any Array and convert it to an {@link ArrayList} of type {@link R}
- * @param <C> the class which will be retrieved from the Discord Api, usually {@link Data}
+ * @param <C> the class which will be retrieved from the Discord Api, usually {@link SOData}
  * @param <R> the result class, to which {@link C} should be converted to
  */
 public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{

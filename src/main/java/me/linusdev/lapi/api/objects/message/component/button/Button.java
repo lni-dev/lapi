@@ -190,7 +190,7 @@ public class Button implements Component, HasLApi {
 
     /**
      *
-     * @return {@link Data} representing this {@link Button}
+     * @return {@link SOData} representing this {@link Button}
      */
     @Override
     public SOData getData() {

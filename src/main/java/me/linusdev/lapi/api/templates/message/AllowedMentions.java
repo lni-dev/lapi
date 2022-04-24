@@ -90,7 +90,7 @@ public class AllowedMentions implements Datable {
     /**
      *
      *
-     * @return {@link Data} for this {@link AllowedMentions}
+     * @return {@link SOData} for this {@link AllowedMentions}
      */
     @Override
     public SOData getData() {

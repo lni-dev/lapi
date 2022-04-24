@@ -27,11 +27,11 @@ public interface Updatable {
     void updateSelfByData(SOData data) throws InvalidDataException;
 
     /**
-     * checks whether given {@link Data} could represent this object.<br>
+     * checks whether given {@link SOData} could represent this object.<br>
      * Note: Even if {@code false} is returned, given data may not contain exactly the same
      * information as this object.
      * @param data to compare with
-     * @return {@code true} if given {@link Data} could represent this object, {@code false} otherwise
+     * @return {@code true} if given {@link SOData} could represent this object, {@code false} otherwise
      */
     default boolean checkIfChanged(SOData data) {
         throw new UnsupportedOperationException("Not implemented");

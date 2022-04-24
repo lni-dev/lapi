@@ -68,7 +68,7 @@ public class GuildStickersUpdateEvent extends Event implements GuildEvent {
     /**
      * {@link ArrayList} of {@link Sticker stickers}, which has been retrieved from Discord in the update event
      * @return {@link ArrayList} of {@link Sticker stickers}
-     * @throws InvalidDataException if a {@link Data} was invalid
+     * @throws InvalidDataException if a {@link SOData} was invalid
      */
     @Contract(value="-> new",pure = true)
     public @NotNull ArrayList<Sticker> getStickers() throws InvalidDataException {

@@ -47,7 +47,7 @@ public class IntegrationAccount implements Datable {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link IntegrationAccount}
      * @throws InvalidDataException if {@link #ID_KEY} or {@link #NAME_KEY} are missing or {@code null}
      */
@@ -83,7 +83,7 @@ public class IntegrationAccount implements Datable {
     }
 
     /**
-     * @return {@link Data}
+     * @return {@link SOData}
      */
     @Override
     public SOData getData() {

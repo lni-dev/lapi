@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * This exception is thrown if an Object is created from a {@link Data}, but the Data does not contain the necessary fields
+ * This exception is thrown if an Object is created from a {@link SOData}, but the Data does not contain the necessary fields
  */
 public class InvalidDataException extends LApiException{
 
@@ -58,7 +58,7 @@ public class InvalidDataException extends LApiException{
     }
 
     /**
-     * @param missingFields the fields missing in the {@link Data}
+     * @param missingFields the fields missing in the {@link SOData}
      * @return itself
      */
     public InvalidDataException addMissingFields(String... missingFields){
@@ -69,14 +69,14 @@ public class InvalidDataException extends LApiException{
     /**
      * This may not contain all missing fields!
      *
-     * @return {@link ArrayList} of keys as {@link String}, which are required but were missing in the {@link me.linusdev.data.Data}
+     * @return {@link ArrayList} of keys as {@link String}, which are required but were missing in the {@link SOData}
      */
     public ArrayList<String> getMissingFields() {
         return missingFields;
     }
 
     /**
-     * @return The {@link Data} where the fields are missing
+     * @return The {@link SOData} where the fields are missing
      */
     public @Nullable SOData getData() {
         return data;
@@ -97,9 +97,9 @@ public class InvalidDataException extends LApiException{
 
     /**
      *
-     * @param data Invalid {@link Data}
+     * @param data Invalid {@link SOData}
      * @param message message to throw.
-     * @param clazz class in which the {@link Data} was used in. this will be added to the message like this: ". Invalid Data while creating " + clazz.getSimpleName() + "."
+     * @param clazz class in which the {@link SOData} was used in. this will be added to the message like this: ". Invalid Data while creating " + clazz.getSimpleName() + "."
      * @param checkIfNull array of Objects which may be null
      * @param keys array of keys corresponding to the Objects, will be added as {@link #addMissingFields(String...)} if Object with same index in checkIfNull array is null
      * @throws InvalidDataException always

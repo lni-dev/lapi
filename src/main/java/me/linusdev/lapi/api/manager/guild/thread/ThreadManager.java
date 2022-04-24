@@ -43,16 +43,16 @@ public interface ThreadManager extends ThreadPool, Manager {
 
     /**
      * Received when a thread is updated. (not when last_message_id changes)
-     * @param data {@link Data} to {@link Updatable#updateSelfByData(Data) update}
+     * @param data {@link SOData} to {@link Updatable#updateSelfByData(SOData) update}
      * @return {@link ThreadUpdate} or {@code null} if this thread is not cached. (Which is totally valid and not an error!)
-     * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(Data)}
+     * @throws InvalidDataException if id is missing in data or in {@link Updatable#updateSelfByData(SOData)}
      */
     @NotNull ThreadUpdate onUpdate(@NotNull SOData data) throws InvalidDataException;
 
     /**
      * Received, when a thread relevant to the current user is deleted.
-     * The {@link Data} only contains the id, guild_id, parent_id, and type fields.
-     * @param data {@link Data} containing just the id, guild_id, parent_id, and type fields.
+     * The {@link SOData} only contains the id, guild_id, parent_id, and type fields.
+     * @param data {@link SOData} containing just the id, guild_id, parent_id, and type fields.
      * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
      * @throws InvalidDataException if id field is missing in given data
      */
@@ -71,7 +71,7 @@ public interface ThreadManager extends ThreadPool, Manager {
 
     /**
      *
-     * @param data retrieved {@link Data}
+     * @param data retrieved {@link SOData}
      * @return {@link ThreadMemberUpdate} containing the new and old {@link ThreadMember} object and the updated {@link Thread}.
      * Or {@code null} if no thread with given id (in data) is cached.
      * @throws InvalidDataException see {@link ThreadMember#fromData(Data)}

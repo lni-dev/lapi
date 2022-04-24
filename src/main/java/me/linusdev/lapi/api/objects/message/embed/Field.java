@@ -68,7 +68,7 @@ public class Field implements Datable {
     }
 
     /**
-     * creates a {@link Field} from {@link Data}
+     * creates a {@link Field} from {@link SOData}
      * @param data to create {@link Field}
      * @return {@link Field}
      * @throws InvalidDataException if {@link #NAME_KEY} or {@link #VALUE_KEY} are missing
@@ -110,7 +110,7 @@ public class Field implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Field}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Field}, useful to convert it to JSON
      */
     @Override
     public SOData getData() {

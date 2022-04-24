@@ -51,10 +51,10 @@ public class ChannelMention implements Datable {
     }
 
     /**
-     * Creates a {@link ChannelMention} from {@link Data}
+     * Creates a {@link ChannelMention} from {@link SOData}
      * Required fields are {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #TYPE_KEY} and {@link #NAME_KEY}
      *
-     * @param data {@link Data} to create this {@link ChannelMention}
+     * @param data {@link SOData} to create this {@link ChannelMention}
      * @throws InvalidDataException if a required field is missing
      */
     public ChannelMention(@NotNull SOData data) throws InvalidDataException {

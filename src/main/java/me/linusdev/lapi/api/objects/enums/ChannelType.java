@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.enums;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +30,7 @@ public enum ChannelType implements SimpleDatable {
     /**
      * This is LApi specific, in case discord adds another channel type
      *
-     * It's id is -2, cause -1 is sometimes used to check if the type field is missing in a {@link me.linusdev.data.Data}
+     * It's id is -2, cause -1 is sometimes used to check if the type field is missing in a {@link SOData}
      */
     UNKNOWN(-2, "Unknown Channel", SimpleChannelType.UNKNOWN),
 

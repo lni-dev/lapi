@@ -95,7 +95,7 @@ public class Author implements Datable {
     }
 
     /**
-     * creates a {@link Author} from {@link Data}
+     * creates a {@link Author} from {@link SOData}
      * @param data to create {@link Author}
      * @return {@link Author} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #NAME_KEY} is missing in given data
@@ -141,7 +141,7 @@ public class Author implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Author}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Author}, useful to convert it to JSON
      */
     @Override
     public SOData getData() {

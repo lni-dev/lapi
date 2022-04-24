@@ -59,7 +59,7 @@ public class Footer implements Datable {
     }
 
     /**
-     * creates a {@link Footer} from {@link Data}
+     * creates a {@link Footer} from {@link SOData}
      * @param data to create {@link Footer}
      * @return {@link Footer} or {@code null} if data is {@code null}
      * @throws InvalidDataException if {@link #TEXT_KEY} is missing in given data
@@ -117,7 +117,7 @@ public class Footer implements Datable {
     }
 
     /**
-     * Creates a {@link Data} from this {@link Footer}, useful to convert it to JSON
+     * Creates a {@link SOData} from this {@link Footer}, useful to convert it to JSON
      */
     @Override
     public @NotNull SOData getData() {

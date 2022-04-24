@@ -94,7 +94,7 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param lApi {@link LApi}
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return {@link Interaction}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #APPLICATION_ID_KEY}, {@link #TYPE_KEY}, {@link #TOKEN_KEY} or {@link #VERSION_KEY} are missing or {@code null}
      */

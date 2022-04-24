@@ -99,7 +99,7 @@ public class SelectMenu implements Component, HasLApi {
 
     /**
      *
-     * @param data {@link Data} with required fields
+     * @param data {@link SOData} with required fields
      * @return {@link SelectMenu}
      * @throws InvalidDataException if {@link #TYPE_KEY}, {@link #CUSTOM_ID_KEY} or {@link #OPTION_KEY} are missing or null
      */
@@ -187,7 +187,7 @@ public class SelectMenu implements Component, HasLApi {
 
     /**
      *
-     * @return {@link Data} for this {@link SelectMenu}
+     * @return {@link SOData} for this {@link SelectMenu}
      */
     @Override
     public SOData getData() {

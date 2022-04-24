@@ -72,8 +72,8 @@ public class GatewayConfigBuilder implements Datable {
 
     /**
      *
-     * @return {@link Data} corresponding to this {@link GatewayConfigBuilder}
-     * @see #fromData(Data)
+     * @return {@link SOData} corresponding to this {@link GatewayConfigBuilder}
+     * @see #fromData(SOData)
      */
     @Override
     public SOData getData() {
@@ -95,7 +95,7 @@ public class GatewayConfigBuilder implements Datable {
     /**
      * Adjust this {@link GatewayConfigBuilder} depending on given data
      *
-     * @param data {@link Data}
+     * @param data {@link SOData}
      * @return this
      * @see #getData()
      */

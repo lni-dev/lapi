@@ -69,7 +69,7 @@ public class LApiHttpBody {
 
     /**
      * Sets the jsonPart for this Body
-     * @param jsonPart {@link Data} for this Body
+     * @param jsonPart {@link SOData} for this Body
      * @return this
      */
     public LApiHttpBody setJSONPart(SOData jsonPart){
