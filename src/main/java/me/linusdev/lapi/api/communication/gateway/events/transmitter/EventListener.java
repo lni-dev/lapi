@@ -39,6 +39,7 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -180,6 +181,12 @@ public interface EventListener {
     default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
 
     default void onPresenceUpdate(@NotNull LApi lApi, @NotNull PresenceUpdateEvent event) {}
+
+    default void onStageInstanceCreate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {}
+
+    default void onStageInstanceDelete(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {}
+
+    default void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {}
 
     default void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {}
 

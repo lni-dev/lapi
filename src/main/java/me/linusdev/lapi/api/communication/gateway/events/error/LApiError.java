@@ -25,6 +25,7 @@ public class LApiError {
         UNKNOWN_ROLE,
         UNKNOWN_MEMBER,
         UNKNOWN_CHANNEL,
+        UNKNOWN_STAGE_INSTANCE,
     }
 
     private final @Nullable ErrorCode code;

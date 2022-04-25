@@ -36,6 +36,7 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.config.ConfigFlag;
@@ -486,6 +487,50 @@ public enum EventIdentifier{
      * </ul>
      */
     PRESENCE_UPDATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                         Stage Instance                        *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onStageInstanceCreate(LApi, StageInstanceEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    STAGE_INSTANCE_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onStageInstanceDelete(LApi, StageInstanceEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    STAGE_INSTANCE_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onStageInstanceUpdate(LApi, StageInstanceEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS}
+     *     </li>
+     * </ul>
+     */
+    STAGE_INSTANCE_UPDATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

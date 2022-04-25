@@ -103,14 +103,28 @@ public class StageInstance implements Datable, SnowflakeAble, CopyAndUpdatable<S
     /**
      * The guild id of the associated Stage channel
      */
-    public @NotNull Snowflake getGuildId() {
-        return guildId;
+    public @NotNull String getGuildId() {
+        return guildId.asString();
     }
 
     /**
      * The id of the associated Stage channel
      */
-    public @NotNull Snowflake getChannelId() {
+    public @NotNull String getChannelId() {
+        return channelId.asString();
+    }
+
+    /**
+     * The guild id {@link Snowflake} of the associated Stage channel
+     */
+    public @NotNull Snowflake getGuildIdAsSnowflake() {
+        return guildId;
+    }
+
+    /**
+     * The id as {@link Snowflake} of the associated Stage channel
+     */
+    public @NotNull Snowflake getChannelIdAsSnowflake() {
         return channelId;
     }
 

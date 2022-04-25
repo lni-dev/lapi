@@ -47,6 +47,7 @@ import me.linusdev.lapi.api.communication.gateway.events.interaction.Interaction
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
@@ -86,6 +87,7 @@ import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.log.LogInstance;
@@ -376,7 +378,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * @param type {@link GatewayEvent type} of the event
      * @param innerPayload the {@link SOData} sent with this event
      * @param payload {@link GatewayPayloadAbstract}
-     * @throws InvalidDataException
      */
     @SuppressWarnings("DuplicateBranchesInSwitch")
     protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable SOData innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
@@ -1289,12 +1290,142 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case STAGE_INSTANCE_CREATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onStageInstanceCreate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.CREATE));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onStageInstanceCreate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.CREATE));
+                            break;
+                        }
+
+                        ListManager<StageInstance> stageInstanceManager = guild.getStageInstanceManager();
+                        if (stageInstanceManager == null) {
+                            //RoleManagerImpl may be null, if CACHE_ROLES is disabled.
+                            transmitter.onStageInstanceCreate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.CREATE));
+                            break;
+                        }
+
+                        StageInstance instance = stageInstanceManager.onAdd(data);
+                        transmitter.onStageInstanceCreate(lApi, new StageInstanceEvent(lApi, payload,
+                                new Update<>(null, instance),
+                                StageInstanceEvent.Type.CREATE));
+                    }
                     break;
 
                 case STAGE_INSTANCE_DELETE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.DELETE));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.DELETE));
+                            break;
+                        }
+
+                        ListManager<StageInstance> stageInstanceManager = guild.getStageInstanceManager();
+                        if (stageInstanceManager == null) {
+                            //RoleManagerImpl may be null, if CACHE_ROLES is disabled.
+                            transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.DELETE));
+                            break;
+                        }
+
+                        StageInstance stageInstance = StageInstance.fromData(data);
+                        StageInstance deleted = stageInstanceManager.onDelete(stageInstance.getId());
+                        if (deleted == null) {
+                            //StageInstanceManager didn't contain this stage instance...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_STAGE_INSTANCE, null)));
+                            transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.DELETE));
+                            break;
+                        }
+                        transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
+                                new Update<>(deleted, StageInstance.fromData(data)),
+                                StageInstanceEvent.Type.DELETE));
+                    }
                     break;
 
                 case STAGE_INSTANCE_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.UPDATE));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.UPDATE));
+                            break;
+                        }
+
+                        ListManager<StageInstance> stageInstanceManager = guild.getStageInstanceManager();
+                        if (stageInstanceManager == null) {
+                            //RoleManagerImpl may be null, if CACHE_ROLES is disabled.
+                            transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.UPDATE));
+                            break;
+                        }
+
+                        Update<StageInstance, StageInstance> update = stageInstanceManager.onUpdate(data);
+                        if (update == null) {
+                            //StageInstanceManager didn't contain this stage instance...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_STAGE_INSTANCE, null)));
+                            transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
+                                    new Update<>(null, StageInstance.fromData(data)),
+                                    StageInstanceEvent.Type.UPDATE));
+                            break;
+                        }
+                        transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
+                                update,
+                                StageInstanceEvent.Type.UPDATE));
+                    }
                     break;
 
                 case TYPING_START:

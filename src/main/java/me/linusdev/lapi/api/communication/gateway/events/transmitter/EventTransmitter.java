@@ -39,6 +39,7 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -886,6 +887,72 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onPresenceUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStageInstanceCreate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onStageInstanceCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onStageInstanceCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStageInstanceDelete(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onStageInstanceDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onStageInstanceDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onStageInstanceUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onStageInstanceUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

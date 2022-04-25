@@ -333,7 +333,6 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(stickerManager != null){
             if(!stickerManager.isInitialized()){
-                @SuppressWarnings("unchecked")
                 List<Object> stickersData = data.getList(STICKERS_KEY);
                 if(stickersData != null){
                     stickerManager.init(stickersData.size());
@@ -353,7 +352,6 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(voiceStatesManager != null) {
             if(!voiceStatesManager.isInitialized()) {
-                @SuppressWarnings("unchecked")
                 List<Object> voiceStatesData = data.getList(VOICE_STATES_KEY);
                 if(voiceStatesData != null) {
                     voiceStatesManager.init(voiceStatesData.size());
@@ -373,7 +371,6 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(memberManager != null){
             if(!memberManager.isInitialized()) {
-                @SuppressWarnings("unchecked")
                 List<Object> membersData = data.getList(MEMBERS_KEY);
                 if(membersData != null){
                     memberManager.init(membersData.size());
@@ -405,7 +402,6 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(threadsManager != null){
             if(!threadsManager.isInitialized()) {
-                @SuppressWarnings("unchecked")
                 List<Object> threadsData = data.getList(THREADS_KEY);
                 if(threadsData != null){
                     threadsManager.init(threadsData.size());
@@ -474,24 +470,34 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         return stickerManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable VoiceStateManager getVoiceStatesManager() {
         return voiceStatesManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable MemberManager getMemberManager() {
         return memberManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable ListManager<Channel<?>> getChannelManager() {
         return channelManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable ThreadManager getThreadManager() {
         return threadsManager;
     }
 
+    @ApiStatus.Internal
     public @Nullable PresenceManager getPresenceManager() {
         return presenceManager;
+    }
+
+    @ApiStatus.Internal
+    public @Nullable ListManager<StageInstance> getStageInstanceManager() {
+        return stageInstanceManager;
     }
 
     @NotNull

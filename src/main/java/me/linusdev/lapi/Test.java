@@ -45,6 +45,7 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
@@ -394,6 +395,21 @@ public class Test implements EventListener{
         System.out.print("onPresenceUpdate: ");
         System.out.println("" + (event.getOldPresence() == null ? "" : event.getOldPresence().getStatus()) + " -> " + event.getPresence().getStatus());
 
+    }
+
+    @Override
+    public void onStageInstanceCreate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        System.out.println("onStageInstanceCreate: " + event.getStageInstance().getData().toJsonString());
+    }
+
+    @Override
+    public void onStageInstanceDelete(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        System.out.println("onStageInstanceDelete: " + event.getStageInstance().getData().toJsonString());
+    }
+
+    @Override
+    public void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
+        System.out.println("onStageInstanceUpdate: "  + event.getStageInstance().getData().toJsonString());
     }
 
     @Override
