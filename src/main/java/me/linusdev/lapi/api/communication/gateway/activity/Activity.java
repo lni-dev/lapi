@@ -143,7 +143,7 @@ public class Activity implements Datable {
 
         Number flags = (Number) data.get(FLAGS_KEY);
 
-        ArrayList<ActivityButton> buttons = data.getListAndConvertWithException(BUTTONS_KEY, ActivityButton::fromData);
+        ArrayList<ActivityButton> buttons = data.getListAndConvertWithException(BUTTONS_KEY, ActivityButton::fromObject);
 
         if(name == null || type == null){
             InvalidDataException.throwException(data, null, Activity.class,

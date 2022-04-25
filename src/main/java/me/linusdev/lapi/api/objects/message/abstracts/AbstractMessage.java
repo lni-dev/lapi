@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -97,7 +98,7 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #CHANNEL_ID_KEY}, {@link #CONTENT_KEY}, {@link #TIMESTAMP_KEY}, {@link #TTS_KEY}, {@link #MENTION_EVERYONE_KEY}, {@link #MENTIONS_KEY}, {@link #MENTION_ROLES_KEY}, {@link #ATTACHMENTS_KEY}, {@link #EMBEDS_KEY}, {@link #PINNED_KEY} or {@link #TYPE_KEY} are missing or null
      */
     @SuppressWarnings("unchecked cast")
-    protected AbstractMessage(LApi lApi, @NotNull SOData data) throws InvalidDataException{
+    protected AbstractMessage(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException{
         this.lApi = lApi;
 
         String id = (String) data.get(ID_KEY);
@@ -108,10 +109,10 @@ public abstract class AbstractMessage implements Datable, Message, HasLApi {
         String editedTimestamp = (String) data.get(EDITED_TIMESTAMP_KEY);
         Boolean tts = (Boolean) data.get(TTS_KEY);
         Boolean mentionEveryone = (Boolean) data.get(MENTION_EVERYONE_KEY);
-        ArrayList<Object> mentionsData = (ArrayList<Object>) data.get(MENTIONS_KEY);
-        ArrayList<Object> mentionRolesData = (ArrayList<Object>) data.get(MENTION_ROLES_KEY);
-        ArrayList<Object> attachmentsData = (ArrayList<Object>) data.get(ATTACHMENTS_KEY);
-        ArrayList<Object> embedsData = (ArrayList<Object>) data.get(EMBEDS_KEY);
+        List<Object> mentionsData = data.getList(MENTIONS_KEY);
+        List<Object> mentionRolesData = data.getList(MENTION_ROLES_KEY);
+        List<Object> attachmentsData = data.getList(ATTACHMENTS_KEY);
+        List<Object> embedsData = data.getList(EMBEDS_KEY);
         Boolean pinned = (Boolean) data.get(PINNED_KEY);
         Number type = (Number) data.get(TYPE_KEY);
 

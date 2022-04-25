@@ -78,8 +78,8 @@ public class MessageImplementation extends AbstractMessage {
 
         String guildId = (String) data.get(GUILD_ID_KEY);
         SOData member = (SOData) data.get(MEMBER_KEY);
-        ArrayList<Object> mentionChannelsData = (ArrayList<Object>) data.get(MENTION_CHANNELS_KEY);
-        ArrayList<Object> reactionsData = (ArrayList<Object>) data.get(REACTIONS_KEY);
+        List<Object> mentionChannelsData = data.getList(MENTION_CHANNELS_KEY);
+        List<Object> reactionsData = data.getList(REACTIONS_KEY);
         Object nonce = (Object) data.get(NONCE_KEY);
         String webhookId = (String) data.get(WEBHOOK_ID_KEY);
         SOData activity = (SOData) data.get(ACTIVITY_KEY);
@@ -90,9 +90,9 @@ public class MessageImplementation extends AbstractMessage {
         SOData referencedMessage = (SOData) data.get(REFERENCED_MESSAGE_KEY);
         SOData interaction = (SOData) data.get(INTERACTION_KEY);
         SOData thread = (SOData) data.get(THREAD_KEY);
-        ArrayList<Object> components = (ArrayList<Object>) data.get(COMPONENTS_KEY);
-        ArrayList<Object> stickerItems = (ArrayList<Object>) data.get(STICKER_ITEMS_KEY);
-        ArrayList<Object> stickers = (ArrayList<Object>) data.get(STICKERS_KEY);
+        List<Object> components = data.getList(COMPONENTS_KEY);
+        List<Object> stickerItems = data.getList(STICKER_ITEMS_KEY);
+        List<Object> stickers = data.getList(STICKERS_KEY);
 
 
         this.guildId = Snowflake.fromString(guildId);
