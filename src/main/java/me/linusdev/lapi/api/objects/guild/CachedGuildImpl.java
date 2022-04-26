@@ -438,7 +438,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         }
 
-        //TODO: stages, scheduled events
+        //TODO: scheduled events
     }
 
     @Override
