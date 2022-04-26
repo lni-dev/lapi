@@ -1493,7 +1493,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     /**
      * handles any received payloads and starts heart-beating, sets sessionId, etc.
-     * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayEvent, Data, GatewayPayloadAbstract)}
+     * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayEvent, SOData, GatewayPayloadAbstract)}
      */
     protected void handleReceivedPayload(@NotNull GatewayPayloadAbstract payload) throws Throwable {
         Long seq = payload.getSequence();
@@ -1572,6 +1572,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             //check if this is an old session. if so, we should resume
             if(canResume.get()){
+                //TODO: lastReceivedSequence is updated above, so it is probably wrong here.
                 Resume resume = new Resume(token, sessionId, lastReceivedSequence.get());
 
                 GatewayPayload resumePayload = GatewayPayload.newResume(resume);
