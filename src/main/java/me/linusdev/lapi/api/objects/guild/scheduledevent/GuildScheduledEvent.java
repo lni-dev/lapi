@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.objects.guild.scheduledevent;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -45,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object" target="_top">GuildImpl Scheduled Event Object</a>
  */
-public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
+public class GuildScheduledEvent implements CopyAndUpdatable<GuildScheduledEvent>, Datable, HasLApi, SnowflakeAble {
 
     public static final String ID_KEY = "id";
     public static final String GUILD_ID_KEY = "guild_id";
@@ -67,19 +69,19 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
 
     private final @NotNull Snowflake id;
     private final @NotNull Snowflake guildId;
-    private final @Nullable Snowflake channelId;
+    private @Nullable Snowflake channelId;
     private final @Nullable Snowflake creatorId;
-    private final @NotNull String name;
-    private final @Nullable String description;
-    private final @NotNull ISO8601Timestamp scheduledStartTime;
-    private final @Nullable ISO8601Timestamp scheduledEndTime;
-    private final @NotNull PrivacyLevel privacyLevel;
-    private final @NotNull Status status;
-    private final @NotNull EntityType entityType;
-    private final @Nullable Snowflake entityId;
-    private final @Nullable EntityMetadata entityMetadata;
-    private final @Nullable User creator;
-    private final @Nullable Integer userCount;
+    private @NotNull String name;
+    private @Nullable String description;
+    private @NotNull ISO8601Timestamp scheduledStartTime;
+    private @Nullable ISO8601Timestamp scheduledEndTime;
+    private @NotNull PrivacyLevel privacyLevel;
+    private @NotNull Status status;
+    private @NotNull EntityType entityType;
+    private @Nullable Snowflake entityId;
+    private @Nullable EntityMetadata entityMetadata;
+    private @Nullable User creator;
+    private @Nullable Integer userCount;
 
     /**
      *
@@ -324,5 +326,59 @@ public class GuildScheduledEvent implements Datable, HasLApi, SnowflakeAble {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @NotNull GuildScheduledEvent copy() {
+        return new GuildScheduledEvent(lApi,
+                Copyable.copy(id),
+                Copyable.copy(guildId),
+                Copyable.copy(channelId),
+                Copyable.copy(creatorId),
+                Copyable.copy(name),
+                Copyable.copy(description),
+                Copyable.copy(scheduledStartTime),
+                Copyable.copy(scheduledEndTime),
+                privacyLevel,
+                status,
+                entityType,
+                Copyable.copy(entityId),
+                Copyable.copy(entityMetadata),
+                creator,
+                userCount);
+    }
+
+    @Override
+    public void updateSelfByData(@NotNull SOData data) throws InvalidDataException {
+        data.processIfContained(CHANNEL_ID_KEY, (String str) -> this.channelId = Snowflake.fromString(str));
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(DESCRIPTION_KEY, (String str) -> this.description = str);
+        data.processIfContained(SCHEDULED_START_TIME_KEY, (String str) -> this.scheduledStartTime = ISO8601Timestamp.fromString(str));
+        data.processIfContained(SCHEDULED_END_TIME_KEY, (String str) -> this.scheduledEndTime = ISO8601Timestamp.fromString(str));
+        data.processIfContained(PRIVACY_LEVEL_KEY, (Number num) -> {
+            if(num != null )
+                this.privacyLevel = PrivacyLevel.fromValue(num.intValue());
+        });
+        data.processIfContained(STATUS_KEY, (Number num) -> {
+            if(num != null)
+                this.status = Status.fromValue(num.intValue());
+        });
+        data.processIfContained(ENTITY_TYPE_KEY, (Number num) -> {
+            if(num != null)
+                this.entityType = EntityType.fromValue(num.intValue());
+        });
+        data.processIfContained(ENTITY_ID_KEY, (String str) -> this.entityId = Snowflake.fromString(str));
+        data.processIfContained(ENTITY_METADATA_KEY, (SOData d) -> this.entityMetadata = EntityMetadata.fromData(d));
+
+        SOData creator = (SOData) data.get(CREATOR_KEY);
+        if(creator != null) {
+            this.creator = User.fromData(lApi, creator);
+        }
+
+        data.processIfContained(USER_COUNT_KEY, (Number num) -> {
+            if(num != null)
+                this.userCount = num.intValue();
+        });
+
     }
 }

@@ -16,37 +16,23 @@
 
 package me.linusdev.lapi.api.manager.guild.scheduledevent;
 
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
+import me.linusdev.lapi.api.other.LApiImplConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
-public class GuildScheduledEventManagerImpl implements GuildScheduledEventManager{
+public class GuildScheduledEventManagerImpl extends ListManager<GuildScheduledEvent> implements GuildScheduledEventManager{
 
-    private final @NotNull LApi lApi;
-    private boolean initialized = false;
 
-    private @Nullable HashMap<String, GuildScheduledEvent> events;
-
-    public GuildScheduledEventManagerImpl(@NotNull LApi lApi) {
-        this.lApi = lApi;
-    }
-
-    @Override
-    public void init(int initialCapacity) {
-        this.initialized = true;
-        events = new HashMap<>(initialCapacity);
-    }
-
-    @Override
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    @Override
-    public @NotNull LApi getLApi() {
-        return lApi;
+    public GuildScheduledEventManagerImpl(@NotNull LApiImpl lApi, @NotNull String idKey, @NotNull LApiImplConverter<SOData, GuildScheduledEvent, InvalidDataException> converter, @NotNull Supplier<Boolean> doCopy) {
+        super(lApi, idKey, converter, doCopy);
     }
 }

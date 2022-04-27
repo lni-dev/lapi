@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.objects.guild.scheduledevent;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -25,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#guild-scheduled-event-object-guild-scheduled-event-entity-metadata" target="_top">GuildImpl Scheduled Event Entity Metadata</a>
  */
-public class EntityMetadata implements Datable {
+public class EntityMetadata implements Datable, Copyable<EntityMetadata> {
 
     public static final String LOCATION_KEY = "location";
 
@@ -68,5 +70,10 @@ public class EntityMetadata implements Datable {
         if(location != null) data.add(LOCATION_KEY, location);
 
         return data;
+    }
+
+    @Override
+    public @NotNull EntityMetadata copy() {
+        return new EntityMetadata(location);
     }
 }
