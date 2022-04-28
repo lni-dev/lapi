@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
@@ -52,12 +53,13 @@ public class Config {
     private final @NotNull ManagerFactory<ThreadManager> threadsManagerFactory;
     private final @NotNull ManagerFactory<PresenceManager> presenceManagerFactory;
     private final @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory;
+    private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
-                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory){
+                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
         this.token = token;
 
@@ -73,6 +75,7 @@ public class Config {
         this.threadsManagerFactory = threadsManagerFactory;
         this.presenceManagerFactory = presenceManagerFactory;
         this.stageInstanceManagerFactory = stageInstanceManagerFactory;
+        this.guildScheduledEventManagerFactory = guildScheduledEventManagerFactory;
     }
 
     /**
@@ -137,5 +140,9 @@ public class Config {
 
     public @NotNull ManagerFactory<ListManager<StageInstance>> getStageInstanceManagerFactory() {
         return stageInstanceManagerFactory;
+    }
+
+    public @NotNull ManagerFactory<GuildScheduledEventManager> getGuildScheduledEventManagerFactory() {
+        return guildScheduledEventManagerFactory;
     }
 }

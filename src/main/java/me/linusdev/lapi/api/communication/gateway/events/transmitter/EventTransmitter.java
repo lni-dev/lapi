@@ -31,6 +31,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.Guil
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
@@ -792,6 +794,116 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildRoleDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildScheduledEventCreate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildScheduledEventCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildScheduledEventCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildScheduledEventUpdate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildScheduledEventUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildScheduledEventUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildScheduledEventDelete(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildScheduledEventDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildScheduledEventDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildScheduledEventUserAdd(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildScheduledEventUserAdd(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_ADD);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildScheduledEventUserAdd(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildScheduledEventUserRemove(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildScheduledEventUserRemove(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_REMOVE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildScheduledEventUserRemove(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

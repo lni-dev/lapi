@@ -725,7 +725,16 @@ public class LApiImpl implements LApi {
         return config.isFlagSet(ConfigFlag.COPY_STAGE_INSTANCE_ON_UPDATE_EVENT);
     }
 
-    //api-internal getter
+    @Override
+    public boolean isCacheGuildScheduledEventsEnabled() {
+        return config.isFlagSet(ConfigFlag.CACHE_GUILD_SCHEDULED_EVENTS);
+    }
+
+    @Override
+    public boolean isCopyOldGuildScheduledEventOnUpdateEventEnabled() {
+        return config.isFlagSet(ConfigFlag.COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE);
+    }
+//api-internal getter
 
     /**
      * @see #guildManager

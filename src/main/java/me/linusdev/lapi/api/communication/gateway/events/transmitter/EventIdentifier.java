@@ -28,6 +28,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMembe
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.GuildMembersChunkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
@@ -429,6 +431,74 @@ public enum EventIdentifier{
      */
     GUILD_ROLE_DELETE,
 
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                     GuildScheduledEvent                       *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onGuildScheduledEventCreate(LApi, GuildScheduledEventEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_SCHEDULED_EVENTS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENT_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildScheduledEventUpdate(LApi, GuildScheduledEventEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_SCHEDULED_EVENTS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENT_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onGuildScheduledEventDelete(LApi, GuildScheduledEventEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_SCHEDULED_EVENTS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENT_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onGuildScheduledEventUserAdd(LApi, GuildScheduledEventUserEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_SCHEDULED_EVENTS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENT_USER_ADD,
+
+    /**
+     * identifier for {@link EventListener#onGuildScheduledEventUserRemove(LApi, GuildScheduledEventUserEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_SCHEDULED_EVENTS}
+     *     </li>
+     * </ul>
+     */
+    GUILD_SCHEDULED_EVENT_USER_REMOVE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

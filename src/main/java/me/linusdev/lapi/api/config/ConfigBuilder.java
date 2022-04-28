@@ -34,6 +34,8 @@ import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManagerImpl;
+import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManager;
+import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManagerImpl;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManagerImpl;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
@@ -88,6 +90,8 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<ThreadManager> threadManagerFactory = null;
     private ManagerFactory<PresenceManager> presenceManagerFactory = null;
     private ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory = null;
+    private ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory = null;
+
 
 
     /**
@@ -429,6 +433,23 @@ public class ConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code lApi -> new GuildScheduledEventManagerImpl(lApi)}
+     * <p>
+     *     Factory for the {@link GuildScheduledEventManager} used by {@link me.linusdev.lapi.api.objects.guild.CachedGuild CachedGuild}
+     * </p>
+     * <p>
+     *     Set to {@code null} to reset to default
+     * </p>
+     * @param guildScheduledEventManagerFactory the {@link ManagerFactory ManagerFactory&lt;GuildScheduledEventManager&gt;}
+     * @return this
+     */
+    public ConfigBuilder setGuildScheduledEventManagerFactory(ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory) {
+        this.guildScheduledEventManagerFactory = guildScheduledEventManagerFactory;
+        return this;
+    }
+
+    /**
      * <p>
      *     Adjusts this {@link ConfigBuilder} depending on given data.
      * </p>
@@ -525,7 +546,8 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(threadManagerFactory, lApi -> new ThreadManagerImpl(lApi)),
                 Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi)),
                 Objects.requireNonNullElse(stageInstanceManagerFactory,
-                        lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), lApi::isCopyOldStageInstanceOnUpdateEventEnabled)));
+                        lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), lApi::isCopyOldStageInstanceOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(guildScheduledEventManagerFactory, lApi -> new GuildScheduledEventManagerImpl(lApi)));
     }
 
     /**

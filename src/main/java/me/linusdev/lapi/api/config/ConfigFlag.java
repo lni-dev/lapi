@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
+import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import org.jetbrains.annotations.NotNull;
@@ -230,6 +231,22 @@ public enum ConfigFlag implements SimpleDatable {
      * </p>
      */
     COPY_STAGE_INSTANCE_ON_UPDATE_EVENT(1 << 22),
+
+    /**
+     * <p>
+     *     Caches all {@link GuildScheduledEvent scheduled events} retrieved by the
+     *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
+     * </p>
+     */
+    CACHE_GUILD_SCHEDULED_EVENTS(1 << 23),
+
+    /**
+     * <p>
+     *    Copies {@link GuildScheduledEvent} objects, when they receive an update, so
+     *    you can check the difference between the old object and the updated one.
+     * </p>
+     */
+    COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE(1 << 24)
     ;
 
     private final long value;

@@ -796,4 +796,14 @@ public interface LApi extends HasLApi {
      */
     boolean isCopyOldStageInstanceOnUpdateEventEnabled();
 
+    /**
+     * @see ConfigFlag#CACHE_GUILD_SCHEDULED_EVENTS
+     */
+    boolean isCacheGuildScheduledEventsEnabled();
+
+    /**
+     * @see ConfigFlag#COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE
+     */
+    boolean isCopyOldGuildScheduledEventOnUpdateEventEnabled();
+
 }

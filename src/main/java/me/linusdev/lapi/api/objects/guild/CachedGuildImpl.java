@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
+import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
@@ -74,7 +75,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable ThreadManager threadsManager;
     protected @Nullable PresenceManager presenceManager;
     protected @Nullable ListManager<StageInstance> stageInstanceManager;
-    protected @Nullable GuildScheduledEvent[] guildScheduledEvents;
+    protected @Nullable GuildScheduledEventManager scheduledEventManager;
 
 
     public CachedGuildImpl(@NotNull LApiImpl lApi, @NotNull Snowflake id, @Nullable Boolean unavailable, boolean awaitingEvent){
@@ -157,6 +158,10 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
 
         if(lApi.isCacheStageInstancesEnabled()) {
             this.stageInstanceManager = lApi.getConfig().getStageInstanceManagerFactory().newInstance(lApi);
+        }
+
+        if(lApi.isCacheGuildScheduledEventsEnabled()) {
+            this.scheduledEventManager = lApi.getConfig().getGuildScheduledEventManagerFactory().newInstance(lApi);
         }
 
     }
@@ -498,6 +503,11 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     @ApiStatus.Internal
     public @Nullable ListManager<StageInstance> getStageInstanceManager() {
         return stageInstanceManager;
+    }
+
+    @ApiStatus.Internal
+    public @Nullable GuildScheduledEventManager getScheduledEventManager() {
+        return scheduledEventManager;
     }
 
     @NotNull

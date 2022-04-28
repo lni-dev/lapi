@@ -38,14 +38,14 @@ import java.util.function.Supplier;
 
 public class ListManager<T extends SnowflakeAble & CopyAndUpdatable<? extends T>> implements HasLApi, ListPool<T>, Manager {
 
-    private boolean initialized = false;
+    protected boolean initialized = false;
 
-    private final @NotNull LApiImpl lApi;
-    private @Nullable ConcurrentHashMap<String, T> objects;
+    protected final @NotNull LApiImpl lApi;
+    protected @Nullable ConcurrentHashMap<String, T> objects;
 
-    private final @NotNull String idKey;
-    private final @NotNull LApiImplConverter<SOData, T, InvalidDataException> converter;
-    private final @NotNull Supplier<Boolean> doCopy;
+    protected final @NotNull String idKey;
+    protected final @NotNull LApiImplConverter<SOData, T, InvalidDataException> converter;
+    protected final @NotNull Supplier<Boolean> doCopy;
 
     public ListManager(@NotNull LApiImpl lApi, @NotNull String idKey,
                        @NotNull LApiImplConverter<SOData, T, InvalidDataException> converter,
