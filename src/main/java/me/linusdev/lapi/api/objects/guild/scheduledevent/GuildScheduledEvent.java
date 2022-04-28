@@ -28,6 +28,7 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,6 +84,8 @@ public class GuildScheduledEvent implements CopyAndUpdatable<GuildScheduledEvent
     private @Nullable User creator;
     private @Nullable Integer userCount;
 
+    //TODO: Add CoverImageHash and also add it to the CDN image retriever
+
     /**
      *
      * @param lApi {@link LApi}
@@ -128,6 +131,7 @@ public class GuildScheduledEvent implements CopyAndUpdatable<GuildScheduledEvent
      * @return {@link GuildScheduledEvent}
      * @throws InvalidDataException if {@link #ID_KEY}, {@link #GUILD_ID_KEY}, {@link #NAME_KEY}, {@link #SCHEDULED_START_TIME_KEY}, {@link #PRIVACY_LEVEL_KEY}, {@link #STATUS_KEY} or {@link #ENTITY_TYPE_KEY} are null or missing
      */
+    @Contract("_, null -> null; _, !null -> !null")
     public static @Nullable GuildScheduledEvent fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 

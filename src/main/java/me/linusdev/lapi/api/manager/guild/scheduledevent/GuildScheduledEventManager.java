@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.LApiImplConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,15 +55,15 @@ public interface GuildScheduledEventManager extends Manager, GuildScheduledEvent
     /**
      * Adds given data to the current list. If an old entry with the same id exists, it is overwritten.
      *
-     * @param data data of {@link T} to add
-     * @return added {@link T}
+     * @param data data of {@link GuildScheduledEvent} to add
+     * @return added {@link GuildScheduledEvent}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */
     @NotNull GuildScheduledEvent onAdd(@NotNull SOData data) throws InvalidDataException;
 
     /**
-     * Updates {@link T} with the same id as given {@link SOData}. If no such {@link T} exists, {@code null} is returned.
-     * @param data data of {@link T} to {@link CopyAndUpdatable#updateSelfByData(SOData) updated}
+     * Updates {@link GuildScheduledEvent} with the same id as given {@link SOData}. If no such {@link GuildScheduledEvent} exists, {@code null} is returned.
+     * @param data data of {@link GuildScheduledEvent} to {@link CopyAndUpdatable#updateSelfByData(SOData) updated}
      * @return {@link Update}
      * @throws InvalidDataException in {@link LApiImplConverter#convert(LApiImpl, Object)}
      */
@@ -70,9 +71,21 @@ public interface GuildScheduledEventManager extends Manager, GuildScheduledEvent
 
     /**
      *
-     * @param id id of the {@link T} to remove
+     * @param id id of the {@link GuildScheduledEvent} to remove
      * @return {@link GuildScheduledEvent} which was removed, or {@code null} if there was no {@link GuildScheduledEvent} with given id
      */
     @Nullable GuildScheduledEvent onDelete(@NotNull String id);
+
+    /**
+     *
+     * @param data containing the id key of the {@link GuildScheduledEvent} to remove
+     * @return {@link GuildScheduledEvent} which was removed.
+     * @throws InvalidDataException if id field is missing
+     */
+    default @Nullable GuildScheduledEvent onDelete(@NotNull SOData data) throws InvalidDataException {
+        String id = (String) data.get(GuildScheduledEvent.ID_KEY);
+        if(id == null) throw new InvalidDataException(data, "id field missing in data");
+        return onDelete(id);
+    }
 
 }

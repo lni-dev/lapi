@@ -42,6 +42,7 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.Guil
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
@@ -64,6 +65,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadMemberUpdate;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadUpdate;
@@ -80,6 +82,7 @@ import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.guild.GuildImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
+import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
@@ -1178,12 +1181,134 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_SCHEDULED_EVENT_CREATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.CREATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.CREATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        GuildScheduledEventManager guildScheduledEventManager = guild.getScheduledEventManager();
+                        if (guildScheduledEventManager == null) {
+                            //Cache disabled
+                            transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.CREATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        GuildScheduledEvent scheduledEvent = guildScheduledEventManager.onAdd(data);
+                        if (scheduledEvent == null) {
+                            //RoleManagerImpl didn't contain this role...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
+                            transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.CREATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+                        transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                GuildScheduledEventEvent.Type.CREATE, scheduledEvent));
+                    }
                     break;
 
                 case GUILD_SCHEDULED_EVENT_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.UPDATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.UPDATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        GuildScheduledEventManager guildScheduledEventManager = guild.getScheduledEventManager();
+                        if (guildScheduledEventManager == null) {
+                            //Cache disabled
+                            transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.UPDATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        Update<GuildScheduledEvent, GuildScheduledEvent> update = guildScheduledEventManager.onUpdate(data);
+                        if (update == null) {
+                            //RoleManagerImpl didn't contain this role...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
+                            transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.UPDATE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+                        transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                GuildScheduledEventEvent.Type.UPDATE, update));
+                    }
                     break;
 
                 case GUILD_SCHEDULED_EVENT_DELETE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if (guildId == null)
+                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+
+                        if (guildManager == null) {
+                            transmitter.onGuildScheduledEventDelete(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.DELETE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(guildId);
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onGuildScheduledEventDelete(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.DELETE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        GuildScheduledEventManager guildScheduledEventManager = guild.getScheduledEventManager();
+                        if (guildScheduledEventManager == null) {
+                            //Cache disabled
+                            transmitter.onGuildScheduledEventDelete(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                    GuildScheduledEventEvent.Type.DELETE, GuildScheduledEvent.fromData(lApi, data)));
+                            break;
+                        }
+
+                        GuildScheduledEvent removed = guildScheduledEventManager.onDelete(data);
+                        if (removed == null) {
+                            //RoleManagerImpl didn't contain this role...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
+                        }
+
+                        //For the event, the received version is used instead of the cached one
+                        transmitter.onGuildScheduledEventDelete(lApi, new GuildScheduledEventEvent(lApi, payload,
+                                GuildScheduledEventEvent.Type.DELETE, GuildScheduledEvent.fromData(lApi, data)));
+                    }
                     break;
 
                 case GUILD_SCHEDULED_EVENT_USER_ADD:

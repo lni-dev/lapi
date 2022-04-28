@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
+import me.linusdev.lapi.api.communication.gateway.update.Update;
+import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import org.jetbrains.annotations.NotNull;
@@ -32,12 +34,20 @@ public class GuildScheduledEventEvent extends Event {
     }
 
     private final @NotNull Type type;
-    private final @NotNull GuildScheduledEvent scheduledEvent;
+    private final @NotNull Update<GuildScheduledEvent, GuildScheduledEvent> scheduledEvent;
 
-    public GuildScheduledEventEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull Type type, @NotNull GuildScheduledEvent scheduledEvent) {
+    public GuildScheduledEventEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull Type type,
+                                    @NotNull GuildScheduledEvent scheduledEvent) {
         super(lApi, payload, scheduledEvent.getGuildIdAsSnowflake());
         this.type = type;
-        this.scheduledEvent = scheduledEvent;
+        this.scheduledEvent = new Update<>(null, scheduledEvent);
+    }
+
+    public GuildScheduledEventEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull Type type,
+                                    @NotNull Update<GuildScheduledEvent, GuildScheduledEvent> update) {
+        super(lApi, payload, update.getObj().getGuildIdAsSnowflake());
+        this.type = type;
+        this.scheduledEvent = update;
     }
 
 
@@ -54,6 +64,15 @@ public class GuildScheduledEventEvent extends Event {
      * @return the {@link GuildScheduledEvent}
      */
     public @NotNull GuildScheduledEvent getGuildScheduledEvent() {
-        return scheduledEvent;
+        return scheduledEvent.getObj();
+    }
+
+    /**
+     * Only not {@code null} if {@link #getType()} is {@link Type#UPDATE} and {@link ConfigFlag#COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE}
+     * is enabled.
+     * @return the old {@link GuildScheduledEvent}
+     */
+    public @Nullable GuildScheduledEvent getOldGuildScheduledEvent() {
+        return scheduledEvent.getObj();
     }
 }

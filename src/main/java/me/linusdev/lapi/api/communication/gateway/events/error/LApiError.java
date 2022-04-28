@@ -26,6 +26,7 @@ public class LApiError {
         UNKNOWN_MEMBER,
         UNKNOWN_CHANNEL,
         UNKNOWN_STAGE_INSTANCE,
+        UNKNOWN_GUILD_SCHEDULED_EVENT,
     }
 
     private final @Nullable ErrorCode code;

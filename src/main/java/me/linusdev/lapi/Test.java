@@ -37,6 +37,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.member.chunk.Guil
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
@@ -317,6 +319,31 @@ public class Test implements EventListener{
     @Override
     public void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {
         System.out.println("onGuildRoleDelete: " + event.getRole().getName());
+    }
+
+    @Override
+    public void onGuildScheduledEventCreate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        System.out.println("onGuildScheduledEventCreate: " + event.getGuildScheduledEvent().getData().toJsonString());
+    }
+
+    @Override
+    public void onGuildScheduledEventUpdate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        System.out.println("onGuildScheduledEventUpdate: " + event.getGuildScheduledEvent().getData().toJsonString());
+    }
+
+    @Override
+    public void onGuildScheduledEventDelete(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
+        System.out.println("onGuildScheduledEventDelete: " + event.getGuildScheduledEvent().getData().toJsonString());
+    }
+
+    @Override
+    public void onGuildScheduledEventUserAdd(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
+        System.out.println("onGuildScheduledEventUserAdd");
+    }
+
+    @Override
+    public void onGuildScheduledEventUserRemove(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
+        System.out.println("onGuildScheduledEventUserRemove");
     }
 
     @Override
