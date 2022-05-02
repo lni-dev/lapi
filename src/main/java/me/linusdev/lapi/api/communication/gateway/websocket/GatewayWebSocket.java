@@ -43,6 +43,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleCre
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserAddRemoveData;
+import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
@@ -1312,9 +1314,81 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_SCHEDULED_EVENT_USER_ADD:
+                    {
+                        GuildScheduledEventUserAddRemoveData userData = GuildScheduledEventUserAddRemoveData.fromData(data);
+
+                        if (guildManager == null) {
+                            transmitter.onGuildScheduledEventUserAdd(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,true, null));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(userData.getGuildId());
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onGuildScheduledEventUserAdd(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,true, null));
+                            break;
+                        }
+
+                        GuildScheduledEventManager guildScheduledEventManager = guild.getScheduledEventManager();
+                        if (guildScheduledEventManager == null) {
+                            //Cache disabled
+                            transmitter.onGuildScheduledEventUserAdd(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,true, null));
+                            break;
+                        }
+
+                        GuildScheduledEvent scheduledEvent = guildScheduledEventManager.onUserAdd(userData);
+                        if (scheduledEvent == null) {
+                            //guildScheduledEventManager didn't contain this scheduled event...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
+                        }
+
+                        transmitter.onGuildScheduledEventUserAdd(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                userData,true, scheduledEvent));
+                    }
                     break;
 
                 case GUILD_SCHEDULED_EVENT_USER_REMOVE:
+                    {
+                        GuildScheduledEventUserAddRemoveData userData = GuildScheduledEventUserAddRemoveData.fromData(data);
+
+                        if (guildManager == null) {
+                            transmitter.onGuildScheduledEventUserRemove(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,false, null));
+                            break;
+                        }
+
+                        CachedGuildImpl guild = guildManager.getUpdatableGuildById(userData.getGuildId());
+                        if (guild == null) {
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
+                            transmitter.onGuildScheduledEventUserRemove(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,false, null));
+                            break;
+                        }
+
+                        GuildScheduledEventManager guildScheduledEventManager = guild.getScheduledEventManager();
+                        if (guildScheduledEventManager == null) {
+                            //Cache disabled
+                            transmitter.onGuildScheduledEventUserRemove(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                    userData,false, null));
+                            break;
+                        }
+
+                        GuildScheduledEvent scheduledEvent = guildScheduledEventManager.onUserRemove(userData);
+                        if (scheduledEvent == null) {
+                            //guildScheduledEventManager didn't contain this scheduled event...
+                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
+                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
+                        }
+
+                        transmitter.onGuildScheduledEventUserRemove(lApi, new GuildScheduledEventUserEvent(lApi, payload,
+                                userData,false, scheduledEvent));
+                    }
                     break;
 
                 case INTEGRATION_CREATE:
