@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.queue;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DispatchEventQueue {
 
@@ -30,7 +31,7 @@ public class DispatchEventQueue {
     private int pullPosition;
     private int size;
 
-
+    private @Nullable DispatchEventProcessor processor;
 
     public DispatchEventQueue(int capacity) {
         this.lastSequence = 0L;
@@ -97,6 +98,10 @@ public class DispatchEventQueue {
         }
 
         return null;
+    }
+
+    public void setProcessor(@Nullable DispatchEventProcessor processor) {
+        this.processor = processor;
     }
 
     public synchronized long getLastSequence() {
