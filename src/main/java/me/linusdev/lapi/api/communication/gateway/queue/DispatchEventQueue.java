@@ -16,8 +16,10 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
+import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 public class DispatchEventQueue {
 
@@ -33,6 +35,9 @@ public class DispatchEventQueue {
 
     private @Nullable DispatchEventProcessor processor;
 
+    /**
+     * @param capacity the capacity of the queue
+     */
     public DispatchEventQueue(int capacity) {
         this.lastSequence = 0L;
         this.array = new ReceivedPayload[capacity];
@@ -41,6 +46,15 @@ public class DispatchEventQueue {
         this.size = 0;
     }
 
+    /**
+     * Will add given payload to the correct position in the queue
+     * based on {@link GatewayPayloadAbstract#getSequence() the sequence of given payload}. If this sequence is less than
+     * the {@link #getLastSequence() last received sequence} it will be ignored.<br>
+     * Only if the given sequence is exactly one more than the last sequence, the last sequence will be changed afterwards.
+     * @param payload the payload to push
+     * @throws IllegalArgumentException if {@link GatewayPayloadAbstract#getSequence()} is {@code null}
+     * @throws IllegalStateException if this queue is full or has overflown
+     */
     public synchronized void push(@NotNull ReceivedPayload payload) {
         Long sequence = payload.getPayload().getSequence();
         if(sequence == null) {
@@ -57,7 +71,17 @@ public class DispatchEventQueue {
         set(payload, (int) difference);
     }
 
-    private void set(@NotNull ReceivedPayload payload, int dif) {
+    /**
+     * Given payload will be placed at the correct position in the queue (depending on given dif).
+     * If dif is exactly one, the {@link #lastSequence} will be updated accordingly
+     * (if there has not been retrieved any sequence, higher than {@link #lastSequence} + 1, {@link #lastSequence} will
+     * be increased by exactly one)
+     *
+     * @param payload the payload to add to this queue
+     * @param dif the offset from the {@link #lastSequence}
+     * @throws IllegalStateException If after this operation was done, the queue is full or has overflown
+     */
+    private void set(@NotNull ReceivedPayload payload, @Range(from = 1, to = Integer.MAX_VALUE) int dif) {
 
         if(dif == 1) {
             array[pushPosition] = payload;
