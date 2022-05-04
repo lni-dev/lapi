@@ -385,8 +385,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * @param payload {@link GatewayPayloadAbstract}
      */
     @SuppressWarnings("DuplicateBranchesInSwitch")
-    protected void handleReceivedEvent(@Nullable GatewayEvent type, @Nullable SOData innerPayload, @NotNull GatewayPayloadAbstract payload) throws InvalidDataException {
+    @ApiStatus.Internal
+    public void handleReceivedEvent(@NotNull GatewayPayloadAbstract payload) {
         try {
+            @Nullable GatewayEvent type = payload.getType();
+            @Nullable SOData innerPayload = (SOData) payload.getPayloadData();
+
             if (type == null) {
                 transmitter.onUnknownEvent(lApi, null, payload);
                 return;
@@ -1729,7 +1733,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         + GatewayOpcode.DISPATCH + " but without a type... payload:\n" + payload.toJsonString());
             }
 
-            handleReceivedEvent(payload.getType(), (SOData) payload.getPayloadData(), payload);
+            handleReceivedEvent(payload);
 
         } else if (opcode == GatewayOpcode.HEARTBEAT) {
             //Discord requested us to send a Heartbeat

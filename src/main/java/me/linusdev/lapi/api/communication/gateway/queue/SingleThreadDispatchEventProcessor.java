@@ -16,16 +16,24 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor {
 
-    protected SingleThreadDispatchEventProcessor(@NotNull DispatchEventQueue queue) {
-        super(queue);
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    protected SingleThreadDispatchEventProcessor(@NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
+        super(queue, gateway);
     }
 
     @Override
-    public void onNext() {
-
+    public synchronized void onNext() {
+        ReceivedPayload payload = queue.pull();
+        executor.submit(() -> gateway.handleReceivedEvent(payload.getPayload()));
     }
 }

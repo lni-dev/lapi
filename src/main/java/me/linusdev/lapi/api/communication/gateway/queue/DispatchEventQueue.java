@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.queue;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -87,10 +88,12 @@ public class DispatchEventQueue {
             array[pushPosition] = payload;
             pushPosition = (pushPosition + 1) % array.length;
             this.size++;
+            if(processor != null) processor.onNext();
 
             while (get(pushPosition) != null && this.size < array.length) {
                 this.pushPosition++;
                 this.size++;
+                if(processor != null) processor.onNext();
             }
 
             //noinspection ConstantConditions: This will never be null, because a payload without a sequence cannot be added.
@@ -109,11 +112,21 @@ public class DispatchEventQueue {
         }
     }
 
-    private ReceivedPayload get(int index) {
+    /**
+     * Get {@link ReceivedPayload} at given index in {@link #array} (not in the queue!)
+     * @param index index
+     * @return {@link ReceivedPayload} at given index mod {@link java.lang.reflect.Array#getLength(Object) array length}
+     */
+    @ApiStatus.Internal
+    private @Nullable ReceivedPayload get(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
         index = index % array.length;
         return array[index];
     }
 
+    /**
+     * Pulls {@link ReceivedPayload} at {@link #pullPosition} and increases {@link #pullPosition} by 1 (if returned value is not {@code null}).
+     * @return {@link ReceivedPayload} at the first position in the queue or {@code null} if there is no such.
+     */
     public synchronized ReceivedPayload pull() {
         if(array[pullPosition] != null){
             ReceivedPayload payload = array[pullPosition];
@@ -122,6 +135,14 @@ public class DispatchEventQueue {
         }
 
         return null;
+    }
+
+    /**
+     * {@link #pullPosition} is not increased.
+     * @return {@link ReceivedPayload} at the first position in the queue or {@code null} if there is no such.
+     */
+    public synchronized ReceivedPayload peek() {
+        return array[pullPosition];
     }
 
     public void setProcessor(@Nullable DispatchEventProcessor processor) {

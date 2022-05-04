@@ -16,14 +16,17 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
+import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class DispatchEventProcessor {
 
     protected final @NotNull DispatchEventQueue queue;
+    protected final @NotNull GatewayWebSocket gateway;
 
-    protected DispatchEventProcessor(@NotNull DispatchEventQueue queue) {
+    protected DispatchEventProcessor(@NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
         this.queue = queue;
+        this.gateway = gateway;
     }
 
     /**
