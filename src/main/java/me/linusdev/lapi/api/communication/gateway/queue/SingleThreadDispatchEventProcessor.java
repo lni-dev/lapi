@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
-import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +26,7 @@ public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor {
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    protected SingleThreadDispatchEventProcessor(@NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
+    public SingleThreadDispatchEventProcessor(@NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
         super(queue, gateway);
     }
 

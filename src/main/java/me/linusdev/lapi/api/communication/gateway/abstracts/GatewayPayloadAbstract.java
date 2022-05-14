@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.abstracts;
 
+import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
 import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
@@ -25,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @see GatewayPayload GatewayPayload Implementation
  */
-public interface GatewayPayloadAbstract {
+public interface GatewayPayloadAbstract extends Datable {
 
     /**
      * opcode for the payload

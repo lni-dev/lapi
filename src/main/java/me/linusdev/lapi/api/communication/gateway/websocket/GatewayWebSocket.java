@@ -58,6 +58,9 @@ import me.linusdev.lapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.lapi.api.communication.gateway.identify.Identify;
 import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
+import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
+import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
+import me.linusdev.lapi.api.communication.gateway.queue.SingleThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
@@ -161,7 +164,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     //Generate Data keys
     public static final String SESSION_ID_KEY = "sessionId";
     public static final String CAN_RESUME_KEY = "can_resume";
-    public static final String LAST_RECEIVED_SEQUENCE_KEY = "sequence";
+    public static final String DISPATCH_EVENT_QUEUE_KEY = "dispatch_event_queue";
     public static final String HEARTBEATS_SENT_KEY = "heartbeats_sent";
     public static final String HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY = "heartbeat_acks_received";
     public static final String DATA_GENERATED_TIME_MILLIS_KEY = "generated_at";
@@ -185,10 +188,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     private final @NotNull GatewayIntent[] intents;
 
     private WebSocket webSocket = null;
-    /**
-     * The last sequence received from Discord. -1 if we haven't received one yet
-     */
-    private final AtomicLong lastReceivedSequence;
+
+    private DispatchEventQueue dispatchEventQueue;
     private long heartbeatInterval;
     private String sessionId;
 
@@ -235,7 +236,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 config.getGatewayConfig().getIntents(),
                 config.getGatewayConfig().getJsonToPayloadConverter(),
                 config.getGatewayConfig().getEtfToPayloadConverter(),
-                config.getGatewayConfig().getUnexpectedEventHandler()
+                config.getGatewayConfig().getUnexpectedEventHandler(),
+                config.getGatewayConfig().getDispatchEventQueueSize()
         );
     }
 
@@ -243,7 +245,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * You should not use this, as the @Nullable annotations are possibly wrong. That is because the checking of Nullability was
      * moved to {@link me.linusdev.lapi.api.config.ConfigBuilder ConfigBuilder} and
      * {@link me.linusdev.lapi.api.config.GatewayConfigBuilder GatewayConfigBuilder}.<br>
-     * Use {@link GatewayWebSocket#GatewayWebSocket(LApi, EventTransmitter, Config)} instead.
+     * Use {@link GatewayWebSocket#GatewayWebSocket(LApiImpl, EventTransmitter, Config)} instead.
      */
     @ApiStatus.Internal
     private GatewayWebSocket(@NotNull LApiImpl lApi, @NotNull EventTransmitter transmitter, @NotNull String token, @Nullable ApiVersion apiVersion,
@@ -252,7 +254,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                              @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater selfPresence, @NotNull GatewayIntent[] intents,
                              @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter,
                              ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter,
-                             @NotNull UnexpectedEventHandler unexpectedEventHandler) {
+                             @NotNull UnexpectedEventHandler unexpectedEventHandler, int dispatchEventQueueSize) {
         this.lApi = lApi;
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.transmitter = transmitter;
@@ -290,7 +292,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         this.canResume = new AtomicBoolean(false);
 
-        this.lastReceivedSequence = new AtomicLong(-1);
+        this.dispatchEventQueue = new DispatchEventQueue(dispatchEventQueueSize);
+        this.dispatchEventQueue.setProcessor(new SingleThreadDispatchEventProcessor(this.dispatchEventQueue, this));
 
         this.heartbeatsSent = new AtomicLong(0);
         this.heartbeatAcknowledgementsReceived = new AtomicLong(0);
@@ -1700,7 +1703,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      */
     protected void handleReceivedPayload(@NotNull GatewayPayloadAbstract payload) throws Throwable {
         Long seq = payload.getSequence();
-        if (seq != null) this.lastReceivedSequence.set(seq);
         GatewayOpcode opcode = payload.getOpcode();
 
         if(Logger.DEBUG_LOG) logger.debug(String.format("Received Payload. Opcode: %s, Sequence: %d, Event: %s", opcode, seq, payload.getType()));
@@ -1733,7 +1735,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         + GatewayOpcode.DISPATCH + " but without a type... payload:\n" + payload.toJsonString());
             }
 
-            handleReceivedEvent(payload);
+            dispatchEventQueue.push(new ReceivedPayload(payload));
+            //handleReceivedEvent(payload);
 
         } else if (opcode == GatewayOpcode.HEARTBEAT) {
             //Discord requested us to send a Heartbeat
@@ -1775,8 +1778,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             //check if this is an old session. if so, we should resume
             if(canResume.get()){
-                //TODO: lastReceivedSequence is updated above, so it is probably wrong here.
-                Resume resume = new Resume(token, sessionId, lastReceivedSequence.get());
+                Resume resume = new Resume(token, sessionId, dispatchEventQueue.getLastSequence());
 
                 GatewayPayload resumePayload = GatewayPayload.newResume(resume);
                 sendPayload(resumePayload);
@@ -1808,7 +1810,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     /**
      * will close the current WebSocket and start a new Session. Meaning:
      * This will reset {@link #sessionId}, {@link #heartbeatsSent}, {@link #heartbeatAcknowledgementsReceived},
-     * {@link #heartbeatInterval}, {@link #lastReceivedSequence}
+     * {@link #heartbeatInterval}, {@link #dispatchEventQueue}
      *
      * @param sendClose whether to send a close, if the web socket is still open
      */
@@ -1876,16 +1878,16 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         String sessionId = (String) data.get(SESSION_ID_KEY);
         Boolean canResume = (Boolean) data.get(CAN_RESUME_KEY);
-        Number lastReceivedSeq = (Number) data.get(LAST_RECEIVED_SEQUENCE_KEY);
+        SOData dispatchEventQueueData = (SOData) data.get(DISPATCH_EVENT_QUEUE_KEY);
         Number heartbeatsSent = (Number) data.get(HEARTBEATS_SENT_KEY);
         Number heartbeatsAcksReceived = (Number) data.get(HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY);
         Number genMillis = (Number) data.get(DATA_GENERATED_TIME_MILLIS_KEY);
 
-        if(sessionId == null || canResume == null ||lastReceivedSeq == null || heartbeatsSent == null ||
+        if(sessionId == null || canResume == null || dispatchEventQueueData == null || heartbeatsSent == null ||
         heartbeatsAcksReceived == null || genMillis == null){
             InvalidDataException.throwException(data, null, GatewayWebSocket.class,
-                    new Object[]{sessionId, canResume, lastReceivedSeq, heartbeatsSent, heartbeatsAcksReceived, genMillis},
-                    new String[]{SESSION_ID_KEY, CAN_RESUME_KEY, LAST_RECEIVED_SEQUENCE_KEY, HEARTBEATS_SENT_KEY, HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY, DATA_GENERATED_TIME_MILLIS_KEY});
+                    new Object[]{sessionId, canResume, dispatchEventQueueData, heartbeatsSent, heartbeatsAcksReceived, genMillis},
+                    new String[]{SESSION_ID_KEY, CAN_RESUME_KEY, DISPATCH_EVENT_QUEUE_KEY, HEARTBEATS_SENT_KEY, HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY, DATA_GENERATED_TIME_MILLIS_KEY});
         }
 
         long timePasted = System.currentTimeMillis() - genMillis.longValue();
@@ -1894,7 +1896,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         this.sessionId = sessionId;
         this.canResume.set(canResume);
-        this.lastReceivedSequence.set(lastReceivedSeq.longValue());
+        this.dispatchEventQueue = DispatchEventQueue.fromData(dispatchEventQueueData);
         this.heartbeatsSent.set(heartbeatsSent.longValue());
         this.heartbeatAcknowledgementsReceived.set(heartbeatsAcksReceived.longValue());
 
@@ -1937,7 +1939,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         sessionId = null;
         canResume.set(false);
 
-        lastReceivedSequence.set(-1);
+        dispatchEventQueue.reset();
 
         heartbeatsSent.set(0);
         heartbeatAcknowledgementsReceived.set(0);
@@ -1948,8 +1950,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      */
     protected void sendHeartbeat() {
 
-        Long sequence = lastReceivedSequence.get();
-        if (sequence == -1) sequence = null;
+        Long sequence = dispatchEventQueue.getLastSequence();
 
         GatewayPayload payload = GatewayPayload.newHeartbeat(sequence);
         logger.debug("sending heartbeat: sequence=" + sequence);
@@ -2029,7 +2030,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
 
     @Override
-    public void onOpen(WebSocket webSocket) {
+    public synchronized void onOpen(WebSocket webSocket) {
         logger.debug("onOpen");
         this.webSocket = webSocket;
         WebSocket.Listener.super.onOpen(webSocket);
@@ -2040,7 +2041,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * transmits the raw input to {@link #handleReceivedPayload(GatewayPayloadAbstract)}
      */
     @Override
-    public CompletionStage<?> onText(WebSocket webSocket, CharSequence text, boolean last) {
+    public synchronized CompletionStage<?> onText(WebSocket webSocket, CharSequence text, boolean last) {
         try {
 
             if(webSocket != this.webSocket) return null;
@@ -2074,7 +2075,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * transmits the raw input to {@link #handleReceivedPayload(GatewayPayloadAbstract)}
      */
     @Override
-    public CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer bytes, boolean last) {
+    public synchronized CompletionStage<?> onBinary(WebSocket webSocket, ByteBuffer bytes, boolean last) {
         try {
 
             if(webSocket != this.webSocket) return null;
@@ -2110,21 +2111,21 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     }
 
     @Override
-    public CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
+    public synchronized CompletionStage<?> onPing(WebSocket webSocket, ByteBuffer message) {
         if(webSocket != this.webSocket) return null;
         logger.warning("Received a ping... Why? message: " + new String(message.array()));
         return WebSocket.Listener.super.onPing(webSocket, message);
     }
 
     @Override
-    public CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
+    public synchronized CompletionStage<?> onPong(WebSocket webSocket, ByteBuffer message) {
         if(webSocket != this.webSocket) return null;
         logger.warning("Received a pong... Why? message: " + new String(message.array()));
         return WebSocket.Listener.super.onPong(webSocket, message);
     }
 
     @Override
-    public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
+    public synchronized CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
         try {
             if (webSocket != this.webSocket) return null;
             heartbeatFuture.cancel(true);
@@ -2215,7 +2216,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         data.add(SESSION_ID_KEY, sessionId);
         data.add(CAN_RESUME_KEY, canResume.get());
-        data.add(LAST_RECEIVED_SEQUENCE_KEY, lastReceivedSequence.get());
+        data.add(DISPATCH_EVENT_QUEUE_KEY, dispatchEventQueue);
         data.add(HEARTBEATS_SENT_KEY, heartbeatsSent.get());
         data.add(HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY, heartbeatAcknowledgementsReceived.get());
         data.add(DATA_GENERATED_TIME_MILLIS_KEY, System.currentTimeMillis());

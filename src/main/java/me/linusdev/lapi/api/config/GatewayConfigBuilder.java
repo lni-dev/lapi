@@ -53,6 +53,8 @@ public class GatewayConfigBuilder implements Datable {
     public static final String STARTUP_PRESENCE_KEY = "startup_presence";
     public static final String INTENTS_KEY = "intents";
 
+    public static final int DEFAULT_DISPATCH_EVENT_QUEUE_SIZE = 200;
+
     private ApiVersion apiVersion = null;
     private GatewayEncoding encoding = null;
     private GatewayCompression compression = null;
@@ -65,6 +67,7 @@ public class GatewayConfigBuilder implements Datable {
     private ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter = null;
     private ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter = null;
     private GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler = null;
+    private Integer dispatchEventQueueSize = null;
 
     public GatewayConfigBuilder() {
         this.startupPresence = new SelfUserPresenceUpdater(false);
@@ -356,10 +359,27 @@ public class GatewayConfigBuilder implements Datable {
      * </p>
      *
      * @param unexpectedEventHandler the unexpected event handler for the {@link GatewayWebSocket}
-     * @return
      */
     public GatewayConfigBuilder setUnexpectedEventHandler(@Nullable GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
         this.unexpectedEventHandler = unexpectedEventHandler;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link #DEFAULT_DISPATCH_EVENT_QUEUE_SIZE}
+     * <p>
+     * The size of the dispatch event queue. If there are too many events for you to handle,
+     * they will be stored in the dispatch event queue.
+     * </p>
+     * <p>
+     * Set to {@code null} to use default
+     * </p>
+     *
+     * @param dispatchEventQueueSize the size of the Dispatch Event queue
+     */
+    public GatewayConfigBuilder setDispatchEventQueueSize(@Nullable Integer dispatchEventQueueSize) {
+        this.dispatchEventQueueSize = dispatchEventQueueSize;
         return this;
     }
 
@@ -384,8 +404,10 @@ public class GatewayConfigBuilder implements Datable {
 
         if (unexpectedEventHandler == null) unexpectedEventHandler = GatewayWebSocket.STANDARD_UNEXPECTED_EVENT_HANDLER;
 
+        if(dispatchEventQueueSize == null) dispatchEventQueueSize = DEFAULT_DISPATCH_EVENT_QUEUE_SIZE;
+
         return new GatewayConfig(apiVersion, encoding, compression, os, largeThreshold, shardId,
-                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter, bytesToPayloadConverter, unexpectedEventHandler);
+                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter, bytesToPayloadConverter, unexpectedEventHandler, dispatchEventQueueSize);
     }
 
 

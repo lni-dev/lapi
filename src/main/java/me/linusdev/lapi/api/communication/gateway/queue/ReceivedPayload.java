@@ -16,14 +16,23 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
+import me.linusdev.data.AbstractData;
+import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class ReceivedPayload {
+public class ReceivedPayload implements Datable {
+
+    public static final String PAYLOAD_KEY = "payload";
+    public static final String TIME_KEY = "time";
+    public static final String GUILD_ID_KEY = "guild_id";
 
     private final @NotNull GatewayPayloadAbstract payload;
     private final long time;
@@ -46,6 +55,20 @@ public class ReceivedPayload {
         this.guildId = guildId;
     }
 
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable ReceivedPayload fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+
+        GatewayPayloadAbstract payload = data.getAndConvertWithException(PAYLOAD_KEY,
+                convertible -> GatewayPayload.fromData(data), null);
+        long time = ((Number) data.getOrDefaultBoth(TIME_KEY, 0L)).longValue();
+        String guildId = (String) data.get(GUILD_ID_KEY);
+
+        if(payload == null) throw new InvalidDataException(data, "payload may not be null!");
+
+        return new ReceivedPayload(payload, time, guildId);
+    }
+
     public @NotNull GatewayPayloadAbstract getPayload() {
         return payload;
     }
@@ -60,5 +83,16 @@ public class ReceivedPayload {
 
     public boolean isFromGuild() {
         return guildId != null;
+    }
+
+    @Override
+    public AbstractData<?, ?> getData() {
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
+
+        data.add(PAYLOAD_KEY, payload);
+        data.add(TIME_KEY, time);
+        data.add(GUILD_ID_KEY, guildId);
+
+        return data;
     }
 }

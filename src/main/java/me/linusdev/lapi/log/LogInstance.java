@@ -89,6 +89,6 @@ public class LogInstance {
         for(StackTraceElement e : throwable.getStackTrace())
             err.append(e.toString()).append("\n");
 
-        errorAlign(err.toString(), throwable.toString());
+        errorAlign(err.toString(), throwable.getClass().getSimpleName());
     }
 }

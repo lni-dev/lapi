@@ -50,8 +50,9 @@ public class GatewayConfig {
     private final @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter;
     private final @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
     private final @NotNull GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler;
+    private final int dispatchEventQueueSize;
 
-    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler) {
+    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler, int dispatchEventQueueSize) {
         this.apiVersion = ApiVersion;
         this.encoding = encoding;
         this.compression = compression;
@@ -64,6 +65,7 @@ public class GatewayConfig {
         this.jsonToPayloadConverter = jsonToPayloadConverter;
         this.etfToPayloadConverter = etfToPayloadConverter;
         this.unexpectedEventHandler = unexpectedEventHandler;
+        this.dispatchEventQueueSize = dispatchEventQueueSize;
     }
 
     public @NotNull ApiVersion getApiVersion() {
@@ -112,5 +114,9 @@ public class GatewayConfig {
 
     public @NotNull GatewayWebSocket.UnexpectedEventHandler getUnexpectedEventHandler() {
         return unexpectedEventHandler;
+    }
+
+    public int getDispatchEventQueueSize() {
+        return dispatchEventQueueSize;
     }
 }
