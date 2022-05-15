@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.gateway.queue;
+package me.linusdev.lapi.api.communication.gateway.queue.processor;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
+import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
@@ -52,5 +53,9 @@ public abstract class DispatchEventProcessor implements HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    public @NotNull GatewayWebSocket getGateway() {
+        return gateway;
     }
 }

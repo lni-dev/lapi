@@ -60,7 +60,7 @@ import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
-import me.linusdev.lapi.api.communication.gateway.queue.SingleThreadDispatchEventProcessor;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.SingleThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
