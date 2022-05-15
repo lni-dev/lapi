@@ -21,6 +21,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import org.jetbrains.annotations.Contract;
@@ -71,6 +72,10 @@ public class ReceivedPayload implements Datable {
 
     public @NotNull GatewayPayloadAbstract getPayload() {
         return payload;
+    }
+
+    public @Nullable GatewayEvent getType() {
+        return payload.getType();
     }
 
     public long getTime() {

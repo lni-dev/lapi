@@ -293,7 +293,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         this.canResume = new AtomicBoolean(false);
 
         this.dispatchEventQueue = new DispatchEventQueue(dispatchEventQueueSize);
-        this.dispatchEventQueue.setProcessor(new SingleThreadDispatchEventProcessor(this.dispatchEventQueue, this));
+        this.dispatchEventQueue.setProcessor(new SingleThreadDispatchEventProcessor(this.lApi, this.dispatchEventQueue, this));
 
         this.heartbeatsSent = new AtomicLong(0);
         this.heartbeatAcknowledgementsReceived = new AtomicLong(0);
@@ -383,8 +383,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      *     <li>{@link GatewayEvent#INVALID_SESSION}</li>
      *     <li>{@link GatewayEvent#RECONNECT}</li>
      * </ul>
-     * @param type {@link GatewayEvent type} of the event
-     * @param innerPayload the {@link SOData} sent with this event
+     *
+     * Note: {@link GatewayEvent#GUILD_CREATE} must be handled as first event for every guild,
+     * otherwise an {@link IllegalStateException} will be thrown.
+     *
      * @param payload {@link GatewayPayloadAbstract}
      */
     @SuppressWarnings("DuplicateBranchesInSwitch")

@@ -16,22 +16,41 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
+import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class DispatchEventProcessor {
+/**
+ * This class processes {@link GatewayOpcode#DISPATCH DISPATCH} events in a different {@link Thread}.
+ * This means, this class calls {@link GatewayWebSocket#handleReceivedEvent(GatewayPayloadAbstract)  handleReceivedEvent}
+ * for every event in a Thread.<br>
+ * The first event handled for each guild, must always be {@link GatewayEvent#GUILD_CREATE GUILD_CREATE}, see also
+ * {@link GatewayWebSocket#handleReceivedEvent(GatewayPayloadAbstract)  handleReceivedEvent}.
+ */
+public abstract class DispatchEventProcessor implements HasLApi {
 
+    protected final @NotNull LApiImpl lApi;
     protected final @NotNull DispatchEventQueue queue;
     protected final @NotNull GatewayWebSocket gateway;
 
-    protected DispatchEventProcessor(@NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
+    protected DispatchEventProcessor(@NotNull LApiImpl lApi, @NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
+        this.lApi = lApi;
         this.queue = queue;
         this.gateway = gateway;
     }
 
     /**
-     * Called when a new element is available in the queue - this call should always be thread safe, e.g. in a synchronized
-     * context.
+     * Called when a new element is available in the queue - this method should always be thread safe, e.g. synchronized.
      */
     public abstract void onNext();
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
+    }
 }

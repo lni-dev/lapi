@@ -55,9 +55,9 @@ public class ActivityParty implements Datable {
         if(data == null) return null;
 
         String id = (String) data.get(ID_KEY);
-        ArrayList<Integer> size = data.getListAndConvert(SIZE_KEY, convertible -> (Integer) convertible);
+        ArrayList<Number> size = data.getListAndConvert(SIZE_KEY, convertible -> (Number) convertible);
 
-        return new ActivityParty(id, size == null ? null : size.get(0), size == null ? null : size.get(1));
+        return new ActivityParty(id, size == null ? null : size.get(0).intValue(), size == null ? null : size.get(1).intValue());
     }
 
     /**

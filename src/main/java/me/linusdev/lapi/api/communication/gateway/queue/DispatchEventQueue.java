@@ -206,7 +206,7 @@ public class DispatchEventQueue implements Datable {
      * Pulls {@link ReceivedPayload} at {@link #pullPosition} and increases {@link #pullPosition} by 1 (if returned value is not {@code null}).
      * @return {@link ReceivedPayload} at the first position in the queue or {@code null} if there is no such.
      */
-    public synchronized ReceivedPayload pull() {
+    public synchronized @Nullable ReceivedPayload pull() {
         if(array[pullPosition] != null){
             ReceivedPayload payload = array[pullPosition];
             array[pullPosition] = null;
@@ -222,10 +222,24 @@ public class DispatchEventQueue implements Datable {
      * {@link #pullPosition} is not increased.
      * @return {@link ReceivedPayload} at the first position in the queue or {@code null} if there is no such.
      */
-    public synchronized ReceivedPayload peek() {
+    public synchronized @Nullable ReceivedPayload peek() {
         return array[pullPosition];
     }
 
+    /**
+     * resets this queue:
+     * <ul>
+     *     <li>
+     *         {@link #lastSequence} will be 0.
+     *     </li>
+     *     <li>
+     *         The queue's {@link #size} will be minimized. That means all missing sequences will be ignored.
+     *     </li>
+     *     <li>
+     *         {@link #pushPosition} will be updated accordingly.
+     *     </li>
+     * </ul>
+     */
     public synchronized void reset() {
         lastSequence = 0;
 
@@ -247,6 +261,12 @@ public class DispatchEventQueue implements Datable {
         receivedFirstSequence = false;
     }
 
+    /**
+     * Calculates the size of the queue after a new element has been added.
+     * @param dif the difference of the position of the added element and the current {@link #pushPosition} (always positive or 0)
+     * @return {@link #size}
+     */
+    @SuppressWarnings("UnusedReturnValue")
     private int calculateSize(int dif) {
         int tempPushPosition = pushPosition;
 
@@ -261,10 +281,17 @@ public class DispatchEventQueue implements Datable {
         this.processor = processor;
     }
 
+    /**
+     * @return next required sequence - 1
+     */
     public synchronized long getLastSequence() {
         return lastSequence;
     }
 
+    /**
+     *
+     * @return the queues max capacity
+     */
     public int getCapacity() {
         return array.length;
     }
@@ -309,6 +336,6 @@ public class DispatchEventQueue implements Datable {
             i++;
         }
 
-        return s.toString() + "\n\n";
+        return s + "\n\n";
     }
 }
