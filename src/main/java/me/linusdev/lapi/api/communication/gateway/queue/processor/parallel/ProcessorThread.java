@@ -20,17 +20,19 @@ import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
+import java.util.concurrent.locks.Lock;
 
 public class ProcessorThread extends Thread{
 
     private final @NotNull MultiThreadDispatchEventProcessor processor;
     private final @NotNull GatewayWebSocket gateway;
 
-    private boolean running;
+    private volatile boolean running;
 
-    private Queue<ReceivedPayload> queue;
+    private volatile @Nullable Queue<ReceivedPayload> queue;
     private boolean changeQueue;
     private boolean waiting;
 
@@ -39,6 +41,10 @@ public class ProcessorThread extends Thread{
         setDaemon(false);
         this.gateway = processor.getGateway();
         this.processor = processor;
+
+        this.running = true;
+        this.changeQueue = false;
+        this.waiting = false;
     }
 
     @Override
@@ -47,17 +53,22 @@ public class ProcessorThread extends Thread{
             while(isRunning()) {
 
                 synchronized (this) {
-                    if(!isRunning()) break;
-                    waiting = true;
-                    this.wait();
-                    waiting = false;
+                    queue = processor.nextQueue();
+                    if(queue != null || changeQueue) {
+                        changeQueue = false;
+                    } else {
+                        waiting = true;
+                        this.wait();
+                        waiting = false;
+
+                    }
                 }
 
                 if(!isRunning()) break;
 
                 ReceivedPayload payload;
 
-                while ((payload=queue.poll()) != null) {
+                while (queue != null && (payload=queue.poll()) != null) {
                     gateway.handleReceivedEvent(payload.getPayload());
 
                     synchronized (this) {
@@ -73,12 +84,14 @@ public class ProcessorThread extends Thread{
         }
     }
 
-    public synchronized void shutdown() {
+    public void shutdown() {
         this.running = false;
-        this.notify();
+        synchronized (this){
+            this.notify();
+        }
     }
 
-    public synchronized boolean isRunning() {
+    public boolean isRunning() {
         return running;
     }
 
@@ -88,5 +101,16 @@ public class ProcessorThread extends Thread{
 
     public synchronized void notifyChangeQueue() {
         changeQueue = true;
+        this.notify();
+    }
+
+    public synchronized boolean notifyChangeQueue(@NotNull Queue<ReceivedPayload> queue) {
+        if(isWaiting()) {
+            this.queue = queue;
+            this.notify();
+            return true;
+        }
+
+        return false;
     }
 }

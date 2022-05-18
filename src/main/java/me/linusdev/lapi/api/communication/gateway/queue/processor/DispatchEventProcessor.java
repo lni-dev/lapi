@@ -39,7 +39,7 @@ public abstract class DispatchEventProcessor implements HasLApi {
     protected final @NotNull DispatchEventQueue queue;
     protected final @NotNull GatewayWebSocket gateway;
 
-    protected DispatchEventProcessor(@NotNull LApiImpl lApi, @NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
+    public DispatchEventProcessor(@NotNull LApiImpl lApi, @NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
         this.lApi = lApi;
         this.queue = queue;
         this.gateway = gateway;

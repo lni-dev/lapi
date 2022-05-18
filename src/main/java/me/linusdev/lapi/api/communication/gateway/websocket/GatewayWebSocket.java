@@ -61,6 +61,7 @@ import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdat
 import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.SingleThreadDispatchEventProcessor;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.parallel.MultiThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
@@ -293,7 +294,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         this.canResume = new AtomicBoolean(false);
 
         this.dispatchEventQueue = new DispatchEventQueue(dispatchEventQueueSize);
-        this.dispatchEventQueue.setProcessor(new SingleThreadDispatchEventProcessor(this.lApi, this.dispatchEventQueue, this));
+        //this.dispatchEventQueue.setProcessor(new SingleThreadDispatchEventProcessor(this.lApi, this.dispatchEventQueue, this));
+        this.dispatchEventQueue.setProcessor(new MultiThreadDispatchEventProcessor(lApi, dispatchEventQueue, this, 4));
 
         this.heartbeatsSent = new AtomicLong(0);
         this.heartbeatAcknowledgementsReceived = new AtomicLong(0);
