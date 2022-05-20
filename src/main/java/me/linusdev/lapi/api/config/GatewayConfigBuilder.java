@@ -26,10 +26,15 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.identify.Identify;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
+import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessor;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessorFactory;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.SingleThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import org.jetbrains.annotations.*;
 
 import java.nio.ByteBuffer;
@@ -68,6 +73,7 @@ public class GatewayConfigBuilder implements Datable {
     private ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> bytesToPayloadConverter = null;
     private GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler = null;
     private Integer dispatchEventQueueSize = null;
+    private DispatchEventProcessorFactory dispatchEventProcessorFactory = null;
 
     public GatewayConfigBuilder() {
         this.startupPresence = new SelfUserPresenceUpdater(false);
@@ -384,6 +390,23 @@ public class GatewayConfigBuilder implements Datable {
     }
 
     /**
+     * <em>Optional</em><br>
+     * Default: {@code SingleThreadDispatchEventProcessor::new}
+     * <p>
+     * The Factory for the {@link DispatchEventProcessor}
+     * </p>
+     * <p>
+     * Set to {@code null} to use default
+     * </p>
+     *
+     * @param dispatchEventProcessorFactory the factory
+     */
+    public GatewayConfigBuilder setDispatchEventProcessorFactory(@Nullable DispatchEventProcessorFactory dispatchEventProcessorFactory) {
+        this.dispatchEventProcessorFactory = dispatchEventProcessorFactory;
+        return this;
+    }
+
+    /**
      * builds a {@link GatewayConfig}
      *
      * @return {@link GatewayConfig}
@@ -406,8 +429,13 @@ public class GatewayConfigBuilder implements Datable {
 
         if(dispatchEventQueueSize == null) dispatchEventQueueSize = DEFAULT_DISPATCH_EVENT_QUEUE_SIZE;
 
+        if(dispatchEventProcessorFactory == null)
+            dispatchEventProcessorFactory = SingleThreadDispatchEventProcessor::new;
+
         return new GatewayConfig(apiVersion, encoding, compression, os, largeThreshold, shardId,
-                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter, bytesToPayloadConverter, unexpectedEventHandler, dispatchEventQueueSize);
+                numShards, startupPresence, intents.toArray(new GatewayIntent[0]), jsonToPayloadConverter,
+                bytesToPayloadConverter, unexpectedEventHandler, dispatchEventQueueSize,
+                dispatchEventProcessorFactory);
     }
 
 

@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
+import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessorFactory;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
@@ -51,8 +52,9 @@ public class GatewayConfig {
     private final @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
     private final @NotNull GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler;
     private final int dispatchEventQueueSize;
+    private final @NotNull DispatchEventProcessorFactory dispatchEventProcessorFactory;
 
-    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler, int dispatchEventQueueSize) {
+    public GatewayConfig(@NotNull ApiVersion ApiVersion, @NotNull GatewayEncoding encoding, @NotNull GatewayCompression compression, @NotNull String os, int largeThreshold, @Nullable Integer shardId, @Nullable Integer numShards, @NotNull SelfUserPresenceUpdater startupPresence, @NotNull GatewayIntent[] intents, @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter, @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter, GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler, int dispatchEventQueueSize, @NotNull DispatchEventProcessorFactory dispatchEventProcessorFactory) {
         this.apiVersion = ApiVersion;
         this.encoding = encoding;
         this.compression = compression;
@@ -66,6 +68,7 @@ public class GatewayConfig {
         this.etfToPayloadConverter = etfToPayloadConverter;
         this.unexpectedEventHandler = unexpectedEventHandler;
         this.dispatchEventQueueSize = dispatchEventQueueSize;
+        this.dispatchEventProcessorFactory = dispatchEventProcessorFactory;
     }
 
     public @NotNull ApiVersion getApiVersion() {
@@ -118,5 +121,9 @@ public class GatewayConfig {
 
     public int getDispatchEventQueueSize() {
         return dispatchEventQueueSize;
+    }
+
+    public @NotNull DispatchEventProcessorFactory getDispatchEventProcessorFactory() {
+        return dispatchEventProcessorFactory;
     }
 }
