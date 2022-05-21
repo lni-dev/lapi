@@ -21,7 +21,9 @@ import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEv
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
+import me.linusdev.lapi.api.communication.gateway.events.guild.ban.GuildBanEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.integration.GuildIntegrationsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
@@ -38,8 +40,10 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -107,6 +111,20 @@ public enum EventIdentifier{
      * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
      */
     LAPI_READY,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                           RESUMED                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onResumed(LApi, ResumedEvent)}.
+     * <br><br>
+     */
+    RESUMED,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
@@ -330,6 +348,30 @@ public enum EventIdentifier{
     GUILD_AVAILABLE,
 
     /**
+     * identifier for {@link EventListener#onGuildBanAdd(LApi, GuildBanEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_BANS }
+     *     </li>
+     * </ul>
+     */
+    GUILD_BAN_ADD,
+
+    /**
+     * identifier for {@link EventListener#onGuildBanRemove(LApi, GuildBanEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_BANS }
+     *     </li>
+     * </ul>
+     */
+    GUILD_BAN_REMOVE,
+
+    /**
      * identifier for {@link EventListener#onGuildEmojisUpdate(LApi, GuildEmojisUpdateEvent)}.
      * <br><br>
      * requires:
@@ -353,6 +395,18 @@ public enum EventIdentifier{
      */
     GUILD_STICKERS_UPDATE,
 
+    /**
+     * identifier for {@link EventListener#onGuildIntegrationsUpdate(LApi, GuildIntegrationsUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INTEGRATIONS }
+     *     </li>
+     * </ul>
+     */
+    GUILD_INTEGRATIONS_UPDATE,
+    
     /**
      * identifier for {@link EventListener#onGuildMemberAdd(LApi, GuildMemberAddEvent)}.
      * <br><br>
@@ -601,6 +655,27 @@ public enum EventIdentifier{
      * </ul>
      */
     STAGE_INSTANCE_UPDATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             TYPING                            *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onTypingStart(LApi, TypingStartEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#DIRECT_MESSAGE_TYPING DIRECT_MESSAGE_TYPING}
+     *         And / or {@link GatewayIntent#GUILD_MESSAGE_TYPING GUILD_MESSAGE_TYPING}
+     *     </li>
+     * </ul>
+     */
+    TYPING_START,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

@@ -23,7 +23,9 @@ import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEv
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
+import me.linusdev.lapi.api.communication.gateway.events.guild.ban.GuildBanEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.integration.GuildIntegrationsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
@@ -41,8 +43,10 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
@@ -226,6 +230,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onLApiReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onResumed(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(RESUMED);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onResumed(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }
@@ -604,6 +630,50 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     @Override
+    public void onGuildBanAdd(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildBanAdd(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_ADD);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildBanAdd(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildBanRemove(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildBanRemove(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_REMOVE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildBanRemove(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
     public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
         for(EventListener listener : listeners){
             try {
@@ -640,6 +710,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildStickersUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGuildIntegrationsUpdate(@NotNull LApi lApi, @NotNull GuildIntegrationsUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onGuildIntegrationsUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_INTEGRATIONS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onGuildIntegrationsUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }
@@ -1065,6 +1157,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onStageInstanceUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onTypingStart(@NotNull LApi lApi, @NotNull TypingStartEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onTypingStart(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(TYPING_START);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onTypingStart(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

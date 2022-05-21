@@ -28,6 +28,7 @@ import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,11 +37,12 @@ public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor i
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final LogInstance logger;
 
+    private final ArrayList<ReceivedPayload> postponedEvents;
 
     public SingleThreadDispatchEventProcessor(@NotNull LApiImpl lApi, @NotNull DispatchEventQueue queue, @NotNull GatewayWebSocket gateway) {
         super(lApi, queue, gateway);
         this.logger = Logger.getLogger(this);
-
+        this.postponedEvents = new ArrayList<>();
     }
 
     @Override
@@ -52,7 +54,14 @@ public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor i
                 lApi.getGuildManager() != null && !lApi.getGuildManager().allGuildsReceivedEvent()) {
             //Not all guilds received a ready event yet. we cannot call handle events
             logger.debug("onNext(), but event handle will be postponed because not all guilds are ready yet");
+            postponedEvents.add(queue.pull());
             return;
+
+        } else if(postponedEvents.size() > 0 && lApi.getGuildManager() != null && lApi.getGuildManager().allGuildsReceivedEvent()) {
+            for(ReceivedPayload p : postponedEvents) {
+                executor.submit(() -> gateway.handleReceivedEvent(p.getPayload()));
+            }
+
         }
         //noinspection ConstantConditions
         executor.submit(() -> gateway.handleReceivedEvent(queue.pull().getPayload()));

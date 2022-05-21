@@ -29,7 +29,9 @@ import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEv
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
+import me.linusdev.lapi.api.communication.gateway.events.guild.ban.GuildBanEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.integration.GuildIntegrationsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
@@ -47,9 +49,11 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
@@ -182,6 +186,11 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {
+        System.out.println("onResumed");
+    }
+
+    @Override
     public void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {
         System.out.println("onChannelCreate: " + event.getChannel());
     }
@@ -263,6 +272,16 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onGuildBanAdd(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
+        EventListener.super.onGuildBanAdd(lApi, event);
+    }
+
+    @Override
+    public void onGuildBanRemove(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
+        EventListener.super.onGuildBanRemove(lApi, event);
+    }
+
+    @Override
     public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
         System.out.println("onGuildEmojisUpdate");
 
@@ -278,6 +297,11 @@ public class Test implements EventListener{
     @Override
     public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
         System.out.println("onGuildStickersUpdate");
+    }
+
+    @Override
+    public void onGuildIntegrationsUpdate(@NotNull LApi lApi, @NotNull GuildIntegrationsUpdateEvent event) {
+        EventListener.super.onGuildIntegrationsUpdate(lApi, event);
     }
 
     @Override
@@ -437,6 +461,17 @@ public class Test implements EventListener{
     @Override
     public void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
         System.out.println("onStageInstanceUpdate: "  + event.getStageInstance().getData().toJsonString());
+    }
+
+    @Override
+    public void onTypingStart(@NotNull LApi lApi, @NotNull TypingStartEvent event) {
+        System.out.println("onTypingStart");
+
+        if(event.getGuildId() == null) {
+            MessageBuilder msg = new MessageBuilder(lApi, "Hi ");
+            msg.appendUserMention(event.getUserId());
+            msg.getQueueable(event.getChannelId()).queue();
+        }
     }
 
     @Override

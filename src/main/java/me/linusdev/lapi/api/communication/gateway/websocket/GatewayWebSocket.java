@@ -33,7 +33,9 @@ import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEv
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
+import me.linusdev.lapi.api.communication.gateway.events.guild.ban.GuildBanEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.integration.GuildIntegrationsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
@@ -50,9 +52,12 @@ import me.linusdev.lapi.api.communication.gateway.events.interaction.Interaction
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEventFields;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.lapi.api.communication.gateway.identify.Identify;
@@ -137,6 +142,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String ROLE_ID_KEY = "role_id";
     public static final String EMOJIS_KEY = "emojis";
     public static final String STICKERS_KEY = "stickers";
+    public static final String USER_KEY = "user";
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
@@ -408,7 +414,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             //handle Events, that do not require a innerPayload Data here:
             if (type == GatewayEvent.RESUMED) {
                 //related gateway logic is done in handleReceivedPayload
-                //TODO: event, transmitter
+                transmitter.onResumed(lApi, new ResumedEvent(lApi, payload));
                 return;
             }
 
@@ -420,7 +426,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             switch (type) {
                 case READY:
                     //related gateway logic is done in handleReceivedPayload
-                    //TODO: event, transmitter
+                    transmitter.onReady(lApi,  ReadyEvent.fromData(lApi, payload, data));
                     break;
 
                 case CHANNEL_CREATE:
@@ -847,9 +853,33 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_BAN_ADD:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        SOData user = (SOData) data.get(USER_KEY);
+
+                        if (guildId == null || user == null)
+                            throw new InvalidDataException(data, null, null, GUILD_ID_KEY, USER_KEY);
+
+                        GuildBanEvent event = new GuildBanEvent(lApi, payload, Snowflake.fromString(guildId),
+                                User.fromData(lApi, user));
+
+                        transmitter.onGuildBanAdd(lApi, event);
+                    }
                     break;
 
                 case GUILD_BAN_REMOVE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        SOData user = (SOData) data.get(USER_KEY);
+
+                        if (guildId == null || user == null)
+                            throw new InvalidDataException(data, null, null, GUILD_ID_KEY, USER_KEY);
+
+                        GuildBanEvent event = new GuildBanEvent(lApi, payload, Snowflake.fromString(guildId),
+                                User.fromData(lApi, user));
+
+                        transmitter.onGuildBanRemove(lApi, event);
+                    }
                     break;
 
                 case GUILD_EMOJIS_UPDATE:
@@ -931,6 +961,15 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case GUILD_INTEGRATIONS_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+
+                        if(guildId == null)
+                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY);
+
+                        transmitter.onGuildIntegrationsUpdate(lApi,
+                                new GuildIntegrationsUpdateEvent(lApi, payload, Snowflake.fromString(guildId)));
+                    }
                     break;
 
                 case GUILD_MEMBER_ADD:
@@ -1641,6 +1680,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case TYPING_START:
+                    {
+                        TypingStartEventFields fields = TypingStartEventFields.fromData(lApi, data);
+                        transmitter.onTypingStart(lApi, new TypingStartEvent(lApi, payload, fields));
+                    }
                     break;
 
                 case USER_UPDATE:
@@ -1705,7 +1748,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     /**
      * handles any received payloads and starts heart-beating, sets sessionId, etc.
-     * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayEvent, SOData, GatewayPayloadAbstract)}
+     * <br> Events are then transmitted to {@link #handleReceivedEvent(GatewayPayloadAbstract)}
      */
     protected void handleReceivedPayload(@NotNull GatewayPayloadAbstract payload) throws Throwable {
         Long seq = payload.getSequence();
@@ -1727,7 +1770,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 this.pendingConnects.set(0);
 
                 if(lApi.getGuildManager() != null) lApi.getGuildManager().onReady(event);
-                transmitter.onReady(lApi, event);
                 workOnQueueIfPossible();
 
             } else if (payload.getType() == GatewayEvent.RESUMED) {

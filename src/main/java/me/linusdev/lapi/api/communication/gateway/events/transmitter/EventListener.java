@@ -23,7 +23,9 @@ import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEv
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
+import me.linusdev.lapi.api.communication.gateway.events.guild.ban.GuildBanEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.emoji.GuildEmojisUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.integration.GuildIntegrationsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberAddEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberRemoveEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.member.GuildMemberUpdateEvent;
@@ -41,8 +43,10 @@ import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdate
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
+import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.log.LogInstance;
@@ -112,6 +116,8 @@ public interface EventListener {
      */
     default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
 
+    default void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {}
+
     default void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {}
 
     default void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {}
@@ -156,9 +162,15 @@ public interface EventListener {
      */
     default void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {}
 
+    default void onGuildBanAdd(@NotNull LApi lApi, @NotNull GuildBanEvent event) {}
+
+    default void onGuildBanRemove(@NotNull LApi lApi, @NotNull GuildBanEvent event) {}
+
     default void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {}
 
     default void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {}
+
+    default void onGuildIntegrationsUpdate(@NotNull LApi lApi, @NotNull GuildIntegrationsUpdateEvent event) {}
 
     default void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {}
 
@@ -199,6 +211,8 @@ public interface EventListener {
     default void onStageInstanceDelete(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {}
 
     default void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {}
+
+    default void onTypingStart(@NotNull LApi lApi, @NotNull TypingStartEvent event) {}
 
     default void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {}
 
