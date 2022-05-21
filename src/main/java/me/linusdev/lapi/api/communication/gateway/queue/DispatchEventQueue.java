@@ -186,7 +186,7 @@ public class DispatchEventQueue implements Datable {
      * @return {@link ReceivedPayload} at given index mod {@link java.lang.reflect.Array#getLength(Object) array length}
      */
     @ApiStatus.Internal
-    private @Nullable ReceivedPayload get(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
+    private synchronized @Nullable ReceivedPayload get(@Range(from = 0, to = Integer.MAX_VALUE) int index) {
         index = index % array.length;
         return array[index];
     }
@@ -197,7 +197,7 @@ public class DispatchEventQueue implements Datable {
      *              Array-index will be calculated by given index modulo array length
      * @param payload the {@link ReceivedPayload} or {@code null} to set at given index
      */
-    private void set(@Range(from = 0, to = Integer.MAX_VALUE) int index, @Nullable ReceivedPayload payload) {
+    private synchronized void set(@Range(from = 0, to = Integer.MAX_VALUE) int index, @Nullable ReceivedPayload payload) {
         array[index % array.length] = payload;
     }
 

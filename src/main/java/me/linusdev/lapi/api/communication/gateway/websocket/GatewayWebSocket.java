@@ -1998,7 +1998,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      */
     protected void sendHeartbeat() {
 
-        Long sequence = dispatchEventQueue.getLastSequence();
+        long sequence = dispatchEventQueue.getLastSequence();
 
         GatewayPayload payload = GatewayPayload.newHeartbeat(sequence);
         logger.debug("sending heartbeat: sequence=" + sequence);
