@@ -114,7 +114,7 @@ public interface LApi extends HasLApi {
     public static final String LAPI_VERSION = "1.0.0";
     public static final String LAPI_NAME = "LApi";
 
-    public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V9;
+    public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V10;
 
     public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;

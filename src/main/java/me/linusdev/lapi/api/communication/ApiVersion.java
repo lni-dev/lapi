@@ -35,6 +35,11 @@ public enum ApiVersion implements SimpleDatable {
     /**
      * Available
      */
+    V10("10", 10),
+
+    /**
+     * Available
+     */
     V9("9", 9),
 
     /**

@@ -335,6 +335,12 @@ public enum GatewayIntent implements SimpleDatable {
     DIRECT_MESSAGE_REACTIONS (1 << 13),
 
     /**
+     * This is a special case as it doesn't represent individual events, but rather affects the data sent for most events
+     * that could contain message content fields (content, attachments, embeds, and components).
+     */
+    MESSAGE_CONTENT (1 << 15),
+
+    /**
      * <ul>
      *     <li>
      *         {@link GatewayEvent#TYPING_START TYPING_START}

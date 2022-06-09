@@ -124,7 +124,7 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
-                            .setApiVersion(ApiVersion.V9)
+                            .setApiVersion(ApiVersion.V10)
                             .setCompression(GatewayCompression.NONE)
                             .setEncoding(GatewayEncoding.JSON)
                             .setOs("Windows 10")
