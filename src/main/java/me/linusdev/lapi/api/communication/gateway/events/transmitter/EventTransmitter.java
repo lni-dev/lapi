@@ -20,6 +20,7 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
@@ -36,7 +37,12 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpd
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
@@ -66,6 +72,12 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     private final @NotNull LApiImpl lApi;
 
     private final ArrayList<EventListener> listeners = new ArrayList<>(1);
+
+    /**
+     * This stores the specified EventListener. For each {@link EventIdentifier} there is an array of Listener.
+     * <br><br>
+     * TODO: This LinkedHashMap could be replaced with an Array with the amount of different EventIdentifier as size
+     */
     private final LinkedHashMap<EventIdentifier, ArrayList<EventListener>> specifiedListeners = new LinkedHashMap<>();
 
     private final AtomicBoolean triggeredGuildsReadyEvent = new AtomicBoolean(false);
@@ -450,6 +462,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onThreadMembersUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onChannelPinsUpdate(@NotNull LApi lApi, @NotNull ChannelPinsUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onChannelPinsUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_PINS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onChannelPinsUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }
@@ -996,6 +1030,116 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildScheduledEventUserRemove(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onIntegrationCreate(@NotNull LApi lApi, @NotNull IntegrationCreateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onIntegrationCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onIntegrationCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onIntegrationUpdate(@NotNull LApi lApi, @NotNull IntegrationUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onIntegrationUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onIntegrationUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onIntegrationDelete(@NotNull LApi lApi, @NotNull IntegrationDeleteEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onIntegrationDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onIntegrationDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onInviteCreate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INVITE_CREATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onInviteCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onInviteDelete(@NotNull LApi lApi, @NotNull InviteDeleteEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onInviteDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(INVITE_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onInviteDelete(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

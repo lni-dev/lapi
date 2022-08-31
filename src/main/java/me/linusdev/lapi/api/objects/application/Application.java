@@ -64,7 +64,7 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
     private final @Nullable String termsOfServiceUrl;
     private final @Nullable String privacyPolicyUrl;
     private final @Nullable User owner;
-    private final @NotNull String summary;
+    private final @Deprecated(forRemoval = true, since = "will be removed in discord api v11") @Nullable String summary;
     private final @NotNull String verifyKey;
     private final @Nullable Team team;
     private final @Nullable Snowflake guildId;
@@ -99,7 +99,7 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
      */
     public Application(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull String name, @Nullable String icon, @NotNull String description, @Nullable String[] rpcOrigins,
                        boolean botPublic, boolean botRequireCodeGrant, @Nullable String termsOfServiceUrl, @Nullable String privacyPolicyUrl,
-                       @Nullable User owner, @NotNull String summary, @NotNull String verifyKey, @Nullable Team team, @Nullable Snowflake guildId,
+                       @Nullable User owner, @Nullable String summary, @NotNull String verifyKey, @Nullable Team team, @Nullable Snowflake guildId,
                        @Nullable Snowflake primarySkuId, @Nullable String slug, @Nullable String coverImage, @Nullable Integer flags){
         this.lApi = lApi;
         this.id = id;
@@ -151,7 +151,7 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
         String coverImage = (String) data.get(COVER_IMAGE_KEY);
         Number flags = (Number) data.get(FLAGS_KEY);
 
-        if(id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || summary == null || verifyKey == null){
+        if(id == null || name == null || description == null || botPublic == null || botRequireCodeGrant == null || verifyKey == null){
             InvalidDataException exception = new InvalidDataException(data, "Cannot create " + Application.class.getSimpleName());
 
             if(id == null) exception.addMissingFields(ID_KEY);
@@ -159,7 +159,6 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
             if(description == null) exception.addMissingFields(DESCRIPTION_KEY);
             if(botPublic == null) exception.addMissingFields(BOT_PUBLIC_KEY);
             if(botRequireCodeGrant == null) exception.addMissingFields(BOT_REQUIRE_CODE_GRANT_KEY);
-            if(summary == null) exception.addMissingFields(SUMMARY_KEY);
             if(verifyKey == null) exception.addMissingFields(VERIFY_KEY_KEY);
 
             throw exception;
@@ -253,7 +252,8 @@ public class Application implements ApplicationAbstract, Datable, HasLApi {
     /**
      * if this application is a game sold on Discord, this field will be the summary field for the store page of its primary sku
      */
-    public @NotNull String getSummary() {
+    @Deprecated(forRemoval = true, since = "will be removed in discord api v11")
+    public @Nullable String getSummary() {
         return summary;
     }
 

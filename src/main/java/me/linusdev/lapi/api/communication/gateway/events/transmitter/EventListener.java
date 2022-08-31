@@ -20,6 +20,7 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
@@ -36,7 +37,12 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpd
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
@@ -136,6 +142,8 @@ public interface EventListener {
 
     default void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {}
 
+    default void onChannelPinsUpdate(@NotNull LApi lApi, @NotNull ChannelPinsUpdateEvent event) {}
+
     default void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {}
 
     default void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {}
@@ -195,6 +203,16 @@ public interface EventListener {
     default void onGuildScheduledEventUserAdd(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {}
 
     default void onGuildScheduledEventUserRemove(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {}
+
+    default void onIntegrationCreate(@NotNull LApi lApi, @NotNull IntegrationCreateEvent event) {}
+
+    default void onIntegrationUpdate(@NotNull LApi lApi, @NotNull IntegrationUpdateEvent event) {}
+
+    default void onIntegrationDelete(@NotNull LApi lApi, @NotNull IntegrationDeleteEvent event) {}
+
+    default void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {}
+
+    default void onInviteDelete(@NotNull LApi lApi, @NotNull InviteDeleteEvent event) {}
 
     default void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {}
 

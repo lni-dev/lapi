@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
@@ -43,6 +44,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.Gu
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
@@ -129,6 +132,7 @@ public class Test implements EventListener{
                             .setEncoding(GatewayEncoding.JSON)
                             .setOs("Windows 10")
                             .addIntent(GatewayIntent.ALL)
+                            .removeIntent(GatewayIntent.GUILD_PRESENCES)
                             .adjustStartupPresence(presence -> {
                                 presence.setStatus(StatusType.ONLINE);
                             })
@@ -233,6 +237,11 @@ public class Test implements EventListener{
     @Override
     public void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {
         System.out.println("onThreadMembersUpdate");
+    }
+
+    @Override
+    public void onChannelPinsUpdate(@NotNull LApi lApi, @NotNull ChannelPinsUpdateEvent event) {
+        System.out.println("onChannelPinsUpdate: " + event.getChannelId());
     }
 
     @Override
@@ -368,6 +377,16 @@ public class Test implements EventListener{
     @Override
     public void onGuildScheduledEventUserRemove(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
         System.out.println("onGuildScheduledEventUserRemove");
+    }
+
+    @Override
+    public void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {
+        System.out.println("onInviteCreate: " + event.getCode());
+    }
+
+    @Override
+    public void onInviteDelete(@NotNull LApi lApi, @NotNull InviteDeleteEvent event) {
+        System.out.println("onInviteDelete: " + event.getCode());
     }
 
     @Override

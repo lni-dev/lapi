@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.*;
@@ -33,7 +34,12 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpd
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
@@ -241,6 +247,18 @@ public enum EventIdentifier{
      * </ul>
      */
     THREAD_MEMBERS_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onChannelPinsUpdate(LApi, ChannelPinsUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILDS} and/or {@link GatewayIntent#DIRECT_MESSAGES}
+     *     </li>
+     * </ul>
+     */
+    CHANNEL_PINS_UPDATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
@@ -554,6 +572,82 @@ public enum EventIdentifier{
      */
     GUILD_SCHEDULED_EVENT_USER_REMOVE,
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                         Integration                           *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onIntegrationCreate(LApi, IntegrationCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INTEGRATIONS}
+     *     </li>
+     * </ul>
+     */
+    INTEGRATION_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onIntegrationUpdate(LApi, IntegrationUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INTEGRATIONS}
+     *     </li>
+     * </ul>
+     */
+    INTEGRATION_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onIntegrationDelete(LApi, IntegrationDeleteEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INTEGRATIONS}
+     *     </li>
+     * </ul>
+     */
+    INTEGRATION_DELETE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                           INVITE                              *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onInviteCreate(LApi, InviteCreateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INVITES}
+     *     </li>
+     * </ul>
+     */
+    INVITE_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onInviteDelete(LApi, InviteDeleteEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_INVITES}
+     *     </li>
+     * </ul>
+     */
+    INVITE_DELETE,
+    
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
      *                                                               *

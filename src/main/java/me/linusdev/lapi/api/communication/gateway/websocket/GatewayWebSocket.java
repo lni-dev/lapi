@@ -29,6 +29,7 @@ import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.communication.gateway.enums.*;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
 import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
@@ -48,7 +49,12 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.Gu
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserAddRemoveData;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
@@ -95,7 +101,9 @@ import me.linusdev.lapi.api.objects.guild.GuildImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
+import me.linusdev.lapi.api.objects.integration.Integration;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
+import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
@@ -103,6 +111,7 @@ import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
+import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -143,6 +152,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String EMOJIS_KEY = "emojis";
     public static final String STICKERS_KEY = "stickers";
     public static final String USER_KEY = "user";
+    public static final String CHANNEL_ID_KEY = "channel_id";
+    public static final String LAST_PIN_TIMESTAMP = "last_pin_timestamp";
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
@@ -576,8 +587,21 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case CHANNEL_PINS_UPDATE:
+                    {
+                        @Nullable String guildId = (String) data.get(Channel.GUILD_ID_KEY);
+                        @NotNull String channelId = (String) data.get(CHANNEL_ID_KEY);
+                        @Nullable ISO8601Timestamp lastPinTimestamp = data.getAndConvert(LAST_PIN_TIMESTAMP, ISO8601Timestamp::fromString);
 
-                    //TODO: implement
+                        ChannelPinsUpdateEvent event = new ChannelPinsUpdateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), Snowflake.fromString(channelId), lastPinTimestamp);
+
+                        transmitter.onChannelPinsUpdate(lApi, event);
+
+                        //TODO: It would maybe be a good Idea, to have an option to keep the channel pins up-to-date
+                        //That would mean, if this event is triggered, the pins for given channel should be retrieved
+                        //AND if a message is deleted in a channel which has pins, it needs to be checked if the deleted
+                        //message was a pinned message
+                    }
 
                     break;
 
@@ -1444,12 +1468,50 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case INTEGRATION_CREATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Integration integration = Integration.fromData(lApi, data);
+
+                        if(guildId == null) {
+                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
+                                    new Object[]{guildId,}, new String[]{GUILD_ID_KEY});
+                        }
+
+                        transmitter.onIntegrationCreate(lApi,
+                                new IntegrationCreateEvent(lApi, payload, Snowflake.fromString(guildId), integration));
+                    }
                     break;
 
                 case INTEGRATION_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Integration integration = Integration.fromData(lApi, data);
+
+                        if(guildId == null) {
+                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
+                                    new Object[]{guildId,}, new String[]{GUILD_ID_KEY});
+                        }
+
+                        transmitter.onIntegrationUpdate(lApi,
+                                new IntegrationUpdateEvent(lApi, payload, Snowflake.fromString(guildId), integration));
+                    }
                     break;
 
                 case INTEGRATION_DELETE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Snowflake integrationId = data.getAndConvert(Integration.ID_KEY, Snowflake::fromString);
+                        @Nullable Snowflake applicationId = data.getAndConvert(IntegrationDeleteEvent.APPLICATION_ID_KEY, Snowflake::fromString);
+
+                        if(guildId == null || integrationId == null) {
+                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
+                                    new Object[]{guildId, integrationId}, new String[]{GUILD_ID_KEY, Integration.ID_KEY});
+                            return; //unreachable statement
+                        }
+
+                        transmitter.onIntegrationDelete(lApi,
+                                new IntegrationDeleteEvent(lApi, payload, Snowflake.fromString(guildId), integrationId, applicationId));
+                    }
                     break;
 
                 case INTERACTION_CREATE:
@@ -1461,9 +1523,19 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case INVITE_CREATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        InviteCreateEvent event = InviteCreateEvent.fromData(lApi, payload, Snowflake.fromString(guildId), data);
+                        transmitter.onInviteCreate(lApi, event);
+                    }
                     break;
 
                 case INVITE_DELETE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        InviteDeleteEvent event = InviteDeleteEvent.fromData(lApi, payload, Snowflake.fromString(guildId), data);
+                        transmitter.onInviteDelete(lApi, event);
+                    }
                     break;
 
                 case MESSAGE_CREATE:
