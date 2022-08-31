@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.GuildMessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;

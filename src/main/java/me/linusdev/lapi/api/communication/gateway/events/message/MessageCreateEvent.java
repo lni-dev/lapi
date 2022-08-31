@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.gateway.events.messagecreate;
+package me.linusdev.lapi.api.communication.gateway.events.message;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;

@@ -18,7 +18,7 @@ package me.linusdev.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;

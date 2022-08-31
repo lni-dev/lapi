@@ -43,8 +43,10 @@ import me.linusdev.lapi.api.communication.gateway.events.integration.Integration
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.*;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveAllEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveEmojiEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
@@ -210,6 +212,8 @@ public interface EventListener {
 
     default void onIntegrationDelete(@NotNull LApi lApi, @NotNull IntegrationDeleteEvent event) {}
 
+    default void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {}
+
     default void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {}
 
     default void onInviteDelete(@NotNull LApi lApi, @NotNull InviteDeleteEvent event) {}
@@ -218,9 +222,21 @@ public interface EventListener {
 
     default void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {}
 
-    default void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {}
-
     default void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {}
+
+    default void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {}
+
+    default void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {}
+
+    default void onMessageDeleteBulk(@NotNull LApi lApi, @NotNull MessageDeleteBulkEvent event) {}
+
+    default void onMessageReactionAdd(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {}
+
+    default void onMessageReactionRemove(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {}
+
+    default void onMessageReactionRemoveAll(@NotNull LApi lApi, @NotNull MessageReactionRemoveAllEvent event) {}
+
+    default void onMessageReactionRemoveEmoji(@NotNull LApi lApi, @NotNull MessageReactionRemoveEmojiEvent event) {}
 
     default void onPresenceUpdate(@NotNull LApi lApi, @NotNull PresenceUpdateEvent event) {}
 

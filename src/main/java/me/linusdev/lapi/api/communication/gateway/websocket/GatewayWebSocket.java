@@ -55,7 +55,8 @@ import me.linusdev.lapi.api.communication.gateway.events.integration.Integration
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
@@ -72,7 +73,6 @@ import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdat
 import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessorFactory;
-import me.linusdev.lapi.api.communication.gateway.queue.processor.SingleThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
@@ -103,8 +103,8 @@ import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.integration.Integration;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
-import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
+import me.linusdev.lapi.api.objects.message.abstracts.AbstractMessage;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -1546,12 +1546,37 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case MESSAGE_UPDATE:
+                    {
+
+                        //TODO: finish
+                    }
                     break;
 
                 case MESSAGE_DELETE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String channelId = (String) data.get(AbstractMessage.CHANNEL_ID_KEY);
+                        String messageId = (String) data.get(AbstractMessage.ID_KEY);
+
+                        if(messageId == null || channelId == null) {
+                            InvalidDataException.throwException(data, null, MessageDeleteEvent.class,
+                                    new Object[]{guildId, channelId, messageId},
+                                    new String[]{GUILD_ID_KEY, AbstractMessage.CHANNEL_ID_KEY, AbstractMessage.ID_KEY});
+                            break; //unreachable statement
+                        }
+
+                        MessageDeleteEvent event = new MessageDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
+                                Snowflake.fromString(messageId), Snowflake.fromString(channelId));
+
+                        transmitter.onMessageDelete(lApi, event);
+                    }
                     break;
 
                 case MESSAGE_DELETE_BULK:
+                    {
+
+                        //TODO: finish
+                    }
                     break;
 
                 case MESSAGE_REACTION_ADD:

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.gateway.events.messagecreate;
+package me.linusdev.lapi.api.communication.gateway.events.message;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
@@ -36,14 +36,14 @@ public class GuildMessageCreateEvent extends MessageCreateEvent implements Guild
     @SuppressWarnings("ConstantConditions")
     @Override
     public @NotNull Snowflake getGuildIdAsSnowflake() {
-        //GuildImpl messages will have a guild id
+        //Guild messages will have a guild id
         return super.getGuildIdAsSnowflake();
     }
 
     @SuppressWarnings("ConstantConditions")
     @Override
     public @NotNull String getGuildId() {
-        //GuildImpl messages will have a message id
+        //Guild messages will have a message id
         return super.getGuildId();
     }
 }

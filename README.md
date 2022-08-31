@@ -1,5 +1,6 @@
 # LApi 
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/lni-dev/lapi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/lni-dev/lapi/context:java)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/lni-dev/lapi/CodeQL)
 ![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?color=%2300dd00)
 ![Lines of code](https://img.shields.io/tokei/lines/github/lni-dev/lapi)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/lni-dev/lapi)

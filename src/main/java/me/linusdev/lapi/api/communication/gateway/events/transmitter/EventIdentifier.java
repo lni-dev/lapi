@@ -40,8 +40,10 @@ import me.linusdev.lapi.api.communication.gateway.events.integration.Integration
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.*;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveAllEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveEmojiEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
@@ -658,6 +660,8 @@ public enum EventIdentifier{
 
     /**
      * identifier for {@link EventListener#onMessageCreate(LApi, MessageCreateEvent)}.
+     *
+     * TODO: What does this one require and also all other Message Events below
      */
     MESSAGE_CREATE,
 
@@ -672,6 +676,41 @@ public enum EventIdentifier{
      * sub-event of {@link #MESSAGE_CREATE}.
      */
     NON_GUILD_MESSAGE_CREATE,
+
+    /**
+     * identifier for {@link EventListener#onMessageUpdate(LApi, MessageUpdateEvent)}.
+     */
+    MESSAGE_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onMessageDelete(LApi, MessageDeleteEvent)}.
+     */
+    MESSAGE_DELETE,
+
+    /**
+     * identifier for {@link EventListener#onMessageDeleteBulk(LApi, MessageDeleteBulkEvent)}.
+     */
+    MESSAGE_DELETE_BULK,
+
+    /**
+     * identifier for {@link EventListener#onMessageReactionAdd(LApi, MessageReactionEvent)}.
+     */
+    MESSAGE_REACTION_ADD,
+
+    /**
+     * identifier for {@link EventListener#onMessageReactionRemove(LApi, MessageReactionEvent)}.
+     */
+    MESSAGE_REACTION_REMOVE,
+
+    /**
+     * identifier for {@link EventListener#onMessageReactionRemoveAll(LApi, MessageReactionRemoveAllEvent)}.
+     */
+    MESSAGE_REACTION_REMOVE_ALL,
+
+    /**
+     * identifier for {@link EventListener#onMessageReactionRemoveEmoji(LApi, MessageReactionRemoveEmojiEvent)}.
+     */
+    MESSAGE_REACTION_REMOVE_EMOJI,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

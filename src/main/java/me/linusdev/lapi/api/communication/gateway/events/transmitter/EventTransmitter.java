@@ -43,8 +43,10 @@ import me.linusdev.lapi.api.communication.gateway.events.integration.Integration
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.*;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveAllEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveEmojiEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
@@ -1213,6 +1215,160 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onGuildMessageCreate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageDelete(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageDelete(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageDeleteBulk(@NotNull LApi lApi, @NotNull MessageDeleteBulkEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageDeleteBulk(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE_BULK);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageDeleteBulk(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageReactionAdd(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageReactionAdd(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_ADD);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageReactionAdd(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemove(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageReactionRemove(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageReactionRemove(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemoveAll(@NotNull LApi lApi, @NotNull MessageReactionRemoveAllEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageReactionRemoveAll(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_ALL);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageReactionRemoveAll(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onMessageReactionRemoveEmoji(@NotNull LApi lApi, @NotNull MessageReactionRemoveEmojiEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onMessageReactionRemoveEmoji(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_EMOJI);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onMessageReactionRemoveEmoji(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

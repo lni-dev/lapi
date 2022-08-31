@@ -46,8 +46,8 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStic
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.messagecreate.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.GuildMessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
