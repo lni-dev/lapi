@@ -64,7 +64,7 @@ public interface Emoji extends Datable {
      * <br><br>
      * Example Standard emoji: 🔥
      *
-     * More Standard Emojis: {@link me.linusdev.lapi.api.objects.emoji.StandardEmoji}
+     * More Standard Emojis: {@link me.linusdev.lapi.api.objects.emoji.StandardEmoji StandardEmoji}
      *
      * @return {@code true} if this is a standard (Unicode) Emoji
      */

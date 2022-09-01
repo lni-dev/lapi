@@ -19,6 +19,9 @@ package me.linusdev.lapi.api.communication.gateway.events.message.reaction;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +35,86 @@ import org.jetbrains.annotations.Nullable;
  *     Discord Documentation (Reaction Remove)</a>
  */
 public class MessageReactionEvent extends Event {
-    public MessageReactionEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
-        super(lApi, payload, guildId);
+
+    private final @NotNull MessageReactionEventType type;
+    private final @NotNull MessageReactionEventFields fields;
+
+    public MessageReactionEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
+                                @NotNull MessageReactionEventType type, @NotNull MessageReactionEventFields fields) {
+        super(lApi, payload, fields.getGuildId());
+        this.type = type;
+        this.fields = fields;
+    }
+
+    /**
+     * Whether this reaction was {@link MessageReactionEventType#ADD added} or
+     * {@link MessageReactionEventType#REMOVE removed}.
+     *
+     * <br><br>
+     *
+     * If this reaction was {@link MessageReactionEventType#REMOVE removed}, {@link #getMember()}
+     * will always be {@code null}
+     */
+    public @NotNull MessageReactionEventType getType() {
+        return type;
+    }
+
+    /**
+     * the id as {@link Snowflake} of the user
+     */
+    public @NotNull Snowflake getUserIdAsSnowflake() {
+        return fields.getUserId();
+    }
+
+    /**
+     * the id as {@link String} of the user
+     */
+    public @NotNull String getUserId() {
+        return fields.getUserId().asString();
+    }
+
+    /**
+     * the id as {@link Snowflake} of the channel
+     */
+    public @NotNull Snowflake getChannelIdAsSnowflake() {
+        return fields.getChannelId();
+    }
+
+    /**
+     * the id as {@link String} of the channel
+     */
+    public @NotNull String getChannelId() {
+        return fields.getChannelId().asString();
+    }
+
+    /**
+     * the id as {@link Snowflake} of the message
+     */
+    public @NotNull Snowflake getMessageIdAsSnowflake() {
+        return fields.getMessageId();
+    }
+
+    /**
+     * the id as {@link String} of the message
+     */
+    public @NotNull String getMessageId() {
+        return fields.getMessageId().asString();
+    }
+
+    /**
+     * the member who reacted if this happened in a guild.
+     * <br><br>
+     * If this reaction was {@link MessageReactionEventType#REMOVE removed}, {@link #getMember()}
+     * will always be {@code null}.
+     */
+    public @Nullable Member getMember() {
+        return fields.getMember();
+    }
+
+    /**
+     * the emoji used to react
+     */
+    public @NotNull EmojiObject getEmoji() {
+        return fields.getEmoji();
     }
 }

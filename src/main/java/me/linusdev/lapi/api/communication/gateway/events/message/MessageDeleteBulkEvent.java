@@ -23,11 +23,38 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  * @see <a href="https://discord.com/developers/docs/topics/gateway#message-delete-bulk" target="_TOP">Discord Documentation</a>
  */
 public class MessageDeleteBulkEvent extends Event {
-    public MessageDeleteBulkEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
+
+    public static final String IDS_KEY = "ids";
+
+    private final @NotNull List<String> messageIds;
+    private final @NotNull Snowflake channelId;
+
+    public MessageDeleteBulkEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload,
+                                  @Nullable Snowflake guildId, @NotNull List<String> messageIds,
+                                  @NotNull Snowflake channelId) {
         super(lApi, payload, guildId);
+        this.messageIds = messageIds;
+        this.channelId = channelId;
+    }
+
+    /**
+     * List of all deleted messages id's as {@link String}.<br>
+     * Every id can be converted to a {@link Snowflake} with the function {@link Snowflake#fromString(String)} if necessary
+     */
+    public @NotNull List<String> getMessageIds() {
+        return messageIds;
+    }
+
+    /**
+     * the id of the channel the messages were deleted in.
+     */
+    public @NotNull Snowflake getChannelId() {
+        return channelId;
     }
 }

@@ -43,11 +43,15 @@ import me.linusdev.lapi.api.communication.gateway.events.guild.role.GuildRoleUpd
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.sticker.GuildStickersUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.integration.IntegrationUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
-import me.linusdev.lapi.api.communication.gateway.events.message.GuildMessageCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.*;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveAllEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.MessageReactionRemoveEmojiEvent;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.LApiReadyEvent;
@@ -91,6 +95,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -380,6 +385,16 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onIntegrationUpdate(@NotNull LApi lApi, @NotNull IntegrationUpdateEvent event) {
+        System.out.println("onIntegrationUpdate");
+    }
+
+    @Override
+    public void onIntegrationDelete(@NotNull LApi lApi, @NotNull IntegrationDeleteEvent event) {
+        System.out.println("onIntegrationDelete");
+    }
+
+    @Override
     public void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {
         System.out.println("onInviteCreate: " + event.getCode());
     }
@@ -458,6 +473,41 @@ public class Test implements EventListener{
     @Override
     public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
         System.out.println("onGuildMessageCreate");
+    }
+
+    @Override
+    public void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {
+        System.out.println("onMessageUpdate: " + event.getPayload().toJsonString());
+    }
+
+    @Override
+    public void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {
+        System.out.println("onMessageDelete: " + event.getMessageId());
+    }
+
+    @Override
+    public void onMessageDeleteBulk(@NotNull LApi lApi, @NotNull MessageDeleteBulkEvent event) {
+        System.out.println("onMessageDeleteBulk: channel: " + event.getChannelId() + "messages: " + event.getMessageIds());
+    }
+
+    @Override
+    public void onMessageReactionAdd(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
+        System.out.println("onMessageReactionAdd: " + event.getUserId() + ", " + event.getEmoji());
+    }
+
+    @Override
+    public void onMessageReactionRemove(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
+        System.out.println("onMessageReactionRemove: " + event.getUserId() + ", " + event.getEmoji());
+    }
+
+    @Override
+    public void onMessageReactionRemoveAll(@NotNull LApi lApi, @NotNull MessageReactionRemoveAllEvent event) {
+        System.out.println("onMessageReactionRemoveAll: " + event.getMessageId());
+    }
+
+    @Override
+    public void onMessageReactionRemoveEmoji(@NotNull LApi lApi, @NotNull MessageReactionRemoveEmojiEvent event) {
+        System.out.println("onMessageReactionRemoveEmoji: " + event.getMessageId() + ", " + event.getEmoji());
     }
 
     @Override

@@ -31,7 +31,41 @@ import org.jetbrains.annotations.Nullable;
  *     </a>
  */
 public class MessageReactionRemoveAllEvent extends Event {
-    public MessageReactionRemoveAllEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
+
+    private final @NotNull Snowflake channelId;
+    private final @NotNull Snowflake messageId;
+
+    public MessageReactionRemoveAllEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull Snowflake channelId, @NotNull Snowflake messageId) {
         super(lApi, payload, guildId);
+        this.channelId = channelId;
+        this.messageId = messageId;
+    }
+
+    /**
+     * the id as {@link Snowflake} of the channel
+     */
+    public @NotNull Snowflake getChannelIdAsSnowflake() {
+        return channelId;
+    }
+
+    /**
+     * the id as {@link String} of the channel
+     */
+    public @NotNull String getChannelId() {
+        return channelId.asString();
+    }
+
+    /**
+     * the id as {@link Snowflake} of the message
+     */
+    public @NotNull Snowflake getMessageIdAsSnowflake() {
+        return messageId;
+    }
+
+    /**
+     * the id as {@link String} of the message
+     */
+    public @NotNull String getMessageId() {
+        return messageId.asString();
     }
 }

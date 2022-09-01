@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.communication.gateway.events.message;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.message.MessageImplementation;
+import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +29,28 @@ import org.jetbrains.annotations.Nullable;
  * @see <a href="https://discord.com/developers/docs/topics/gateway#message-update" target="_TOP">Discord Documentation</a>
  */
 public class MessageUpdateEvent extends Event {
-    public MessageUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
-        super(lApi, payload, guildId);
+
+    protected final @NotNull MessageImplementation message;
+
+    public MessageUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull MessageImplementation message) {
+        super(lApi, payload, message.getGuildIdAsSnowflake());
+        this.message = message;
+    }
+
+    /**
+     * The message that was created.
+     *
+     * @return {@link Message}
+     */
+    public @NotNull Message getMessage() {
+        return message;
+    }
+
+    /**
+     *
+     * @return the channel-id of the channel, the message was sent in
+     */
+    public @NotNull String getChannelId() {
+        return message.getChannelId();
     }
 }

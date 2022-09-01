@@ -56,7 +56,10 @@ import me.linusdev.lapi.api.communication.gateway.events.interaction.Interaction
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.invite.InviteDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageDeleteBulkEvent;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.reaction.*;
 import me.linusdev.lapi.api.communication.gateway.events.presence.PresenceUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
@@ -126,6 +129,7 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -154,6 +158,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public static final String USER_KEY = "user";
     public static final String CHANNEL_ID_KEY = "channel_id";
     public static final String LAST_PIN_TIMESTAMP = "last_pin_timestamp";
+    public static final String MESSAGE_ID_KEY = "message_id";
+    public static final String EMOJI_KEY = "emoji";
 
     public static final ExceptionConverter<String, GatewayPayloadAbstract, Exception> STANDARD_JSON_TO_PAYLOAD_CONVERTER = convertible -> {
         StringReader reader = new StringReader(convertible);
@@ -364,7 +370,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         if(throwable != null){
                             logger.error("Could not build web socket! We will try again");
                             logger.error(throwable);
-                            // if this happens, we should have a internet connection, because getGatewayBot worked...
+                            // if this happens, we should have an internet connection, because getGatewayBot worked...
                             // so let's try again
                             if(pendingConnects.get() < 4){
                                 start();
@@ -1540,15 +1546,17 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case MESSAGE_CREATE:
                     {
-                        MessageImplementation msg = Message.fromData(lApi, innerPayload);
+                        MessageImplementation msg = Message.fromData(lApi, data);
                         transmitter.onMessageCreate(lApi, new MessageCreateEvent(lApi, payload, msg));
                     }
                     break;
 
                 case MESSAGE_UPDATE:
                     {
-
-                        //TODO: finish
+                        MessageImplementation msg = Message.fromData(lApi, data);
+                        transmitter.onMessageUpdate(lApi, new MessageUpdateEvent(lApi, payload, msg));
+                        //TODO: This may has to be changed. The Message in the MESSAGE_UPDATE event, can have all fields
+                        //missing, except id and channel_id
                     }
                     break;
 
@@ -1574,21 +1582,76 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case MESSAGE_DELETE_BULK:
                     {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String channelId = (String) data.get(CHANNEL_ID_KEY);
+                        List<String> messageIds = data.getListAndConvert(MessageDeleteBulkEvent.IDS_KEY, convertible -> (String) convertible);
 
-                        //TODO: finish
+                        if(channelId == null || messageIds == null){
+                            InvalidDataException.throwException(data, null, MessageDeleteBulkEvent.class,
+                                    new Object[]{channelId, messageIds}, new String[]{CHANNEL_ID_KEY, MessageDeleteBulkEvent.IDS_KEY});
+                            break; //unreachable statement
+                        }
+
+                        MessageDeleteBulkEvent event = new MessageDeleteBulkEvent(lApi, payload, Snowflake.fromString(guildId),
+                                messageIds, Snowflake.fromString(channelId));
+                        transmitter.onMessageDeleteBulk(lApi, event);
                     }
                     break;
 
                 case MESSAGE_REACTION_ADD:
+                    {
+                        MessageReactionEventFields fields = MessageReactionEventFields.fromData(lApi, data);
+
+                        transmitter.onMessageReactionAdd(lApi,
+                                new MessageReactionEvent(lApi, payload, MessageReactionEventType.ADD, fields));
+                    }
+
                     break;
 
                 case MESSAGE_REACTION_REMOVE:
+                    {
+                        MessageReactionEventFields fields = MessageReactionEventFields.fromData(lApi, data);
+
+                        transmitter.onMessageReactionRemove(lApi,
+                                new MessageReactionEvent(lApi, payload, MessageReactionEventType.REMOVE, fields));
+                    }
                     break;
 
                 case MESSAGE_REACTION_REMOVE_ALL:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
+                        Snowflake messageId = data.getAndConvert(MESSAGE_ID_KEY, Snowflake::fromString);
+
+                        if(channelId == null || messageId == null) {
+                            InvalidDataException.throwException(data, null, MessageReactionRemoveAllEvent.class,
+                                    new Object[]{channelId, messageId}, new String[]{CHANNEL_ID_KEY, MESSAGE_ID_KEY});
+                            break; //unreachable statement
+                        }
+
+                        transmitter.onMessageReactionRemoveAll(lApi,
+                                new MessageReactionRemoveAllEvent(lApi, payload,
+                                        Snowflake.fromString(guildId), channelId, messageId));
+                    }
                     break;
 
                 case MESSAGE_REACTION_REMOVE_EMOJI:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
+                        Snowflake messageId = data.getAndConvert(MESSAGE_ID_KEY, Snowflake::fromString);
+                        EmojiObject emoji = data.getAndConvertWithException(EMOJI_KEY, (SOData c)  -> EmojiObject.fromData(lApi, c), null);
+
+                        if(channelId == null || messageId == null || emoji == null) {
+                            InvalidDataException.throwException(data, null, MessageReactionRemoveEmojiEvent.class,
+                                    new Object[]{channelId, messageId, emoji}, new String[]{CHANNEL_ID_KEY, MESSAGE_ID_KEY, EMOJI_KEY});
+                            break; //unreachable statement
+                        }
+
+                        transmitter.onMessageReactionRemoveEmoji(lApi,
+                                new MessageReactionRemoveEmojiEvent(lApi, payload,
+                                        Snowflake.fromString(guildId), channelId, messageId , emoji));
+                    }
                     break;
 
                 case PRESENCE_UPDATE:
@@ -2000,7 +2063,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
     /**
      * The Gateway will stop sending heartbeats or receiving any events. But a close will NOT be sent.<br>
-     * This is useful, if you want to call {@link #resume(Data)} later
+     * This is useful, if you want to call {@link #resume(SOData)} later
      */
     public void abort(){
         heartbeatFuture.cancel(true);
@@ -2132,7 +2195,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     }
 
     /**
-     * Triggerd periodically, when a Heartbeat ACK is received.<br>
+     * Triggered periodically, when a Heartbeat ACK is received.<br>
      * Also triggered, when a {@link GatewayEvent#READY} or {@link GatewayEvent#RESUMED} event is received
      */
     public synchronized void workOnQueueIfPossible(){

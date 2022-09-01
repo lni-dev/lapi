@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.communication.gateway.events.message.reaction;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,50 @@ import org.jetbrains.annotations.Nullable;
  *     </a>
  */
 public class MessageReactionRemoveEmojiEvent extends Event {
-    public MessageReactionRemoveEmojiEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId) {
+
+    private final @NotNull Snowflake channelId;
+    private final @NotNull Snowflake messageId;
+    private final @NotNull EmojiObject emoji;
+
+    public MessageReactionRemoveEmojiEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull Snowflake channelId, @NotNull Snowflake messageId, @NotNull EmojiObject emoji) {
         super(lApi, payload, guildId);
+        this.channelId = channelId;
+        this.messageId = messageId;
+        this.emoji = emoji;
+    }
+
+    /**
+     * the id as {@link Snowflake} of the channel
+     */
+    public @NotNull Snowflake getChannelIdAsSnowflake() {
+        return channelId;
+    }
+
+    /**
+     * the id as {@link String} of the channel
+     */
+    public @NotNull String getChannelId() {
+        return channelId.asString();
+    }
+
+    /**
+     * the id as {@link Snowflake} of the message
+     */
+    public @NotNull Snowflake getMessageIdAsSnowflake() {
+        return messageId;
+    }
+
+    /**
+     * the id as {@link String} of the message
+     */
+    public @NotNull String getMessageId() {
+        return messageId.asString();
+    }
+
+    /**
+     * the emoji that was removed
+     */
+    public @NotNull EmojiObject getEmoji() {
+        return emoji;
     }
 }
