@@ -8,7 +8,7 @@ plugins {
 
 group = 'io.github.lni-dev'
 archivesBaseName = 'lapi'
-version = '1.0.2'
+version = '1.0.3'
 
 targetCompatibility = JavaVersion.VERSION_11
 sourceCompatibility = JavaVersion.VERSION_11
@@ -44,6 +44,7 @@ publishing {
     repositories {
         maven {
             if(project.hasProperty("ossrhUsername") && project.hasProperty("ossrhPassword")){
+                name = "OSSRH"
                 def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
                 def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
                 url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
@@ -57,9 +58,23 @@ publishing {
                 project.logger.lifecycle("no OSSRH username and password given. Cannot deploy.")
             }
         }
+
+        maven {
+            if(project.hasProperty("githubUsername") && project.hasProperty("githubToken")){
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/lni-dev/lapi")
+                credentials {
+                    username = githubUsername
+                    password = githubToken
+                }
+            }else {
+                project.logger.lifecycle("no github username and token given. Cannot publish package.")
+            }
+        }
     }
 
     publications {
+
         mavenJava(MavenPublication) {
             artifactId = 'lapi'
             from components.java
