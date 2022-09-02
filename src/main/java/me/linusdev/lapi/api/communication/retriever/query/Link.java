@@ -18,9 +18,11 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.lapihttprequest.Method;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.invite.Invite;
@@ -29,7 +31,6 @@ import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK;
 import static me.linusdev.lapi.api.communication.PlaceHolder.*;
 import static me.linusdev.lapi.api.communication.lapihttprequest.Method.*;
 
@@ -37,6 +38,97 @@ import static me.linusdev.lapi.api.communication.lapihttprequest.Method.*;
  * These are links to communicate with the official discord api.
  */
 public enum Link implements AbstractLink{
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                      Application Commands                     *
+     *                                                               *
+     *  Done: 02.09.2022                                             *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    GET_GLOBAL_APPLICATION_COMMANDS(GET, "applications/" + APPLICATION_ID + "/commands"),
+
+    CREATE_GLOBAL_APPLICATION_COMMAND(POST, "applications/" + APPLICATION_ID + "/commands"),
+
+    GET_GLOBAL_APPLICATION_COMMAND(GET, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
+
+    EDIT_GLOBAL_APPLICATION_COMMAND(PATCH, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
+
+    DELETE_GLOBAL_APPLICATION_COMMAND(DELETE, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
+
+    BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS(PUT, "applications/" + APPLICATION_ID + "/commands"),
+
+    GET_GUILD_APPLICATION_COMMANDS(GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
+
+    CREATE_GUILD_APPLICATION_COMMAND(POST, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
+
+    GET_GUILD_APPLICATION_COMMAND(GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
+
+    EDIT_GUILD_APPLICATION_COMMAND(PATCH, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
+
+    DELETE_GUILD_APPLICATION_COMMAND(DELETE, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
+
+    BULK_OVERWRITE_GUILD_APPLICATION_COMMANDS(PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
+
+    GET_GUILD_APPLICATION_COMMAND_PERMISSIONS(GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/permissions"),
+
+    GET_APPLICATION_COMMAND_PERMISSIONS(GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
+
+    EDIT_APPLICATION_COMMAND_PERMISSIONS(PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
+
+    /**
+     * This endpoint has been disabled with updates to command permissions (Permissions v2).
+     * Instead, you can edit each application command permissions (though you should be careful to handle any potential rate limits).
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions" target="_top">Discord Documentation</a>
+     */
+    @Deprecated
+    BATCH_EDIT_APPLICATION_COMMAND_PERMISSIONS(PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/permissions"),
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                   Receiving and Responding                    *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * Create a response to an Interaction from the gateway. Body is an interaction response. Returns 204 No Content.<br>
+     *
+     * This endpoint also supports file attachments similar to the webhook endpoints. Refer to Uploading Files for details on uploading files and multipart/form-data requests.
+     *
+     * @see PlaceHolder#INTERACTION_ID
+     * @see PlaceHolder#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
+     */
+    CREATE_INTERACTION_RESPONSE(POST, "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback"),
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                           Audit Log                           *
+     *                                                               *
+     *  Done: 02.09.2022                                             *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    GET_GUILD_AUDIT_LOG(GET, "guilds/" + GUILD_ID + "/audit-logs"),
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                        Auto Moderation                        *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                            Channel                            *
+     *                                                               *
+     *  Done: 02.09.2022                                             *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Get a {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} by ID.
@@ -102,6 +194,22 @@ public enum Link implements AbstractLink{
     GET_CHANNEL_MESSAGE(GET, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
 
     /**
+     * Post a message to a guild text or DM channel. Returns a {@link MessageImplementation message} object.
+     *
+     * @see PlaceHolder#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
+     */
+    CREATE_MESSAGE(POST, "channels/" + CHANNEL_ID + "/messages"),
+
+    CROSSPOST_MESSAGE(POST, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/crosspost"),
+
+    CREATE_REACTION(PUT, "channels/" +  CHANNEL_ID + "/messages/" +  MESSAGE_ID + "/reactions/" + EMOJI + "/@me"),
+
+    DELETE_OWN_REACTION(DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI + "/@me"),
+
+    DELETE_USER_REACTION(DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI + "/{user.id}"),
+
+    /**
      * <p>
      *     Get a list of users that reacted with this emoji. Returns an array of
      *     {@link me.linusdev.lapi.api.objects.user.User user objects} on success.
@@ -131,6 +239,18 @@ public enum Link implements AbstractLink{
      */
     GET_REACTIONS(GET, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI),
 
+    DELETE_ALL_REACTIONS(DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions"),
+
+    DELETE_ALL_REACTIONS_FOR_EMOJI(DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI),
+
+    EDIT_MESSAGE(PATCH, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
+
+    DELETE_MESSAGE(DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
+
+    BULK_DELETE_MESSAGES(POST, "channels/" + CHANNEL_ID + "/messages/bulk-delete"),
+
+    EDIT_CHANNEL_PERMISSIONS(PUT, "channels/" + CHANNEL_ID + "/permissions/" + OVERWRITE_ID),
+
     /**
      * <p>
      *     Returns a list of {@link Invite invite objects}
@@ -144,6 +264,14 @@ public enum Link implements AbstractLink{
      */
     GET_CHANNEL_INVITES(GET, "channels/" + CHANNEL_ID + "/invites"),
 
+    CREATE_CHANNEL_INVITE(POST, "channels/" +  CHANNEL_ID + "/invites"),
+
+    DELETE_CHANNEL_PERMISSION(DELETE, "channels/" + CHANNEL_ID + "/permissions/" + OVERWRITE_ID),
+
+    FOLLOW_ANNOUNCEMENT_CHANNEL(POST, "channels/" + CHANNEL_ID + "/followers"),
+
+    TRIGGER_TYPING_INDICATOR(POST, "channels/" + CHANNEL_ID + "/typing"),
+
     /**
      * <p>
      *     Returns all pinned messages in the channel as an array of {@link MessageImplementation message} objects.
@@ -153,9 +281,31 @@ public enum Link implements AbstractLink{
      */
     GET_PINNED_MESSAGES(GET, "channels/" + CHANNEL_ID + "/pins"),
 
+    PIN_MESSAGE(PUT, "channels/" + CHANNEL_ID + "/pins/" + MESSAGE_ID),
+
+    UNPIN_MESSAGE(DELETE, "channels/" + CHANNEL_ID + "/pins/" + MESSAGE_ID),
+
+    GROUP_DM_ADD_RECIPIENT(PUT, "channels/" + CHANNEL_ID + "/recipients/" + USER_ID),
+
+    GROUP_DM_REMOVE_RECIPIENT(DELETE, "channels/" + CHANNEL_ID + "/recipients/" + USER_ID),
+
+    START_THREAD_FROM_MESSAGE(POST, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/threads"),
+
+    START_THREAD_WITHOUT_MESSAGE(POST, "channels/" + CHANNEL_ID + "/threads"),
+
+    START_THREAD_IN_FORUM_CHANNEL(POST, "channels/" + CHANNEL_ID + "/threads"),
+
+    JOIN_THREAD(PUT, "channels/" + CHANNEL_ID + "/thread-members/@me"),
+
+    ADD_THREAD_MEMBER(PUT, "channels/" + CHANNEL_ID + "/thread-members/" + USER_ID),
+
+    LEAVE_THREAD(DELETE, "channels/" + CHANNEL_ID + "/thread-members/@me"),
+
+    REMOVE_THREAD_MEMBER(DELETE, "channels/" + CHANNEL_ID + "/thread-members/" + USER_ID),
+
     /**
      * <p>
-     *     Returns a {@link me.linusdev.lapi.api.objects.channel.thread.ThreadMember thread member} object
+     *     Returns a {@link ThreadMember thread member} object
      *     for the specified user if they are a member of the thread, returns a 404 response otherwise.
      * </p>
      * @see PlaceHolder#CHANNEL_ID
@@ -169,9 +319,9 @@ public enum Link implements AbstractLink{
      *     Returns array of thread members objects that are members of the thread.
      * </p>
      * <p>
-     *     This endpoint is restricted according to whether the GUILD_MEMBERS Privileged GatewayIntent is enabled for your application.
+     *     This endpoint is restricted according to whether the {@link GatewayIntent#GUILD_MEMBERS GUILD_MEMBERS}
+     *     Privileged GatewayIntent is enabled for your application.
      * </p>
-     * TODO add @links
      * @see PlaceHolder#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-thread-members" target="_top">List Thread Members</a>
      */
@@ -182,7 +332,7 @@ public enum Link implements AbstractLink{
      *     Returns all active threads in the channel, including public and private threads. Threads are ordered by their id, in descending order.
      * </p>
      * <p>
-     *     This route is deprecated and will be removed in v10. It is replaced by List Active GuildImpl Threads.
+     *     This route is deprecated and will be removed in v10. It is replaced by List Active Guild Threads.
      * </p>
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
      * @see PlaceHolder#CHANNEL_ID
@@ -250,6 +400,36 @@ public enum Link implements AbstractLink{
      */
     LIST_JOINED_PRIVATE_ARCHIVED_THREADS(GET, "channels/" + CHANNEL_ID + "/users/@me/threads/archived/private"),
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             Emoji                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             Other                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /*
@@ -311,24 +491,7 @@ public enum Link implements AbstractLink{
     GET_CURRENT_USER_CONNECTIONS(GET, "users/@me/connections"),
 
 
-    /**
-     * Post a message to a guild text or DM channel. Returns a {@link MessageImplementation message} object.
-     *
-     * @see PlaceHolder#CHANNEL_ID
-     * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
-     */
-    CREATE_MESSAGE(POST, "channels/" + CHANNEL_ID + "/messages"),
 
-    /**
-     * Create a response to an Interaction from the gateway. Body is an interaction response. Returns 204 No Content.<br>
-     *
-     * This endpoint also supports file attachments similar to the webhook endpoints. Refer to Uploading Files for details on uploading files and multipart/form-data requests.
-     *
-     * @see PlaceHolder#INTERACTION_ID
-     * @see PlaceHolder#INTERACTION_TOKEN
-     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
-     */
-    CREATE_INTERACTION_RESPONSE(POST, "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback"),
 
     /**
      * Returns an object with a single valid WSS URL, which the client can use for Connecting.

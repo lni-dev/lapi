@@ -27,6 +27,8 @@ public class PlaceHolder {
     public static final String STICKER_PACK_BANNER_ASSET_ID = "{stickerpackbannerasset.id}";
     public static final String STICKER_ID = "{sticker.id}";
     public static final String TEAM_ID = "{team.id}";
+    public static final String OVERWRITE_ID = "{overwrite.id}";
+    public static final String COMMAND_ID = "{command.id}";
 
     public static final String INTERACTION_ID = "{interaction.id}";
     public static final String INTERACTION_TOKEN = "{interaction.token}";
