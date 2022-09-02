@@ -303,11 +303,12 @@ public class Future<T> implements java.util.concurrent.Future<T> {
         queueable.getLApi().checkQueueThread();
 
         synchronized (this) {
-            this.wait();
+            if (result == null)
+                this.wait();
         }
 
         if (result == null && isCancelled()) throw new CancellationException("Task has been canceled");
-        if (result.hasError())
+        if (result != null && result.hasError())
             throw new ExecutionException("There was an Error while completing the Queueable", result.getError().getThrowable());
         return result == null ? null : result.get();
     }

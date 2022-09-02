@@ -78,6 +78,7 @@ import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
+import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.abstracts.Message;
 import me.linusdev.lapi.api.objects.message.component.Component;
 import me.linusdev.lapi.api.objects.message.component.ComponentType;
@@ -157,8 +158,6 @@ public class Test implements EventListener{
                 }).buildLApi();
 
         lApi.getEventTransmitter().addListener(new Test());
-
-
 
     }
 
