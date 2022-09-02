@@ -20,6 +20,7 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
@@ -49,6 +50,7 @@ import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -77,6 +79,7 @@ public class ConfigBuilder implements Datable {
     public final static long DEFAULT_FLAGS = 0L;
 
     private String token = null;
+    private ApiVersion apiVersion = null;
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
@@ -212,6 +215,22 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setToken(@NotNull String token){
         this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_API_VERSION}
+     * <p>
+     *     {@link ApiVersion discord api version} used for HttpRequests
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to {@link LApiImpl#DEFAULT_API_VERSION default}
+     * </p>
+     * @param apiVersion discord api version
+     */
+    public ConfigBuilder setApiVersion(@Nullable ApiVersion apiVersion) {
+        this.apiVersion = apiVersion;
         return this;
     }
 
@@ -535,6 +554,7 @@ public class ConfigBuilder implements Datable {
                 flags,
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
+                Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),

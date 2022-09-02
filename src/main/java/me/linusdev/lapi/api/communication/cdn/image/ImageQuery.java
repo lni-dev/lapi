@@ -74,7 +74,7 @@ public class ImageQuery implements Query {
 
     @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
-        String uri = link.getLink();
+        String uri = link.getLink(lApi.getHttpRequestApiVersion());
 
         for(PlaceHolder p : placeHolders)
             uri = p.place(uri);
@@ -92,7 +92,7 @@ public class ImageQuery implements Query {
 
     @Override
     public String asString() {
-        String uri = link.getLink();
+        String uri = link.getLink(lApi.getHttpRequestApiVersion());
 
         for(PlaceHolder p : placeHolders)
             uri = p.place(uri);

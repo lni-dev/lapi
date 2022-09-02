@@ -194,7 +194,7 @@ public class MessageBuilder implements HasLApi {
      * @return {@link Queueable} to create a message
      */
     public Queueable<MessageImplementation> getQueueable(@NotNull String channelId) throws LimitException {
-        return lApi.createMessage(channelId, build());
+        return lApi.getRequestFactory().createMessage(channelId, build());
     }
 
     /**

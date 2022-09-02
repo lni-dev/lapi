@@ -37,8 +37,8 @@ public class DiscordApiCommunicationHelper {
      * API Versioning
      * </a>
      */
-    //TODO: remove api version from this link! api-version is set in config!
-    public static final String O_DISCORD_API_VERSION_LINK = "https://discord.com/api/v10/";
+    public static final String O_DISCORD_API_VERSION_LINK =
+            "https://discord.com/api/v" + PlaceHolder.DISCORD_API_VERSION_NUMBER + "/";
 
     /**
      * <a href="https://discord.com/developers/docs/reference#image-formatting-image-base-url" target="_top">

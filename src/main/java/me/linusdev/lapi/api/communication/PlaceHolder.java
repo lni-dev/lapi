@@ -48,6 +48,8 @@ public class PlaceHolder {
     public static final String LAPI_URL = "<LApi-url>";
     public static final String LAPI_VERSION = "<LApi-version>";
 
+    public static final String DISCORD_API_VERSION_NUMBER = "<vn>";
+
     private final String name;
     private final String value;
 

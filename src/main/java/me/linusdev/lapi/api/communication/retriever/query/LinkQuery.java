@@ -32,13 +32,18 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LinkQuery implements Query, HasLApi {
 
+    public static final String AROUND_KEY = "around";
+    public static final String BEFORE_KEY = "before";
+    public static final String AFTER_KEY = "after";
+    public static final String LIMIT_KEY = "limit";
+
     private final @NotNull LApi lApi;
     private final @NotNull AbstractLink link;
     private final @Nullable LApiHttpBody body;
     private final @Nullable SOData queryStringsData;
     private final @NotNull PlaceHolder[] placeHolders;
 
-    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable SOData queryStringsData, PlaceHolder... placeHolders){
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable SOData queryStringsData, @NotNull PlaceHolder... placeHolders){
         this.lApi = lApi;
         this.link = link;
         this.body = body;
@@ -46,8 +51,28 @@ public class LinkQuery implements Query, HasLApi {
         this.placeHolders = placeHolders;
     }
 
-    public LinkQuery(@NotNull LApi lApi, @NotNull Link link){
-        this(lApi, link, null, null);
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable SOData queryStringsData, @NotNull PlaceHolder... placeHolders){
+        this.lApi = lApi;
+        this.link = link;
+        this.body = null;
+        this.queryStringsData = queryStringsData;
+        this.placeHolders = placeHolders;
+    }
+
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @NotNull PlaceHolder... placeHolders){
+        this.lApi = lApi;
+        this.link = link;
+        this.body = body;
+        this.queryStringsData = null;
+        this.placeHolders = placeHolders;
+    }
+
+    public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @NotNull PlaceHolder... placeHolders){
+        this.lApi = lApi;
+        this.link = link;
+        this.body = null;
+        this.queryStringsData = null;
+        this.placeHolders = placeHolders;
     }
 
     @Override
@@ -57,7 +82,7 @@ public class LinkQuery implements Query, HasLApi {
 
     @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
-        String url = link.getLink();
+        String url = link.getLink(lApi.getHttpRequestApiVersion());
         for(PlaceHolder p : placeHolders)
             url = p.place(url);
 
@@ -68,7 +93,7 @@ public class LinkQuery implements Query, HasLApi {
 
     @Override
     public String asString() {
-        String url = link.getLink();
+        String url = link.getLink(lApi.getHttpRequestApiVersion());
         for(PlaceHolder p : placeHolders)
             url = p.place(url);
 

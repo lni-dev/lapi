@@ -73,6 +73,7 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
+import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
@@ -89,6 +90,7 @@ import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
 import me.linusdev.lapi.api.objects.message.embed.InvalidEmbedException;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.helper.Helper;
@@ -101,6 +103,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiConsumer;
 
 public class Test implements EventListener{
 
@@ -158,6 +161,7 @@ public class Test implements EventListener{
                 }).buildLApi();
 
         lApi.getEventTransmitter().addListener(new Test());
+
 
     }
 
@@ -424,7 +428,7 @@ public class Test implements EventListener{
             }else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
                 try {
-                    lApi.createMessage(event.getChannelId(), new MessageTemplate("look below", false,
+                    lApi.getRequestFactory().createMessage(event.getChannelId(), new MessageTemplate("look below", false,
                             new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
                             null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
                             new Component[]{new Button(lApi, ComponentType.BUTTON,

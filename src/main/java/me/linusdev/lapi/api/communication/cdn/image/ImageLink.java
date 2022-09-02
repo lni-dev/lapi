@@ -16,7 +16,9 @@
 
 package me.linusdev.lapi.api.communication.cdn.image;
 
+import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
+import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.lapihttprequest.Method;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +70,8 @@ public enum ImageLink implements AbstractLink {
     }
 
     @Override
-    public @NotNull String getLink() {
+    public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
+        //The discord api version is not present in cdn links, so we do not need to replace it
         return link;
     }
 }

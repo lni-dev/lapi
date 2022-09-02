@@ -33,7 +33,6 @@ import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodEx
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.*;
-import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
@@ -42,18 +41,15 @@ import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsRes
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.Error;
-import me.linusdev.lapi.api.templates.message.AllowedMentions;
-import me.linusdev.lapi.api.templates.message.MessageTemplate;
+import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -85,11 +81,11 @@ public class LApiImpl implements LApi {
      */
     public static final String CREATOR_ID = "247421526532554752";
 
-    public static final String LAPI_URL = "https://twitter.com/Linus_Dev";
-    public static final String LAPI_VERSION = "1.0";
+    public static final String LAPI_URL = "https://github.com/lni-dev/lapi";
+    public static final String LAPI_VERSION = "1.0.3";
     public static final String LAPI_NAME = "LApi";
 
-    public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V9;
+    public static final ApiVersion DEFAULT_API_VERSION = ApiVersion.V10;
 
     public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
@@ -113,6 +109,7 @@ public class LApiImpl implements LApi {
             ATTRIBUTE_USER_AGENT_VALUE.replace(PlaceHolder.LAPI_URL, LAPI_URL).replace(PlaceHolder.LAPI_VERSION, LAPI_VERSION));
 
     private final HttpClient client = HttpClient.newHttpClient();
+    private final @NotNull RequestFactory requestFactory;
 
     //Queue
     private final Queue<Future<?>> queue;
@@ -202,6 +199,8 @@ public class LApiImpl implements LApi {
             }
         });
 
+        requestFactory = new RequestFactory(this);
+
         //Gateway
         if(this.config.isFlagSet(ConfigFlag.ENABLE_GATEWAY)){
             this.eventTransmitter = new EventTransmitter(this);
@@ -225,7 +224,6 @@ public class LApiImpl implements LApi {
         }else{
             this.guildManager = null;
         }
-
     }
 
     @Override
@@ -360,52 +358,13 @@ public class LApiImpl implements LApi {
         }
     }
 
-    public @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId){
-        return new ChannelRetriever(this, channelId);
-    }
-
-    public @NotNull Queueable<MessageImplementation> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId){
-        return new MessageRetriever(this, channelId, messageId);
-    }
-
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
-
-        SOData queryStringsData = null;
-
-        if(anchorMessageId != null || limit != null){
-            queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-
-            if(anchorMessageId != null) {
-                if (anchorType == AnchorType.AROUND) queryStringsData.add(GetLinkQuery.AROUND_KEY, anchorMessageId);
-                else if (anchorType == AnchorType.BEFORE)
-                    queryStringsData.add(GetLinkQuery.BEFORE_KEY, anchorMessageId);
-                else if (anchorType == AnchorType.AFTER) queryStringsData.add(GetLinkQuery.AFTER_KEY, anchorMessageId);
-            }
-
-            if(limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
-        }
-
-
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_MESSAGES, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, MessageImplementation>(this, query, MessageImplementation::new);
-    }
-
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
-        return getChannelMessagesRetriever(channelId, anchorMessageId, null, anchorType);
-    }
-
-    public @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId) {
-        return getChannelMessagesRetriever(channelId, null, null, null);
-    }
-
     public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable String afterUserId, @Nullable Integer limit){
         SOData queryStringsData = null;
 
         if(afterUserId != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            if (afterUserId != null) queryStringsData.add(GetLinkQuery.AFTER_KEY, afterUserId);
-            if (limit != null) queryStringsData.add(GetLinkQuery.LIMIT_KEY, limit);
+            if (afterUserId != null) queryStringsData.add(LinkQuery.AFTER_KEY, afterUserId);
+            if (limit != null) queryStringsData.add(LinkQuery.LIMIT_KEY, limit);
         }
 
         String emojiString;
@@ -415,8 +374,10 @@ public class LApiImpl implements LApi {
             emojiString = emoji.getName() + ":" + emoji.getId();
         }
 
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_REACTIONS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId), new PlaceHolder(PlaceHolder.EMOJI, emojiString));
+        LinkQuery query = new LinkQuery(this, Link.GET_REACTIONS, queryStringsData,
+                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId),
+                new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId),
+                new PlaceHolder(PlaceHolder.EMOJI, emojiString));
         return new ArrayRetriever<>(this, query, User::fromData);
     }
 
@@ -425,25 +386,25 @@ public class LApiImpl implements LApi {
     }
 
     public @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CHANNEL_INVITES,
+        LinkQuery query = new LinkQuery(this, Link.GET_CHANNEL_INVITES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, Invite>(this, query, Invite::fromData);
+        return new ArrayRetriever<>(this, query, Invite::fromData);
     }
 
     public @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_PINNED_MESSAGES,
+        LinkQuery query = new LinkQuery(this, Link.GET_PINNED_MESSAGES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, MessageImplementation>(this, query, MessageImplementation::new);
+        return new ArrayRetriever<>(this, query, MessageImplementation::new);
     }
 
     public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_THREAD_MEMBER,
+        LinkQuery query = new LinkQuery(this, Link.GET_THREAD_MEMBER,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
-        return new ConvertingRetriever<ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+        return new ConvertingRetriever<>(this, query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_THREAD_MEMBERS,
+        LinkQuery query = new LinkQuery(this, Link.LIST_THREAD_MEMBERS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ArrayRetriever<SOData, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
     }
@@ -451,7 +412,7 @@ public class LApiImpl implements LApi {
     @SuppressWarnings("removal")
     @Deprecated(since = "api v10", forRemoval = true)
     public @NotNull Queueable<ListThreadsResponseBody> getActiveThreadsRetriever(@NotNull String channelId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_ACTIVE_THREADS,
+        LinkQuery query = new LinkQuery(this, Link.LIST_ACTIVE_THREADS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
     }
@@ -461,11 +422,11 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
         }
 
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
+        LinkQuery query = new LinkQuery(this, Link.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
     }
@@ -478,11 +439,11 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
         }
 
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
+        LinkQuery query = new LinkQuery(this, Link.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
     }
@@ -495,11 +456,11 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(GetLinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(GetLinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
         }
 
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
+        LinkQuery query = new LinkQuery(this, Link.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
     }
@@ -516,56 +477,26 @@ public class LApiImpl implements LApi {
      * </p>
      *
      * @return {@link Queueable} to retrieve the current {@link User user} (your bot)
-     * @see GetLinkQuery.Links#GET_CURRENT_USER
+     * @see Link#GET_CURRENT_USER
      */
     public @NotNull Queueable<User> getCurrentUserRetriever(){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_CURRENT_USER);
+        LinkQuery query = new LinkQuery(this, Link.GET_CURRENT_USER);
         return new ConvertingRetriever<>(this, query, User::fromData);
     }
 
     public @NotNull Queueable<User> getUserRetriever(@NotNull String userId){
-        GetLinkQuery query = new GetLinkQuery(this, GetLinkQuery.Links.GET_USER,
+        LinkQuery query = new LinkQuery(this, Link.GET_USER,
                 new PlaceHolder(PlaceHolder.USER_ID, userId));
         return new ConvertingRetriever<>(this, query, User::fromData);
     }
 
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
-        Query query = new LinkQuery(this, Link.CREATE_MESSAGE, message.getBody(), null,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
 
-        return new ConvertingRetriever<>(this, query, MessageImplementation::new);
-    }
-
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
-        return createMessage(channelId, new MessageTemplate(
-                content,
-                false, null,
-                allowMentions ? null : AllowedMentions.noneAllowed(),
-                null, null, null, null,
-                null));
-    }
-
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content){
-        return createMessage(channelId, content,true);
-    }
-
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
-        return createMessage(channelId,
-                new MessageTemplate(null, false, embeds,
-                        allowMentions ? null : AllowedMentions.noneAllowed(),
-                        null, null, null, null,
-                        null));
-    }
-
-    public @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
-        return createMessage(channelId, true, embeds);
-    }
 
     @Override
     public @NotNull Queueable<LApiHttpResponse> createInteractionResponse(@NotNull String interactionId,
                                                                    @NotNull String interactionToken,
                                                                    @NotNull InteractionResponse response) {
-        Query query = new LinkQuery(this, Link.CREATE_INTERACTION_RESPONSE, response.getBody(), null,
+        Query query = new LinkQuery(this, Link.CREATE_INTERACTION_RESPONSE, response.getBody(),
                 new PlaceHolder(PlaceHolder.INTERACTION_ID, interactionId),
                 new PlaceHolder(PlaceHolder.INTERACTION_TOKEN, interactionToken));
 
@@ -575,11 +506,22 @@ public class LApiImpl implements LApi {
     //Gateway
 
     public @NotNull Queueable<GetGatewayResponse> getGatewayBot(){
-        Query query = new LinkQuery(this, Link.GET_GATEWAY_BOT, null, null);
+        Query query = new LinkQuery(this, Link.GET_GATEWAY_BOT);
         return new ConvertingRetriever<>(this, query, (lApi, data) -> GetGatewayResponse.fromData(data));
     }
 
     //Getter
+
+
+    @Override
+    public @NotNull ApiVersion getHttpRequestApiVersion() {
+        return config.getApiVersion();
+    }
+
+    @Override
+    public @NotNull RequestFactory getRequestFactory() {
+        return requestFactory;
+    }
 
     @Override
     public AbstractEventTransmitter getEventTransmitter() {

@@ -39,7 +39,7 @@ import java.util.function.Consumer;
 
 /**
  * A Retriever is a {@link Queueable} that can be {@link LApi#queue(Queueable, BiConsumer, Consumer, Consumer) queued}.
- * It is used to retrieve an Object from Discords endpoint ({@link MessageRetriever for example a Message}).
+ * It is used to retrieve an Object from Discords endpoint ({@link ConvertingRetriever for example a Message}).
  * @param <T> the class of the Object that should be retrieved
  */
 public abstract class Retriever<T> extends Queueable<T> implements HasLApi {

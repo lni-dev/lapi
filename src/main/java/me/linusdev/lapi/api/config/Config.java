@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.config;
 
+import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -42,6 +43,7 @@ public class Config {
     private final long flags;
     private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;
     private final @NotNull String token;
+    private final @NotNull ApiVersion apiVersion;
     private final @NotNull GatewayConfig gatewayConfig;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
     private final @NotNull ManagerFactory<RoleManager> roleManagerFactory;
@@ -56,7 +58,7 @@ public class Config {
     private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
-                  @NotNull GatewayConfig gatewayConfig,
+                  @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
@@ -64,6 +66,7 @@ public class Config {
         this.token = token;
 
         this.queueSupplier = queueSupplier;
+        this.apiVersion = apiVersion;
         this.gatewayConfig = gatewayConfig;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
@@ -96,6 +99,10 @@ public class Config {
 
     public @NotNull String getToken() {
         return token;
+    }
+
+    public @NotNull ApiVersion getApiVersion() {
+        return apiVersion;
     }
 
     public @NotNull GatewayConfig getGatewayConfig() {

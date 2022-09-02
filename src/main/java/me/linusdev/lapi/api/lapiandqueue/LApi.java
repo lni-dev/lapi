@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.lapiandqueue;
 
-import me.linusdev.data.so.SOData;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
@@ -29,7 +28,6 @@ import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdat
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
@@ -46,11 +44,10 @@ import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.Error;
-import me.linusdev.lapi.api.templates.message.MessageTemplate;
+import me.linusdev.lapi.api.request.RequestFactory;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -189,90 +186,6 @@ public interface LApi extends HasLApi {
 
     /**
      *
-     * @param channelId the id of the {@link Channel}, which should be retrieved
-     * @return {@link Queueable} which can retrieve the {@link Channel}
-     * @see Queueable#queue()
-     * @see Queueable#completeHereAndIgnoreQueueThread()
-     */
-    @NotNull Queueable<Channel> getChannelRetriever(@NotNull String channelId);
-
-    /**
-     *
-     * @param channelId the id of the {@link Channel}, in which the message was sent
-     * @param messageId the id of the {@link MessageImplementation}
-     * @return {@link Queueable} which can retrieve the {@link MessageImplementation}
-     */
-    @NotNull Queueable<MessageImplementation> getChannelMessageRetriever(@NotNull String channelId, @NotNull String messageId);
-
-    enum AnchorType {
-        /**
-         * Retrieve objects around the given object
-         */
-        AROUND,
-
-        /**
-         * Retrieve objects before the given object
-         */
-        BEFORE,
-
-        /**
-         * Retrieve objects after the given object
-         */
-        AFTER,
-        ;
-    }
-
-    /**
-     * <p>
-     *     This is used to retrieve a bunch of {@link MessageImplementation messages} in a {@link Channel channel}.
-     * </p>
-     * <p>
-     *     If anchorType is {@code null}, it should use {@link AnchorType#AROUND}, but it may result in unexpected behavior.
-     * </p>
-     * <p>
-     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link MessageImplementation messages} in the {@link Channel channel}.
-     * </p>
-     * <p>
-     *     If limit is {@code null}, the limit will be 50
-     * </p>
-     *
-     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
-     * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
-     *                        If this is {@code null}, it will retrieve the latest messages in the channel<br><br>
-     * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50<br><br>
-     * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
-     * @see me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CHANNEL_MESSAGES
-     */
-    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType);
-
-    /**
-     * This will retrieve 50 or less {@link MessageImplementation messages}.<br><br> For more information see
-     * {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)}<br><br>
-     *
-     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
-     * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
-     *                       If this is {@code null}, it will retrieve the latest messages in the channel.<br><br>
-     * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
-     * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
-     */
-    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType);
-
-    /**
-     * This should retrieve the latest 50 or less {@link MessageImplementation messages} in given {@link Channel channel}. The newest {@link MessageImplementation message} will have index 0
-     * <br><br>
-     * See {@link #getChannelMessagesRetriever(String, String, Integer, AnchorType)} for more information<br><br>
-     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
-     * @see #getChannelMessagesRetriever(String, String, Integer, AnchorType)
-     */
-    @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessagesRetriever(@NotNull String channelId);
-
-    /**
-     *
      * <p>
      *     This is used to retrieve the {@link User users}, that have reacted with a specific {@link Emoji}.<br>
      *     If you want to retrieve more than 100 {@link User users},
@@ -317,7 +230,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the id of the {@link Channel}, you want a list of invites for
      * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link Invite invites} for given channel
-     * @see GetLinkQuery.Links#GET_CHANNEL_INVITES
+     * @see Link#GET_CHANNEL_INVITES
      */
     @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId);
 
@@ -336,7 +249,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the id of the {@link Channel}, you want the pinned messages from
      * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link MessageImplementation pinned messages} for given channel
-     * @see GetLinkQuery.Links#GET_PINNED_MESSAGES
+     * @see Link#GET_PINNED_MESSAGES
      */
     @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId);
 
@@ -349,7 +262,7 @@ public interface LApi extends HasLApi {
      * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread}, the user is a member of
      * @param userId the {@link User#getId() user id}
      * @return {@link Queueable} to retrieve the {@link ThreadMember} matching given user in given thread
-     * @see GetLinkQuery.Links#GET_THREAD_MEMBER
+     * @see Link#GET_THREAD_MEMBER
      */
     @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId);
 
@@ -363,7 +276,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the channel id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread}
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
-     * @see me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery.Links#LIST_THREAD_MEMBERS
+     * @see me.linusdev.lapi.api.communication.retriever.query.Link#LIST_THREAD_MEMBERS
      */
     @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId);
 
@@ -377,7 +290,7 @@ public interface LApi extends HasLApi {
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
      * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Thread threads} from
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_ACTIVE_THREADS
+     * @see Link#LIST_ACTIVE_THREADS
      * @see ListThreadsResponseBody
      */
     @SuppressWarnings("removal")
@@ -404,7 +317,7 @@ public interface LApi extends HasLApi {
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
+     * @see Link#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
     @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
@@ -426,7 +339,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_PUBLIC_ARCHIVED_THREADS
+     * @see Link#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
     @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId);
@@ -450,7 +363,7 @@ public interface LApi extends HasLApi {
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_PRIVATE_ARCHIVED_THREADS
+     * @see Link#LIST_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
     @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
@@ -472,7 +385,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_PRIVATE_ARCHIVED_THREADS
+     * @see Link#LIST_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      * @see #getPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
      */
@@ -495,7 +408,7 @@ public interface LApi extends HasLApi {
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
+     * @see Link#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      */
     @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit);
@@ -515,7 +428,7 @@ public interface LApi extends HasLApi {
      *
      * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
-     * @see GetLinkQuery.Links#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
+     * @see Link#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
      * @see #getJoinedPrivateArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)
      */
@@ -529,7 +442,7 @@ public interface LApi extends HasLApi {
      * </p>
      *
      * @return {@link Queueable} to retrieve the current {@link User user} (your bot)
-     * @see GetLinkQuery.Links#GET_CURRENT_USER
+     * @see Link#GET_CURRENT_USER
      */
     @NotNull Queueable<User> getCurrentUserRetriever();
 
@@ -545,91 +458,9 @@ public interface LApi extends HasLApi {
      *
      * @param userId the id of the {@link User user} you want to retrieve
      * @return {@link Queueable} to retrieve {@link User user} with given id
-     * @see GetLinkQuery.Links#GET_USER
+     * @see Link#GET_USER
      */
     @NotNull Queueable<User> getUserRetriever(@NotNull String userId);
-
-    /**
-     * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
-     *     in the channel with given id
-     * </p>
-     *
-     * <p>
-     *     For a simple {@link MessageTemplate} creation see
-     *     {@link me.linusdev.lapi.api.templates.message.builder.MessageBuilder MessageBuilder}
-     * </p>
-     *
-     * @param channelId the id of the {@link Channel} the message should be created in
-     * @param message the message to create
-     * @return {@link Queueable} to create the message
-     * @see Link#CREATE_MESSAGE
-     */
-    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message);
-
-    /**
-     * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
-     *     in the channel with given id.
-     * </p>
-     *
-     * <p>
-     *     This allows you to control if mentions are allowed. For a better control see
-     *     {@link me.linusdev.lapi.api.templates.message.builder.MessageBuilder MessageBuilder}
-     * </p>
-     *
-     * @param channelId the id of the {@link Channel} the message should be created in
-     * @param content the text content of the message
-     * @param allowMentions whether this message is allowed to mention user, roles, everyone, here, etc.
-     * @return {@link Queueable} to create the message
-     * @see Link#CREATE_MESSAGE
-     */
-    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions);
-
-    /**
-     * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
-     *     in the channel with given id.
-     * </p>
-     *
-     * <p>
-     *     All mentions will be allowed. For more control see {@link #createMessage(String, String, boolean)}
-     * </p>
-     *
-     * @param channelId the id of the {@link Channel} the message should be created in
-     * @param content the text content of the message
-     * @return {@link Queueable} to create the message
-     * @see Link#CREATE_MESSAGE
-     */
-    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content);
-
-    /**
-     * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
-     *     in the channel with given id.
-     * </p>
-     *
-     * @param channelId the id of the {@link Channel} the message should be created in
-     * @param embeds the embeds for the message
-     * @param allowMentions mentions inside embeds will never ping the user. In case that ever changes, you can adjust the behavior here
-     * @return {@link Queueable} to create the message
-     * @see Link#CREATE_MESSAGE
-     */
-    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds);
-
-    /**
-     * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
-     *     in the channel with given id.
-     * </p>
-     *
-     *
-     * @param channelId the id of the {@link Channel} the message should be created in
-     * @param embeds the embeds for the message
-     * @return {@link Queueable} to create the message
-     * @see Link#CREATE_MESSAGE
-     */
-    @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds);
 
     @NotNull Queueable<LApiHttpResponse> createInteractionResponse(@NotNull String interactionId, @NotNull String interactionToken, @NotNull InteractionResponse response);
 
@@ -648,6 +479,14 @@ public interface LApi extends HasLApi {
     @NotNull Queueable<GetGatewayResponse> getGatewayBot();
 
     //Getter
+
+    /**
+     *
+     * @return {@link ApiVersion} used for Http Requests
+     */
+    @NotNull ApiVersion getHttpRequestApiVersion();
+
+    @NotNull RequestFactory getRequestFactory();
 
     /**
      * <p>

@@ -48,7 +48,7 @@ public class Examples {
 
                 if(!event.getMessage().getAuthor().isBot()
                     && event.getMessage().getContent().equals("Hi")){
-                    lApi.createMessage(event.getChannelId(), "Hi").queue();
+                    lApi.getRequestFactory().createMessage(event.getChannelId(), "Hi").queue();
                 }
             }
         });

@@ -204,7 +204,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      * total permissions for the user in the guild (excludes overwrites).<br>
      * <p>
-     *     This field is only sent when using the {@link me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
+     *     This field is only sent when using the {@link me.linusdev.lapi.api.communication.retriever.query.Link#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
      * </p>
      * @see #getPermissions()
      */
@@ -213,7 +213,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      * total permissions for the user in the guild (excludes overwrites).<br>
      * <p>
-     *     This field is only sent when using the {@link me.linusdev.lapi.api.communication.retriever.query.GetLinkQuery.Links#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
+     *     This field is only sent when using the {@link me.linusdev.lapi.api.communication.retriever.query.Link#GET_CURRENT_USER_GUILDS GET Current User Guilds} endpoint and are relative to the requested user!
      * </p>
      * <p>
      *     Changes on the {@link Permissions} object will change the {@link String} returned by {@link #getPermissionsAsString()} as well.

@@ -83,7 +83,7 @@ public class Main {
         ;
 
         log.log("getChannelMessageRetriever");
-        api.getChannelMessageRetriever("820084724693073921", "854807543603003402").queue((message, error) -> {
+        api.getRequestFactory().getChannelMessage("820084724693073921", "854807543603003402").queue((message, error) -> {
             if (error != null) error.getThrowable().printStackTrace();
             Reaction[] reactions = message.getReactions();
 
@@ -218,7 +218,7 @@ public class Main {
                 .getQueueable("912377387868639282")
                 .queue();
 
-        api.getChannelMessageRetriever("912377387868639282", "913107065285800026").queue(message -> {
+        api.getRequestFactory().getChannelMessage("912377387868639282", "913107065285800026").queue(message -> {
             String content = message.getContent();
             Reaction reaction = message.getReactions()[1];
             System.out.println(reaction.getData().toJsonString());
@@ -229,7 +229,7 @@ public class Main {
                 .setTitle("Hi")
                 .setDescription(MentionType.USER.get(new PlaceHolder(PlaceHolder.USER_ID, LApi.CREATOR_ID))).build();
 
-        api.createMessage("912377387868639282", e).queue();
+        api.getRequestFactory().createMessage("912377387868639282", e).queue();
 
         new MessageBuilder(api)
                 .addEmbed(e)

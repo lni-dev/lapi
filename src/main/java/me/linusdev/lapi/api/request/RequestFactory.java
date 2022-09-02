@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.query;
+package me.linusdev.lapi.api.request;
 
-import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.lapihttprequest.Method;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.objects.HasLApi;
+
 import org.jetbrains.annotations.NotNull;
 
-public interface AbstractLink {
+/**
+ * The {@link RequestFactory} can create {@link Queueable Queueables} to send HTTP-requests to discord.
+ */
+public class RequestFactory implements HasLApi,
+        ChannelRequests {
 
-    /**
-     *
-     * @return the {@link Method} for this Link
-     */
-    @NotNull Method getMethod();
+    private final @NotNull LApiImpl lApi;
 
-    /**
-     * The url, may still be missing placeholders!
-     */
-    @NotNull String getLink(@NotNull ApiVersion apiVersion);
+    public RequestFactory(@NotNull LApiImpl lApi) {
+        this.lApi = lApi;
+    }
+
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
+    }
+
+
 }

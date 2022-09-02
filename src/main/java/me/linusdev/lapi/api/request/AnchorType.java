@@ -14,22 +14,35 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.query;
+package me.linusdev.lapi.api.request;
 
-import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.lapihttprequest.Method;
+import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import org.jetbrains.annotations.NotNull;
 
-public interface AbstractLink {
+public enum AnchorType {
+    /**
+     * Retrieve objects around the given object
+     */
+    AROUND(LinkQuery.AROUND_KEY),
 
     /**
-     *
-     * @return the {@link Method} for this Link
+     * Retrieve objects before the given object
      */
-    @NotNull Method getMethod();
+    BEFORE(LinkQuery.BEFORE_KEY),
 
     /**
-     * The url, may still be missing placeholders!
+     * Retrieve objects after the given object
      */
-    @NotNull String getLink(@NotNull ApiVersion apiVersion);
+    AFTER(LinkQuery.AFTER_KEY),
+    ;
+
+    private final @NotNull String queryStringKey;
+
+    AnchorType(@NotNull String queryStringKey) {
+        this.queryStringKey = queryStringKey;
+    }
+
+    public @NotNull String getQueryStringKey() {
+        return queryStringKey;
+    }
 }
