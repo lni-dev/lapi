@@ -55,7 +55,10 @@ import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
-import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -1487,6 +1490,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     @Override
+    public void onUserUpdate(@NotNull LApi lApi, @NotNull UserUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onUserUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(USER_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onUserUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
     public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
         for(EventListener listener : listeners){
             try {
@@ -1523,6 +1548,50 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try {
                     listener.onVoiceStateUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onVoiceServerUpdate(@NotNull LApi lApi, @NotNull VoiceServerUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onVoiceServerUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_SERVER_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onVoiceServerUpdate(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWebhooksUpdate(@NotNull LApi lApi, @NotNull WebhooksUpdateEvent event) {
+        for(EventListener listener : listeners){
+            try {
+                listener.onWebhooksUpdate(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(WEBHOOKS_UPDATE);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    listener.onWebhooksUpdate(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

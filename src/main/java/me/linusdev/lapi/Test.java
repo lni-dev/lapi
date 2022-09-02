@@ -61,7 +61,10 @@ import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEven
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
-import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
@@ -95,7 +98,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -544,6 +546,11 @@ public class Test implements EventListener{
     }
 
     @Override
+    public void onUserUpdate(@NotNull LApi lApi, @NotNull UserUpdateEvent event) {
+        System.out.println("onUserUpdate: " + event.getUser().getData().toJsonString());
+    }
+
+    @Override
     public void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {
         System.out.println("onVoiceStateUpdate");
         System.out.println("updated: " + event.getVoiceState().getData().toJsonString());
@@ -551,6 +558,16 @@ public class Test implements EventListener{
             System.out.println("old: " + event.getOldVoiceState().getData().toJsonString());
         }
 
+    }
+
+    @Override
+    public void onVoiceServerUpdate(@NotNull LApi lApi, @NotNull VoiceServerUpdateEvent event) {
+        System.out.println("onVoiceServerUpdate: token=" + event.getToken() + ", endpoint=" + event.getEndpoint());
+    }
+
+    @Override
+    public void onWebhooksUpdate(@NotNull LApi lApi, @NotNull WebhooksUpdateEvent event) {
+        System.out.println("onWebhooksUpdate: guildId=" + event.getGuildId() + ", channelId=" + event.getChannelId());
     }
 
     @Override

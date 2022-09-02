@@ -55,7 +55,10 @@ import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
-import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -248,7 +251,13 @@ public interface EventListener {
 
     default void onTypingStart(@NotNull LApi lApi, @NotNull TypingStartEvent event) {}
 
+    default void onUserUpdate(@NotNull LApi lApi, @NotNull UserUpdateEvent event) {}
+
     default void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {}
+
+    default void onVoiceServerUpdate(@NotNull LApi lApi, @NotNull VoiceServerUpdateEvent event) {}
+
+    default void onWebhooksUpdate(@NotNull LApi lApi, @NotNull WebhooksUpdateEvent event) {}
 
     default void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) { }
 

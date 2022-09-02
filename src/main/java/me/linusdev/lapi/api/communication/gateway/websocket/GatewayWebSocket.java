@@ -68,7 +68,10 @@ import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEventFields;
-import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.identify.ConnectionProperties;
 import me.linusdev.lapi.api.communication.gateway.identify.Identify;
 import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
@@ -1847,6 +1850,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case USER_UPDATE:
+                    {
+                        User user = User.fromData(lApi, data);
+                        UserUpdateEvent event = new UserUpdateEvent(lApi, payload, user);
+                        transmitter.onUserUpdate(lApi, event);
+                    }
                     break;
 
                 case VOICE_STATE_UPDATE:
@@ -1890,9 +1898,41 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     break;
 
                 case VOICE_SERVER_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String token = (String) data.get(VoiceServerUpdateEvent.TOKEN_KEY);
+                        String endpoint = (String) data.get(VoiceServerUpdateEvent.ENDPOINT_KEY);
+
+                        if(token == null || guildId == null) {
+                            InvalidDataException.throwException(data, null, VoiceServerUpdateEvent.class,
+                                    new Object[]{guildId, token},
+                                    new String[]{GUILD_ID_KEY, VoiceServerUpdateEvent.TOKEN_KEY});
+                            break; //unreachable statement
+                        }
+
+                        VoiceServerUpdateEvent event = new VoiceServerUpdateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), token, endpoint);
+
+                        transmitter.onVoiceServerUpdate(lApi, event);
+                    }
                     break;
 
                 case WEBHOOKS_UPDATE:
+                    {
+                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
+
+                        if(guildId == null || channelId == null) {
+                            InvalidDataException.throwException(data, null, VoiceServerUpdateEvent.class,
+                                    new Object[]{guildId, channelId},
+                                    new String[]{GUILD_ID_KEY, CHANNEL_ID_KEY});
+                            break; //unreachable statement
+                        }
+
+                        WebhooksUpdateEvent event = new WebhooksUpdateEvent(lApi, payload,
+                                Snowflake.fromString(guildId), channelId);
+                        transmitter.onWebhooksUpdate(lApi, event);
+                    }
                     break;
 
                 default:

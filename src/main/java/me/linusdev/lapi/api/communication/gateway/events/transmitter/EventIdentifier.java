@@ -52,7 +52,10 @@ import me.linusdev.lapi.api.communication.gateway.events.resumed.ResumedEvent;
 import me.linusdev.lapi.api.communication.gateway.events.stage.StageInstanceEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.*;
 import me.linusdev.lapi.api.communication.gateway.events.typing.TypingStartEvent;
-import me.linusdev.lapi.api.communication.gateway.events.voice.state.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -426,7 +429,7 @@ public enum EventIdentifier{
      * </ul>
      */
     GUILD_INTEGRATIONS_UPDATE,
-    
+
     /**
      * identifier for {@link EventListener#onGuildMemberAdd(LApi, GuildMemberAddEvent)}.
      * <br><br>
@@ -649,7 +652,7 @@ public enum EventIdentifier{
      * </ul>
      */
     INVITE_DELETE,
-    
+
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
      *                                                               *
@@ -813,6 +816,20 @@ public enum EventIdentifier{
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
      *                                                               *
+     *                           USER UPDATE                         *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onUserUpdate(LApi, UserUpdateEvent)}.
+     * <br><br>
+     */
+    USER_UPDATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
      *                              VOICE                            *
      *                                                               *
      *                                                               *
@@ -829,6 +846,32 @@ public enum EventIdentifier{
      * </ul>
      */
     VOICE_STATE_UPDATE,
+
+    /**
+     * identifier for {@link EventListener#onVoiceServerUpdate(LApi, VoiceServerUpdateEvent)}.
+     * <br><br>
+     */
+    VOICE_SERVER_UPDATE,
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                             Webhooks                          *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * identifier for {@link EventListener#onWebhooksUpdate(LApi, WebhooksUpdateEvent)}.
+     * <br><br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link GatewayIntent#GUILD_WEBHOOKS}
+     *     </li>
+     * </ul>
+     */
+    WEBHOOKS_UPDATE,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
