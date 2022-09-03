@@ -26,8 +26,19 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The {@link RequestFactory} can create {@link Queueable Queueables} to send HTTP-requests to discord.
  */
-public class RequestFactory implements HasLApi,
-        ChannelRequests {
+public class RequestFactory implements
+        HasLApi,
+        ChannelRequests,
+        ApplicationCommandRequests {
+
+    public static final String WITH_LOCALIZATIONS_KEY = "with_localizations";
+
+    public static final String AROUND_KEY = "around";
+    public static final String BEFORE_KEY = "before";
+    public static final String AFTER_KEY = "after";
+    public static final String LIMIT_KEY = "limit";
+
+
 
     private final @NotNull LApiImpl lApi;
 

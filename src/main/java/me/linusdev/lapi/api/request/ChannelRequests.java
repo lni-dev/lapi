@@ -35,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
+import static me.linusdev.lapi.api.request.RequestFactory.*;
+
 public interface ChannelRequests extends HasLApi {
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -53,7 +55,7 @@ public interface ChannelRequests extends HasLApi {
      * @see Queueable#completeHereAndIgnoreQueueThread()
      */
     default @NotNull Queueable<Channel<?>> getChannel(@NotNull String channelId){
-        return new ConvertingRetriever<>(getLApi(),
+        return new ConvertingRetriever<>(
                 new LinkQuery(getLApi(), Link.GET_CHANNEL, new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId)),
                 Channel::fromData);
     }
@@ -79,7 +81,7 @@ public interface ChannelRequests extends HasLApi {
     default @NotNull Queueable<MessageImplementation> getChannelMessage(@NotNull String channelId, @NotNull String messageId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGE,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId));
-        return new ConvertingRetriever<>(getLApi(), query, MessageImplementation::new);
+        return new ConvertingRetriever<>(query, MessageImplementation::new);
     }
 
 
@@ -105,11 +107,11 @@ public interface ChannelRequests extends HasLApi {
      *     If limit is {@code null}, the limit will be 50
      * </p>
      *
-     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
+     * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
      * @param anchorMessageId the message around, before or after which you want to retrieve messages.
      *                       The {@link MessageImplementation} with this id will most likely be included in the result.
-     *                        If this is {@code null}, it will retrieve the latest messages in the channel<br><br>
-     * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50<br><br>
+     *                        If this is {@code null}, it will retrieve the latest messages in the channel
+     * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50
      * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
      * @see Link#GET_CHANNEL_MESSAGES
@@ -125,7 +127,7 @@ public interface ChannelRequests extends HasLApi {
                 queryStringsData.add(anchorType.getQueryStringKey(), anchorMessageId);
             }
 
-            if(limit != null) queryStringsData.add(LinkQuery.LIMIT_KEY, limit);
+            if(limit != null) queryStringsData.add(LIMIT_KEY, limit);
         }
 
 
@@ -191,7 +193,7 @@ public interface ChannelRequests extends HasLApi {
         Query query = new LinkQuery(getLApi(), Link.CREATE_MESSAGE, message.getBody(),
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
 
-        return new ConvertingRetriever<>(getLApi(), query, MessageImplementation::new);
+        return new ConvertingRetriever<>(query, MessageImplementation::new);
     }
 
     /**

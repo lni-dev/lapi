@@ -32,11 +32,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LinkQuery implements Query, HasLApi {
 
-    public static final String AROUND_KEY = "around";
-    public static final String BEFORE_KEY = "before";
-    public static final String AFTER_KEY = "after";
-    public static final String LIMIT_KEY = "limit";
-
     private final @NotNull LApi lApi;
     private final @NotNull AbstractLink link;
     private final @Nullable LApiHttpBody body;

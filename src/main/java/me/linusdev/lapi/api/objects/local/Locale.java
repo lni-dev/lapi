@@ -16,65 +16,77 @@
 
 package me.linusdev.lapi.api.objects.local;
 
+import me.linusdev.lapi.helper.Helper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 
 /**
  * @see <a href="https://discord.com/developers/docs/reference#locales" target="_top">Locales</a>
  */
 public enum Locale {
-    UNKNOWN("unknown", "unknown"),
+    UNKNOWN("unknown", "unknown", "unknown"),
 
 
+    DA("da", "Danish", "Dansk"),
+    DE("de", "German", "Deutsch"),
+    EN_GB("en-GB", "English, UK", "English, UK"),
+    EN_US("en-US", "English, US", "English, US"),
+    ES_ES("es-ES", "Spanish", "Español"),
+    FR("fr", "French", "Français"),
+    HR("hr", "Croatian", "Hrvatski"),
+    IT("it", "Italian", "Italiano"),
+    LT("lt", "Lithuanian", "Lietuviškai"),
+    HU("hu", "Hungarian", "Magyar"),
+    NL("nl", "Dutch", "Nederlands"),
+    NO("no", "Norwegian", "Norsk"),
+    PL("pl", "Polish", "Polski"),
+    PT_BR("pt-BR", "Portuguese, Brazilian", "Português do Brasil"),
+    RO("ro", "Romanian, Romania", "Română"),
+    FI("fi", "Finnish", "Suomi"),
+    SV_SE("sv-SE", "Swedish", "Svenska"),
+    VI("vi", "Vietnamese", "Tiếng Việt"),
+    TR("tr", "Turkish", "Türkçe"),
+    CS("cs", "Czech", "Čeština"),
+    EL("el", "Greek", "Ελληνικά"),
+    BG("bg", "Bulgarian", "български"),
+    RU("ru", "Russian", "Pусский"),
+    UK("uk", "Ukrainian", "Українська"),
+    HI("hi", "Hindi", "हिन्दी"),
+    TH("th", "Thai", "ไทย"),
+    ZH_CN("zh-CN", "Chinese, China", "中文"),
+    JA("ja", "Japanese", "日本語"),
+    ZH_TW("zh-TW", "Chinese, Taiwan", "繁體中文"),
+    KO("ko", "Korean", "한국어"),
 
-    EN_US("en-US", "English (United States)"),
-    EN_GB("en-GB", "English (Great Britain)"),
-    BG("bg", "Bulgarian"),
-    ZH_CN("zh-CN", "Chinese (China)"),
-    ZH_TW("zh-TW", "Chinese (Taiwan)"),
-    HR("hr", "Croatian"),
-    CS("cs", "Czech"),
-    DA("da", "Danish"),
-    NL("nl", "Dutch"),
-    FI("fi", "Finnish"),
-    FR("fr", "French"),
-    DE("de", "German"),
-    EL("el", "Greek"),
-    HI("hi", "Hindi"),
-    HU("hu", "Hungarian"),
-    IT("it", "Italian"),
-    JA("ja", "Japanese"),
-    KO("ko", "Korean"),
-    LT("lt", "Lithuanian"),
-    NO("no", "Norwegian"),
-    PL("pl", "Polish"),
-    PT_BR("pt-BR", "Portuguese (Brazil)"),
-    RO("ro", "Romanian"),
-    RU("ru", "Russian"),
-    ES_ES("es-ES", "Spanish (Spain)"),
-    SV_SE("sv-SE", "Swedish"),
-    TH("th", "Thai"),
-    TR("tr", "Turkish"),
-    UK("uk", "Ukrainian"),
-    VI("vi", "Vietnamese"),
 
     ;
 
-    private final String locale;
-    private final String languageName;
+    private final @NotNull String locale;
+    private final @NotNull String languageName;
+    private final @NotNull String nativeName;
 
-    Locale(String locale, String languageName){
+    Locale(@NotNull String locale, @NotNull String languageName, @NotNull String nativeName){
         this.locale = locale;
         this.languageName = languageName;
+        this.nativeName = nativeName;
     }
 
-    public String getLocale() {
+    public @NotNull String getLocale() {
         return locale;
     }
 
-    public String getLanguageName() {
+    public @NotNull String getLanguageName() {
         return languageName;
+    }
+
+    public @NotNull String getNativeName() {
+        return nativeName;
     }
 
     /**
@@ -95,45 +107,51 @@ public enum Locale {
 
     /**
      * Generation for this enum
+     * @see <a href="https://discord.com/developers/docs/reference#locales" target="_top">Discord Documentation</a>
      */
     @ApiStatus.Internal
-    public static void main(String... args){
-        String s = "en-US\tEnglish (United States)\n" +
-                "en-GB\tEnglish (Great Britain)\n" +
-                "bg\tBulgarian\n" +
-                "zh-CN\tChinese (China)\n" +
-                "zh-TW\tChinese (Taiwan)\n" +
-                "hr\tCroatian\n" +
-                "cs\tCzech\n" +
-                "da\tDanish\n" +
-                "nl\tDutch\n" +
-                "fi\tFinnish\n" +
-                "fr\tFrench\n" +
-                "de\tGerman\n" +
-                "el\tGreek\n" +
-                "hi\tHindi\n" +
-                "hu\tHungarian\n" +
-                "it\tItalian\n" +
-                "ja\tJapanese\n" +
-                "ko\tKorean\n" +
-                "lt\tLithuanian\n" +
-                "no\tNorwegian\n" +
-                "pl\tPolish\n" +
-                "pt-BR\tPortuguese (Brazil)\n" +
-                "ro\tRomanian\n" +
-                "ru\tRussian\n" +
-                "es-ES\tSpanish (Spain)\n" +
-                "sv-SE\tSwedish\n" +
-                "th\tThai\n" +
-                "tr\tTurkish\n" +
-                "uk\tUkrainian\n" +
-                "vi\tVietnamese";
+    public static void main(String... args) throws URISyntaxException, IOException {
+        String s = "da\tDanish\tDansk\n" +
+                "de\tGerman\tDeutsch\n" +
+                "en-GB\tEnglish, UK\tEnglish, UK\n" +
+                "en-US\tEnglish, US\tEnglish, US\n" +
+                "es-ES\tSpanish\tEspañol\n" +
+                "fr\tFrench\tFrançais\n" +
+                "hr\tCroatian\tHrvatski\n" +
+                "it\tItalian\tItaliano\n" +
+                "lt\tLithuanian\tLietuviškai\n" +
+                "hu\tHungarian\tMagyar\n" +
+                "nl\tDutch\tNederlands\n" +
+                "no\tNorwegian\tNorsk\n" +
+                "pl\tPolish\tPolski\n" +
+                "pt-BR\tPortuguese, Brazilian\tPortuguês do Brasil\n" +
+                "ro\tRomanian, Romania\tRomână\n" +
+                "fi\tFinnish\tSuomi\n" +
+                "sv-SE\tSwedish\tSvenska\n" +
+                "vi\tVietnamese\tTiếng Việt\n" +
+                "tr\tTurkish\tTürkçe\n" +
+                "cs\tCzech\tČeština\n" +
+                "el\tGreek\tΕλληνικά\n" +
+                "bg\tBulgarian\tбългарски\n" +
+                "ru\tRussian\tPусский\n" +
+                "uk\tUkrainian\tУкраїнська\n" +
+                "hi\tHindi\tहिन्दी\n" +
+                "th\tThai\tไทย\n" +
+                "zh-CN\tChinese, China\t中文\n" +
+                "ja\tJapanese\t日本語\n" +
+                "zh-TW\tChinese, Taiwan\t繁體中文\n" +
+                "ko\tKorean\t한국어";
 
         String[] lines = s.split("\n");
 
+        StringBuilder out = new StringBuilder();
+
         for(String line : lines){
             String[] split = line.split("\t");
-            System.out.println(split[0].toUpperCase().replace("-", "_") + "(\"" + split[0] + "\", \"" + split[1] + "\"),");
+            out.append(split[0].toUpperCase().replace("-", "_")
+                    + "(\"" + split[0] + "\", \"" + split[1] + "\", \"" + split[2] + "\"),\n");
         }
+
+        Files.writeString(Helper.getJarPath().getParent().resolve("locale-enum.txt"), out);
     }
 }

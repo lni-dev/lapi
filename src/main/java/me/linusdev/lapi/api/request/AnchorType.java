@@ -23,17 +23,17 @@ public enum AnchorType {
     /**
      * Retrieve objects around the given object
      */
-    AROUND(LinkQuery.AROUND_KEY),
+    AROUND(RequestFactory.AROUND_KEY),
 
     /**
      * Retrieve objects before the given object
      */
-    BEFORE(LinkQuery.BEFORE_KEY),
+    BEFORE(RequestFactory.BEFORE_KEY),
 
     /**
      * Retrieve objects after the given object
      */
-    AFTER(LinkQuery.AFTER_KEY),
+    AFTER(RequestFactory.AFTER_KEY),
     ;
 
     private final @NotNull String queryStringKey;

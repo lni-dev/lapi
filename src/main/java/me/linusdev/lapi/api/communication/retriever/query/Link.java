@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
+import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.lapihttprequest.Method;
@@ -24,11 +25,13 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.invite.InviteMetadata;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.permission.Permission;
+import me.linusdev.lapi.api.request.RequestFactory;
 import org.jetbrains.annotations.NotNull;
 
 import static me.linusdev.lapi.api.communication.PlaceHolder.*;
@@ -47,39 +50,138 @@ public enum Link implements AbstractLink{
      *  Done: 02.09.2022                                             *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    /**
+     *
+     * <p>
+     * Fetch all of the global commands for your application. Returns an array of
+     * {@link ApplicationCommand application command} objects.
+     * </p>
+     * <br>
+     * <p style="margin-bottom:0;padding-bottom:0;">
+     *     This can have Query String parameters:
+     * </p>
+     * <ul style="margin-bottom:0;padding-bottom:0;margin-top:0;padding-top:0;">
+     *     <li>
+     *         {@link RequestFactory#WITH_LOCALIZATIONS_KEY WITH_LOCALIZATIONS_KEY} Whether to include
+     *         full localization dictionaries
+     *     </li>
+     * </ul>
+     * <p style="margin-top:0;padding-top:0;">
+     *
+     * </p>
+     *
+     * @see PlaceHolder#APPLICATION_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands" target="_top">Discord Documentation</a>
+     */
     GET_GLOBAL_APPLICATION_COMMANDS(GET, "applications/" + APPLICATION_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#create-global-application-command" target="_top">Discord Documentation</a>
+     */
     CREATE_GLOBAL_APPLICATION_COMMAND(POST, "applications/" + APPLICATION_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-global-application-command" target="_top">Discord Documentation</a>
+     */
     GET_GLOBAL_APPLICATION_COMMAND(GET, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command" target="_top">Discord Documentation</a>
+     */
     EDIT_GLOBAL_APPLICATION_COMMAND(PATCH, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command" target="_top">Discord Documentation</a>
+     */
     DELETE_GLOBAL_APPLICATION_COMMAND(DELETE, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands" target="_top">Discord Documentation</a>
+     */
     BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS(PUT, "applications/" + APPLICATION_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands" target="_top">Discord Documentation</a>
+     */
     GET_GUILD_APPLICATION_COMMANDS(GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command" target="_top">Discord Documentation</a>
+     */
     CREATE_GUILD_APPLICATION_COMMAND(POST, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command" target="_top">Discord Documentation</a>
+     */
     GET_GUILD_APPLICATION_COMMAND(GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command" target="_top">Discord Documentation</a>
+     */
     EDIT_GUILD_APPLICATION_COMMAND(PATCH, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command" target="_top">Discord Documentation</a>
+     */
     DELETE_GUILD_APPLICATION_COMMAND(DELETE, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands" target="_top">Discord Documentation</a>
+     */
     BULK_OVERWRITE_GUILD_APPLICATION_COMMANDS(PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions" target="_top">Discord Documentation</a>
+     */
     GET_GUILD_APPLICATION_COMMAND_PERMISSIONS(GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/permissions"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions" target="_top">Discord Documentation</a>
+     */
     GET_APPLICATION_COMMAND_PERMISSIONS(GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
 
+    /**
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
+     * @see PlaceHolder#COMMAND_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions" target="_top">Discord Documentation</a>
+     */
     EDIT_APPLICATION_COMMAND_PERMISSIONS(PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
 
     /**
      * This endpoint has been disabled with updates to command permissions (Permissions v2).
      * Instead, you can edit each application command permissions (though you should be careful to handle any potential rate limits).
+     *
+     * @see PlaceHolder#APPLICATION_ID
+     * @see PlaceHolder#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions" target="_top">Discord Documentation</a>
      */
     @Deprecated
@@ -159,16 +261,16 @@ public enum Link implements AbstractLink{
      * </p>
      * <ul style="margin-bottom:0;padding-bottom:0;margin-top:0;padding-top:0;">
      *     <li>
-     *         {@link #AROUND_KEY} get messages around this message ID
+     *         {@link RequestFactory#AROUND_KEY AROUND_KEY} get messages around this message ID
      *     </li>
      *     <li>
-     *         {@link #BEFORE_KEY} get messages before this message ID
+     *         {@link RequestFactory#BEFORE_KEY BEFORE_KEY} get messages before this message ID
      *     </li>
      *     <li>
-     *         {@link #AFTER_KEY} get messages after this message ID
+     *         {@link RequestFactory#AFTER_KEY AFTER_KEY} get messages after this message ID
      *     </li>
      *     <li>
-     *         {@link #LIMIT_KEY} max number of messages to return (1-100). Default: 50
+     *         {@link RequestFactory#LIMIT_KEY LIMIT_KEY} max number of messages to return (1-100). Default: 50
      *     </li>
      * </ul>
      * <p style="margin-top:0;padding-top:0;">
@@ -527,7 +629,7 @@ public enum Link implements AbstractLink{
 
     Link(@NotNull Method method, @NotNull String link){
         this.method = method;
-        this.link = link;
+        this.link = DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK + link;
     }
 
     @Override

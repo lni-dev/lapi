@@ -19,12 +19,16 @@ package me.linusdev.lapi.api.communication.gateway.events.interaction;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.command.ApplicationCommandInteractionDataOption;
+import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.interaction.InteractionData;
 import me.linusdev.lapi.api.objects.interaction.InteractionType;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
 
 public class InteractionCreateEvent extends Event {
 
@@ -42,8 +46,6 @@ public class InteractionCreateEvent extends Event {
 
     /**
      * Will always be present for
-     * {@link InteractionType#APPLICATION_COMMAND APPLICATION_COMMAND},
-     * {@link InteractionType#APPLICATION_COMMAND_AUTOCOMPLETE APPLICATION_COMMAND_AUTOCOMPLETE}
      * {@link InteractionType#MESSAGE_COMPONENT MESSAGE_COMPONENT},
      * and {@link InteractionType#MODAL_SUBMIT MODAL_SUBMIT}.
      * @return custom id of this interaction
@@ -52,6 +54,35 @@ public class InteractionCreateEvent extends Event {
         InteractionData data = interaction.getInteractionData();
         if(data == null) return null;
         return data.getCustomId();
+    }
+
+    /**
+     *
+     * @return {@code true} if this interaction event has a {@link #getCustomId() custom id}
+     */
+    public boolean hasCustomId() {
+        return getCustomId() != null;
+    }
+
+    /**
+     * Will always be present for
+     * {@link InteractionType#APPLICATION_COMMAND}
+     * and {@link InteractionType#APPLICATION_COMMAND_AUTOCOMPLETE}
+     * @return command id of this interaction
+     */
+    public @Nullable String getCommandId() {
+        InteractionData data = interaction.getInteractionData();
+        if(data == null) return null;
+
+        return data.getId();
+    }
+
+    /**
+     *
+     * @return {@code true} if this interaction event has a {@link #getCommandId() command id}
+     */
+    public boolean hasCommandId() {
+        return getCommandId() != null;
     }
 
     /**

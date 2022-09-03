@@ -363,8 +363,8 @@ public class LApiImpl implements LApi {
 
         if(afterUserId != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            if (afterUserId != null) queryStringsData.add(LinkQuery.AFTER_KEY, afterUserId);
-            if (limit != null) queryStringsData.add(LinkQuery.LIMIT_KEY, limit);
+            if (afterUserId != null) queryStringsData.add(RequestFactory.AFTER_KEY, afterUserId);
+            if (limit != null) queryStringsData.add(RequestFactory.LIMIT_KEY, limit);
         }
 
         String emojiString;
@@ -400,7 +400,7 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
         LinkQuery query = new LinkQuery(this, Link.GET_THREAD_MEMBER,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
-        return new ConvertingRetriever<>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+        return new ConvertingRetriever<>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
@@ -414,7 +414,7 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ListThreadsResponseBody> getActiveThreadsRetriever(@NotNull String channelId){
         LinkQuery query = new LinkQuery(this, Link.LIST_ACTIVE_THREADS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+        return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId, @Nullable ISO8601Timestamp before, @Nullable Integer limit){
@@ -422,13 +422,13 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(RequestFactory.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(RequestFactory.LIMIT_KEY, limit);
         }
 
         LinkQuery query = new LinkQuery(this, Link.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+        return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getPublicArchivedThreadsRetriever(@NotNull String channelId) {
@@ -439,13 +439,13 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(RequestFactory.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(RequestFactory.LIMIT_KEY, limit);
         }
 
         LinkQuery query = new LinkQuery(this, Link.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+        return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getPrivateArchivedThreadsRetriever(@NotNull String channelId){
@@ -456,13 +456,13 @@ public class LApiImpl implements LApi {
         SOData queryStringsData = null;
         if(before != null || limit != null) {
             queryStringsData = SOData.newOrderedDataWithKnownSize(2);
-            queryStringsData.addIfNotNull(LinkQuery.BEFORE_KEY, before);
-            queryStringsData.addIfNotNull(LinkQuery.LIMIT_KEY, limit);
+            queryStringsData.addIfNotNull(RequestFactory.BEFORE_KEY, before);
+            queryStringsData.addIfNotNull(RequestFactory.LIMIT_KEY, limit);
         }
 
         LinkQuery query = new LinkQuery(this, Link.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ConvertingRetriever<>(this, query, ListThreadsResponseBody::new);
+        return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
     public @NotNull Queueable<ListThreadsResponseBody> getJoinedPrivateArchivedThreadsRetriever(@NotNull String channelId) {
@@ -481,13 +481,13 @@ public class LApiImpl implements LApi {
      */
     public @NotNull Queueable<User> getCurrentUserRetriever(){
         LinkQuery query = new LinkQuery(this, Link.GET_CURRENT_USER);
-        return new ConvertingRetriever<>(this, query, User::fromData);
+        return new ConvertingRetriever<>(query, User::fromData);
     }
 
     public @NotNull Queueable<User> getUserRetriever(@NotNull String userId){
         LinkQuery query = new LinkQuery(this, Link.GET_USER,
                 new PlaceHolder(PlaceHolder.USER_ID, userId));
-        return new ConvertingRetriever<>(this, query, User::fromData);
+        return new ConvertingRetriever<>(query, User::fromData);
     }
 
 
@@ -507,7 +507,7 @@ public class LApiImpl implements LApi {
 
     public @NotNull Queueable<GetGatewayResponse> getGatewayBot(){
         Query query = new LinkQuery(this, Link.GET_GATEWAY_BOT);
-        return new ConvertingRetriever<>(this, query, (lApi, data) -> GetGatewayResponse.fromData(data));
+        return new ConvertingRetriever<>(query, (lApi, data) -> GetGatewayResponse.fromData(data));
     }
 
     //Getter

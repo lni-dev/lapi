@@ -16,6 +16,9 @@
 
 package me.linusdev.lapi.api.objects.permission;
 
+import me.linusdev.data.AbstractData;
+import me.linusdev.data.Datable;
+import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +32,7 @@ import java.util.Objects;
  * This class contains a set of permissions.
  * @see Permission
  */
-public class Permissions {
+public class Permissions implements SimpleDatable {
 
     private @NotNull BigInteger setBits;
 
@@ -120,5 +123,10 @@ public class Permissions {
     @Override
     public int hashCode() {
         return Objects.hash(setBits);
+    }
+
+    @Override
+    public Object simplify() {
+        return getValueAsString();
     }
 }

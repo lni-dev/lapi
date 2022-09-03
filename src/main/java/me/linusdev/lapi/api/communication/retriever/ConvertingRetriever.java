@@ -36,12 +36,11 @@ public class ConvertingRetriever<R> extends DataRetriever<R>{
 
     /**
      *
-     * @param lApi {@link LApi}
      * @param query {@link Query} for the HttpRequest
      * @param converter {@link Converter} to convert from {@link SOData} to {@link R}
      */
-    public ConvertingRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<SOData, R> converter) {
-        super(lApi, query);
+    public ConvertingRetriever(@NotNull Query query, @NotNull Converter<SOData, R> converter) {
+        super(query.getLApi(), query);
         this.converter = converter;
     }
 

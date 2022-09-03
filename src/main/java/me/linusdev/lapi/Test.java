@@ -75,6 +75,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.emoji.StandardEmoji;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
@@ -91,6 +92,7 @@ import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
 import me.linusdev.lapi.api.objects.message.embed.InvalidEmbedException;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.Error;
+import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.helper.Helper;
@@ -179,6 +181,23 @@ public class Test implements EventListener{
     @Override
     public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
         System.out.println("onReady");
+
+        String applicationId = event.getApplication().getId();
+
+        /*lApi.getRequestFactory().createGlobalApplicationCommand(applicationId,
+                new ApplicationCommandTemplate("hi", null, "says hi to you",
+                        null,
+                        null, null, null, null))
+                .queue(((applicationCommand, error) -> {
+                    if(error != null){
+                        System.out.println(error);
+                        return;
+                    }
+
+                    System.out.println("application command id: " + applicationCommand.getId());
+                    System.out.println("application command name: " + applicationCommand.getName());
+                }));*/
+
     }
 
     @Override
@@ -583,7 +602,7 @@ public class Test implements EventListener{
         System.out.println("onInteractionCreate");
         System.out.println("customID: " + event.getCustomId());
 
-        if(event.getCustomId().equals("me.linusdev.btn_1")){
+        if(event.hasCustomId() && event.getCustomId().equals("me.linusdev.btn_1")){
             System.out.println("button pressed");
 
             InteractionResponseBuilder builder = new InteractionResponseBuilder(event.getLApi(), event.getInteraction());
@@ -591,6 +610,15 @@ public class Test implements EventListener{
             builder.channelMessageWithSource(messageBuilder -> {
                 messageBuilder.appendContent("good job!")
                         .setFlag(MessageFlag.EPHEMERAL);
+            }, true);
+
+            builder.getQueueable().queue();
+
+        } else if(event.hasCommandId() && event.getCommandId().equals("1015622878298919026")){
+            InteractionResponseBuilder builder = new InteractionResponseBuilder(event.getLApi(), event.getInteraction());
+
+            builder.channelMessageWithSource(messageBuilder -> {
+                messageBuilder.appendContent("Hi ").appendEmoji(StandardEmoji.BANANA);
             }, true);
 
             builder.getQueueable().queue();
