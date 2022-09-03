@@ -618,7 +618,7 @@ public class Test implements EventListener{
             InteractionResponseBuilder builder = new InteractionResponseBuilder(event.getLApi(), event.getInteraction());
 
             builder.channelMessageWithSource(messageBuilder -> {
-                messageBuilder.appendContent("Hi ").appendEmoji(StandardEmoji.BANANA);
+                messageBuilder.appendContent("Hi ").appendEmoji(StandardEmoji.getRandom());
             }, true);
 
             builder.getQueueable().queue();

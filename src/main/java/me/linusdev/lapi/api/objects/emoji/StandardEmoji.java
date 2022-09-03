@@ -22,6 +22,8 @@ import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 /**
  * This is a list of Standard/Unicode Emojis. Discord will replace some of these for two (or more) other Emojis
  * <br><br>
@@ -1861,6 +1863,16 @@ public enum StandardEmoji implements Emoji {
         this.hexCode = hexCode;
         this.emojiString = emojiString;
         this.name = name;
+    }
+
+    /**
+     *
+     * @return a random {@link StandardEmoji}
+     */
+    public static @NotNull StandardEmoji getRandom() {
+        Random random = new Random();
+        StandardEmoji[] values = values();
+        return values[random.nextInt(values.length)];
     }
 
     /**
