@@ -50,7 +50,7 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
     @Override
     @Nullable
     protected ArrayList<R> processData(@NotNull SOData data) throws InvalidDataException {
-        List<Object> dataArray = data.getList("array");
+        List<Object> dataArray = data.getList(LApi.LAPI_ARRAY_WRAPPER_KEY);
         ArrayList<R> resultArray = new ArrayList<>(dataArray.size());
 
         for(Object o : dataArray)

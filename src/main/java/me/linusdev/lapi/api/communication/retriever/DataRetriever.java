@@ -51,11 +51,8 @@ public abstract class DataRetriever<T> extends Retriever<T>{
     @Override
     protected @Nullable T process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException {
         this.response = response;
-        if(response.isJsonArray()){
-            this.data = response.getData(LApi.LAPI_ARRAY_WRAPPER_KEY);
-        } else {
-            this.data = response.getData();
-        }
+        this.data = response.getData(LApi.LAPI_ARRAY_WRAPPER_KEY);
+
         return processData(data);
     }
 

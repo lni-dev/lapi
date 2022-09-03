@@ -40,7 +40,6 @@ import java.util.Optional;
 public class LApiHttpResponse {
 
     private final InputStream inputStream;
-    private final @Nullable PushbackReader reader;
     private final @NotNull HttpResponseCode responseCode;
     private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
@@ -59,16 +58,12 @@ public class LApiHttpResponse {
         if(contentTypeHeader.isPresent()){
             this.contentType = ContentType.of(contentTypeHeader.get());
             if(contentType == ContentType.APPLICATION_JSON){
-                this.reader = new PushbackReader(new InputStreamReader(inputStream));
-                if (!isJsonArray()) {
-                    error = ErrorMessage.fromData(getData());
-                }
-            } else {
-               this.reader = null;
+                //try to read an error from the data. will return null if it fails
+                this.error = ErrorMessage.fromData(getData());
+
             }
         } else {
             this.contentType = ContentType.UNKNOWN;
-            this.reader = null;
         }
     }
 
@@ -94,48 +89,12 @@ public class LApiHttpResponse {
     public @NotNull SOData getData(@Nullable String arrayKey) throws IOException, ParseException {
         if(data != null) return data;
         if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
-        if(reader == null) throw new IllegalStateException("Reader is null."); //<- this should never happen
-        int c = reader.read();
-        reader.unread(c);
-        if (c == -1){
-            noContent = true;
-            data = SOData.newOrderedDataWithKnownSize(1);
-            return data;
-        }
 
         JsonParser jsonParser = new JsonParser();
         if(arrayKey != null) jsonParser.setArrayWrapperKey(arrayKey);
-        data = jsonParser.parseReader(reader);
+        data = jsonParser.parseStream(inputStream);
+        if(data.size() == 0) noContent = true;
         return data;
-    }
-
-    /**
-     *
-     * @return {@code true} if the response body starts with a '['
-     * @throws IOException from {@link PushbackReader}
-     */
-    public boolean isJsonArray() throws IOException {
-        if (isArray != null) return isArray;
-        if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
-        if(reader == null) throw new IllegalStateException("Reader is null."); //<- this should never happen
-
-        int c;
-        while ((c = reader.read()) != -1) {
-            if (c != ' ' && c > '\u001F') {
-                break;
-            }
-        }
-
-        if (c == -1) {
-            isArray = false;
-            noContent = true;
-            data = SOData.newOrderedDataWithKnownSize(1);
-            return false;
-        }
-
-        reader.unread(c);
-        isArray = ((char) c) == '[';
-        return isArray;
     }
 
     /**
