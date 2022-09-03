@@ -32,6 +32,7 @@ import me.linusdev.lapi.api.objects.invite.InviteMetadata;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.request.RequestFactory;
+import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import static me.linusdev.lapi.api.communication.PlaceHolder.*;
@@ -76,6 +77,16 @@ public enum Link implements AbstractLink{
     GET_GLOBAL_APPLICATION_COMMANDS(GET, "applications/" + APPLICATION_ID + "/commands"),
 
     /**
+     * <p>
+     *     Create a new global command. Returns 201 and an {@link ApplicationCommand application command object}.
+     * </p>
+     * <p>
+     *     Creating a command with the same name as an existing command for your application will overwrite the old command.
+     * </p>
+     * <p>
+     *     This can have json params. see {@link ApplicationCommandTemplate}.
+     * </p>
+     *
      * @see PlaceHolder#APPLICATION_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#create-global-application-command" target="_top">Discord Documentation</a>
      */
