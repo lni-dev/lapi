@@ -21,13 +21,16 @@ import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
+import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.LocalizationDictionary;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
+import me.linusdev.lapi.api.templates.commands.EditApplicationCommandTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -62,14 +65,94 @@ public interface ApplicationCommandRequests extends HasLApi {
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMANDS, queryStringsData,
                 new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
-        return new ArrayRetriever<>(getLApi(), query, ApplicationCommand::fromData);
+        return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
+    /**
+     * <p>
+     *     Create a new global command. Returns 201 and an {@link ApplicationCommand application command object}.
+     * </p>
+     * <p>
+     *     Creating a command with the same name as an existing command for your application will overwrite the old command.
+     * </p>
+     * @param applicationId id of your application
+     * @param template {@link ApplicationCommandTemplate} of the new command
+     * @return {@link Queueable} which can create and retrieve the new command
+     * @see Queueable#queue()
+     * @see Link#CREATE_GLOBAL_APPLICATION_COMMAND
+     */
     default @NotNull Queueable<ApplicationCommand> createGlobalApplicationCommand(@NotNull String applicationId,
                                                                                   @NotNull ApplicationCommandTemplate template){
         LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GLOBAL_APPLICATION_COMMAND, template.getBody(),
                 new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
+    }
+
+    /**
+     * <p>
+     *     Fetch a global command for your application.
+     * </p>
+     * @param applicationId id of your application
+     * @param commandId id of the {@link ApplicationCommand application command} to retrieve
+     * @return {@link Queueable} which can retrieve the {@link ApplicationCommand}
+     * @see Queueable#queue()
+     * @see Link#GET_GLOBAL_APPLICATION_COMMAND
+     */
+    default @NotNull Queueable<ApplicationCommand> getGlobalApplicationCommand(@NotNull String applicationId,
+                                                                               @NotNull String commandId) {
+        LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMAND,
+                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
+                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+        return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
+    }
+
+    /**
+     * <p>
+     *     Edit a global command. Returns 200 and an {@link ApplicationCommand application command object}.
+     *     All fields are optional, but any fields provided will entirely overwrite the existing values of those fields.
+     * </p>
+     * @param applicationId id of your application
+     * @param commandId id of the {@link ApplicationCommand application command} to edit
+     * @param template {@link EditApplicationCommandTemplate} with all fields to edit
+     * @return {@link Queueable} which can edit and retrieve the {@link ApplicationCommand}
+     * @see Queueable#queue()
+     * @see Link#EDIT_GLOBAL_APPLICATION_COMMAND
+     */
+    default @NotNull Queueable<ApplicationCommand> editGlobalApplicationCommand(@NotNull String applicationId,
+                                                                                @NotNull String commandId,
+                                                                                @NotNull EditApplicationCommandTemplate template){
+        LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_GLOBAL_APPLICATION_COMMAND, template.getBody(),
+                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
+                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+        return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
+    }
+
+    /**
+     * <p>
+     *     Deletes a global command. Returns 204 No Content on success.
+     * </p>
+     * @param applicationId id of your application
+     * @param commandId id of the {@link ApplicationCommand application command} to edit
+     * @return {@link Queueable} which can delete the {@link ApplicationCommand}
+     * @see Queueable#queue()
+     * @see Link#DELETE_GLOBAL_APPLICATION_COMMAND
+     */
+    default @NotNull Queueable<LApiHttpResponse> deleteGlobalApplicationCommand(@NotNull String applicationId,
+                                                                                @NotNull String commandId) {
+        LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_GLOBAL_APPLICATION_COMMAND,
+                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
+                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+        return new NoContentRetriever(query);
+    }
+
+    default @NotNull Queueable<ArrayList<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(@NotNull String applicationId,
+                                                                                               @NotNull ApplicationCommandTemplate[] templates) {
+
+        //TODO: send a json array
+
+        LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS,
+                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
+        return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

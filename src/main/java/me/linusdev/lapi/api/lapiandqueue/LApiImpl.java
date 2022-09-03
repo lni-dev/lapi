@@ -378,7 +378,7 @@ public class LApiImpl implements LApi {
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId),
                 new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId),
                 new PlaceHolder(PlaceHolder.EMOJI, emojiString));
-        return new ArrayRetriever<>(this, query, User::fromData);
+        return new ArrayRetriever<>(query, User::fromData);
     }
 
     public @NotNull Queueable<ArrayList<User>> getReactionsRetriever(@NotNull String channelId, @NotNull String messageId, @NotNull Emoji emoji, @Nullable Integer limit){
@@ -388,13 +388,13 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ArrayList<Invite>> getChannelInvitesRetriever(@NotNull String channelId){
         LinkQuery query = new LinkQuery(this, Link.GET_CHANNEL_INVITES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<>(this, query, Invite::fromData);
+        return new ArrayRetriever<>(query, Invite::fromData);
     }
 
     public @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessagesRetriever(@NotNull String channelId){
         LinkQuery query = new LinkQuery(this, Link.GET_PINNED_MESSAGES,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<>(this, query, MessageImplementation::new);
+        return new ArrayRetriever<>(query, MessageImplementation::new);
     }
 
     public @NotNull Queueable<ThreadMember> getThreadMemberRetriever(@NotNull String channelId, @NotNull String userId){
@@ -406,7 +406,7 @@ public class LApiImpl implements LApi {
     public @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembersRetriever(@NotNull String channelId){
         LinkQuery query = new LinkQuery(this, Link.LIST_THREAD_MEMBERS,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, ThreadMember>(this, query, (lApi, data) -> ThreadMember.fromData(data));
+        return new ArrayRetriever<SOData, ThreadMember>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
     @SuppressWarnings("removal")
@@ -500,7 +500,7 @@ public class LApiImpl implements LApi {
                 new PlaceHolder(PlaceHolder.INTERACTION_ID, interactionId),
                 new PlaceHolder(PlaceHolder.INTERACTION_TOKEN, interactionToken));
 
-        return new NoContentRetriever(this, query);
+        return new NoContentRetriever(query);
     }
 
     //Gateway

@@ -46,7 +46,7 @@ public class VoiceRegionManager implements HasLApi {
      * This will wait the current Thread until the voice regions are retrieved from Discord!
      */
     public void update() throws LApiException, IOException, ParseException, InterruptedException {
-        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<SOData, VoiceRegion>(lApi,
+        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<SOData, VoiceRegion>(
                 new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
         ArrayList<VoiceRegion> list = retriever.completeHere().get();
 
@@ -75,7 +75,7 @@ public class VoiceRegionManager implements HasLApi {
      * retrieves and saves all voice regions into the array, ignores current content of the array
      */
     public void init() {
-        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<>(lApi,
+        ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<>(
                 new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
         retriever.queue(list -> regions = list);

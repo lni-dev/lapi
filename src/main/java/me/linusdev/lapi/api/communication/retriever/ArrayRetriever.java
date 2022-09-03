@@ -42,8 +42,8 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
      * @param query {@link Query} for the HttpRequest
      * @param converter {@link Converter} to convert from {@link C} to {@link R}
      */
-    public ArrayRetriever(@NotNull LApi lApi, @NotNull Query query, @NotNull Converter<C, R> converter) {
-        super(lApi, query);
+    public ArrayRetriever(@NotNull Query query, @NotNull Converter<C, R> converter) {
+        super(query.getLApi(), query);
         this.converter = converter;
     }
 

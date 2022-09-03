@@ -133,7 +133,7 @@ public interface ChannelRequests extends HasLApi {
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGES, queryStringsData,
                 new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, MessageImplementation>(getLApi(), query, MessageImplementation::new);
+        return new ArrayRetriever<SOData, MessageImplementation>(query, MessageImplementation::new);
     }
 
     /**

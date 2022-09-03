@@ -32,11 +32,10 @@ import java.util.function.BiConsumer;
 
 public class NoContentRetriever extends Retriever<LApiHttpResponse> {
     /**
-     * @param lApi  {@link LApi}
      * @param query the {@link Query} used to retrieve a response
      */
-    public NoContentRetriever(@NotNull LApi lApi, @NotNull Query query) {
-        super(lApi, query);
+    public NoContentRetriever(@NotNull Query query) {
+        super(query.getLApi(), query);
     }
 
     @Override
