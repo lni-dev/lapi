@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.lapihttprequest.body;
 
 import me.linusdev.data.so.SOData;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import java.util.ArrayList;
  * This class is used to create a {@link LApiHttpMultiPartBodyPublisher},
  * which will then be used as {@link java.net.http.HttpRequest.BodyPublisher BodyPublisher} to create a {@link java.net.http.HttpRequest HttpRequest}
  */
+@ApiStatus.Internal
 public class LApiHttpBody {
 
     private @Nullable SOData jsonPart;

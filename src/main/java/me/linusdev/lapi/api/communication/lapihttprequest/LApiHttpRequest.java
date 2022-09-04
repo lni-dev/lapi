@@ -18,7 +18,6 @@ package me.linusdev.lapi.api.communication.lapihttprequest;
 
 import me.linusdev.data.entry.Entry;
 import me.linusdev.data.so.SOData;
-import me.linusdev.data.so.SOEntryImpl;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpMultiPartBodyPublisher;
