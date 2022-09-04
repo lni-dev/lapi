@@ -16,12 +16,11 @@
 
 package me.linusdev.lapi.api.templates.commands;
 
-import me.linusdev.data.AbstractData;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
-import me.linusdev.lapi.api.objects.command.LocalizationDictionary;
+import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.request.RequestFactory;

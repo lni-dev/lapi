@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.config;
 
-import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;

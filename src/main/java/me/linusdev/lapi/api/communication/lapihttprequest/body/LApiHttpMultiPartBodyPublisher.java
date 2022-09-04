@@ -26,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Flow;
 
 /**
- * I was trying to write my own MultiPart{@link java.net.http.HttpRequest.BodyPublisher BodyPublisher}. I don't really know if this was a success
+ * I was trying to write my own MultiPart{@link java.net.http.HttpRequest.BodyPublisher BodyPublisher}.
  * <br>
  * <p>
  *   A multi-part-body is a body which can contain multiple different content-types.<br>

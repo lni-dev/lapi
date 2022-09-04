@@ -28,7 +28,7 @@ import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
-import me.linusdev.lapi.api.objects.command.LocalizationDictionary;
+import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import me.linusdev.lapi.api.templates.commands.EditApplicationCommandTemplate;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public interface ApplicationCommandRequests extends HasLApi {
      *                                                               *
      *                   Global Application Command                  *
      *                                                               *
-     *                                                               *
+     *  Done: 04.09.2022                                             *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -145,12 +145,26 @@ public interface ApplicationCommandRequests extends HasLApi {
         return new NoContentRetriever(query);
     }
 
+    /**
+     * <p>
+     *     Takes a list of application commands, overwriting the existing global command list for this application.
+     *     Returns 200 and a list of application command objects. Commands that do not already exist will count toward
+     *     daily application command create limits.
+     * </p>
+     * <p>
+     *     This will overwrite all types of application commands: slash commands, user commands, and message commands.
+     * </p>
+     * @param applicationId id of your application
+     * @param templates Array of {@link ApplicationCommandTemplate} containing the commands, that should be overwritten
+     * @return {@link Queueable} which can overwrite the commands and retrieve the new {@link ApplicationCommand}s
+     * @see Queueable#queue()
+     * @see Link#BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS
+     */
     default @NotNull Queueable<ArrayList<ApplicationCommand>> bulkOverwriteGlobalApplicationCommands(@NotNull String applicationId,
                                                                                                @NotNull ApplicationCommandTemplate[] templates) {
 
-        //TODO: send a json array
-
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS,
+                new LApiHttpBody(SOData.wrap(templates)),
                 new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }

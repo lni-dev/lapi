@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.templates.commands;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.objects.command.LocalizationDictionary;
+import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.templates.abstracts.Template;

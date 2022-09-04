@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.websocket;
 
 import me.linusdev.data.Datable;
-import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;

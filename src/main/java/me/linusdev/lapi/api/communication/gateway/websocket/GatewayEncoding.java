@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.websocket;
 
 import me.linusdev.data.SimpleDatable;
-import me.linusdev.data.converter.ExceptionConverter;
+import me.linusdev.data.functions.ExceptionConverter;
 import org.jetbrains.annotations.Nullable;
 
 /**

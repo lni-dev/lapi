@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.command;
+package me.linusdev.lapi.api.other.localization;
 
-import me.linusdev.data.AbstractData;
 import me.linusdev.data.Datable;
+import me.linusdev.data.entry.Entry;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.local.Locale;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
+
 /**
  * This stores localizations for different {@link Locale locales}.
  * @see ApplicationCommand
  */
-public class LocalizationDictionary implements Datable {
+public class LocalizationDictionary implements Datable, Iterable<Localization> {
 
     private final @NotNull SOData data;
 
@@ -77,5 +80,24 @@ public class LocalizationDictionary implements Datable {
     @Override
     public @NotNull SOData getData() {
         return data;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Localization> iterator() {
+        return new Iterator<>() {
+            private final Iterator<Entry<String, Object>> it = data.iterator();
+
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public Localization next() {
+                Entry<String, Object> entry = it.next();
+                return new Localization(entry.getKey(), entry.getValue().toString());
+            }
+        };
     }
 }

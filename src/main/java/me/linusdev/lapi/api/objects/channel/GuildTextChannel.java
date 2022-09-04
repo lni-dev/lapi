@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.channel;
 
-import me.linusdev.data.converter.Converter;
+import me.linusdev.data.functions.Converter;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;

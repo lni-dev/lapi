@@ -10,7 +10,7 @@
 In order to install it, you can either build it yourself or use gradle and implement it into your Project:<br><br>
 In your `build.gradle` add `mavenCentral()` to the repositories if you have not done so already and add `io.github.lni-dev:lapi:[version]` to the dependencies. Replace `[version]` with the version you want to install.
  <br><br>![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?label=current%20newest%20version%3A%20)
-```gradle
+```groovy
 repositories {
     mavenCentral()
 }
@@ -21,7 +21,7 @@ dependencies {
 ```
 
 <br>An example `build.gradle` could look like this:
-```gradle
+```groovy
 plugins {
     id 'java'
 }
@@ -42,7 +42,7 @@ dependencies {
 <br>If you want to make an executable .jar file at some point in time, I recommend
 the gradle plugins `application` and `shadow`. An example `build.gradle` with these plugins could
 look like this:
-```gradle
+```groovy
 plugins {
     id 'java'
     id 'application'

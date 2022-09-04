@@ -465,7 +465,7 @@ public class EmbedBuilder {
     /**
      * To facilitate showing rich content, rich embeds do not follow the traditional limits of message content. However, some limits are still in place to prevent excessively large embeds. The following table describes the limits
      * <br><br>
-     * All of the following limits are measured inclusively. Leading and trailing whitespace characters are not included (they are trimmed automatically).
+     * All the following limits are measured inclusively. Leading and trailing whitespace characters are not included (they are trimmed automatically).
      * <br>
      *
      * {@link #title} limit:         256 characters {@link #TITLE_CHAR_LIMIT} <br>
