@@ -56,7 +56,7 @@ public class Main {
 
         final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLApi();
 
-        User currentUser = api.getCurrentUserRetriever().queueAndWait();
+        User currentUser = api.getRequestFactory().getCurrentUser().queueAndWait();
 
         System.out.println(currentUser.getUsername());
         System.out.println(currentUser.isBot());
@@ -88,7 +88,7 @@ public class Main {
             Reaction[] reactions = message.getReactions();
 
             Reaction reaction = reactions[0];
-            api.getReactionsRetriever(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
+            api.getRequestFactory().getReactions(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
                 if (e != null){
                     e.getThrowable().printStackTrace();
                     return;
@@ -98,7 +98,7 @@ public class Main {
         });
 
         log.log("getChannelInvites");
-        api.getChannelInvitesRetriever("387972238256898048").queue((invites, error) -> {
+        api.getRequestFactory().getChannelInvites("387972238256898048").queue((invites, error) -> {
             System.out.println("retrieved invites....");
             if (error != null) {
                 System.out.println("error");
@@ -111,7 +111,7 @@ public class Main {
             }
         });
 
-        api.getPinnedMessagesRetriever("912377387868639282").queue(((messages, error) -> {
+        api.getRequestFactory().getPinnedMessages("912377387868639282").queue(((messages, error) -> {
             if(error != null){
                 System.out.println(error);
                 return;
@@ -123,7 +123,7 @@ public class Main {
 
         }));
 
-        api.getThreadMemberRetriever("912398268238037022", "247421526532554752").queue((member, error) -> {
+        api.getRequestFactory().getThreadMember("912398268238037022", "247421526532554752").queue((member, error) -> {
             if(error != null){
                 System.out.println("Error");
                 if(error.getThrowable() instanceof InvalidDataException){
@@ -138,7 +138,7 @@ public class Main {
             System.out.println(member.getUserId());
         });
 
-        api.getThreadMembersRetriever("912398268238037022").queue((threadMembers, error) -> {
+        api.getRequestFactory().getThreadMembers("912398268238037022").queue((threadMembers, error) -> {
             if(error != null){
                 System.out.println("Error");
                 return;
@@ -153,7 +153,7 @@ public class Main {
         });
 
 
-        api.getActiveThreadsRetriever("912377387868639282").queue((threadResponseBody, error) -> {
+        api.getRequestFactory().listActiveThreads("912377387868639282").queue((threadResponseBody, error) -> {
             if(error != null){
                 System.out.println("Error");
                 System.out.println(((InvalidDataException) error.getThrowable()).getData().toJsonString());
@@ -172,7 +172,7 @@ public class Main {
             System.out.println(threadResponseBody.hasMore());
         });
 
-        api.getPublicArchivedThreadsRetriever("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
+        api.getRequestFactory().listPublicArchivedThreads("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
             if(error != null){
                 System.out.println("Error");
                 return;
@@ -192,7 +192,7 @@ public class Main {
 
         });
 
-        api.getUserRetriever("378980330281107457").queue((user, error) -> {
+        api.getRequestFactory().getUser("378980330281107457").queue((user, error) -> {
             if(error != null){
                 System.out.println("Error");
                 error.getThrowable().printStackTrace();

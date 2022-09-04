@@ -45,7 +45,7 @@ public class InteractionResponseBuilder implements HasLApi {
     }
 
     public @NotNull Queueable<LApiHttpResponse> getQueueable(){
-        return lApi.createInteractionResponse(interaction.getId(), interaction.getToken(), build());
+        return lApi.getRequestFactory().createInteractionResponse(interaction.getId(), interaction.getToken(), build());
     }
 
     /**

@@ -580,13 +580,13 @@ public enum Link implements AbstractLink{
      * </span>
      * <ul style="margin:0;padding:0">
      *     <li>
-     *         {@value #BEFORE_KEY}: get guilds before this guild ID
+     *         {@value RequestFactory#BEFORE_KEY}: get guilds before this guild ID
      *     </li>
      *     <li>
-     *         {@value #AFTER_KEY}: get guilds after this guild ID
+     *         {@value RequestFactory#AFTER_KEY}: get guilds after this guild ID
      *     </li>
      *     <li>
-     *         {@value #LIMIT_KEY}: max number of guilds to return (1-200). Default: 200
+     *         {@value RequestFactory#LIMIT_KEY}: max number of guilds to return (1-200). Default: 200
      *     </li>
      * </ul>
      *

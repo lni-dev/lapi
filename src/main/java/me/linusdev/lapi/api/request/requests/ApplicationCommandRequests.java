@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.request;
+package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.PlaceHolder;

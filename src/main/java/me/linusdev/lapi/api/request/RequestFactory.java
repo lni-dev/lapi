@@ -21,15 +21,18 @@ import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 
+import me.linusdev.lapi.api.request.requests.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * The {@link RequestFactory} can create {@link Queueable Queueables} to send HTTP-requests to discord.
  */
-public class RequestFactory implements
-        HasLApi,
+public class RequestFactory implements HasLApi,
+        ReceivingAndRespondingRequests,
+        ApplicationCommandRequests,
         ChannelRequests,
-        ApplicationCommandRequests {
+        UserRequests,
+        GatewayRequests {
 
     public static final String WITH_LOCALIZATIONS_KEY = "with_localizations";
 
