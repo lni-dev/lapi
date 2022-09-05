@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * @see <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-interaction-data-option-structure" target="_top">Application Command Interaction Data Option Structure</a>
+ * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-application-command-interaction-data-option-structure" target="_top">Application Command Interaction Data Option Structure</a>
  */
 public class ApplicationCommandInteractionDataOption implements Datable {
 

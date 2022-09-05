@@ -68,7 +68,15 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
     public static final String DEFAULT_PERMISSIONS_KEY = "default_permission";
     public static final String VERSION_KEY = "version";
 
+    public static final int NAME_MIN_CHARS = 1;
     public static final int NAME_MAX_CHARS = 32;
+
+    /**
+     * Description is only for {@link ApplicationCommandType#CHAT_INPUT CHAT_INPUT} commands.
+     * For {@link ApplicationCommandType#USER USER} and {@link ApplicationCommandType#MESSAGE MESSAGE} commands,
+     * description must be an empty string: "".
+     */
+    public static final int DESCRIPTION_MIN_CHARS = 1;
     public static final int DESCRIPTION_MAX_CHARS = 100;
     public static final int MAX_OPTIONS_AMOUNT = 25;
 
@@ -310,8 +318,10 @@ public class ApplicationCommand implements Datable, HasLApi, SnowflakeAble {
         data.add(APPLICATION_ID_KEY, applicationId);
         data.addIfNotNull(GUILD_ID_KEY, guildId);
         data.add(NAME_KEY, name);
+        data.addIfNotNull(NAME_LOCALIZED_KEY, nameLocalized);
         data.addIfNotNull(NAME_LOCALIZATIONS_KEY, nameLocalizations);
         data.add(DESCRIPTION_KEY, description);
+        data.addIfNotNull(DESCRIPTION_LOCALIZED_KEY, descriptionLocalized);
         data.addIfNotNull(DESCRIPTION_LOCALIZATIONS_KEY, descriptionLocalizations);
         data.addIfNotNull(OPTIONS_KEY, options);
         data.add(DEFAULT_MEMBER_PERMISSIONS_KEY, defaultMemberPermissions);

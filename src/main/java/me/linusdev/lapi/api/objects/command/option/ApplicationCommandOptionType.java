@@ -20,6 +20,7 @@ import me.linusdev.data.SimpleDatable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.attachment.Attachment;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
@@ -101,8 +102,17 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
                 return ((Number) convertible).doubleValue();
     });
 
-    public static final ApplicationCommandOptionType[] values = {SUB_COMMAND, SUB_COMMAND_GROUP, STRING,
-            INTEGER, BOOLEAN, USER, CHANNEL, ROLE, MENTIONABLE, NUMBER, UNKNOWN};
+    /**
+     * {@link Attachment attachment object}
+     */
+    public static final ApplicationCommandOptionType<SOData, Attachment, InvalidDataException>
+            ATTACHMENT = new ApplicationCommandOptionType<>(11, (lApi, convertible) ->{
+        if(convertible == null) return null;
+        return new Attachment(convertible);
+    });
+
+    public static final ApplicationCommandOptionType<?, ?, ?>[] values = {SUB_COMMAND, SUB_COMMAND_GROUP, STRING,
+            INTEGER, BOOLEAN, USER, CHANNEL, ROLE, MENTIONABLE, NUMBER, UNKNOWN, ATTACHMENT};
 
     private final int value;
     private final LApiConverter<C, R, E> converter;
@@ -117,8 +127,8 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
      * @param value int
      * @return {@link ApplicationCommandOptionType} matching given value or {@link #UNKNOWN} if none matches
      */
-    public static @NotNull ApplicationCommandOptionType fromValue(int value){
-        for(ApplicationCommandOptionType type : values){
+    public static @NotNull ApplicationCommandOptionType<?, ?, ?> fromValue(int value){
+        for(ApplicationCommandOptionType<?, ?, ?> type : values){
             if(type.value == value) return type;
         }
 

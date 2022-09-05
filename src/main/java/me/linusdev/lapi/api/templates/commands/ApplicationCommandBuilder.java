@@ -17,19 +17,18 @@
 package me.linusdev.lapi.api.templates.commands;
 
 import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandException;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
 import me.linusdev.lapi.api.other.localization.Localization;
-import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
-import me.linusdev.lapi.api.objects.local.Locale;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.function.Consumer;
 
 /**
@@ -39,52 +38,48 @@ import java.util.function.Consumer;
  *
  * @see ApplicationCommand
  */
-public class ApplicationCommandBuilder {
+public class ApplicationCommandBuilder extends CommandNameAndDescriptionBuilder<ApplicationCommandBuilder> {
 
-    private @Nullable String name = null;
-    private @Nullable LocalizationDictionary nameLocalizations = null;
-
-    private @Nullable String description = null;
-    private @Nullable LocalizationDictionary descriptionLocalizations = null;
-
-    private @Nullable ArrayList<ApplicationCommandOption> options = null;
+    private final @NotNull LApi lApi;
 
     private @Nullable Permissions defaultMemberPermissions = null;
     private @Nullable Boolean dmPermissions = null;
     private @Nullable ApplicationCommandType type = null;
 
     /**
-     *
-     * @param name command name
+     * @param name        command name
      * @param description command description
-     * @see #newSlashCommandBuilder(String, String)
-     * @see #newUserCommandBuilder(String)
-     * @see #newMessageCommandBuilder(String)
+     * @param lApi {@link LApi}
+     * @see #newSlashCommandBuilder(HasLApi, String, String)
+     * @see #newUserCommandBuilder(HasLApi, String)
+     * @see #newMessageCommandBuilder(HasLApi, String)
      */
-    public ApplicationCommandBuilder(@NotNull String name, @NotNull String description) {
+    public ApplicationCommandBuilder(@NotNull HasLApi lApi, @NotNull String name, @NotNull String description) {
+        this.lApi = lApi.getLApi();
         this.name = name;
         this.description = description;
     }
 
     /**
-     *
      * @param name command name
-     * @see #newSlashCommandBuilder(String, String)
-     * @see #newUserCommandBuilder(String)
-     * @see #newMessageCommandBuilder(String)
+     * @param lApi {@link LApi}
+     * @see #newSlashCommandBuilder(HasLApi, String, String)
+     * @see #newUserCommandBuilder(HasLApi, String)
+     * @see #newMessageCommandBuilder(HasLApi, String)
      */
-    public ApplicationCommandBuilder(@NotNull String name) {
+    public ApplicationCommandBuilder(@NotNull HasLApi lApi, @NotNull String name) {
+        this.lApi = lApi.getLApi();
         this.name = name;
     }
 
     /**
      *
-     * @see #newSlashCommandBuilder(String, String)
-     * @see #newUserCommandBuilder(String)
-     * @see #newMessageCommandBuilder(String)
+     * @see #newSlashCommandBuilder(HasLApi, String, String)
+     * @see #newUserCommandBuilder(HasLApi, String)
+     * @see #newMessageCommandBuilder(HasLApi, String)
      */
-    public ApplicationCommandBuilder() {
-
+    public ApplicationCommandBuilder(@NotNull HasLApi lApi) {
+        this.lApi = lApi.getLApi();
     }
 
     /**
@@ -94,8 +89,8 @@ public class ApplicationCommandBuilder {
      * @return {@link ApplicationCommandBuilder}
      */
     @Contract("_, _ -> new")
-    public static @NotNull ApplicationCommandBuilder newSlashCommandBuilder(@NotNull String name, @NotNull String description){
-        return new ApplicationCommandBuilder(name, description).setType(ApplicationCommandType.CHAT_INPUT);
+    public static @NotNull ApplicationCommandBuilder newSlashCommandBuilder(@NotNull HasLApi lApi, @NotNull String name, @NotNull String description){
+        return new ApplicationCommandBuilder(lApi, name, description).setType(ApplicationCommandType.CHAT_INPUT);
     }
 
     /**
@@ -104,8 +99,8 @@ public class ApplicationCommandBuilder {
      * @return {@link ApplicationCommandBuilder}
      */
     @Contract("_ -> new")
-    public static @NotNull ApplicationCommandBuilder newUserCommandBuilder(@NotNull String name){
-        return new ApplicationCommandBuilder(name, "").setType(ApplicationCommandType.USER);
+    public static @NotNull ApplicationCommandBuilder newUserCommandBuilder(@NotNull HasLApi lApi, @NotNull String name){
+        return new ApplicationCommandBuilder(lApi, name, "").setType(ApplicationCommandType.USER);
     }
 
     /**
@@ -114,74 +109,8 @@ public class ApplicationCommandBuilder {
      * @return {@link ApplicationCommandBuilder}
      */
     @Contract("_ -> new")
-    public static @NotNull ApplicationCommandBuilder newMessageCommandBuilder(@NotNull String name){
-        return new ApplicationCommandBuilder(name, "").setType(ApplicationCommandType.MESSAGE);
-    }
-
-    /**
-     *
-     * @param name name of the command
-     */
-    public ApplicationCommandBuilder setName(@NotNull String name) {
-        this.name = name;
-        return this;
-    }
-
-    /**
-     * replace the {@link LocalizationDictionary} for the name with given one.
-     * <br><br>
-     * You are probably looking for {@link #setNameLocalization(Locale, String)}.
-     * @param dictionary the new {@link LocalizationDictionary}
-     * @see #setNameLocalization(Locale, String)
-     */
-    public ApplicationCommandBuilder setNameLocalizations(@Nullable LocalizationDictionary dictionary) {
-        this.nameLocalizations = dictionary;
-        return this;
-    }
-
-    /**
-     * set name localization for given {@link Locale}. Set to {@code null} to remove the localization for given {@link Locale}
-     * @param locale {@link Locale} to set localization for
-     * @param localization {@link String} localization or {@code null}
-     */
-    public ApplicationCommandBuilder setNameLocalization(@NotNull Locale locale, @Nullable String localization) {
-        if(this.nameLocalizations == null) this.nameLocalizations = new LocalizationDictionary();
-
-        nameLocalizations.setLocalization(locale, localization);
-        return this;
-    }
-
-    /**
-     *
-     * @param description description of the command
-     */
-    public ApplicationCommandBuilder setDescription(@NotNull String description) {
-        this.description = description;
-        return this;
-    }
-
-    /**
-     * replace the {@link LocalizationDictionary} for the description with given one.
-     * <br><br>
-     * You are probably looking for {@link #setDescriptionLocalization(Locale, String)}.
-     * @param dictionary the new {@link LocalizationDictionary}
-     * @see #setDescriptionLocalization(Locale, String)
-     */
-    public ApplicationCommandBuilder setDescriptionLocalizations(@Nullable LocalizationDictionary dictionary) {
-        this.descriptionLocalizations = dictionary;
-        return this;
-    }
-
-    /**
-     * set description localization for given {@link Locale}. Set to {@code null} to remove the localization for given {@link Locale}
-     * @param locale {@link Locale} to set localization for
-     * @param localization {@link String} localization or {@code null}
-     */
-    public ApplicationCommandBuilder setDescriptionLocalization(@NotNull Locale locale, @Nullable String localization) {
-        if(this.descriptionLocalizations == null) this.descriptionLocalizations = new LocalizationDictionary();
-
-        descriptionLocalizations.setLocalization(locale, localization);
-        return this;
+    public static @NotNull ApplicationCommandBuilder newMessageCommandBuilder(@NotNull HasLApi lApi, @NotNull String name){
+        return new ApplicationCommandBuilder(lApi, name, "").setType(ApplicationCommandType.MESSAGE);
     }
 
     /**
@@ -343,6 +272,37 @@ public class ApplicationCommandBuilder {
         if(name == null) throw new InvalidApplicationCommandException("name may not be null.");
         if(description == null) throw new InvalidApplicationCommandException("description may not be null.");
 
+        //name length
+        if(name.length() < ApplicationCommand.NAME_MIN_CHARS || name.length() > ApplicationCommand.NAME_MAX_CHARS)
+            throw new InvalidApplicationCommandException("name \"" + name + "\" is too short or too long");
+
+        if(nameLocalizations != null) {
+            for (Localization localization : nameLocalizations) {
+                if(localization.getLocalization().length() < ApplicationCommand.NAME_MIN_CHARS
+                        || localization.getLocalization().length() > ApplicationCommand.NAME_MAX_CHARS) {
+                    throw new InvalidApplicationCommandException("name localization \"" + localization.getLocalization() + "\" for local \""
+                            + localization.getLocale() + "\" is too short or too long");
+
+                }
+            }
+        }
+
+        //description length
+        if(description.length() < ApplicationCommand.DESCRIPTION_MIN_CHARS || description.length() > ApplicationCommand.DESCRIPTION_MAX_CHARS)
+            throw new InvalidApplicationCommandException("description \"" + description + "\" is too short or too long");
+
+        if(descriptionLocalizations != null) {
+            for (Localization localization : descriptionLocalizations) {
+                if(localization.getLocalization().length() < ApplicationCommand.DESCRIPTION_MIN_CHARS
+                        || localization.getLocalization().length() > ApplicationCommand.DESCRIPTION_MAX_CHARS) {
+                    throw new InvalidApplicationCommandException("description localization \"" + localization.getLocalization() + "\" for local \""
+                            + localization.getLocale() + "\" is too short or too long");
+
+                }
+            }
+        }
+
+        //type specific
         if(type == ApplicationCommandType.CHAT_INPUT) {
             if(!name.matches(ApplicationCommand.COMMAND_NAME_MATCH_REGEX)) throw new InvalidApplicationCommandException("name does meet requirements (regex check failed).");
 
@@ -371,7 +331,7 @@ public class ApplicationCommandBuilder {
      *
      * @param check whether to {@link #check()} if this would build a valid {@link ApplicationCommandTemplate}
      * @return built {@link ApplicationCommandTemplate}
-     * @throws InvalidApplicationCommandException if {@link #check()} fails.
+     * @throws InvalidApplicationCommandException if {@link #check()} fails and check is set to {@code true}.
      * @see #check()
      * @see ApplicationCommandTemplate
      */
@@ -384,4 +344,8 @@ public class ApplicationCommandBuilder {
     }
 
 
+    @Override
+    public @NotNull LApi getLApi() {
+        return lApi;
+    }
 }
