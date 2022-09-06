@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
 import me.linusdev.lapi.api.objects.guild.enums.ExplicitContentFilterLevel;
@@ -224,8 +225,8 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      * 	voice region for the guild (deprecated).
      *  <br><br>
-     *  All {@link VoiceRegion VoiceRegions} are managed by the {@link me.linusdev.lapi.api.VoiceRegionManager VoiceRegionManager}.
-     *  See {@link me.linusdev.lapi.api.VoiceRegionManager#getVoiceRegionById(String) getVoiceRegionById()} for more information.
+     *  All {@link VoiceRegion VoiceRegions} are managed by the {@link VoiceRegionManager VoiceRegionManager}.
+     *  See {@link VoiceRegionManager#getVoiceRegionById(String) getVoiceRegionById()} for more information.
      */
     @Deprecated
     @Nullable VoiceRegion getRegion();

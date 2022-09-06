@@ -20,6 +20,7 @@ import me.linusdev.data.SimpleDatable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
@@ -40,7 +41,7 @@ public enum ConfigFlag implements SimpleDatable {
      * <p>
      *     retrieves and caches all voice regions when {@link me.linusdev.lapi.api.lapiandqueue.LApiImpl LApi} starts.
      * </p>
-     * @see me.linusdev.lapi.api.VoiceRegionManager VoiceRegionManager
+     * @see VoiceRegionManager VoiceRegionManager
      */
     CACHE_VOICE_REGIONS(1 << 0),
 

@@ -59,6 +59,7 @@ import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdate
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 
 /**
  * <p>
@@ -78,7 +79,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
  * </p>
  *
  * <p>
- *     Almost all events require {@link ConfigFlag#ENABLE_GATEWAY}. This won't be listed below.
+ *     Almost all events (except {@link #LAPI_READY}) require {@link ConfigFlag#ENABLE_GATEWAY}. This won't be listed below.
  * </p>
  *
  */
@@ -122,6 +123,14 @@ public enum EventIdentifier{
      * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
      */
     LAPI_READY,
+
+    /**
+     * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
+     * <br><br>
+     * May be called more than once if {@link VoiceRegionManager#init(int)}
+     * or {@link VoiceRegionManager#update()} is called.
+     */
+    VOICE_REGION_MANAGER_READY,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

@@ -73,6 +73,7 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.emoji.StandardEmoji;
@@ -164,6 +165,10 @@ public class Test implements EventListener{
 
         lApi.getEventTransmitter().addListener(new Test());
 
+        System.out.println("waitUntilLApiReadyEvent");
+        long tiem = System.currentTimeMillis();
+        lApi.waitUntilLApiReadyEvent();
+        System.out.println("yay took: " + (System.currentTimeMillis() - tiem) + " millis");
 
     }
 
@@ -203,18 +208,15 @@ public class Test implements EventListener{
     @Override
     public void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {
         System.out.println("onGuildsReady");
-
-        for(CachedGuildImpl guild : event.getGuildPool()){
-            System.out.println(guild);
-            RequestGuildMembersCommand cmd = RequestGuildMembersCommand.createQueryGuildMembersCommand(lApi, guild.getId(),
-                    "Lin", true, "guild-" + guild.getName());
-            cmd.send();
-        }
-
     }
 
     @Override
     public void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {
+        System.out.println("onLApiReady");
+    }
+
+    @Override
+    public void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {
         System.out.println("onLApiReady");
     }
 
@@ -608,7 +610,7 @@ public class Test implements EventListener{
             InteractionResponseBuilder builder = new InteractionResponseBuilder(event.getLApi(), event.getInteraction());
 
             builder.channelMessageWithSource(messageBuilder -> {
-                messageBuilder.appendContent("good job!")
+                messageBuilder.appendContent("https://tenor.com/view/milim-milim-nava-that-time-i-got-reincarnated-as-a-slime-cute-tensura-gif-17182466")
                         .setFlag(MessageFlag.EPHEMERAL);
             }, true);
 

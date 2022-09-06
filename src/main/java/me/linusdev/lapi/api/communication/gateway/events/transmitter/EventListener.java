@@ -60,6 +60,7 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdate
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -126,6 +127,8 @@ public interface EventListener {
      * This event will only happen once.
      */
     default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
+
+    default void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {}
 
     default void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {}
 

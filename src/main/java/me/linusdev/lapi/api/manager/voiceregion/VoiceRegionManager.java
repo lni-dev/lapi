@@ -14,25 +14,29 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api;
+package me.linusdev.lapi.api.manager.voiceregion;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.communication.gateway.events.error.LApiError;
+import me.linusdev.lapi.api.communication.gateway.events.error.LApiErrorEvent;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.voice.region.VoiceRegion;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class VoiceRegionManager implements HasLApi {
+public class VoiceRegionManager implements Manager, HasLApi {
     ArrayList<VoiceRegion> regions = null;
 
     private final LApiImpl lApi;
@@ -73,18 +77,32 @@ public class VoiceRegionManager implements HasLApi {
 
     /**
      * retrieves and saves all voice regions into the array, ignores current content of the array
+     * @param initialCapacity is ignored
      */
-    public void init() {
+    @Override
+    public void init(int initialCapacity) {
         ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<>(
                 new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
-        retriever.queue(list -> regions = list);
+        retriever.queue((voiceRegions, error) -> {
+
+            if(error != null) {
+                //TODO: handle error
+                Logger.getLogger(this).error(error.getThrowable());
+
+            } else {
+                regions = voiceRegions;
+                lApi.transmitEvent().
+                        onVoiceRegionManagerReady(lApi, new VoiceRegionManagerReadyEvent(lApi, this));
+            }
+        });
     }
 
     /**
      *
      * @return true if {@link #regions} is not {@code null}
      */
+    @Override
     public boolean isInitialized(){
         return regions != null;
     }

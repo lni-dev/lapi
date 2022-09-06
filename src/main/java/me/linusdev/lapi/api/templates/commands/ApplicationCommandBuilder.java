@@ -316,13 +316,19 @@ public class ApplicationCommandBuilder extends CommandNameAndDescriptionBuilder<
                 }
             }
 
-        } else if(type == ApplicationCommandType.USER) {
-            if(!description.equals("")) throw new InvalidApplicationCommandException("USER or MESSAGE commands must have an empty (\"\") description.");
+            if(options != null && options.size() > ApplicationCommand.MAX_OPTIONS_AMOUNT) {
+                throw new InvalidApplicationCommandException("too many options. max: " + ApplicationCommand.MAX_OPTIONS_AMOUNT);
+            }
 
-        } else if(type == ApplicationCommandType.MESSAGE) {
-            if(!description.equals("")) throw new InvalidApplicationCommandException("USER or MESSAGE commands must have an empty (\"\") description.");
+        } else if(type == ApplicationCommandType.USER || type == ApplicationCommandType.MESSAGE) {
+            if (!description.equals(""))
+                throw new InvalidApplicationCommandException("USER or MESSAGE commands must have an empty (\"\") description.");
 
+            if(options != null) {
+                throw new InvalidApplicationCommandException("USER or MESSAGE commands cannot have options.");
+            }
         }
+
 
         return this;
     }

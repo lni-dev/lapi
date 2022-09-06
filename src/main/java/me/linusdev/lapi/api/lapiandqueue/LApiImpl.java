@@ -17,14 +17,12 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.VoiceRegionManager;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
-import me.linusdev.lapi.api.communication.gateway.other.GetGatewayResponse;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
@@ -32,22 +30,10 @@ import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.*;
-import me.linusdev.lapi.api.communication.retriever.query.Link;
-import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
-import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
-import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
-import me.linusdev.lapi.api.objects.invite.Invite;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.log.LogInstance;
@@ -63,7 +49,6 @@ import java.net.URLConnection;
 import java.net.http.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
-import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -118,9 +103,12 @@ public class LApiImpl implements LApi {
     private volatile QueueThread queueThread;
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
+    //LApiReadyEventListener
+    @NotNull final LApiReadyListener lApiReadyListener;
+
     //Gateway
-    final EventTransmitter eventTransmitter;
-    final GatewayWebSocket gateway;
+    @NotNull final EventTransmitter eventTransmitter;
+    @Nullable final GatewayWebSocket gateway;
 
     //executor
     private final ThreadPoolExecutor executor;
@@ -200,22 +188,13 @@ public class LApiImpl implements LApi {
         });
 
         requestFactory = new RequestFactory(this);
+        eventTransmitter = new EventTransmitter(this);
+        lApiReadyListener = new LApiReadyListener(this);
 
-        //Gateway
-        if(this.config.isFlagSet(ConfigFlag.ENABLE_GATEWAY)){
-            this.eventTransmitter = new EventTransmitter(this);
-            this.gateway = new GatewayWebSocket(this, eventTransmitter, config);
-            gateway.start();
-        }else{
-            this.eventTransmitter = null;
-            this.gateway = null;
-        }
-
-        //TODO: Probably move these before the Gateway! since Gateway uses the GuildManager
         //VoiceRegions
         this.voiceRegionManager = new VoiceRegionManager(this);
         if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS))
-            this.voiceRegionManager.init();
+            this.voiceRegionManager.init(0);
 
         //GuildImpl Manager
         if(isCacheGuildsEnabled()){
@@ -224,6 +203,16 @@ public class LApiImpl implements LApi {
         }else{
             this.guildManager = null;
         }
+
+        //Gateway
+        if(isGatewayEnabled()){
+            this.gateway = new GatewayWebSocket(this, eventTransmitter, config);
+            gateway.start();
+        }else{
+            this.gateway = null;
+        }
+
+        lApiReadyListener.lApiConstructorReady();
     }
 
     @Override
@@ -358,6 +347,11 @@ public class LApiImpl implements LApi {
         }
     }
 
+    @Override
+    public void waitUntilLApiReadyEvent() throws InterruptedException {
+        lApiReadyListener.waitUntilLApiReadyEvent();
+    }
+
     //Getter
 
 
@@ -383,10 +377,11 @@ public class LApiImpl implements LApi {
      * <p>
      *     <b>After you finished adjusting your presence, you will have to call {@link SelfUserPresenceUpdater#updateNow()}!</b>
      * </p>
-     * @return {@link SelfUserPresenceUpdater}
+     * @return {@link SelfUserPresenceUpdater} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY} is not set.
      */
     @Override
-    public SelfUserPresenceUpdater getSelfPresenceUpdater(){
+    public @Nullable SelfUserPresenceUpdater getSelfPresenceUpdater(){
+        if(gateway == null) return null;
         return gateway.getSelfUserPresenceUpdater();
     }
 
@@ -403,6 +398,11 @@ public class LApiImpl implements LApi {
     @Override
     public @NotNull LApi getLApi() {
         return this;
+    }
+
+    @Override
+    public boolean isGatewayEnabled() {
+        return config.isFlagSet(ConfigFlag.ENABLE_GATEWAY);
     }
 
     @Override
@@ -524,7 +524,24 @@ public class LApiImpl implements LApi {
     public boolean isCopyOldGuildScheduledEventOnUpdateEventEnabled() {
         return config.isFlagSet(ConfigFlag.COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE);
     }
-//api-internal getter
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                      LApi Internal Getter                     *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     *
+     * @return {@link EventTransmitter} used by this {@link LApiImpl}
+     */
+    @ApiStatus.Internal
+    public @NotNull EventTransmitter transmitEvent() {
+        return eventTransmitter;
+    }
 
     /**
      * @see #guildManager
@@ -534,6 +551,7 @@ public class LApiImpl implements LApi {
         return guildManager;
     }
 
+    @ApiStatus.Internal
     public @NotNull Config getConfig() {
         return config;
     }

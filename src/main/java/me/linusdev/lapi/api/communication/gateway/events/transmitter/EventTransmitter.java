@@ -61,7 +61,11 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateE
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.list.LinusLinkedList;
+import me.linusdev.lapi.log.LogInstance;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,7 +80,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
 
     private final @NotNull LApiImpl lApi;
 
-    private final ArrayList<EventListener> listeners = new ArrayList<>(1);
+    private final LinusLinkedList<EventListener> listeners = new LinusLinkedList<>();
 
     /**
      * This stores the specified EventListener. For each {@link EventIdentifier} there is an array of Listener.
@@ -247,6 +251,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onLApiReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onVoiceRegionManagerReady(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_REGION_MANAGER_READY);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onVoiceRegionManagerReady(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

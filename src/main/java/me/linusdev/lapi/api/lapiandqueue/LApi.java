@@ -17,35 +17,22 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.lapi.api.VoiceRegionManager;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
-import me.linusdev.lapi.api.communication.gateway.other.GetGatewayResponse;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.objects.HasLApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
-import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
-import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
-import me.linusdev.lapi.api.objects.permission.Permission;
-import me.linusdev.lapi.api.objects.invite.Invite;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
-import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.request.RequestFactory;
 import org.jetbrains.annotations.ApiStatus;
@@ -54,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -182,6 +168,12 @@ public interface LApi extends HasLApi {
      */
     void checkQueueThread() throws LApiRuntimeException;
 
+    /**
+     * waits the current thread until {@link EventIdentifier#LAPI_READY LAPI_READY} event hast been triggered.
+     * @throws InterruptedException if interrupted while waiting
+     */
+    void waitUntilLApiReadyEvent() throws InterruptedException;
+
     //Getter
 
     /**
@@ -226,6 +218,12 @@ public interface LApi extends HasLApi {
      * @return {@link GatewayWebSocket} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY ENABLE_GATEWAY} is not enabled.
      */
     @Nullable GatewayWebSocket getGateway();
+
+    /**
+     *
+     * @see ConfigFlag#ENABLE_GATEWAY
+     */
+    boolean isGatewayEnabled();
 
     /**
      * @see ConfigFlag#CACHE_VOICE_REGIONS

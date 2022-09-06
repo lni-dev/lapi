@@ -23,7 +23,6 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.invite.Invite;
@@ -37,14 +36,19 @@ import me.linusdev.lapi.api.templates.message.builder.MentionType;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import me.linusdev.lapi.api.templates.message.builder.TimestampStyle;
 import me.linusdev.lapi.helper.Helper;
+import me.linusdev.lapi.list.LinusLinkedList;
+import me.linusdev.lapi.list.LinusLinkedListEntry;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("removal")
 public class Main {
@@ -54,196 +58,8 @@ public class Main {
         Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
 
-        final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLApi();
+        //final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLApi();
 
-        User currentUser = api.getRequestFactory().getCurrentUser().queueAndWait();
-
-        System.out.println(currentUser.getUsername());
-        System.out.println(currentUser.isBot());
-        System.out.println(currentUser.getId());
-
-        // Private Message
-        // MessageRetriever msgRetriever = new MessageRetriever(api, "765540315905130516", "905348121675071508");
-
-        // GuildImpl Sticker Message
-        //MessageRetriever msgRetriever = new MessageRetriever(api, "751169122775334942", "905396558969847879");
-
-        // GuildImpl Message with Reactions (also animated Emoji) https://ptb.discord.com/channels/317290087383826442/820084724693073921/854807543603003402
-        //MessageRetriever msgRetriever = new MessageRetriever(api, "820084724693073921", "854807543603003402");
-
-        //GuildImpl message pinned
-        //MessageRetriever msgRetriever = new MessageRetriever(api, "714942057260515398", "908716411927547924");
-
-        /*api.getChannelRetriever("765540882387828746").queue(new BiConsumer<Channel, Error>() {
-            @Override
-            public void accept(Channel channel, Error error) {
-                System.out.println("Channel Type:" + channel.getType());
-            }
-        })*/
-        ;
-
-        log.log("getChannelMessageRetriever");
-        api.getRequestFactory().getChannelMessage("820084724693073921", "854807543603003402").queue((message, error) -> {
-            if (error != null) error.getThrowable().printStackTrace();
-            Reaction[] reactions = message.getReactions();
-
-            Reaction reaction = reactions[0];
-            api.getRequestFactory().getReactions(message.getChannelId(), message.getId(), reaction.getEmoji(), null, 100).queue((list, e) -> {
-                if (e != null){
-                    e.getThrowable().printStackTrace();
-                    return;
-                }
-                System.out.println(Arrays.toString(list.stream().map(User::getUsername).toArray()));
-            });
-        });
-
-        log.log("getChannelInvites");
-        api.getRequestFactory().getChannelInvites("387972238256898048").queue((invites, error) -> {
-            System.out.println("retrieved invites....");
-            if (error != null) {
-                System.out.println("error");
-                log.error(error.getThrowable());
-                //error.getThrowable().printStackTrace();
-                return;
-            }
-            for (Invite invite : invites) {
-                System.out.println(invite.getCode());
-            }
-        });
-
-        api.getRequestFactory().getPinnedMessages("912377387868639282").queue(((messages, error) -> {
-            if(error != null){
-                System.out.println(error);
-                return;
-            }
-
-            for(MessageImplementation message : messages){
-                System.out.println("Pinned Message: " + message.getContent());
-            }
-
-        }));
-
-        api.getRequestFactory().getThreadMember("912398268238037022", "247421526532554752").queue((member, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                if(error.getThrowable() instanceof InvalidDataException){
-                    InvalidDataException e = (InvalidDataException) error.getThrowable();
-                    System.out.println(e.getMissingFields());
-                    System.out.println(e.getData().toJsonString().toString());
-                }
-                return;
-            }
-
-            System.out.println(member.getJoinTimestamp());
-            System.out.println(member.getUserId());
-        });
-
-        api.getRequestFactory().getThreadMembers("912398268238037022").queue((threadMembers, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                return;
-            }
-
-            System.out.println("list thread member: ");
-
-            for(ThreadMember member : threadMembers){
-                System.out.println(member.getUserId());
-                System.out.println(member.getJoinTimestamp());
-            }
-        });
-
-
-        api.getRequestFactory().listActiveThreads("912377387868639282").queue((threadResponseBody, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                System.out.println(((InvalidDataException) error.getThrowable()).getData().toJsonString());
-                return;
-            }
-            System.out.println("getListActiveThreadsRetriever...");
-
-            for(Thread thread : threadResponseBody.getThreads()){
-                System.out.println(thread.getName());
-            }
-
-            for(ThreadMember member : threadResponseBody.getMembers()){
-                System.out.println(member.getUserId());
-            }
-
-            System.out.println(threadResponseBody.hasMore());
-        });
-
-        api.getRequestFactory().listPublicArchivedThreads("912377387868639282", null, null).queue((listThreadsResponseBody, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                return;
-            }
-
-            System.out.println("getListPublicArchivedThreadsRetriever...");
-
-            for(Thread thread : listThreadsResponseBody.getThreads()){
-                System.out.println(thread.getName());
-            }
-
-            for(ThreadMember member : listThreadsResponseBody.getMembers()){
-                System.out.println(member.getUserId());
-            }
-
-            System.out.println(listThreadsResponseBody.hasMore());
-
-        });
-
-        api.getRequestFactory().getUser("378980330281107457").queue((user, error) -> {
-            if(error != null){
-                System.out.println("Error");
-                error.getThrowable().printStackTrace();
-                if(error.getThrowable() instanceof InvalidDataException){
-                    System.out.println("Invalid Data:");
-                    System.out.println(((InvalidDataException) error.getThrowable()).getData().toJsonString());
-                }
-                return;
-            }
-
-            System.out.println("Username: " + user.getUsername());
-        });
-
-
-        new MessageBuilder(api, null)
-                .setTTS(false)
-                .appendContent("Hi ")
-                .appendUserMention("765495017552478208")
-                .appendContent(", how are you doing?")
-                .appendContent("<@247421526532554752>")
-                .appendEmoji(new EmojiObject(api, Snowflake.fromString("776601688961712148"), "closecirclefill_red", null, null, null, null, false, null))
-                .appendTimestamp(System.currentTimeMillis(), TimeUnit.MILLISECONDS, TimestampStyle.LONG_DATE_WITH_TIME)
-                .getQueueable("912377387868639282")
-                .queue();
-
-        api.getRequestFactory().getChannelMessage("912377387868639282", "913107065285800026").queue(message -> {
-            String content = message.getContent();
-            Reaction reaction = message.getReactions()[1];
-            System.out.println(reaction.getData().toJsonString());
-            System.out.println(content);
-        });
-
-        Embed e = new EmbedBuilder()
-                .setTitle("Hi")
-                .setDescription(MentionType.USER.get(new PlaceHolder(PlaceHolder.USER_ID, LApi.CREATOR_ID))).build();
-
-        api.getRequestFactory().createMessage("912377387868639282", e).queue();
-
-        new MessageBuilder(api)
-                .addEmbed(e)
-                .allowAllUserMentions()
-                .getQueueable("912377387868639282").queue(message -> System.out.println(message.getTimestamp()));
-
-        //7534015381736783882
-        //rainbowEnergy
-
-        /*LApiHttpBody body = new LApiHttpBody(0, message.getData());
-        LApiHttpRequest request = new LApiHttpRequest("https://httpbin.org/patch", Method.PATCH, body);
-        HttpRequest r = request.getHttpRequest();
-        HttpResponse<String> response = api.getClient().send(r, HttpResponse.BodyHandlers.ofString());
-        System.out.println(response.body());*/
 
     }
 }
