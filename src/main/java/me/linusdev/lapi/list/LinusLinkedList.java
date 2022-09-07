@@ -104,9 +104,22 @@ public class LinusLinkedList<O> implements List<O> {
 
     }
 
-    void remove(LinusLinkedListEntry<O> beforeEntry, LinusLinkedListEntry<O> removeEntry) {
+    /**
+     * removes removeEntry from this lit
+     * @param beforeEntry the entry before the entry to remove
+     * @param removeEntry entry to remove
+     */
+    void remove(@NotNull LinusLinkedListEntry<O> beforeEntry, @NotNull LinusLinkedListEntry<O> removeEntry) {
         synchronized (lock) {
-            beforeEntry.setNext(removeEntry.getNext());
+            if(removeEntry == tail) {
+                //we are removing the last entry, so we need to change the tail
+                tail = beforeEntry;
+                beforeEntry.setNext(null);
+
+            } else {
+                beforeEntry.setNext(removeEntry.getNext());
+
+            }
             size--;
         }
     }
