@@ -61,6 +61,7 @@ public class LApiReadyListener implements EventListener, HasLApi {
                 && voiceRegionManagerReady.get()
                 && guildsReadyEvent.get()) {
             lApi.transmitEvent().onLApiReady(lApi, new LApiReadyEvent(lApi));
+            firedReadyEvent.set(true);
             lApi.getEventTransmitter().removeListener(this);
             this.notifyAll();
         }
