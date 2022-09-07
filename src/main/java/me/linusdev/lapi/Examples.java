@@ -38,8 +38,8 @@ public class Examples {
 
     public static void main(String... args) throws LApiException, IOException, ParseException, InterruptedException {
 
-        Config config = ConfigBuilder.getDefault("TOKEN").build();
-        LApi lApi = ConfigBuilder.getDefault("TOKEN").buildLApi();
+        Config config = ConfigBuilder.getDefault("TOKEN", true).build();
+        LApi lApi = ConfigBuilder.getDefault("TOKEN", true).buildLApi();
 
         lApi.getEventTransmitter().addListener(new EventListener() {
             @Override

@@ -133,26 +133,36 @@ public class ConfigBuilder implements Datable {
     /**
      * <p>
      *     Creates a new {@link ConfigBuilder} with all commonly required stuff enabled.
-     *     The {@link me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket gateway} has
-     *     all intents enabled and will receive all events.
-     * </p>
-     * <p>
-     *    You can directly {@link #buildLApi() build a LApi} with the returned config builder
-     * </p>
-     * <p>
      *     See method source code for all details.
      * </p>
-     * @param token string token
+     * <p>
+     *    You can directly {@link #buildLApi() build a LApi} with the returned config builder.
+     * </p>
+     * <p>
+     *     If addAllIntents is {@code true} all {@link GatewayIntent gateway intents} will be enabled.
+     *     Also the <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">privileged intents</a> !<br>
+     *     If addAllIntents is {@code false} no {@link GatewayIntent gateway intents} will be enabled. You can add
+     *     specific intents with the {@link #adjustGatewayConfig(Consumer)} method:
+     *     <pre>{@code
+     *     configBuilder.adjustGatewayConfig(gb -> {
+     *                     gb.addIntent(GatewayIntent.INTENT_NAME);
+     *                 });
+     *     }</pre>
+     * </p>
+     * @param token your bot token
+     * @param addAllIntents whether to enable all {@link GatewayIntent gateway intents}
      * @return new {@link ConfigBuilder}
      */
     @Contract(value = "_ -> new", pure = true)
-    public static @NotNull ConfigBuilder getDefault(@NotNull String token){
+    public static @NotNull ConfigBuilder getDefault(@NotNull String token, boolean addAllIntents){
 
         return new ConfigBuilder(token)
                 .enable(ConfigFlag.CACHE_VOICE_REGIONS)
                 .enable(ConfigFlag.ENABLE_GATEWAY)
+                .enable(ConfigFlag.BASIC_CACHE)
+                .enable(ConfigFlag.CACHE_GUILDS)
                 .adjustGatewayConfig(gb -> {
-                    gb.addIntent(GatewayIntent.ALL);
+                    if(addAllIntents) gb.addIntent(GatewayIntent.ALL);
                 });
     }
 
