@@ -67,12 +67,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * <h1 style="padding:0;margin:0;">Event Listener</h2>
  * <p>
  *     This listener can listen to events if added to the {@link AbstractEventTransmitter EventTransmitter}.
  * </p>
  * <p>
  *     Even though all methods are {@code default} they do not have any code in them, and you should not call any
- *     super methods. The methods are {@code default} simply for the reason, that you wont need all of them every time
+ *     super methods. The methods are {@code default} simply for the reason, that you wont need all of them every time.
+ *     The only listener with some default code is the {@link #onUncaughtException(Throwable)}, which will log the Exception.
+ * </p>
+ * <p>
+ *     If you want to execute time consuming operations in a listener, you should always start a new thread.
+ *     You should also never use {@link Object#wait() wait()} or any other waiting operation inside any listener.
  * </p>
  * <br>
  * <h2 style="padding:0;margin:0;">How to add a listener to the event transmitter?</h2>
@@ -123,8 +129,7 @@ public interface EventListener {
     default void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {}
 
     /**
-     * TODO: when does it happen / make it happen<br>
-     * This event will only happen once.
+     * @see EventIdentifier#LAPI_READY
      */
     default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
 

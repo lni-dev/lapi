@@ -56,6 +56,7 @@ import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
+import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
@@ -79,8 +80,19 @@ import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
  * </p>
  *
  * <p>
- *     Almost all events (except {@link #LAPI_READY}) require {@link ConfigFlag#ENABLE_GATEWAY}. This won't be listed below.
+ *     Almost all events require {@link ConfigFlag#ENABLE_GATEWAY}. This won't be listed below.
  * </p>
+ * <p>
+ *
+ * <a style="margin-bottom:0">Events that do not require {@link ConfigFlag#ENABLE_GATEWAY} are:</a>
+ * <ul style="margin-top:0">
+ *     <li>
+ *         {@link #LAPI_READY}
+ *     </li>
+ *     <li>
+ *         {@link #VOICE_REGION_MANAGER_READY}
+ *     </li>
+ * </ul>
  *
  */
 public enum EventIdentifier{
@@ -89,7 +101,6 @@ public enum EventIdentifier{
      * LApi specific
      */
     UNKNOWN,
-
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
@@ -121,6 +132,17 @@ public enum EventIdentifier{
 
     /**
      * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
+     * <br><br>
+     * <p>
+     *     This event will only happen once after all of the following events were triggered:
+     *     {@link #READY}, {@link #GUILDS_READY}, {@link #VOICE_REGION_MANAGER_READY}. If any of these events are disabled
+     *     in the {@link ConfigBuilder#setFlags(long) config}, they will be ignored and the {@link #LAPI_READY} event will still fire.
+     * </p>
+     * <p>
+     *     If you want to execute code right after {@link ConfigBuilder#buildLApi() building} a {@link LApi lApi} instance
+     *     it is recommended to wait for this event to happen first. You can wait for it by using {@link LApi#waitUntilLApiReadyEvent()}
+     *     or listening to this event.
+     * </p>
      */
     LAPI_READY,
 
