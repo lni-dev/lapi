@@ -38,7 +38,6 @@ public class ArrayRetriever<C, R> extends DataRetriever<ArrayList<R>>{
 
     /**
      *
-     * @param lApi {@link LApi}
      * @param query {@link Query} for the HttpRequest
      * @param converter {@link Converter} to convert from {@link C} to {@link R}
      */

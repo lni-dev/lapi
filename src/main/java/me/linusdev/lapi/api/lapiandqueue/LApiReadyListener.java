@@ -112,11 +112,6 @@ public class LApiReadyListener implements EventListener, HasLApi {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return this == o;
-    }
-
-    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }
