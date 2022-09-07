@@ -21,6 +21,9 @@ import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 /**
  * * {@link GatewayEvent#THREAD_MEMBERS_UPDATE THREAD_MEMBERS_UPDATE} contains different data depending on which intents are used.<br>
  * ** {@link GatewayEvent#GUILD_SCHEDULED_EVENT_USER_ADD GUILD_SCHEDULED_EVENT_USER_ADD} and
@@ -76,8 +79,7 @@ import org.jetbrains.annotations.Nullable;
  *             {@link #GUILD_MEMBERS}
  *         </li>
  *         <li>
- *             Message content will become a privileged intent in 2022 (for large bots).
- *             <a href="https://support-dev.discord.com/hc/en-us/articles/4404772028055" target="_top">Learn more here</a>.
+ *             {@link #MESSAGE_CONTENT} (<a href="https://discord.com/developers/docs/topics/gateway#message-content-intent" target="_top">Learn more here</a>)
  *         </li>
  *     </ul>
  *     To specify these intents, you need to activate them on the Discord website. Best you read it yourself
@@ -151,7 +153,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILDS (1 << 0),
+    GUILDS (1 << 0, false),
 
     /**
      *   <ul>
@@ -169,7 +171,7 @@ public enum GatewayIntent implements SimpleDatable {
      *       </li>
      *   </ul>
      */
-    GUILD_MEMBERS(1 << 1),
+    GUILD_MEMBERS(1 << 1, true),
 
     /**
      * <ul>
@@ -181,7 +183,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_BANS(1 << 2),
+    GUILD_BANS(1 << 2, false),
 
     /**
      * <ul>
@@ -193,7 +195,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_EMOJIS_AND_STICKERS(1 << 3),
+    GUILD_EMOJIS_AND_STICKERS(1 << 3, false),
 
     /**
      * <ul>
@@ -211,7 +213,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_INTEGRATIONS (1 << 4),
+    GUILD_INTEGRATIONS (1 << 4, false),
 
     /**
      * <ul>
@@ -220,7 +222,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_WEBHOOKS (1 << 5),
+    GUILD_WEBHOOKS (1 << 5, false),
 
     /**
      * <ul>
@@ -232,7 +234,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_INVITES (1 << 6),
+    GUILD_INVITES (1 << 6, false),
 
     /**
      * <ul>
@@ -241,7 +243,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_VOICE_STATES (1 << 7),
+    GUILD_VOICE_STATES (1 << 7, false),
 
     /**
      * <ul>
@@ -250,7 +252,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_PRESENCES (1 << 8),
+    GUILD_PRESENCES (1 << 8, true),
 
     /**
      * <ul>
@@ -268,7 +270,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_MESSAGES (1 << 9),
+    GUILD_MESSAGES (1 << 9, false),
 
     /**
      * <ul>
@@ -286,7 +288,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_MESSAGE_REACTIONS (1 << 10),
+    GUILD_MESSAGE_REACTIONS (1 << 10, false),
 
     /**
      * <ul>
@@ -295,7 +297,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_MESSAGE_TYPING (1 << 11),
+    GUILD_MESSAGE_TYPING (1 << 11, false),
 
     /**
      * <ul>
@@ -313,7 +315,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    DIRECT_MESSAGES (1 << 12),
+    DIRECT_MESSAGES (1 << 12, false),
 
     /**
      *
@@ -332,13 +334,13 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    DIRECT_MESSAGE_REACTIONS (1 << 13),
+    DIRECT_MESSAGE_REACTIONS (1 << 13, false),
 
     /**
      * This is a special case as it doesn't represent individual events, but rather affects the data sent for most events
      * that could contain message content fields (content, attachments, embeds, and components).
      */
-    MESSAGE_CONTENT (1 << 15),
+    MESSAGE_CONTENT (1 << 15, true),
 
     /**
      * <ul>
@@ -347,7 +349,7 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    DIRECT_MESSAGE_TYPING (1 << 14),
+    DIRECT_MESSAGE_TYPING (1 << 14, false),
 
     /**
      * <ul>
@@ -368,15 +370,21 @@ public enum GatewayIntent implements SimpleDatable {
      *     </li>
      * </ul>
      */
-    GUILD_SCHEDULED_EVENTS (1 << 16),
+    GUILD_SCHEDULED_EVENTS (1 << 16, false),
     ;
 
     public static final GatewayIntent[] ALL = values();
+    public static final GatewayIntent[] ALL_WITHOUT_PRIVILEGED =
+            Arrays.stream(values())
+            .filter(GatewayIntent::isPrivileged)
+            .toArray(GatewayIntent[]::new);
 
     private final int value;
+    private final boolean privileged;
 
-    GatewayIntent(int value) {
+    GatewayIntent(int value, boolean privileged) {
         this.value = value;
+        this.privileged = privileged;
     }
 
     /**
@@ -421,6 +429,10 @@ public enum GatewayIntent implements SimpleDatable {
             flags = flags | intent.value;
 
         return flags;
+    }
+
+    public boolean isPrivileged() {
+        return privileged;
     }
 
     /**
