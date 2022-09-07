@@ -46,6 +46,7 @@ import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManagerImpl;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
@@ -73,12 +74,15 @@ import java.util.function.Supplier;
 public class ConfigBuilder implements Datable {
 
     public final static String TOKEN_KEY = "token";
+    public final static String APPLICATION_ID_KEY = "application_id";
+    public static final String API_VERSION_KEY = "apiVersion";
     public final static String FLAGS_KEY = "flags";
     public final static String GATEWAY_CONFIG_KEY = "gateway_config";
 
     public final static long DEFAULT_FLAGS = 0L;
 
     private String token = null;
+    private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
@@ -215,6 +219,23 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setToken(@NotNull String token){
         this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional / Not Recommended</em><br>
+     * Default: {@code null}
+     * <p>
+     *     The application id of your bot. This is only useful in the unlikely case, that both the application id is not the same as
+     *     the bot user id and {@link ConfigFlag#ENABLE_GATEWAY} is not set.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default
+     * </p>
+     * @param applicationId your bot application id
+     */
+    public ConfigBuilder setApplicationId(@Nullable Snowflake applicationId) {
+        this.applicationId = applicationId;
         return this;
     }
 
@@ -479,7 +500,6 @@ public class ConfigBuilder implements Datable {
      */
     @Contract("_ -> this")
     public ConfigBuilder fromData(@NotNull SOData data) throws InvalidDataException {
-        String token = (String) data.get(TOKEN_KEY);
         Object flags = data.getOrDefault(FLAGS_KEY, DEFAULT_FLAGS);
         SOData gateway = (SOData) data.get(GATEWAY_CONFIG_KEY);
 
@@ -491,9 +511,20 @@ public class ConfigBuilder implements Datable {
             }
         }
 
-        this.token = token == null ? this.token : token;
-
         if(gateway != null) gatewayConfigBuilder.fromData(gateway);
+
+        this.token = (String) data.getOrDefaultBoth(TOKEN_KEY, this.token);
+
+        data.processIfContained(APPLICATION_ID_KEY, o -> {
+            if(o == null) return;
+            this.applicationId = Snowflake.fromString((String) o);
+        });
+
+        data.processIfContained(API_VERSION_KEY, o -> {
+            if(o == null) return;
+            this.apiVersion = ApiVersion.fromInt(((Number) o).intValue());
+        } );
+
         return this;
     }
 
@@ -554,7 +585,7 @@ public class ConfigBuilder implements Datable {
                 flags,
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
-                Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
+                applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
@@ -590,7 +621,9 @@ public class ConfigBuilder implements Datable {
 
         SOData data = SOData.newOrderedDataWithKnownSize(3);
 
-        data.add(TOKEN_KEY, token);
+        data.addIfNotNull(TOKEN_KEY, token);
+        data.addIfNotNull(APPLICATION_ID_KEY, applicationId);
+        data.addIfNotNull(API_VERSION_KEY, apiVersion);
         data.add(FLAGS_KEY, ConfigFlag.toData(flags));
         data.add(GATEWAY_CONFIG_KEY, gatewayConfigBuilder);
 

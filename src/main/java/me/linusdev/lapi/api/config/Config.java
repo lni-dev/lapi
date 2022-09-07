@@ -31,9 +31,11 @@ import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.function.Supplier;
@@ -43,6 +45,7 @@ public class Config {
     private final long flags;
     private final @NotNull Supplier<Queue<Future<?>>> queueSupplier;
     private final @NotNull String token;
+    private final @Nullable Snowflake applicationId;
     private final @NotNull ApiVersion apiVersion;
     private final @NotNull GatewayConfig gatewayConfig;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
@@ -58,7 +61,7 @@ public class Config {
     private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
-                  @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
+                  @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
                   @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
@@ -66,6 +69,7 @@ public class Config {
         this.token = token;
 
         this.queueSupplier = queueSupplier;
+        this.applicationId = applicationId;
         this.apiVersion = apiVersion;
         this.gatewayConfig = gatewayConfig;
         this.guildManagerFactory = guildManagerFactory;
@@ -99,6 +103,10 @@ public class Config {
 
     public @NotNull String getToken() {
         return token;
+    }
+
+    public @Nullable Snowflake getApplicationId() {
+        return applicationId;
     }
 
     public @NotNull ApiVersion getApiVersion() {

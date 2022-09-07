@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
@@ -61,6 +62,7 @@ import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 
 /**
  * <p>
@@ -147,12 +149,19 @@ public enum EventIdentifier{
     LAPI_READY,
 
     /**
-     * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
+     * identifier for {@link EventListener#onVoiceRegionManagerReady(LApi, VoiceRegionManagerReadyEvent)}.
      * <br><br>
      * May be called more than once if {@link VoiceRegionManager#init(int)}
      * or {@link VoiceRegionManager#update()} is called.
      */
     VOICE_REGION_MANAGER_READY,
+
+    /**
+     * identifier for {@link EventListener#onCacheReady(LApi, CacheReadyEvent)}.
+     * <br><br>
+     *
+     */
+    CACHE_READY,
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

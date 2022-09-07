@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
@@ -113,6 +114,9 @@ public class LApiImpl implements LApi {
     //executor
     private final ThreadPoolExecutor executor;
 
+    //cache
+    private final @NotNull Cache cache;
+
     //stores and manages the voice regions
     private final @NotNull VoiceRegionManager voiceRegionManager;
 
@@ -190,6 +194,13 @@ public class LApiImpl implements LApi {
         requestFactory = new RequestFactory(this);
         eventTransmitter = new EventTransmitter(this);
         lApiReadyListener = new LApiReadyListener(this);
+
+        if(config.isFlagSet(ConfigFlag.BASIC_CACHE)){
+            cache = new Cache(this);
+        } else {
+            cache = null;
+        }
+
 
         //VoiceRegions
         this.voiceRegionManager = new VoiceRegionManager(this);
@@ -352,6 +363,18 @@ public class LApiImpl implements LApi {
         lApiReadyListener.waitUntilLApiReadyEvent();
     }
 
+    @Override
+    public void runSupervised(@NotNull Runnable runnable) {
+        executor.execute(() -> {
+            try {
+                runnable.run();
+            }catch (Throwable t) {
+                LogInstance log = Logger.getLogger("Supervised Runnable");
+                log.error(t);
+            }
+        });
+    }
+
     //Getter
 
 
@@ -393,6 +416,11 @@ public class LApiImpl implements LApi {
     @Override
     public @Nullable GatewayWebSocket getGateway() {
         return gateway;
+    }
+
+    @Override
+    public @Nullable Cache getCache() {
+        return cache;
     }
 
     @Override

@@ -18,7 +18,9 @@ package me.linusdev.lapi.api.config;
 
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -247,7 +249,16 @@ public enum ConfigFlag implements SimpleDatable {
      *    you can check the difference between the old object and the updated one.
      * </p>
      */
-    COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE(1 << 24)
+    COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE(1 << 24),
+
+    /**
+     * <p>
+     *     Caches some basic information, like the {@link Cache#getCurrentUserId() current user id} and
+     *     the {@link Cache#getCurrentApplicationId() current application id}. You should always enable this.
+     * </p>
+     * @see LApi#getCache()
+     */
+    BASIC_CACHE(1 << 25),
     ;
 
     private final long value;
@@ -300,7 +311,7 @@ public enum ConfigFlag implements SimpleDatable {
      * @param flags long
      * @return new flags long
      */
-    public long  set(long flags){
+    public long set(long flags){
         return flags | value;
     }
 

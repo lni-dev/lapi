@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
@@ -174,6 +175,17 @@ public interface LApi extends HasLApi {
      */
     void waitUntilLApiReadyEvent() throws InterruptedException;
 
+    /**
+     * This function will probably be changed or adjusted in the future and should not be used, if you
+     * are not willing to change your code
+     * <br><br>
+     * <p>
+     *     This will run given {@link Runnable} in a new thread and if a {@link Throwable} is thrown it
+     *     will be logged.
+     * </p>
+     */
+    @ApiStatus.Internal
+    void runSupervised(@NotNull Runnable runnable);
     //Getter
 
     /**
@@ -218,6 +230,12 @@ public interface LApi extends HasLApi {
      * @return {@link GatewayWebSocket} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY ENABLE_GATEWAY} is not enabled.
      */
     @Nullable GatewayWebSocket getGateway();
+
+    /**
+     *
+     * @return {@link Cache} or {@code null} if {@link ConfigFlag#BASIC_CACHE} is not enabled.
+     */
+    @Nullable Cache getCache();
 
     /**
      *

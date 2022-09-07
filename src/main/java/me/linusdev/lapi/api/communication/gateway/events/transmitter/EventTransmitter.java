@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
@@ -273,6 +274,28 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             for(EventListener listener : listeners){
                 try{
                     listener.onVoiceRegionManagerReady(lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
+        for(EventListener listener : listeners){
+            try{
+                listener.onCacheReady(lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        ArrayList<EventListener> listeners = specifiedListeners.get(CACHE_READY);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try{
+                    listener.onCacheReady(lApi, event);
                 } catch (Throwable t) {
                     listener.onUncaughtException(t);
                 }

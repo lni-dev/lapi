@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
@@ -134,6 +135,8 @@ public interface EventListener {
     default void onLApiReady(@NotNull LApi lApi, @NotNull LApiReadyEvent event) {}
 
     default void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {}
+
+    default void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {}
 
     default void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {}
 

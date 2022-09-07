@@ -18,9 +18,18 @@ package me.linusdev.lapi;
 
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
+import me.linusdev.lapi.api.communication.retriever.query.Link;
+import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.config.ConfigBuilder;
+import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
@@ -40,6 +49,7 @@ import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.list.LinusLinkedListEntry;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -50,7 +60,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SuppressWarnings("removal")
+
 public class Main {
 
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
@@ -58,8 +68,27 @@ public class Main {
         Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
 
-        //final LApi api = new ConfigBuilder(Helper.getConfigPath()).buildLApi();
+        ConfigBuilder configBuilder = new ConfigBuilder(Helper.getConfigPath());
+        configBuilder.enable(ConfigFlag.BASIC_CACHE);
+        configBuilder.writeToFile(Helper.getConfigPath(), true);
 
+        final LApi lApi = configBuilder.buildLApi();
+
+        lApi.getEventTransmitter().addListener(new EventListener() {
+            @Override
+            public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
+                System.out.println("onReady");
+            }
+
+            @Override
+            public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
+                System.out.println("cache ready");
+            }
+        });
+
+        lApi.waitUntilLApiReadyEvent();
+
+        System.out.println("yay");
 
     }
 }
