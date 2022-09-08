@@ -61,6 +61,37 @@ public class ApplicationCommandTemplate implements Template, Datable {
         this.type = type;
     }
 
+    public @NotNull String getName() {
+        return name;
+    }
+
+    public @Nullable LocalizationDictionary getNameLocalisations() {
+        return nameLocalisations;
+    }
+
+    public @NotNull String getDescription() {
+        return description;
+    }
+
+    public @Nullable LocalizationDictionary getDescriptionLocalisations() {
+        return descriptionLocalisations;
+    }
+
+    public ApplicationCommandOption[] getOptions() {
+        return options;
+    }
+
+    public @Nullable Permissions getDefaultMemberPermissions() {
+        return defaultMemberPermissions;
+    }
+
+    public @Nullable Boolean getDmPermissions() {
+        return dmPermissions;
+    }
+
+    public @Nullable ApplicationCommandType getType() {
+        return type;
+    }
 
     @Override
     public SOData getData() {

@@ -337,10 +337,10 @@ public enum Link implements AbstractLink{
      * </p>
      * <ul style="margin-bottom:0;padding-bottom:0;margin-top:0;padding-top:0;">
      *      <li>
-     *          {@link #AFTER_KEY} get users after this user ID. Default: absent
+     *          {@link RequestFactory#AFTER_KEY} get users after this user ID. Default: absent
      *      </li>
      *      <li>
-     *          {@link #LIMIT_KEY} max number of users to return (1-100). Default: 25
+     *          {@link RequestFactory#LIMIT_KEY} max number of users to return (1-100). Default: 25
      *      </li>
      * </ul>
      *

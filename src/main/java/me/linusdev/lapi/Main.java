@@ -64,14 +64,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Main {
 
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
-
         Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
 
         ConfigBuilder configBuilder = new ConfigBuilder(Helper.getConfigPath());
-        configBuilder.enable(ConfigFlag.BASIC_CACHE);
-        configBuilder.writeToFile(Helper.getConfigPath(), true);
-
         final LApi lApi = configBuilder.buildLApi();
 
         lApi.getEventTransmitter().addListener(new EventListener() {

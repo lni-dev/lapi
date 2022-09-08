@@ -68,7 +68,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * <h1 style="padding:0;margin:0;">Event Listener</h2>
+ * <h2 style="padding:0;margin:0;">Event Listener</h2>
  * <p>
  *     This listener can listen to events if added to the {@link AbstractEventTransmitter EventTransmitter}.
  * </p>

@@ -68,7 +68,7 @@ import java.util.function.Supplier;
  * This class can build a {@link Config} or a {@link LApi}
  * @see #build()
  * @see #buildLApi()
- * @see #getDefault(String)
+ * @see #getDefault(String, boolean)
  */
 @SuppressWarnings("UnusedReturnValue")
 public class ConfigBuilder implements Datable {
@@ -143,12 +143,13 @@ public class ConfigBuilder implements Datable {
      *     Also the <a href="https://discord.com/developers/docs/topics/gateway#privileged-intents">privileged intents</a> !<br>
      *     If privilegedIntents is {@code false} only not privileged {@link GatewayIntent gateway intents} will be enabled. You can add
      *     specific intents with the {@link #adjustGatewayConfig(Consumer)} method:
+     *     </p>
      *     <pre>{@code
      *     configBuilder.adjustGatewayConfig(gb -> {
      *                     gb.addIntent(GatewayIntent.INTENT_NAME);
      *                 });
      *     }</pre>
-     * </p>
+     *
      * @param token your bot token
      * @param privilegedIntents {@code true} will enable all {@link GatewayIntent gateway intents}. {@code false} will
      *                                      enable all {@link GatewayIntent gateway intents}, that are not privileged.

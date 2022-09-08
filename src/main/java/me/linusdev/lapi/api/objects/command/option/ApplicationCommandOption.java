@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 /**
  *
- * <h1 style="margin-bottom:0;">Option Name and Description Rules</h1>
+ * <h2 style="margin-bottom:0;">Option Name and Description Rules</h2>
  * <ul>
  *     <li>
  *         name length: {@value ApplicationCommandOption#NAME_MIN_CHARS} - {@value ApplicationCommandOption#NAME_MAX_CHARS} character

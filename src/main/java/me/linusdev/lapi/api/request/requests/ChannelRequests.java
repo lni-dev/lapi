@@ -347,7 +347,7 @@ public interface ChannelRequests extends HasLApi {
      * <p>
      *     This is used to retrieve the {@link User users}, that have reacted with a specific {@link Emoji}.<br>
      *     If you want to retrieve more than 100 {@link User users},
-     *     you will have to chain {@link #getReactionsRetriever(String, String, Emoji, String, Integer)}.
+     *     you will have to chain {@link #getReactions(String, String, Emoji, String, Integer)}.
      * </p>
      *
      * @param channelId the id of the {@link Channel}
@@ -578,7 +578,7 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more with {@link #getPublicArchivedThreadsRetriever(String, ISO8601Timestamp, Integer)}
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more with {@link #listPublicArchivedThreads(String, ISO8601Timestamp, Integer)}
      * </p>
      *
      * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
