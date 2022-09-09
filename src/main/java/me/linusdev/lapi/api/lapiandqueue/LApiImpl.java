@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.cache.Cache;
+import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
@@ -77,6 +78,9 @@ public class LApiImpl implements LApi {
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
 
+    //Caller Class
+    private final @NotNull Class<?> callerClass;
+
     //Config
     private @NotNull final String token;
     private @NotNull final Config config;
@@ -111,11 +115,14 @@ public class LApiImpl implements LApi {
     @NotNull final EventTransmitter eventTransmitter;
     @Nullable final GatewayWebSocket gateway;
 
-    //executor
+    //Executor
     private final ThreadPoolExecutor executor;
 
-    //cache
+    //Cache
     private final @NotNull Cache cache;
+
+    //Command Manager
+    private final @NotNull CommandManager commandManager;
 
     //stores and manages the voice regions
     private final @NotNull VoiceRegionManager voiceRegionManager;
@@ -131,6 +138,9 @@ public class LApiImpl implements LApi {
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
     public LApiImpl(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
+        //Caller Class
+        this.callerClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+
         //Config
         this.token = config.getToken();
         this.config = config;
@@ -200,6 +210,8 @@ public class LApiImpl implements LApi {
         } else {
             cache = null;
         }
+
+        commandManager = new CommandManager(this);
 
 
         //VoiceRegions
@@ -577,6 +589,10 @@ public class LApiImpl implements LApi {
     @ApiStatus.Internal
     public @Nullable GuildManager getGuildManager() {
         return guildManager;
+    }
+
+    public @NotNull Class<?> getCallerClass() {
+        return callerClass;
     }
 
     @ApiStatus.Internal

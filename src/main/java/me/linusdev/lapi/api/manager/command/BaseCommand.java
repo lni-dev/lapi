@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.manager.command;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
@@ -31,20 +31,56 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
+ * <h2>Register your Command</h2>
+ * You can
+ * <ul>
+ *     <li>
+ *         either add the {@link Command} annotation to your class that extends {@link BaseCommand}
+ *         and add the following dependency to your build.gradle:
+ *         <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
+ *     </li>
+ *     <li>
+ *         or manually add it to the {@link Config}.<br>
+ *         TODO: add @link how to add to config
+ *     </li>
+ * </ul>
+ *
+ * If your command is registered, it will be automatically managed by {@link LApi}.
+ *
+ * <h2>Requirements</h2>
+ * One of the following must be met:
+ * <ul>
+ *     <li>
+ *         You have overwritten {@link #create()} to return your commands {@link ApplicationCommandTemplate template}.
+ *         Your command can already be uploaded to discord, but does not have to be.
+ *     </li>
+ *     <li>
+ *         Your command is already uploaded to discord and you a have overwritten the {@link #getId()} function to
+ *         return your command's id.
+ *     </li>
+ *     <li>
+ *         Your command is already uploaded to discord and you have overwritten the functions
+ *         {@link #getScope()}, {@link #getType()} and {@link #getName()} to return the values corresponding to your command.
+ *     </li>
+ *
+ * </ul>
  *
  */
 @Command
 public abstract class BaseCommand implements HasLApi {
 
-    protected final @NotNull LApi lApi;
+    /**
+     * Will be available, after the {@link CommandManager} has called {@link #setlApi(LApi)}.<br><br>
+     * Will always be {@code null} in the constructor!<br>
+     * Will never be {@code null} in {@link #getId()}, {@link #getName()}, {@link #getScope()}, {@link #getType()},
+     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent)}.
+     * (given that these functions are only called by the {@link CommandManager})
+     */
+    protected LApi lApi;
     private final @NotNull AtomicBoolean connected = new AtomicBoolean(false);
 
     private @Nullable ApplicationCommandTemplate template;
     private @Nullable ApplicationCommand connectedCommand;
-
-    public BaseCommand(@NotNull LApi lApi) {
-        this.lApi = lApi;
-    }
 
     @ApiStatus.OverrideOnly
     public @Nullable String getId() {
@@ -64,6 +100,10 @@ public abstract class BaseCommand implements HasLApi {
         return getTemplate().getName();
     }
 
+    /**
+     *
+     * @return {@link ApplicationCommandType}
+     */
     @ApiStatus.OverrideOnly
     public @Nullable ApplicationCommandType getType() {
         if(getTemplate() == null) {
@@ -81,18 +121,30 @@ public abstract class BaseCommand implements HasLApi {
         return type;
     }
 
+    /**
+     * @return {@link CommandScope}
+     */
     @ApiStatus.OverrideOnly
     public abstract @NotNull CommandScope getScope();
 
+
     @ApiStatus.Internal
     public final @Nullable ApplicationCommandTemplate getTemplate() {
-        if(template == null) return create();
+        if(template == null) template = create();
         return template;
     }
 
+    /**
+     * You can easily create a {@link ApplicationCommandTemplate} using a {@link ApplicationCommandBuilder}.
+     * @return your {@link ApplicationCommandTemplate}
+     */
     @ApiStatus.OverrideOnly
     protected abstract @Nullable ApplicationCommandTemplate create();
 
+    /**
+     * Respond to users that interacted with your command
+     * @param event {@link InteractionCreateEvent}
+     */
     @ApiStatus.OverrideOnly
     public abstract void onInteract(InteractionCreateEvent event);
 
@@ -110,6 +162,18 @@ public abstract class BaseCommand implements HasLApi {
         this.connectedCommand = connectedCommand;
     }
 
+    /**
+     * called by the {@link CommandManager}
+     * @param lApi {@link LApi}
+     */
+    @ApiStatus.Internal
+    public void setlApi(@NotNull LApi lApi) {
+        this.lApi = lApi;
+    }
+
+    /**
+     * @see #lApi
+     */
     @Override
     public final @NotNull LApi getLApi() {
         return lApi;

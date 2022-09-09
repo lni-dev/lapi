@@ -18,6 +18,11 @@ repositories {
     mavenCentral()
 }
 
+tasks.named('compileJava') {
+    // use the project's version or define one directly
+    options.javaModuleVersion = provider { project.version }
+}
+
 tasks.named('jar') {
     manifest {
         attributes('Implementation-Title': 'LApi',

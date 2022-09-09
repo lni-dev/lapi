@@ -41,7 +41,23 @@ public class Helper {
         return path;
     }
 
+    /**
+     *
+     * @return Path to the currently executed .jar file
+     */
+    @NotNull
+    public static Path getJarPath(Class<?> caller) throws URISyntaxException {
+        Path path = Paths.get(caller.getProtectionDomain().getCodeSource().getLocation().toURI());
+
+        if (!path.toString().endsWith(".jar")) {
+            //we are in IntelliJJ run
+            path = Paths.get(DEBUG_PATH);
+        }
+        return path;
+    }
+
     public static Path getConfigPath() throws URISyntaxException {
-        return getJarPath().getParent().resolve("config.json");
+        Class<?> caller = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+        return getJarPath(caller).getParent().resolve("config.json");
     }
 }
