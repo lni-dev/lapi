@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.communication.exceptions;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 
-public class LApiIllegalStateException extends LApiException {
+public class LApiIllegalStateException extends LApiRuntimeException {
 
     public LApiIllegalStateException(String message) {
         super(message);

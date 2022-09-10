@@ -48,6 +48,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * If your command is registered, it will be automatically managed by {@link LApi}.
  *
  * <h2>Requirements</h2>
+ * The following requirements must always be met:
+ * <ul>
+ *     <li>
+ *         You have overwritten {@link #getScope()} to return the scope of your command
+ *         ({@link CommandScope#GUILD GUILD} or {@link CommandScope#GLOBAL GLOBAL})
+ *     </li>
+ * </ul>
  * One of the following must be met:
  * <ul>
  *     <li>
@@ -60,7 +67,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *     </li>
  *     <li>
  *         Your command is already uploaded to discord and you have overwritten the functions
- *         {@link #getScope()}, {@link #getType()} and {@link #getName()} to return the values corresponding to your command.
+ *         {@link #getType()} and {@link #getName()} to return the values corresponding to your command.
  *     </li>
  *
  * </ul>
@@ -147,6 +154,16 @@ public abstract class BaseCommand implements HasLApi {
      */
     @ApiStatus.OverrideOnly
     public abstract void onInteract(InteractionCreateEvent event);
+
+    /**
+     * Handle errors, that happen while working with your command. For example if your command is missing information
+     * or does not meet the {@link BaseCommand requirements}.
+     * <br><br>
+     * Usually {@link Throwable#printStackTrace()}.
+     * @param error error relate to your command
+     */
+    @ApiStatus.OverrideOnly
+    public abstract void onError(Throwable error);
 
     /**
      * Whether this command represents a discord command

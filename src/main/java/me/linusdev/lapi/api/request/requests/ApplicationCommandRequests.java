@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
@@ -25,6 +27,7 @@ import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
+import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
@@ -49,7 +52,7 @@ public interface ApplicationCommandRequests extends HasLApi {
 
     /**
      *
-     * Fetch all the global commands for your application.
+     * Fetch all global commands for your application.
      *
      * @param applicationId id of your application
      * @param withLocalizations {@code true} to include {@link LocalizationDictionary localizations} in the response {@link ApplicationCommand}s.
@@ -66,6 +69,28 @@ public interface ApplicationCommandRequests extends HasLApi {
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMANDS, queryStringsData,
                 new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
+    }
+
+    /**
+     *
+     * Fetch all global commands for your application.
+     *
+     * @param withLocalizations {@code true} to include {@link LocalizationDictionary localizations} in the response {@link ApplicationCommand}s.
+     *                                      {@code false} to include only the requesters (your) localization.
+     *                                      see <a href="https://discord.com/developers/docs/interactions/application-commands#retrieving-localized-commands">here</a>
+     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link ApplicationCommand}
+     * @throws LApiIllegalStateException if {@link ConfigFlag#BASIC_CACHE} is disabled or {@link EventIdentifier#CACHE_READY} has not yet been triggered.
+     * @see Queueable#queue()
+     * @see Link#GET_GLOBAL_APPLICATION_COMMANDS
+     */
+    default @NotNull Queueable<ArrayList<ApplicationCommand>> getGlobalApplicationCommands(boolean withLocalizations) {
+        if(getLApi().getCache() == null)
+            throw new LApiIllegalStateException("Application id is not cached, because config flag BASIC_CACHE is not enabled.");
+
+        else if(getLApi().getCache().getCurrentApplicationId() == null)
+            throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
+
+        return getGlobalApplicationCommands(getLApi().getCache().getCurrentApplicationId(), withLocalizations);
     }
 
     /**

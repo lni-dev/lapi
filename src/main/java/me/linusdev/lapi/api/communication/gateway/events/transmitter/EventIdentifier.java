@@ -94,6 +94,9 @@ import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
  *     <li>
  *         {@link #VOICE_REGION_MANAGER_READY}
  *     </li>
+ *     <li>
+ *         {@link #CACHE_READY}
+ *     </li>
  * </ul>
  *
  */
@@ -151,15 +154,33 @@ public enum EventIdentifier{
     /**
      * identifier for {@link EventListener#onVoiceRegionManagerReady(LApi, VoiceRegionManagerReadyEvent)}.
      * <br><br>
-     * May be called more than once if {@link VoiceRegionManager#init(int)}
-     * or {@link VoiceRegionManager#update()} is called.
+     * <p>
+     *      May be called more than once if {@link VoiceRegionManager#init(int)}
+     *      or {@link VoiceRegionManager#update()} is called.
+     * </p>
+     * <br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#CACHE_VOICE_REGIONS}
+     *     </li>
+     * </ul>
      */
     VOICE_REGION_MANAGER_READY,
 
     /**
      * identifier for {@link EventListener#onCacheReady(LApi, CacheReadyEvent)}.
      * <br><br>
-     *
+     * <p>
+     *     Triggers, when the {@link LApi#getCache() basic cache} is ready.
+     * </p>
+     * <br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#BASIC_CACHE}
+     *     </li>
+     * </ul>
      */
     CACHE_READY,
 

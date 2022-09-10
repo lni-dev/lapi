@@ -16,23 +16,26 @@
 
 package me.linusdev.lapi.api.manager.command;
 
-import me.linusdev.lapi.api.interfaces.updatable.IsUpdatable;
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.management.ReflectionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandManager implements Manager {
@@ -40,25 +43,18 @@ public class CommandManager implements Manager {
     private final @NotNull LApiImpl lApi;
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
-    private AtomicBoolean initialized = new AtomicBoolean(false);
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private final ArrayList<BaseCommand> commands;
+    private final ArrayList<BaseCommand> allCommands;
+    private final ArrayList<BaseCommand> globalCommands;
+    private final ArrayList<BaseCommand> guildCommands;
 
     public CommandManager(@NotNull LApiImpl lApi) throws IOException {
         this.lApi = lApi;
+        this.allCommands = new ArrayList<>();
+        this.guildCommands = new ArrayList<>();
+        this.globalCommands = new ArrayList<>();
 
-        log.debug("loading commands with a ServiceLoader");
-        this.commands = new ArrayList<>();
-        ServiceLoader<BaseCommand> commands = ServiceLoader.load(BaseCommand.class);
-
-        for(BaseCommand command : commands) {
-            command.setlApi(lApi);
-
-            log.debug(String.format("command '%s' loaded: %s %s %s",
-                    command.getClass().getCanonicalName(), command.getScope(), command.getType(), command.getName()));
-
-            this.commands.add(command);
-        }
 
 
     }
@@ -83,6 +79,89 @@ public class CommandManager implements Manager {
 
     @Override
     public void init(int initialCapacity) {
+        if(isInitialized()) return;
+
+        globalCommands.clear();
+        guildCommands.clear();
+
+        Future<ArrayList<ApplicationCommand>> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
+
+        log.debug("loading commands with a ServiceLoader");
+        ServiceLoader<BaseCommand> commands = ServiceLoader.load(BaseCommand.class);
+
+        Iterator<BaseCommand> it = commands.iterator();
+        while (true){
+            try {
+                if(!it.hasNext()) break;
+                BaseCommand command = it.next();
+                command.setlApi(lApi);
+
+                log.debug(String.format("command '%s' loaded: %s %s %s",
+                        command.getClass().getCanonicalName(), command.getScope(), command.getType(), command.getName()));
+
+                if(command.getScope() == CommandScope.GLOBAL)
+                    globalCommands.add(command);
+                else if(command.getScope() == CommandScope.GUILD)
+                    guildCommands.add(command);
+                else {
+                    log.error(String.format("command '%s' has unknown scope: %s", command.getClass().getCanonicalName(), command.getScope()));
+                    throw new LApiIllegalStateException("command has unknown scope: " + command.getScope());
+                }
+
+
+            } catch (Throwable t) {
+                log.error("Exception while trying to load a command.");
+                log.error(t);
+                //break the loop, so that we do not have an infinite loop
+                return;
+            }
+        }
+
+        //Sort the array, so that we will first iterate over commands, that specified an id.
+        //Then commands that specified a template.
+        //And commands that specified scope, type and name last.
+        this.globalCommands.sort((o1, o2) -> {
+            if(o1.getId() != null && o2.getId() != null) return 0;
+            if(o1.getId() != null && o2.getId() == null) return 2;
+            if(o2.getId() != null) return -2;
+            if(o1.getTemplate() != null && o2.getTemplate() != null) return 0;
+            if(o1.getTemplate() != null && o2.getTemplate() == null) return 1;
+            if(o2.getTemplate() != null) return -1;
+            return 0;
+        });
+
+        try {
+            ArrayList<ApplicationCommand> discordCommands = request.get();
+
+            for(BaseCommand command : this.globalCommands) {
+                try {
+                    if(command.getId() != null) {
+                        //match by id
+
+                    } else if(command.getTemplate() != null) {
+                        //match by template
+
+                    } else if(command.getType() != null && command.getName() != null) {
+                        //match by scope, type and name
+
+                    } else {
+                        //cannot match
+                        command.onError(new LApiIllegalStateException("Your command does not meet the requirements."));
+                    }
+
+                } catch (Throwable t) {
+                    log.error("Exception while trying to match command");
+                    log.error(t);
+                    command.onError(t);
+                }
+            }
+
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Could not fetch discord commands, command manager cannot initialize!");
+            log.error(e);
+            return;
+        }
+
         initialized.set(true);
     }
 
