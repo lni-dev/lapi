@@ -115,6 +115,31 @@ public interface ApplicationCommandRequests extends HasLApi {
 
     /**
      * <p>
+     *     Create a new global command. Returns 201 and an {@link ApplicationCommand application command object}.
+     * </p>
+     * <p>
+     *     Creating a command with the same name as an existing command for your application will overwrite the old command.
+     * </p>
+     * @param template {@link ApplicationCommandTemplate} of the new command
+     * @return {@link Queueable} which can create and retrieve the new command
+     * @throws LApiIllegalStateException if {@link ConfigFlag#BASIC_CACHE} is disabled or {@link EventIdentifier#CACHE_READY} has not yet been triggered.
+     * @see Queueable#queue()
+     * @see Link#CREATE_GLOBAL_APPLICATION_COMMAND
+     */
+    default @NotNull Queueable<ApplicationCommand> createGlobalApplicationCommand(@NotNull ApplicationCommandTemplate template){
+        if(getLApi().getCache() == null)
+            throw new LApiIllegalStateException("Application id is not cached, because config flag BASIC_CACHE is not enabled.");
+
+        else if(getLApi().getCache().getCurrentApplicationId() == null)
+            throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
+
+        LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GLOBAL_APPLICATION_COMMAND, template.getBody(),
+                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()));
+        return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
+    }
+
+    /**
+     * <p>
      *     Fetch a global command for your application.
      * </p>
      * @param applicationId id of your application

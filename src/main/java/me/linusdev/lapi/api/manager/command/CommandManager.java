@@ -16,47 +16,53 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.manager.command.refactor.Refactor;
+import me.linusdev.lapi.api.manager.command.refactor.RefactorType;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
-public class CommandManager implements Manager {
+public class CommandManager implements Manager, EventListener {
 
     private final @NotNull LApiImpl lApi;
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private final ArrayList<BaseCommand> allCommands;
     private final ArrayList<BaseCommand> globalCommands;
     private final ArrayList<BaseCommand> guildCommands;
 
+    private final HashMap<String, BaseCommand> globalCommandsMap;
+
     public CommandManager(@NotNull LApiImpl lApi) throws IOException {
         this.lApi = lApi;
-        this.allCommands = new ArrayList<>();
+
         this.guildCommands = new ArrayList<>();
         this.globalCommands = new ArrayList<>();
 
+        this.globalCommandsMap = new HashMap<>();
 
-
+        lApi.getEventTransmitter().addListener(this);
     }
 
     private @NotNull List<String> readServices() {
@@ -135,18 +141,64 @@ public class CommandManager implements Manager {
 
             for(BaseCommand command : this.globalCommands) {
                 try {
+                    ApplicationCommand match = null;
+
                     if(command.getId() != null) {
                         //match by id
+                        match = match(discordCommands, applicationCommand -> {
+                            return applicationCommand.getId().equals(command.getId());
+                        });
 
                     } else if(command.getTemplate() != null) {
                         //match by template
+                        match = match(discordCommands, applicationCommand -> {
+                           return applicationCommand.getType() == command.getTemplate().getType()
+                                   && applicationCommand.getName().equals(command.getTemplate().getName());
+                        });
 
                     } else if(command.getType() != null && command.getName() != null) {
                         //match by scope, type and name
+                        match = match(discordCommands, applicationCommand -> {
+                            return applicationCommand.getType() == command.getType()
+                                    && applicationCommand.getName().equals(command.getName());
+                        });
 
                     } else {
                         //cannot match
+                        log.error(String.format("command '%s' does not meet the requirements.", command.getClass().getCanonicalName()));
                         command.onError(new LApiIllegalStateException("Your command does not meet the requirements."));
+                        continue;
+
+                    }
+
+                    if(match == null) {
+                        //This is a new command
+
+                        if(command.getTemplate() == null) {
+                            log.error(String.format("command '%s' cannot be found on discord and template returns null." +
+                                    " Cannot create command.", command.getClass().getCanonicalName()));
+                            command.onError(new LApiIllegalStateException("Your command cannot be found on discord" +
+                                    " and that's why needs a template to be created."));
+                            continue;
+                        }
+
+                        try {
+                            ApplicationCommand created = lApi.getRequestFactory()
+                                    .createGlobalApplicationCommand(command.getTemplate()).queueAndWait();
+                            command.setConnected(created);
+                            globalCommandsMap.put(created.getId(), command);
+
+                        } catch (InterruptedException | ExecutionException e) {
+                            log.error(String.format("Could not create command %s.", command.getClass().getCanonicalName()));
+                            command.onError(e);
+                            continue;
+
+                        }
+
+                    } else {
+                        command.setConnected(match);
+                        globalCommandsMap.put(match.getId(), command);
+
                     }
 
                 } catch (Throwable t) {
@@ -166,6 +218,38 @@ public class CommandManager implements Manager {
     }
 
     @Override
+    public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
+        lApi.runSupervised(() -> init(0));
+    }
+
+    @Override
+    public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
+        if(!event.hasCommandId()) return;
+        //noinspection ConstantConditions: checked by above if
+        @NotNull String commandId = event.getCommandId();
+
+        //check global commands
+        for(Map.Entry<String, BaseCommand> command : globalCommandsMap.entrySet()) {
+            if(command.getKey().equals(commandId)) {
+                try {
+                    command.getValue().onInteract(event);
+                } catch (Throwable t) {
+                    command.getValue().onError(t);
+                }
+                return;
+            }
+        }
+
+        //check guild commands
+        if(event.getGuildId() != null) {
+            //TODO: error
+            return;
+        }
+        @NotNull String guild = event.getGuildId();
+        //TODO: check guild commands
+    }
+
+    @Override
     public boolean isInitialized() {
         return initialized.get();
     }
@@ -174,4 +258,19 @@ public class CommandManager implements Manager {
     public @NotNull LApi getLApi() {
         return lApi;
     }
+
+    public static @Nullable ApplicationCommand match(@NotNull ArrayList<ApplicationCommand> list, @NotNull Predicate<ApplicationCommand> matchFunction) {
+        Iterator<ApplicationCommand> iterator = list.iterator();
+        if(list.isEmpty()) return null;
+
+        for(ApplicationCommand command = iterator.next(); iterator.hasNext(); command=iterator.next()){
+            if(matchFunction.test(command)) {
+                iterator.remove();
+                return command;
+            }
+        }
+
+        return null;
+    }
+
 }

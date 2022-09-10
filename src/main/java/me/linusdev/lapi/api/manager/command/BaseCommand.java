@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.manager.command;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.refactor.Refactor;
+import me.linusdev.lapi.api.manager.command.refactor.RefactorType;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
@@ -55,7 +57,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *         ({@link CommandScope#GUILD GUILD} or {@link CommandScope#GLOBAL GLOBAL})
  *     </li>
  * </ul>
- * One of the following must be met:
+ * One of the following requirements must be met:
  * <ul>
  *     <li>
  *         You have overwritten {@link #create()} to return your commands {@link ApplicationCommandTemplate template}.
@@ -147,6 +149,16 @@ public abstract class BaseCommand implements HasLApi {
      */
     @ApiStatus.OverrideOnly
     protected abstract @Nullable ApplicationCommandTemplate create();
+
+    @ApiStatus.OverrideOnly
+    public @Nullable Refactor<?> refactor(){
+        return null;
+    }
+
+    @ApiStatus.OverrideOnly
+    public boolean delete() {
+        return false;
+    }
 
     /**
      * Respond to users that interacted with your command

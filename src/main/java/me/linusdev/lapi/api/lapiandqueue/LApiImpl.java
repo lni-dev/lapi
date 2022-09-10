@@ -351,7 +351,7 @@ public class LApiImpl implements LApi {
         notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
         if(Logger.DEBUG_LOG) log.debug("Request: " + request.toSimpleString()
                 + " returned with code " + response.getResponseCode() + " (" + response.getResponseCodeAsInt() + ")");
-        //TODO maybe log response body too.
+        if(Logger.DEBUG_DATA_LOG) log.debugData("Data: " + response.getData());
         return response;
     }
 

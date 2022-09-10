@@ -17,19 +17,18 @@
 package me.linusdev.lapi.api.communication.retriever.response;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.response.body.ErrorMessage;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.net.http.HttpResponse;
 import java.util.Optional;
@@ -44,9 +43,12 @@ public class LApiHttpResponse {
     private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
 
-    private @Nullable Boolean isArray = null;
     private @Nullable ErrorMessage error;
     private @Nullable SOData data;
+    /**
+     * The array key used to load above data
+     */
+    private @Nullable String usedArrayKey;
     private boolean noContent = false;
 
     public LApiHttpResponse(HttpResponse<InputStream> source) throws IOException, ParseException {
@@ -75,7 +77,7 @@ public class LApiHttpResponse {
      * @throws ParseException from {@link JsonParser}
      */
     public @NotNull SOData getData() throws IOException, ParseException {
-        return getData(null);
+        return getData(LApi.LAPI_ARRAY_WRAPPER_KEY);
     }
 
     /**
@@ -87,11 +89,14 @@ public class LApiHttpResponse {
      * @throws ParseException from {@link JsonParser}
      */
     public @NotNull SOData getData(@Nullable String arrayKey) throws IOException, ParseException {
-        if(data != null) return data;
+        if(data != null &&
+                ((arrayKey == null && usedArrayKey == LApi.LAPI_ARRAY_WRAPPER_KEY) || (arrayKey != null && arrayKey.equals(usedArrayKey)))) return data;
         if(!hasJsonBody()) throw new UnsupportedOperationException("Response has no Json body.");
 
         JsonParser jsonParser = new JsonParser();
-        if(arrayKey != null) jsonParser.setArrayWrapperKey(arrayKey);
+        if(arrayKey == null) arrayKey = LApi.LAPI_ARRAY_WRAPPER_KEY;
+        usedArrayKey = arrayKey;
+        jsonParser.setArrayWrapperKey(arrayKey);
         data = jsonParser.parseStream(inputStream);
         if(data.size() == 0) noContent = true;
         return data;
@@ -153,9 +158,9 @@ public class LApiHttpResponse {
         data.add("responseCode", responseCode);
         data.add("responseCodeAsInt", responseCodeAsInt);
         data.add("contentType", contentType);
-        data.add("isArray", isArray);
         data.add("error", error);
         data.add("data", this.data);
+        data.add("usedArrayKey", usedArrayKey);
 
         return data.toJsonString().toString();
     }
