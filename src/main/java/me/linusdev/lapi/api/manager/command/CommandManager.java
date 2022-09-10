@@ -68,9 +68,10 @@ public class CommandManager implements Manager, EventListener {
     private @NotNull List<String> readServices() {
         ArrayList<String> list = new ArrayList<>();
 
+        BufferedReader reader = null;
         try(InputStream inputStream = lApi.getCallerClass().getClassLoader().getResourceAsStream("META-INF/services/me.linusdev.lapi.api.manager.command.BaseCommand")){
             if(inputStream == null) return list;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            reader = new BufferedReader(new InputStreamReader(inputStream));
             String line = null;
 
             while((line =reader.readLine()) != null){
@@ -78,6 +79,12 @@ public class CommandManager implements Manager, EventListener {
             }
         }catch (IOException exception) {
             Logger.getLogger(this).error(exception);
+        } finally {
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {}
+            }
         }
 
         return list;
