@@ -6,10 +6,10 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/lni-dev/lapi)
 <br>LApi is a Discord API written in Java
 
-## Installation
+## Installation ![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?label=current%20newest%20version%3A%20)
 In order to install it, you can either build it yourself or use gradle and implement it into your Project:<br><br>
 In your `build.gradle` add `mavenCentral()` to the repositories if you have not done so already and add `io.github.lni-dev:lapi:[version]` to the dependencies. Replace `[version]` with the version you want to install.
- <br><br>![Maven Central](https://img.shields.io/maven-central/v/io.github.lni-dev/lapi?label=current%20newest%20version%3A%20)
+ <br><br>
 ```groovy
 repositories {
     mavenCentral()
