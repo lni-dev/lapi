@@ -16,11 +16,10 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.manager.command.refactor.Refactor;
-import me.linusdev.lapi.api.manager.command.refactor.RefactorType;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
@@ -138,9 +137,20 @@ public abstract class BaseCommand implements HasLApi {
 
 
     @ApiStatus.Internal
-    public final @Nullable ApplicationCommandTemplate getTemplate() {
+    final @Nullable ApplicationCommandTemplate getTemplate() {
         if(template == null) template = create();
         return template;
+    }
+
+    /**
+     *
+     * @param newTemplate template, that should be returned by {@link #getTemplate()}.
+     * @throws LApiIllegalStateException if {@link #getTemplate()} is not null.
+     */
+    @ApiStatus.Internal
+    final void setTemplate(@NotNull ApplicationCommandTemplate newTemplate) {
+        if(this.template != null) throw new LApiIllegalStateException("Setting template even though it is not null.");
+        this.template = newTemplate;
     }
 
     /**
@@ -181,12 +191,13 @@ public abstract class BaseCommand implements HasLApi {
      * Whether this command represents a discord command
      * @return {@code true} if this command represents a discord command
      */
+    @Deprecated
     public final boolean isConnected() {
         return connected.get();
     }
 
     @ApiStatus.Internal
-    public final void setConnected(@NotNull ApplicationCommand connectedCommand) {
+    final void setConnected(@NotNull ApplicationCommand connectedCommand) {
         this.connected.set(true);
         this.connectedCommand = connectedCommand;
     }
@@ -196,7 +207,7 @@ public abstract class BaseCommand implements HasLApi {
      * @param lApi {@link LApi}
      */
     @ApiStatus.Internal
-    public void setlApi(@NotNull LApi lApi) {
+    void setlApi(@NotNull LApi lApi) {
         this.lApi = lApi;
     }
 

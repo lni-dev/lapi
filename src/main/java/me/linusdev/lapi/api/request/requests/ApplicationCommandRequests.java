@@ -232,7 +232,7 @@ public interface ApplicationCommandRequests extends HasLApi {
      *     Deletes a global command. Returns 204 No Content on success.
      * </p>
      * @param applicationId id of your application
-     * @param commandId id of the {@link ApplicationCommand application command} to edit
+     * @param commandId id of the {@link ApplicationCommand application command} to delete
      * @return {@link Queueable} which can delete the {@link ApplicationCommand}
      * @see Queueable#queue()
      * @see Link#DELETE_GLOBAL_APPLICATION_COMMAND
@@ -249,7 +249,7 @@ public interface ApplicationCommandRequests extends HasLApi {
      * <p>
      *     Deletes a global command. Returns 204 No Content on success.
      * </p>
-     * @param commandId id of the {@link ApplicationCommand application command} to edit
+     * @param commandId id of the {@link ApplicationCommand application command} to delete
      * @return {@link Queueable} which can delete the {@link ApplicationCommand}
      * @throws LApiIllegalStateException if {@link ConfigFlag#BASIC_CACHE} is disabled or {@link EventIdentifier#CACHE_READY} has not yet been triggered.
      * @see Queueable#queue()

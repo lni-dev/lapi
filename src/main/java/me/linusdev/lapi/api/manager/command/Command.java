@@ -22,9 +22,10 @@ import java.lang.annotation.*;
 /**
  * @see BaseCommand
  */
+@Inherited
 @Documented
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Command {
 
 }

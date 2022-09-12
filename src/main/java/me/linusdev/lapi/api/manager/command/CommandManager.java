@@ -17,21 +17,16 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
-import me.linusdev.lapi.api.manager.command.refactor.Refactor;
-import me.linusdev.lapi.api.manager.command.refactor.RefactorType;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +35,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
+
+import static me.linusdev.lapi.api.manager.command.CommandUtils.*;
 
 public class CommandManager implements Manager, EventListener {
 
@@ -49,18 +45,18 @@ public class CommandManager implements Manager, EventListener {
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private final ArrayList<BaseCommand> globalCommands;
-    private final ArrayList<BaseCommand> guildCommands;
-
-    private final HashMap<String, BaseCommand> globalCommandsMap;
+    private final HashMap<String, BaseCommand> commandsMap;
 
     public CommandManager(@NotNull LApiImpl lApi) throws IOException {
         this.lApi = lApi;
 
-        this.guildCommands = new ArrayList<>();
-        this.globalCommands = new ArrayList<>();
+        this.commandsMap = new HashMap<>();
 
-        this.globalCommandsMap = new HashMap<>();
+        //TODO: remove and make @Command retantetion not RUNTIME
+        System.out.println("Command.class.getDeclaredClasses():");
+        for(Class<?> clazz : Command.class.getDeclaredClasses()){
+            System.out.println("class: "  + clazz.getCanonicalName());
+        }
 
         lApi.getEventTransmitter().addListener(this);
     }
@@ -69,7 +65,8 @@ public class CommandManager implements Manager, EventListener {
         ArrayList<String> list = new ArrayList<>();
 
         BufferedReader reader = null;
-        try(InputStream inputStream = lApi.getCallerClass().getClassLoader().getResourceAsStream("META-INF/services/me.linusdev.lapi.api.manager.command.BaseCommand")){
+        try{
+            InputStream inputStream = lApi.getCallerClass().getClassLoader().getResourceAsStream("META-INF/services/me.linusdev.lapi.api.manager.command.BaseCommand");
             if(inputStream == null) return list;
             reader = new BufferedReader(new InputStreamReader(inputStream));
             String line = null;
@@ -94,8 +91,7 @@ public class CommandManager implements Manager, EventListener {
     public void init(int initialCapacity) {
         if(isInitialized()) return;
 
-        globalCommands.clear();
-        guildCommands.clear();
+        ArrayList<BaseCommand> localCommands = new ArrayList<>();
 
         Future<ArrayList<ApplicationCommand>> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
 
@@ -112,18 +108,14 @@ public class CommandManager implements Manager, EventListener {
                 log.debug(String.format("command '%s' loaded: %s %s %s",
                         command.getClass().getCanonicalName(), command.getScope(), command.getType(), command.getName()));
 
-                if(command.getScope() == CommandScope.GLOBAL)
-                    globalCommands.add(command);
-                else if(command.getScope() == CommandScope.GUILD)
-                    guildCommands.add(command);
-                else {
-                    log.error(String.format("command '%s' has unknown scope: %s", command.getClass().getCanonicalName(), command.getScope()));
-                    throw new LApiIllegalStateException("command has unknown scope: " + command.getScope());
-                }
+
+                localCommands.add(command);
+
+
 
 
             } catch (Throwable t) {
-                log.error("Exception while trying to load a command.");
+                log.error("Exception while trying to load commands.");
                 log.error(t);
                 //break the loop, so that we do not have an infinite loop
                 return;
@@ -133,7 +125,7 @@ public class CommandManager implements Manager, EventListener {
         //Sort the array, so that we will first iterate over commands, that specified an id.
         //Then commands that specified a template.
         //And commands that specified scope, type and name last.
-        this.globalCommands.sort((o1, o2) -> {
+        localCommands.sort((o1, o2) -> {
             if(o1.getId() != null && o2.getId() != null) return 0;
             if(o1.getId() != null && o2.getId() == null) return 2;
             if(o2.getId() != null) return -2;
@@ -143,82 +135,23 @@ public class CommandManager implements Manager, EventListener {
             return 0;
         });
 
+
+
+        ArrayList<ApplicationCommand> globalCommandsOnDiscord = null;
         try {
-            ArrayList<ApplicationCommand> discordCommands = request.get();
-
-            for(BaseCommand command : this.globalCommands) {
-                try {
-                    ApplicationCommand match = null;
-
-                    if(command.getId() != null) {
-                        //match by id
-                        match = match(discordCommands, applicationCommand -> {
-                            return applicationCommand.getId().equals(command.getId());
-                        });
-
-                    } else if(command.getTemplate() != null) {
-                        //match by template
-                        match = match(discordCommands, applicationCommand -> {
-                           return applicationCommand.getType() == command.getTemplate().getType()
-                                   && applicationCommand.getName().equals(command.getTemplate().getName());
-                        });
-
-                    } else if(command.getType() != null && command.getName() != null) {
-                        //match by scope, type and name
-                        match = match(discordCommands, applicationCommand -> {
-                            return applicationCommand.getType() == command.getType()
-                                    && applicationCommand.getName().equals(command.getName());
-                        });
-
-                    } else {
-                        //cannot match
-                        log.error(String.format("command '%s' does not meet the requirements.", command.getClass().getCanonicalName()));
-                        command.onError(new LApiIllegalStateException("Your command does not meet the requirements."));
-                        continue;
-
-                    }
-
-                    if(match == null) {
-                        //This is a new command
-
-                        if(command.getTemplate() == null) {
-                            log.error(String.format("command '%s' cannot be found on discord and template returns null." +
-                                    " Cannot create command.", command.getClass().getCanonicalName()));
-                            command.onError(new LApiIllegalStateException("Your command cannot be found on discord" +
-                                    " and that's why needs a template to be created."));
-                            continue;
-                        }
-
-                        try {
-                            ApplicationCommand created = lApi.getRequestFactory()
-                                    .createGlobalApplicationCommand(command.getTemplate()).queueAndWait();
-                            command.setConnected(created);
-                            globalCommandsMap.put(created.getId(), command);
-
-                        } catch (InterruptedException | ExecutionException e) {
-                            log.error(String.format("Could not create command %s.", command.getClass().getCanonicalName()));
-                            command.onError(e);
-                            continue;
-
-                        }
-
-                    } else {
-                        command.setConnected(match);
-                        globalCommandsMap.put(match.getId(), command);
-
-                    }
-
-                } catch (Throwable t) {
-                    log.error("Exception while trying to match command");
-                    log.error(t);
-                    command.onError(t);
-                }
-            }
+            globalCommandsOnDiscord = request.get();
 
         } catch (InterruptedException | ExecutionException e) {
             log.error("Could not fetch discord commands, command manager cannot initialize!");
             log.error(e);
             return;
+        }
+
+        //TODO: Hashmap must be thread safe! (multiple threads adding and reading)
+        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, new HashMap<>(), commandsMap);
+        for(BaseCommand command : localCommands) {
+            if(!checkCommand(command, log)) continue;
+            CommandUtils.matchCommand(info, command);
         }
 
         initialized.set(true);
@@ -236,7 +169,7 @@ public class CommandManager implements Manager, EventListener {
         @NotNull String commandId = event.getCommandId();
 
         //check global commands
-        for(Map.Entry<String, BaseCommand> command : globalCommandsMap.entrySet()) {
+        for(Map.Entry<String, BaseCommand> command : commandsMap.entrySet()) {
             if(command.getKey().equals(commandId)) {
                 try {
                     command.getValue().onInteract(event);
@@ -266,18 +199,6 @@ public class CommandManager implements Manager, EventListener {
         return lApi;
     }
 
-    public static @Nullable ApplicationCommand match(@NotNull ArrayList<ApplicationCommand> list, @NotNull Predicate<ApplicationCommand> matchFunction) {
-        Iterator<ApplicationCommand> iterator = list.iterator();
-        if(list.isEmpty()) return null;
 
-        for(ApplicationCommand command = iterator.next(); iterator.hasNext(); command=iterator.next()){
-            if(matchFunction.test(command)) {
-                iterator.remove();
-                return command;
-            }
-        }
-
-        return null;
-    }
 
 }

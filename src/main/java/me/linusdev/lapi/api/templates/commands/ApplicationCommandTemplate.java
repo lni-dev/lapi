@@ -61,6 +61,11 @@ public class ApplicationCommandTemplate implements Template, Datable {
         this.type = type;
     }
 
+    public static ApplicationCommandTemplate of(@NotNull ApplicationCommand command) {
+        return new ApplicationCommandTemplate(command.getName(), command.getNameLocalizations(), command.getDescription(), command.getDescriptionLocalizations(),
+                command.getOptions(), command.getDefaultMemberPermissions(), command.getDmPermission(), command.getType());
+    }
+
     public @NotNull String getName() {
         return name;
     }
@@ -107,5 +112,9 @@ public class ApplicationCommandTemplate implements Template, Datable {
         data.addIfNotNull(TYPE_KEY, type);
 
         return data;
+    }
+
+    public @NotNull EditApplicationCommandTemplate toEditTemplate() {
+        return new EditApplicationCommandTemplate(name, nameLocalisations, description, descriptionLocalisations, options, defaultMemberPermissions, dmPermissions);
     }
 }
