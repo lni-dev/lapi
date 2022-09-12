@@ -37,6 +37,7 @@ public class CommandUtils {
     static void matchCommand(@NotNull MatchingInformation info,
                                     @NotNull BaseCommand command) {
         try {
+            info.getLog().debug("Matching command '" + command.getClass().getCanonicalName() + "'.");
             matchCommand0(info, command, false);
 
         } catch (Throwable t) {
@@ -59,30 +60,43 @@ public class CommandUtils {
 
         Refactor<?> refactor = command.refactor();
         if (!ignoreRefactor && refactor != null) {
-           matches = refactor.match(info);
+            info.getLog().debug("Command requires refactoring: " + refactor);
+            matches = refactor.match(info);
 
             if (matches == null) {
+                info.getLog().debug("No match found for old command. Trying to match again with 'ignoreRefactor' set to true");
                 matchCommand0(info, command, true);
                 return;
             }
 
         } else {
+            info.getLog().debug("Normal Matching...");
             matches = match(info, command.getScope(), command.getId(), command.getTemplate(), command.getType(), command.getName());
-
         }
 
 
         if (matches == null) {
+            info.getLog().debug("No matches found. Creating new command...");
             //This is a new command
             createCommand(info, command, null, true);
 
         } else {
-
+            info.getLog().debug(String.format("%d matche%s found.", matches.size(), matches.size() == 1 ? "" : "s"));
             if (command.delete()) {
+                info.getLog().debug("Command requested deletion. deleting Command...");
                 command.getScope().delete(info, matches, command);
 
             } else if (!ignoreRefactor && command.refactor() != null) {
+                info.getLog().debug("Command requested refactoring. refactoring Command...");
                 command.refactor().refactor(info, matches);
+
+            } else {
+                info.getLog().debug("Linking command.");
+                for(ApplicationCommand match : matches) {
+                    info.getConnectedCommands().put(match.getId(), command);
+                    command.setConnected(match);
+                }
+                info.getLog().debug("Command linked.");
 
             }
 
@@ -237,31 +251,56 @@ public class CommandUtils {
                                                            @Nullable ApplicationCommandTemplate template,
                                                            @Nullable ApplicationCommandType type, @Nullable String name) {
         if (commandScope == CommandScope.GLOBAL) {
+            info.getLog().debug("Matching in command Scope: " + CommandScope.GLOBAL);
             if (commandId != null) {
                 //match by id
+                info.getLog().debug("Matching by command id=" + commandId);
                 ApplicationCommand match = matchInList(info.getGlobalCommandsOnDiscord(), applicationCommand ->
                         applicationCommand.getId().equals(commandId));
 
-                if (match == null) return null;
-                if (type != null && match.getType() != type) return null;
-                if (name != null && !match.getName().equals(name)) return null;
+                if (match == null) {
+                    info.getLog().debug("No matches found...");
+                    return null;
+
+                }
+                if (type != null && match.getType() != type) {
+                    info.getLog().debug("match found but type is not correct.");
+                    return null;
+
+                }
+                if (name != null && !match.getName().equals(name)){
+                    info.getLog().debug("match found but name is not correct.");
+                    return null;
+
+                }
+                info.getLog().debug("1 match found.");
                 return List.of(match);
 
             } else if (template != null) {
                 //match by template
-                ApplicationCommand match = matchInList(info.getGlobalCommandsOnDiscord(), applicationCommand ->
-                        applicationCommand.getType() == template.getType() && applicationCommand.getName().equals(template.getName()));
+                info.getLog().debug("Matching by template: type=" + template.getType() + ", name=" + template.getName());
+                ApplicationCommand match = matchInList(info.getGlobalCommandsOnDiscord(), ac ->
+                        ac.getType() == template.getType() && ac.getName().equals(template.getName())
+                );
 
-                if (match == null) return null;
+                if (match == null) {
+                    info.getLog().debug("No matches found...");
+                    return null;
+                }
+                info.getLog().debug("1 match found.");
                 return List.of(match);
 
             } else if (type != null && name != null) {
-                //match by scope, type and name
-
+                //match by type and name
+                info.getLog().debug("Matching by type=" + type + " and name=" + name);
                 ApplicationCommand match = matchInList(info.getGlobalCommandsOnDiscord(), applicationCommand ->
                         applicationCommand.getType() == type && applicationCommand.getName().equals(name));
 
-                if (match == null) return null;
+                if (match == null) {
+                    info.getLog().debug("No matches found...");
+                    return null;
+                }
+                info.getLog().debug("1 match found.");
                 return List.of(match);
 
             } else {
@@ -270,24 +309,28 @@ public class CommandUtils {
             }
 
         } else if (commandScope == CommandScope.GUILD) {
+            info.getLog().debug("Matching in command Scope: " + CommandScope.GUILD);
             ArrayList<ApplicationCommand> matches = new ArrayList<>();
 
             //cannot match by command id! id changes for every guild...
 
             if (template != null) {
                 //match by template
+                info.getLog().debug("Matching by template: type=" + template.getType() + ", name=" + template.getName());
+
                 ApplicationCommand match;
-                for(Map.Entry<String, List<ApplicationCommand>> entry : info.getGuildCommandsOnDiscord().entrySet()) {
-                    match = matchInList(entry.getValue(), applicationCommand ->
-                            applicationCommand.getType() == template.getType() && applicationCommand.getName().equals(template.getName()));
+                for (Map.Entry<String, List<ApplicationCommand>> entry : info.getGuildCommandsOnDiscord().entrySet()) {
+                    match = matchInList(entry.getValue(), ac -> ac.getType() == template.getType() && ac.getName().equals(template.getName()));
                     if (match == null) continue;
                     matches.add(match);
                 }
 
+                info.getLog().debug(matches.size() + " matches found.");
                 return matches.isEmpty() ? null : matches;
 
             } else if (type != null && name != null) {
                 //match by scope, type and name
+                info.getLog().debug("Matching by type=" + type + " and name=" + name);
 
                 ApplicationCommand match;
                 for(Map.Entry<String, List<ApplicationCommand>> entry : info.getGuildCommandsOnDiscord().entrySet()) {
@@ -297,6 +340,7 @@ public class CommandUtils {
                     matches.add(match);
                 }
 
+                info.getLog().debug(matches.size() + " matches found.");
                 return matches.isEmpty() ? null : matches;
 
             } else {
@@ -319,7 +363,9 @@ public class CommandUtils {
         Iterator<ApplicationCommand> iterator = list.iterator();
         if (list.isEmpty()) return null;
 
-        for (ApplicationCommand command = iterator.next(); iterator.hasNext(); command = iterator.next()) {
+        ApplicationCommand command;
+        while (iterator.hasNext()) {
+            command = iterator.next();
             if (matchFunction.test(command)) {
                 iterator.remove();
                 return command;

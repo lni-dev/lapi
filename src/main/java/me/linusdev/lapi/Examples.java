@@ -19,6 +19,8 @@ package me.linusdev.lapi;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageDeleteEvent;
+import me.linusdev.lapi.api.communication.gateway.events.message.MessageUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
@@ -40,6 +42,23 @@ public class Examples {
 
         Config config = ConfigBuilder.getDefault("TOKEN", true).build();
         LApi lApi = ConfigBuilder.getDefault("TOKEN", true).buildLApi();
+
+        lApi.getEventTransmitter().addListener(new EventListener() {
+            @Override
+            public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
+                //code
+            }
+
+            @Override
+            public void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {
+                //code
+            }
+
+            @Override
+            public void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {
+                //code
+            }
+        });
 
         lApi.getEventTransmitter().addListener(new EventListener() {
             @Override

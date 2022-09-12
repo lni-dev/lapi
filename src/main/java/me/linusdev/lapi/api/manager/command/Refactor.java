@@ -63,4 +63,9 @@ public class Refactor<T> {
     public @NotNull T getOldValue() {
         return oldValue;
     }
+
+    @Override
+    public String toString() {
+        return "Refactor " + type + ". Old value: " + oldValue;
+    }
 }

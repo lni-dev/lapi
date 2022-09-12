@@ -108,11 +108,7 @@ public class CommandManager implements Manager, EventListener {
                 log.debug(String.format("command '%s' loaded: %s %s %s",
                         command.getClass().getCanonicalName(), command.getScope(), command.getType(), command.getName()));
 
-
                 localCommands.add(command);
-
-
-
 
             } catch (Throwable t) {
                 log.error("Exception while trying to load commands.");
@@ -121,6 +117,8 @@ public class CommandManager implements Manager, EventListener {
                 return;
             }
         }
+
+        log.debug("successfully loaded " + localCommands.size() + " commands.");
 
         //Sort the array, so that we will first iterate over commands, that specified an id.
         //Then commands that specified a template.
@@ -135,7 +133,7 @@ public class CommandManager implements Manager, EventListener {
             return 0;
         });
 
-
+        log.debug("successfully sorted commands.");
 
         ArrayList<ApplicationCommand> globalCommandsOnDiscord = null;
         try {
@@ -147,6 +145,7 @@ public class CommandManager implements Manager, EventListener {
             return;
         }
 
+        log.debug("starting to match commands.");
         //TODO: Hashmap must be thread safe! (multiple threads adding and reading)
         MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, new HashMap<>(), commandsMap);
         for(BaseCommand command : localCommands) {

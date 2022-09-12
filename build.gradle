@@ -43,6 +43,7 @@ java {
 
 javadoc {
     options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 publishing {

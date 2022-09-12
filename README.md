@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'
     implementation 'io.github.lni-dev:lapi:[version]'
 }
 ```
@@ -34,10 +35,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.lni-dev:lapi:1.0.0'
+    annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'
+    implementation 'io.github.lni-dev:lapi:1.0.3'
 }
 ```
-(Tested on gradle 7.2)
+(Tested on gradle 7.5.1)
 
 <br>If you want to make an executable .jar file at some point in time, I recommend
 the gradle plugins `application` and `shadow`. An example `build.gradle` with these plugins could
@@ -50,7 +52,7 @@ plugins {
 }
 
 group 'com.example'
-version '1.0'
+version '1.0.0'
 mainClassName = 'com.example.exampleProjectName.Main'
 
 repositories {
@@ -58,7 +60,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.lni-dev:lapi:1.0.0'
+    annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'
+    implementation 'io.github.lni-dev:lapi:1.0.3'
 }
 ```
 This will then add a gradle task called shadowJar, which will build an executable jar for you.
@@ -66,46 +69,53 @@ This will then add a gradle task called shadowJar, which will build an executabl
 First you will need to create a Discord bot and copy it's `TOKEN`.<br>
 Then you can create a Config:
 ```java
-Config config = ConfigBuilder.getDefault("TOKEN").build();
+Config config = ConfigBuilder.getDefault("TOKEN", true).build();
 ```
-Then you can create a LApi instance:
+And create a LApi instance:
 ```java
-Config config = ConfigBuilder.getDefault("TOKEN").build();
+Config config = ConfigBuilder.getDefault("TOKEN", true).build();
 LApi lApi = LApi.newInstance(config);
 ```
 Or a lot simpler:
 ```java
-LApi lApi = ConfigBuilder.getDefault("TOKEN").buildLapi();
+LApi lApi = ConfigBuilder.getDefault("TOKEN", true).buildLApi();
 ```
-Note: `TOKEN` must be replaced with your bot token.<br>
+`TOKEN` must be replaced with your bot token. The second boolean parameter specifies, whether
+you want the privileged intents enabled. read more [here](https://discord.com/developers/docs/topics/gateway#privileged-intents).
+If you pass `true`, you have to enabled them for your application's bot [here](https://discord.com/developers/applications).
+<br><br>
 Now you can register an EventListener:
 ```java
 lApi.getEventTransmitter().addListener(new EventListener() {
-            @Override
-            public void onGuildRoleCreate(GuildRoleCreateEvent event) {
-                System.out.println("A Role was created.");
-            }
+    @Override
+    public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
+        //code
+    }
 
-            @Override
-            public void onMessageCreate(MessageCreateEvent event) {
-                System.out.println("Message: " + event.getMessage().getContent());
-            }
-        });
+    @Override
+    public void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {
+        //code
+    }
+
+    @Override
+    public void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {
+        //code
+    }
+});
 ```
 
 Inside your listener, you can overwrite all events, you want to listen to.<br>
 Here a small example on how to respond to "Hi":
 ```java
 lApi.getEventTransmitter().addListener(new EventListener() {
-            @Override
-            public void onMessageCreate(MessageCreateEvent event) {
-                System.out.println("Message: " + event.getMessage().getContent());
-                
-                if(!event.getMessage().getAuthor().isBot()
-                    && event.getMessage().getContent().equals("Hi")){
-                    lApi.createMessage(event.getChannelId(), "Hi").queue();
-                }
-            }
-        });
+    @Override
+    public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
+        System.out.println("Message: " + event.getMessage().getContent());
+
+        if(!event.getMessage().getAuthor().isBot() && event.getMessage().getContent().equals("Hi")){
+            lApi.getRequestFactory().createMessage(event.getChannelId(), "Hi").queue();
+        }
+    }
+});
 ```
 Note the check, if the message was sent by a bot. This check is important, so that your bot does not respond to itself.
