@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.lapiandqueue;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
@@ -122,7 +123,7 @@ public class LApiImpl implements LApi {
     private final @NotNull Cache cache;
 
     //Command Manager
-    private final @NotNull CommandManager commandManager;
+    private final @NotNull CommandManagerImpl commandManager;
 
     //stores and manages the voice regions
     private final @NotNull VoiceRegionManager voiceRegionManager;
@@ -211,7 +212,7 @@ public class LApiImpl implements LApi {
             cache = null;
         }
 
-        commandManager = new CommandManager(this, config.getCommandProvider());
+        commandManager = new CommandManagerImpl(this, config.getCommandProvider());
 
 
         //VoiceRegions
@@ -433,6 +434,11 @@ public class LApiImpl implements LApi {
     @Override
     public @Nullable Cache getCache() {
         return cache;
+    }
+
+    @Override
+    public @Nullable CommandManager getCommandManager() {
+        return commandManager;
     }
 
     @Override

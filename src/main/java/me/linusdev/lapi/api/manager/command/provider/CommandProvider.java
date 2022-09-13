@@ -18,13 +18,13 @@ package me.linusdev.lapi.api.manager.command.provider;
 
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
-import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
 /**
- * This provider is used to manually add your {@link BaseCommand}s to the {@link CommandManager}.
+ * This provider is used to manually add your {@link BaseCommand}s to the {@link CommandManagerImpl}.
  * {@link #iterator(LApi)} must return an instance for each class extending {@link BaseCommand}.
  */
 public interface CommandProvider {

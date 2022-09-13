@@ -32,7 +32,7 @@ public class Refactor<T> {
 
     /**
      * <p>
-     *     Signals the {@link CommandManager}, that this command requires refactoring,
+     *     Signals the {@link CommandManagerImpl}, that this command requires refactoring,
      * </p>
      *
      * @param command the {@link BaseCommand} this {@link Refactor} is for.

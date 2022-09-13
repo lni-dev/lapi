@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.lapiandqueue;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
+import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
@@ -236,6 +238,12 @@ public interface LApi extends HasLApi {
      * @return {@link Cache} or {@code null} if {@link ConfigFlag#BASIC_CACHE} is not enabled.
      */
     @Nullable Cache getCache();
+
+    /**
+     *
+     * @return {@link CommandManagerImpl} or {@code null} if {@link ConfigFlag#COMMAND_MANAGER} is not enabled.
+     */
+    @Nullable CommandManager getCommandManager();
 
     /**
      *

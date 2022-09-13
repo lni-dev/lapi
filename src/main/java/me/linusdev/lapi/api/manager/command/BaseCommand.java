@@ -18,7 +18,6 @@ package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
-import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
@@ -85,11 +84,11 @@ import java.util.function.Predicate;
 public abstract class BaseCommand implements HasLApi {
 
     /**
-     * Will be available, after the {@link CommandManager} has called {@link #setlApi(LApi)}.<br><br>
+     * Will be available, after the {@link CommandManagerImpl} has called {@link #setlApi(LApi)}.<br><br>
      * Will always be {@code null} in the constructor!<br>
      * Will never be {@code null} in {@link #getId()}, {@link #getName()}, {@link #getScope()}, {@link #getType()},
      * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent, InteractionResponseBuilder)}.
-     * (given that these functions are only called by the {@link CommandManager})
+     * (given that these functions are only called by the {@link CommandManagerImpl})
      */
     protected LApi lApi;
 
@@ -228,7 +227,7 @@ public abstract class BaseCommand implements HasLApi {
     }
 
     /**
-     * called by the {@link CommandManager}
+     * called by the {@link CommandManagerImpl}
      * @param lApi {@link LApi}
      */
     @ApiStatus.Internal

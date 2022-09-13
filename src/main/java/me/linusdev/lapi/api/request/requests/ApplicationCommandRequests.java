@@ -35,7 +35,6 @@ import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import me.linusdev.lapi.api.templates.commands.EditApplicationCommandTemplate;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 

@@ -21,6 +21,8 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.BaseCommand;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -259,6 +261,15 @@ public enum ConfigFlag implements SimpleDatable {
      * @see LApi#getCache()
      */
     BASIC_CACHE(1 << 25),
+
+    /**
+     * <p>
+     *     Enables the {@link CommandManagerImpl}, so you can create your own {@link BaseCommand}s.
+     * </p>
+     * @see LApi#getCommandManager()
+     * @see BaseCommand
+     */
+    COMMAND_MANAGER(1 << 26),
     ;
 
     private final long value;

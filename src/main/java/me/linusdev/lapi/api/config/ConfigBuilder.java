@@ -30,7 +30,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.Command;
-import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.manager.command.provider.ServiceLoadingCommandProvider;
 import me.linusdev.lapi.api.manager.command.provider.SimpleCommandProvider;
@@ -325,7 +325,7 @@ public class ConfigBuilder implements Datable {
      * <em>Optional / Not Recommended</em><br>
      *  Default: {@code new ServiceLoadingCommandProvider()}
      * <p>
-     *      The {@link CommandProvider}, so {@link CommandManager} finds your {@link BaseCommand commands}
+     *      The {@link CommandProvider}, so {@link CommandManagerImpl} finds your {@link BaseCommand commands}
      *      if they are not added as services using the {@link Command} annotation.
      *      See {@link BaseCommand} for more information.
      * </p>
@@ -333,7 +333,7 @@ public class ConfigBuilder implements Datable {
      *      Set to {@code null} to reset to default
      * </p>
      *
-     * @param commandProvider {@link CommandProvider} to manually add commands to the {@link CommandManager}.
+     * @param commandProvider {@link CommandProvider} to manually add commands to the {@link CommandManagerImpl}.
      * @see SimpleCommandProvider
      * @see BaseCommand
      */
