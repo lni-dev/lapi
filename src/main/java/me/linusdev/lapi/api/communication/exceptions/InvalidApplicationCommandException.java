@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.exceptions;
 
-public class InvalidApplicationCommandException extends LApiException{
+public class InvalidApplicationCommandException extends LApiRuntimeException{
 
     public InvalidApplicationCommandException(String message) {
         super(message);

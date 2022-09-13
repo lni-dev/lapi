@@ -63,18 +63,16 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
      * @param lApi {@link LApi} or {@link HasLApi}
      * @param name subcommand name (see {@link ApplicationCommandOption rules})
      * @param description subcommand description (see {@link ApplicationCommandOption rules})
-     * @param required If the parameter is required or optional
      * @return new {@link ApplicationCommandOptionBuilder}
      */
     public static @NotNull ApplicationCommandOptionBuilder newSubCommandOptionBuilder(
             @NotNull HasLApi lApi, @NotNull String name,
-            @NotNull String description, boolean required
+            @NotNull String description
     ){
         return new ApplicationCommandOptionBuilder(lApi.getLApi())
                 .setType(ApplicationCommandOptionType.SUB_COMMAND)
                 .setName(name)
-                .setDescription(description)
-                .setRequired(required);
+                .setDescription(description);
     }
 
     /**
@@ -86,18 +84,16 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
      * @param lApi {@link LApi} or {@link HasLApi}
      * @param name subcommand group name (see {@link ApplicationCommandOption rules})
      * @param description subcommand group description (see {@link ApplicationCommandOption rules})
-     * @param required If the parameter is required or optional
      * @return new {@link ApplicationCommandOptionBuilder}
      */
     public static @NotNull ApplicationCommandOptionBuilder newSubCommandGroupOptionBuilder(
             @NotNull HasLApi lApi, @NotNull String name,
-            @NotNull String description, boolean required
+            @NotNull String description
     ){
         return new ApplicationCommandOptionBuilder(lApi.getLApi())
                 .setType(ApplicationCommandOptionType.SUB_COMMAND_GROUP)
                 .setName(name)
-                .setDescription(description)
-                .setRequired(required);
+                .setDescription(description);
     }
 
     /**
@@ -375,7 +371,8 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
 
     /**
      * Whether this Option is required or optional. Default: {@code false}.
-     * Set to {@code  null} to reset to default.
+     * Set to {@code  null} to reset to default. <br>
+     * Does not work on {@link ApplicationCommandOptionType#SUB_COMMAND} or {@link ApplicationCommandOptionType#SUB_COMMAND_GROUP}.
      * @param required {@code true} to make this command required, {@code false} or {@code null} to make this command optional.
      * @return this
      * @see #makeRequired()
@@ -387,7 +384,8 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
     }
 
     /**
-     * Makes this option required.
+     * Makes this option required.<br>
+     * Does not work on {@link ApplicationCommandOptionType#SUB_COMMAND} or {@link ApplicationCommandOptionType#SUB_COMMAND_GROUP}.
      * @return this
      * @see #makeOptional()
      * @see #setRequired(Boolean)
@@ -398,7 +396,8 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
     }
 
     /**
-     * Makes this option optional
+     * Makes this option optional<br>
+     * Does not work on {@link ApplicationCommandOptionType#SUB_COMMAND} or {@link ApplicationCommandOptionType#SUB_COMMAND_GROUP}.
      * @return this
      * @see #makeRequired()
      * @see #setRequired(Boolean)

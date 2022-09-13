@@ -16,11 +16,15 @@
 
 package me.linusdev.lapi.api.objects.interaction.response;
 
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
+import me.linusdev.lapi.api.objects.interaction.response.data.Autocomplete;
+import me.linusdev.lapi.api.objects.interaction.response.data.AutocompleteBuilder;
 import me.linusdev.lapi.api.objects.interaction.response.data.Modal;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
@@ -178,13 +182,28 @@ public class InteractionResponseBuilder implements HasLApi {
      * respond to an autocomplete interaction with suggested choices
      * @return this
      */
-    public InteractionResponseBuilder applicationCommandAutocompleteResult(@NotNull Consumer<MessageBuilder> msgBuilderConsumer, boolean check){
+    public InteractionResponseBuilder applicationCommandAutocompleteResult(@NotNull Autocomplete autocomplete){
         if(type != null)
             throw new UnsupportedOperationException("type is already set to " + type
                     + " and cannot be set to " + InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT);
         type = InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
-        MessageBuilder builder = new MessageBuilder(lApi);
-        msgBuilderConsumer.accept(builder);
+        data = autocomplete;
+        return this;
+    }
+
+    /**
+     * respond to an autocomplete interaction with suggested choices
+     * @return this
+     * @throws LApiIllegalStateException if check is true: see {@link AutocompleteBuilder#check()}
+     */
+    public InteractionResponseBuilder applicationCommandAutocompleteResult(
+            @NotNull Consumer<AutocompleteBuilder> acBuilderConsumer, boolean check){
+        if(type != null)
+            throw new UnsupportedOperationException("type is already set to " + type
+                    + " and cannot be set to " + InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT);
+        type = InteractionCallbackType.APPLICATION_COMMAND_AUTOCOMPLETE_RESULT;
+        AutocompleteBuilder builder = new AutocompleteBuilder();
+        acBuilderConsumer.accept(builder);
         data = builder.build(check);
         return this;
     }

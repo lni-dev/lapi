@@ -20,11 +20,15 @@ import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
+import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
+import me.linusdev.lapi.api.objects.interaction.response.data.AutocompleteBuilder;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandBuilder;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import org.jetbrains.annotations.ApiStatus;
@@ -186,9 +190,20 @@ public abstract class BaseCommand implements HasLApi {
     /**
      * Respond to users that interacted with your command
      * @param event {@link InteractionCreateEvent}
+     * @param response the response builder, which can be queued.
+     * @return whether to automatically {@link Queueable#queue() queue} the response after this method. {@code true} will queue it, {@code false} won't.
      */
     @ApiStatus.OverrideOnly
-    public abstract void onInteract(@NotNull InteractionCreateEvent event, @NotNull InteractionResponseBuilder response);
+    public abstract boolean onInteract(@NotNull InteractionCreateEvent event, @NotNull InteractionResponseBuilder response);
+
+    /**
+     * Respond to autocomplete events. Only if {@link ApplicationCommandOption#getAutocomplete()} is {@code true}.
+     * @param event {@link InteractionCreateEvent}
+     * @param builder the response autocomplete builder, which can be queued.
+     * @return whether to automatically {@link Queueable#queue() queue} the response after this method. {@code true} will queue it, {@code false} won't.
+     */
+    @ApiStatus.OverrideOnly
+    public abstract boolean onAutocomplete(@NotNull InteractionCreateEvent event, @NotNull SelectedOptions options, @NotNull AutocompleteBuilder builder);
 
     /**
      * Handle errors, that happen while working with your command. For example if your command is missing information

@@ -31,6 +31,8 @@ public class Autocomplete implements Datable, Template {
 
     public static final String CHOICES_KEY = "choices";
 
+    public static final int MAX_CHOICES = 25;
+
     private final @NotNull Collection<ApplicationCommandOptionChoice> choices;
 
     public Autocomplete(@NotNull Collection<ApplicationCommandOptionChoice> choices) {

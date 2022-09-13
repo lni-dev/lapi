@@ -20,4 +20,8 @@ public class LApiRuntimeException extends RuntimeException{
     public LApiRuntimeException(String message){
         super(message);
     }
+
+    public LApiRuntimeException(Throwable cause) {
+        super(cause);
+    }
 }

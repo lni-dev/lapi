@@ -23,9 +23,12 @@ import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
+import me.linusdev.lapi.api.objects.interaction.InteractionType;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
+import me.linusdev.lapi.api.objects.interaction.response.data.AutocompleteBuilder;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -162,6 +165,8 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
     @Override
     public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
+        if(event.getType() != InteractionType.APPLICATION_COMMAND && event.getType() != InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE)
+            return;
         if(!event.hasCommandId()) return;
         //noinspection ConstantConditions: checked by above if
         @NotNull String commandId = event.getCommandId();
@@ -172,10 +177,23 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 if(command.getKey().equals(commandId)) {
                     try {
                         InteractionResponseBuilder builder = new InteractionResponseBuilder(lApi, event.getInteraction());
-                        command.getValue().onInteract(event, builder);
-                        builder.getQueueable().queueAndWait();
+                        if(event.getType() == InteractionType.APPLICATION_COMMAND) {
+
+                            if(command.getValue().onInteract(event, builder))
+                                builder.getQueueable().queueAndWait();
+
+                        } else if (event.getType() == InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
+                            AutocompleteBuilder autocomplete = new AutocompleteBuilder();
+                            if(command.getValue().onAutocomplete(event, new SelectedOptions(event.getInteraction().getInteractionData()), autocomplete))
+                                builder.applicationCommandAutocompleteResult(autocomplete.build(true))
+                                        .getQueueable().queueAndWait();
+
+                        }
+
+
                     } catch (Throwable t) {
                         command.getValue().onError(t);
+
                     }
                     return;
                 }

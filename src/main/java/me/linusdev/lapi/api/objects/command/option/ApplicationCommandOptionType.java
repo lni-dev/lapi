@@ -135,7 +135,7 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
         return UNKNOWN;
     }
 
-    public R convertValue(LApi lApi, C convertible) throws E{
+    public R convertValue(LApi lApi, C convertible) throws E {
         return converter.convert(lApi, convertible);
     }
 

@@ -133,16 +133,16 @@ public abstract class CommandNameAndDescriptionBuilder<B extends CommandNameAndD
     }
 
     /**
-     * see {@link ApplicationCommandOptionBuilder#newSubCommandOptionBuilder(HasLApi, String, String, boolean) here} for more information
+     * see {@link ApplicationCommandOptionBuilder#newSubCommandOptionBuilder(HasLApi, String, String) here} for more information
      * @param adjuster {@link Consumer} to further adjust the {@link ApplicationCommandOptionBuilder}
      * @param check whether to if the {@link ApplicationCommandOption} will be valid
      * @return this
      */
-    public B addSubCommandOption(@NotNull String name, @NotNull String description, boolean required,
+    public B addSubCommandOption(@NotNull String name, @NotNull String description,
                                  @Nullable Consumer<ApplicationCommandOptionBuilder> adjuster, boolean check) throws InvalidApplicationCommandOptionException {
 
         ApplicationCommandOptionBuilder option = ApplicationCommandOptionBuilder
-                .newSubCommandOptionBuilder(this, name, description, required);
+                .newSubCommandOptionBuilder(this, name, description);
 
         if(adjuster != null) adjuster.accept(option);
 
@@ -153,16 +153,16 @@ public abstract class CommandNameAndDescriptionBuilder<B extends CommandNameAndD
     }
 
     /**
-     * see {@link ApplicationCommandOptionBuilder#newSubCommandGroupOptionBuilder(HasLApi, String, String, boolean) here} for more information
+     * see {@link ApplicationCommandOptionBuilder#newSubCommandGroupOptionBuilder(HasLApi, String, String) here} for more information
      * @param adjuster {@link Consumer} to further adjust the {@link ApplicationCommandOptionBuilder}
      * @param check whether to if the {@link ApplicationCommandOption} will be valid
      * @return this
      */
-    public B addSubCommandGroupOption(@NotNull String name, @NotNull String description, boolean required,
+    public B addSubCommandGroupOption(@NotNull String name, @NotNull String description,
                                  @Nullable Consumer<ApplicationCommandOptionBuilder> adjuster, boolean check) throws InvalidApplicationCommandOptionException {
 
         ApplicationCommandOptionBuilder option = ApplicationCommandOptionBuilder
-                .newSubCommandGroupOptionBuilder(this, name, description, required);
+                .newSubCommandGroupOptionBuilder(this, name, description);
 
         if(adjuster != null) adjuster.accept(option);
 
