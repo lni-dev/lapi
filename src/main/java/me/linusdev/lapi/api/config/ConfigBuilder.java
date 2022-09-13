@@ -28,6 +28,12 @@ import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.command.BaseCommand;
+import me.linusdev.lapi.api.manager.command.Command;
+import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
+import me.linusdev.lapi.api.manager.command.provider.ServiceLoadingCommandProvider;
+import me.linusdev.lapi.api.manager.command.provider.SimpleCommandProvider;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.LApiGuildManagerImpl;
 import me.linusdev.lapi.api.manager.ManagerFactory;
@@ -87,6 +93,7 @@ public class ConfigBuilder implements Datable {
     private long flags = 0;
     private Supplier<Queue<Future<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
+    private @Nullable CommandProvider commandProvider;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
     private ManagerFactory<RoleManager> roleManagerFactory = null;
     private ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory = null;
@@ -291,6 +298,7 @@ public class ConfigBuilder implements Datable {
      *     It's much easier if you use {@link #adjustGatewayConfig(Consumer)}
      * </p>
      * @param gatewayConfigBuilder gateway config
+     * @return this
      * @see #adjustGatewayConfig(Consumer)
      */
     public ConfigBuilder setGatewayConfig(@NotNull GatewayConfigBuilder gatewayConfigBuilder) {
@@ -311,6 +319,26 @@ public class ConfigBuilder implements Datable {
     public ConfigBuilder adjustGatewayConfig(@NotNull Consumer<GatewayConfigBuilder> setConfig) {
         setConfig.accept(gatewayConfigBuilder);
         return this;
+    }
+
+    /**
+     * <em>Optional / Not Recommended</em><br>
+     *  Default: {@code new ServiceLoadingCommandProvider()}
+     * <p>
+     *      The {@link CommandProvider}, so {@link CommandManager} finds your {@link BaseCommand commands}
+     *      if they are not added as services using the {@link Command} annotation.
+     *      See {@link BaseCommand} for more information.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default
+     * </p>
+     *
+     * @param commandProvider {@link CommandProvider} to manually add commands to the {@link CommandManager}.
+     * @see SimpleCommandProvider
+     * @see BaseCommand
+     */
+    public void setCommandProvider(@Nullable CommandProvider commandProvider) {
+        this.commandProvider = commandProvider;
     }
 
     /**
@@ -600,6 +628,7 @@ public class ConfigBuilder implements Datable {
                 token,
                 applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
+                Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
                 Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),

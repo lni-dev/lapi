@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.command;
+package me.linusdev.lapi.api.manager.command.provider;
 
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.BaseCommand;
+import me.linusdev.lapi.api.manager.command.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.annotation.*;
+import java.util.Iterator;
 
 /**
- * Annotation to automatically add {@link BaseCommand commands} as services. Requires
- * the dependency <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
- * @see BaseCommand
+ * This provider is used to manually add your {@link BaseCommand}s to the {@link CommandManager}.
+ * {@link #iterator(LApi)} must return an instance for each class extending {@link BaseCommand}.
  */
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public interface CommandProvider {
+
+    @NotNull Iterator<BaseCommand> iterator(@NotNull LApi lApi);
 
 }

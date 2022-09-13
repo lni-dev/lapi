@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.command;
+package me.linusdev.lapi.api.manager.command.provider;
 
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.BaseCommand;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.annotation.*;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
-/**
- * Annotation to automatically add {@link BaseCommand commands} as services. Requires
- * the dependency <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
- * @see BaseCommand
- */
-@Inherited
-@Documented
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public class ServiceLoadingCommandProvider implements CommandProvider{
+    @Override
+    public @NotNull Iterator<BaseCommand> iterator(@NotNull LApi lApi) {
+        ServiceLoader<BaseCommand> commands = ServiceLoader.load(BaseCommand.class);
 
+        return commands.iterator();
+    }
 }

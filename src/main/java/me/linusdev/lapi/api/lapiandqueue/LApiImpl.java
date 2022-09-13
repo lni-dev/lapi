@@ -211,7 +211,7 @@ public class LApiImpl implements LApi {
             cache = null;
         }
 
-        commandManager = new CommandManager(this);
+        commandManager = new CommandManager(this, config.getCommandProvider());
 
 
         //VoiceRegions

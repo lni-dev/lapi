@@ -19,7 +19,9 @@ package me.linusdev.lapi.api.manager.command;
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.config.Config;
+import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
@@ -44,15 +46,14 @@ import java.util.function.Predicate;
  *         <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
  *     </li>
  *     <li>
- *         or manually add it to the {@link Config}.<br>
- *         TODO: add @link how to add to config
+ *         or manually add it to the config. see {@link ConfigBuilder#setCommandProvider(CommandProvider) setCommandProvider(...)}.<br>
  *     </li>
  * </ul>
  *
  * If your command is registered, it will be automatically managed by {@link LApi}.
  *
  * <h2>Requirements</h2>
- * The following requirements must always be met:
+ * <b>All</b> of the following requirements must always be met:
  * <ul>
  *     <li>
  *         You have overwritten {@link #getScope()} to return the scope of your command
@@ -62,7 +63,7 @@ import java.util.function.Predicate;
  *         You dont have any overwritten methods that return {@code null}
  *     </li>
  * </ul>
- * One of the following requirements must be met:
+ * <b>One</b> of the following requirements must be met:
  * <ul>
  *     <li>
  *         You have overwritten {@link #create()} to return your commands {@link ApplicationCommandTemplate template}.

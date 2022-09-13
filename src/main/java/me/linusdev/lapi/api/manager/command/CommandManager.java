@@ -23,11 +23,13 @@ import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
+import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,14 +44,16 @@ import static me.linusdev.lapi.api.manager.command.CommandUtils.*;
 public class CommandManager implements Manager, EventListener {
 
     private final @NotNull LApiImpl lApi;
+    private final @NotNull CommandProvider provider;
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     private final HashMap<String, BaseCommand> commandsMap;
 
-    public CommandManager(@NotNull LApiImpl lApi) throws IOException {
+    public CommandManager(@NotNull LApiImpl lApi, @NotNull CommandProvider provider) throws IOException {
         this.lApi = lApi;
+        this.provider = provider;
 
         this.commandsMap = new HashMap<>();
 
@@ -96,10 +100,8 @@ public class CommandManager implements Manager, EventListener {
 
         Future<ArrayList<ApplicationCommand>> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
 
-        log.debug("loading commands with a ServiceLoader");
-        ServiceLoader<BaseCommand> commands = ServiceLoader.load(BaseCommand.class);
-
-        Iterator<BaseCommand> it = commands.iterator();
+        log.debug("loading commands with the Provider '" + provider.getClass().getCanonicalName() + "'.");
+        Iterator<BaseCommand> it = provider.iterator(lApi);
         while (true){
             try {
                 if(!it.hasNext()) break;

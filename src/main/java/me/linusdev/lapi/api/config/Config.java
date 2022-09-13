@@ -20,6 +20,7 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
@@ -48,6 +49,7 @@ public class Config {
     private final @Nullable Snowflake applicationId;
     private final @NotNull ApiVersion apiVersion;
     private final @NotNull GatewayConfig gatewayConfig;
+    private final @NotNull CommandProvider commandProvider;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
     private final @NotNull ManagerFactory<RoleManager> roleManagerFactory;
     private final @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory;
@@ -62,7 +64,7 @@ public class Config {
 
     public Config(long flags, @NotNull Supplier<Queue<Future<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
-                  @NotNull ManagerFactory<GuildManager> guildManagerFactory,
+                  @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
@@ -72,6 +74,7 @@ public class Config {
         this.applicationId = applicationId;
         this.apiVersion = apiVersion;
         this.gatewayConfig = gatewayConfig;
+        this.commandProvider = commandProvider;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
         this.emojiManagerFactory = emojiManagerFactory;
@@ -115,6 +118,10 @@ public class Config {
 
     public @NotNull GatewayConfig getGatewayConfig() {
         return gatewayConfig;
+    }
+
+    public @NotNull CommandProvider getCommandProvider() {
+        return commandProvider;
     }
 
     public @NotNull ManagerFactory<GuildManager> getGuildManagerFactory() {
