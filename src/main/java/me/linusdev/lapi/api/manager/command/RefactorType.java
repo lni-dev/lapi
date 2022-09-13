@@ -29,6 +29,7 @@ public class RefactorType<T> {
             new Functions<>() {
                 @Override
                 public List<ApplicationCommand> match(@NotNull MatchingInformation info, @NotNull BaseCommand command, @NotNull Refactor<String> refactor) {
+                    //template can be null. because BaseCommand.getType() and getName() will check it if not overwritten.
                     return CommandUtils.match(info, command.getScope(), command.getId(), null, command.getType(), refactor.getOldValue());
                 }
 
@@ -43,7 +44,7 @@ public class RefactorType<T> {
             new Functions<>() {
                 @Override
                 public List<ApplicationCommand> match(@NotNull MatchingInformation info, @NotNull BaseCommand command, @NotNull Refactor<CommandScope> refactor) {
-                    return CommandUtils.match(info, refactor.getOldValue(), command.getId(), null, command.getType(), command.getName());
+                    return CommandUtils.match(info, refactor.getOldValue(), command.getId(), command.getTemplate(), command.getType(), command.getName());
                 }
 
                 @Override

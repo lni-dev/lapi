@@ -94,7 +94,7 @@ public class CommandUtils {
                 info.getLog().debug("Linking command.");
                 for(ApplicationCommand match : matches) {
                     info.getConnectedCommands().put(match.getId(), command);
-                    command.setConnected(match);
+                    command.linkWith(match);
                 }
                 info.getLog().debug("Command linked.");
 
@@ -130,7 +130,7 @@ public class CommandUtils {
                             command.onError(error.getThrowable());
 
                         } else {
-                            command.setConnected(returnCommand);
+                            command.linkWith(returnCommand);
                             info.getConnectedCommands().put(returnCommand.getId(), command);
 
                         }
@@ -153,7 +153,7 @@ public class CommandUtils {
                                 command.onError(error.getThrowable());
 
                             } else {
-                                command.setConnected(returnCommand);
+                                command.linkWith(returnCommand);
                                 info.getConnectedCommands().put(returnCommand.getId(), command);
 
                             }

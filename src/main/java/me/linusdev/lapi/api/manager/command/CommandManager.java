@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
+import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -167,25 +168,23 @@ public class CommandManager implements Manager, EventListener {
         //noinspection ConstantConditions: checked by above if
         @NotNull String commandId = event.getCommandId();
 
-        //check global commands
-        for(Map.Entry<String, BaseCommand> command : commandsMap.entrySet()) {
-            if(command.getKey().equals(commandId)) {
-                try {
-                    command.getValue().onInteract(event);
-                } catch (Throwable t) {
-                    command.getValue().onError(t);
+        lApi.runSupervised(() -> {
+            //check global commands
+            for(Map.Entry<String, BaseCommand> command : commandsMap.entrySet()) {
+                if(command.getKey().equals(commandId)) {
+                    try {
+                        InteractionResponseBuilder builder = new InteractionResponseBuilder(lApi, event.getInteraction());
+                        command.getValue().onInteract(event, builder);
+                        builder.getQueueable().queueAndWait();
+                    } catch (Throwable t) {
+                        command.getValue().onError(t);
+                    }
+                    return;
                 }
-                return;
             }
-        }
+        });
 
-        //check guild commands
-        if(event.getGuildId() != null) {
-            //TODO: error
-            return;
-        }
-        @NotNull String guild = event.getGuildId();
-        //TODO: check guild commands
+
     }
 
     @Override

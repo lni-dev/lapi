@@ -23,13 +23,16 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
+import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandBuilder;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * <h2>Register your Command</h2>
@@ -54,6 +57,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *     <li>
  *         You have overwritten {@link #getScope()} to return the scope of your command
  *         ({@link CommandScope#GUILD GUILD} or {@link CommandScope#GLOBAL GLOBAL})
+ *     </li>
+ *     <li>
+ *         You dont have any overwritten methods that return {@code null}
  *     </li>
  * </ul>
  * One of the following requirements must be met:
@@ -81,14 +87,13 @@ public abstract class BaseCommand implements HasLApi {
      * Will be available, after the {@link CommandManager} has called {@link #setlApi(LApi)}.<br><br>
      * Will always be {@code null} in the constructor!<br>
      * Will never be {@code null} in {@link #getId()}, {@link #getName()}, {@link #getScope()}, {@link #getType()},
-     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent)}.
+     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent, InteractionResponseBuilder)}.
      * (given that these functions are only called by the {@link CommandManager})
      */
     protected LApi lApi;
-    private final @NotNull AtomicBoolean connected = new AtomicBoolean(false);
 
     private @Nullable ApplicationCommandTemplate template;
-    private @Nullable ApplicationCommand connectedCommand;
+    private @NotNull List<ApplicationCommand> linkedApplicationCommands = new ArrayList<>();
 
     @ApiStatus.OverrideOnly
     public @Nullable String getId() {
@@ -99,13 +104,17 @@ public abstract class BaseCommand implements HasLApi {
     public @Nullable String getName() {
 
         if(getTemplate() == null) {
-            if(isConnected() && connectedCommand != null)
-                return connectedCommand.getName();
-
-            return null;
+            return getNameFromLinkedApplicationCommands();
         }
 
         return getTemplate().getName();
+    }
+
+    @Nullable String getNameFromLinkedApplicationCommands() {
+        if(!linkedApplicationCommands.isEmpty()) {
+            return linkedApplicationCommands.get(0).getName();
+        }
+        return null;
     }
 
     /**
@@ -115,10 +124,7 @@ public abstract class BaseCommand implements HasLApi {
     @ApiStatus.OverrideOnly
     public @Nullable ApplicationCommandType getType() {
         if(getTemplate() == null) {
-            if(isConnected() && connectedCommand != null)
-                return connectedCommand.getType();
-
-            return null;
+            return getTypeFromLinkedApplicationCommands();
         }
         ApplicationCommandType type = getTemplate().getType();
         if(type == null) {
@@ -127,6 +133,13 @@ public abstract class BaseCommand implements HasLApi {
             type = ApplicationCommandType.CHAT_INPUT;
         }
         return type;
+    }
+
+    @Nullable ApplicationCommandType getTypeFromLinkedApplicationCommands() {
+        if(!linkedApplicationCommands.isEmpty()) {
+            return linkedApplicationCommands.get(0).getType();
+        }
+        return null;
     }
 
     /**
@@ -175,7 +188,7 @@ public abstract class BaseCommand implements HasLApi {
      * @param event {@link InteractionCreateEvent}
      */
     @ApiStatus.OverrideOnly
-    public abstract void onInteract(InteractionCreateEvent event);
+    public abstract void onInteract(@NotNull InteractionCreateEvent event, @NotNull InteractionResponseBuilder response);
 
     /**
      * Handle errors, that happen while working with your command. For example if your command is missing information
@@ -188,18 +201,29 @@ public abstract class BaseCommand implements HasLApi {
     public abstract void onError(Throwable error);
 
     /**
-     * Whether this command represents a discord command
-     * @return {@code true} if this command represents a discord command
+     * Will iterate over all elements until your consumer returns {@code true} or there are no more elements.
+     * @param consumer consumer to iterate over the elements
+     * @return return value of your consumer for the last element iterated over.
      */
-    @Deprecated
-    public final boolean isConnected() {
-        return connected.get();
+    public final boolean forEachLinkedApplicationCommand(Predicate<ApplicationCommand> consumer) {
+        for(ApplicationCommand command : linkedApplicationCommands) {
+            if(consumer.test(command)) return true;
+        }
+        return false;
     }
 
     @ApiStatus.Internal
-    final void setConnected(@NotNull ApplicationCommand connectedCommand) {
-        this.connected.set(true);
-        this.connectedCommand = connectedCommand;
+    final void linkWith(@NotNull ApplicationCommand command) {
+        linkedApplicationCommands.add(command);
+    }
+
+    /**
+     * checks if given {@link ApplicationCommand} is contained in {@link #linkedApplicationCommands}.
+     * @param command {@link ApplicationCommand} to check
+     * @return {@code true} if the {@link ApplicationCommand} is already linked to this {@link BaseCommand}
+     */
+    final boolean isLinkedWith(@NotNull ApplicationCommand command) {
+        return forEachLinkedApplicationCommand(c -> c.getId().equals(command.getId()));
     }
 
     /**
