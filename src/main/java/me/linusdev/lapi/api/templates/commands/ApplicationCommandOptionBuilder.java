@@ -674,19 +674,8 @@ public class ApplicationCommandOptionBuilder extends CommandNameAndDescriptionBu
                 throw new InvalidApplicationCommandOptionException("only subcommand and subcommand group options can have nested options.");
             }
 
-            for(ApplicationCommandOption option : options) {
-                if(type == ApplicationCommandOptionType.SUB_COMMAND
-                        && (option.getType() == ApplicationCommandOptionType.SUB_COMMAND || option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)) {
-                    throw new InvalidApplicationCommandOptionException("A subcommand cannot have a nested subcommand" +
-                            " or subcommand group option.");
-                }
+            ApplicationCommandBuilder.checkOptions(type, options);
 
-                if(type == ApplicationCommandOptionType.SUB_COMMAND_GROUP
-                        && (option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)) {
-                    throw new InvalidApplicationCommandOptionException("A subcommand group cannot have a nested subcommand group" +
-                            " option.");
-                }
-            }
         }
 
         return this;

@@ -179,7 +179,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                         InteractionResponseBuilder builder = new InteractionResponseBuilder(lApi, event.getInteraction());
                         if(event.getType() == InteractionType.APPLICATION_COMMAND) {
 
-                            if(command.getValue().onInteract(event, builder))
+                            if(command.getValue().onInteract(event, new SelectedOptions(event.getInteraction().getInteractionData()), builder))
                                 builder.getQueueable().queueAndWait();
 
                         } else if (event.getType() == InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {

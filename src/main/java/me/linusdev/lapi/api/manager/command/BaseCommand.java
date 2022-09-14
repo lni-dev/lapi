@@ -46,7 +46,7 @@ import java.util.function.Predicate;
  *     <li>
  *         either add the {@link Command} annotation to your class that extends {@link BaseCommand}
  *         and add the following dependency to your build.gradle:
- *         <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
+ *         <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.1'}</pre>
  *     </li>
  *     <li>
  *         or manually add it to the config. see {@link ConfigBuilder#setCommandProvider(CommandProvider) setCommandProvider(...)}.<br>
@@ -91,7 +91,7 @@ public abstract class BaseCommand implements HasLApi {
      * Will be available, after the {@link CommandManagerImpl} has called {@link #setlApi(LApi)}.<br><br>
      * Will always be {@code null} in the constructor!<br>
      * Will never be {@code null} in {@link #getId()}, {@link #getName()}, {@link #getScope()}, {@link #getType()},
-     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent, InteractionResponseBuilder)}.
+     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent, SelectedOptions, InteractionResponseBuilder)}.
      * (given that these functions are only called by the {@link CommandManagerImpl})
      */
     protected LApi lApi;
@@ -194,7 +194,7 @@ public abstract class BaseCommand implements HasLApi {
      * @return whether to automatically {@link Queueable#queue() queue} the response after this method. {@code true} will queue it, {@code false} won't.
      */
     @ApiStatus.OverrideOnly
-    public abstract boolean onInteract(@NotNull InteractionCreateEvent event, @NotNull InteractionResponseBuilder response);
+    public abstract boolean onInteract(@NotNull InteractionCreateEvent event, @NotNull SelectedOptions options, @NotNull InteractionResponseBuilder response);
 
     /**
      * Respond to autocomplete events. Only if {@link ApplicationCommandOption#getAutocomplete()} is {@code true}.

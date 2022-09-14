@@ -102,7 +102,7 @@ public class ApplicationCommandInteractionDataOption implements Datable {
      * value of application command option type. <br>
      * Gives information about what {@link #getValue()} will return
      */
-    public @NotNull ApplicationCommandOptionType getType() {
+    public @NotNull ApplicationCommandOptionType<?,?,?> getType() {
         return type;
     }
 

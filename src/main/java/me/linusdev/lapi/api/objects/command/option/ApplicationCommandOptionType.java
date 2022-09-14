@@ -148,4 +148,8 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
         return value;
     }
 
+    @Override
+    public String toString() {
+        return "ApplicationCommandOptionType: " + value;
+    }
 }

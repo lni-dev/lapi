@@ -22,8 +22,7 @@ import me.linusdev.lapi.api.objects.command.ApplicationCommandInteractionDataOpt
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
 import me.linusdev.lapi.api.objects.interaction.InteractionData;
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,26 +32,47 @@ import java.util.List;
 public class SelectedOptions {
 
 
-    private ArrayList<ApplicationCommandInteractionDataOption> options;
+    private @Nullable ApplicationCommandInteractionDataOption subCommandGroup = null;
+    private @Nullable ApplicationCommandInteractionDataOption subCommand = null;
+
+    private @NotNull List<ApplicationCommandInteractionDataOption> options;
 
     public SelectedOptions(@Nullable InteractionData data) {
         options = new ArrayList<>();
         if(data == null) return;
 
-        //TODO: remove
-        LogInstance log = Logger.getLogger(this);
-        log.debug("SelectedOptions: " + data.getData().toJsonString());
-
-        if(data.getOptions() != null&& !data.getOptions().isEmpty()){
+        if(data.getOptions() != null && !data.getOptions().isEmpty()){
             ApplicationCommandInteractionDataOption option = data.getOptions().get(0);
-            while (option != null) {
-                options.add(option);
-                if(option.getOptions() != null && !option.getOptions().isEmpty())
-                    option = option.getOptions().get(0);
-                else
-                    option = null;
+
+            if(option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
+                subCommandGroup = option;
+                readOptions(option);
+
+            } else if(option.getType() == ApplicationCommandOptionType.SUB_COMMAND) {
+                subCommand = option;
+                readOptions(option);
+
+            } else {
+                options = data.getOptions();
+            }
+        }
+
+    }
+
+    private void readOptions(@NotNull ApplicationCommandInteractionDataOption option) {
+        if (option.getOptions() != null && !option.getOptions().isEmpty()) {
+            ApplicationCommandInteractionDataOption first = option.getOptions().get(0);
+            if (first.getType() == ApplicationCommandOptionType.SUB_COMMAND) {
+                subCommand = first;
+                readOptions(first);
+
+            } else {
+                options = option.getOptions();
 
             }
+
+        } else {
+            options = new ArrayList<>();
         }
     }
 
@@ -111,6 +131,44 @@ public class SelectedOptions {
         for(ApplicationCommandInteractionDataOption option : options) {
             if(option.getName().equals(name)) return option;
         }
+
+        if(subCommandGroup != null && subCommandGroup.getName().equals(name)) return subCommandGroup;
+        if(subCommand != null && subCommand.getName().equals(name)) return subCommandGroup;
+
         return null;
+    }
+
+    /**
+     *
+     * @return the sub command or {@code null} if no sub command is used
+     */
+    public ApplicationCommandInteractionDataOption getSubCommand() {
+        return subCommand;
+    }
+
+    /**
+     *
+     * @return the sub command name or {@code null} if no sub command is used
+     */
+    public String getSubCommandName() {
+        if(subCommand == null) return null;
+        return subCommand.getName();
+    }
+
+    /**
+     *
+     * @return the sub command group or {@code null} if no sub command group is used
+     */
+    public ApplicationCommandInteractionDataOption getSubCommandGroup() {
+        return subCommandGroup;
+    }
+
+    /**
+     *
+     * @return the sub command group name or {@code null} if no sub command group is used
+     */
+    public String getSubCommandGroupName() {
+        if(subCommandGroup == null) return null;
+        return subCommandGroup.getName();
     }
 }

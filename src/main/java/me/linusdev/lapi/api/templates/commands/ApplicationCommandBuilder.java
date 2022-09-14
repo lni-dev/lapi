@@ -17,18 +17,23 @@
 package me.linusdev.lapi.api.templates.commands;
 
 import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandOptionException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
+import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
 import me.linusdev.lapi.api.other.localization.Localization;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -302,6 +307,11 @@ public class ApplicationCommandBuilder extends CommandNameAndDescriptionBuilder<
             }
         }
 
+        //options
+        if(options != null) {
+            checkOptions(null, options);
+        }
+
         //type specific
         if(type == ApplicationCommandType.CHAT_INPUT) {
             if(!name.matches(ApplicationCommand.COMMAND_NAME_MATCH_REGEX)) throw new InvalidApplicationCommandException("name does meet requirements (regex check failed).");
@@ -331,6 +341,42 @@ public class ApplicationCommandBuilder extends CommandNameAndDescriptionBuilder<
 
 
         return this;
+    }
+
+    /**
+     *
+     * @param ownType type of the option containing given options. {@code null} means {@link ApplicationCommand}.
+     * @param options containing options
+     */
+    @ApiStatus.Internal
+    public static void checkOptions(@Nullable ApplicationCommandOptionType<?,?,?> ownType, @NotNull List<ApplicationCommandOption> options) {
+
+        boolean hasSubCommandOrGroup = false;
+        boolean hasOtherOption = false;
+
+        for (ApplicationCommandOption option : options) {
+
+            if (option.getType() == ApplicationCommandOptionType.SUB_COMMAND || option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP) {
+                hasSubCommandOrGroup = true;
+                if (ownType == ApplicationCommandOptionType.SUB_COMMAND) {
+                    throw new InvalidApplicationCommandOptionException("A subcommand cannot have a nested subcommand" +
+                            " or subcommand group option.");
+
+                } else if (ownType == ApplicationCommandOptionType.SUB_COMMAND_GROUP
+                        && (option.getType() == ApplicationCommandOptionType.SUB_COMMAND_GROUP)) {
+                    throw new InvalidApplicationCommandOptionException("A subcommand group cannot have a nested subcommand group" +
+                            " option.");
+
+                }
+
+            } else {
+                hasOtherOption = true;
+            }
+        }
+
+        if(hasSubCommandOrGroup && hasOtherOption) {
+            throw new InvalidApplicationCommandOptionException("Sub-command and sub-command group option types are mutually exclusive to all other types");
+        }
     }
 
     /**

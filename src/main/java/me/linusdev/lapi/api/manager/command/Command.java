@@ -21,7 +21,7 @@ import java.lang.annotation.*;
 
 /**
  * Annotation to automatically add {@link BaseCommand commands} as services. Requires
- * the dependency <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'}</pre>
+ * the dependency <pre>{@code annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.1'}</pre>
  * @see BaseCommand
  */
 @Inherited
