@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.log.LogInstance;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -32,36 +33,36 @@ public class MatchingInformation implements HasLApi {
 
     private final @NotNull List<BaseCommand> localCommands;
 
-    private final @NotNull List<ApplicationCommand> globalCommandsOnDiscord;
-    private final @NotNull Map<String, List<ApplicationCommand>> guildCommandsOnDiscord;
+    private final @Nullable List<ApplicationCommand> globalCommandsOnDiscord;
+    private final @Nullable List<ApplicationCommand> guildCommandsOnDiscord;
 
-    private final @NotNull Map<String, BaseCommand> connectedCommands;
+    private final @NotNull Map<String, BaseCommand> commandLinks;
 
     public MatchingInformation(@NotNull LApi lApi, @NotNull LogInstance log, @NotNull List<BaseCommand> localCommands,
-                               @NotNull List<ApplicationCommand> globalCommandsOnDiscord,
-                               @NotNull Map<String, List<ApplicationCommand>> guildCommandsOnDiscord, @NotNull Map<String, BaseCommand> connectedCommands) {
+                               @Nullable List<ApplicationCommand> globalCommandsOnDiscord,
+                               @Nullable List<ApplicationCommand> guildCommandsOnDiscord, @NotNull Map<String, BaseCommand> commandLinks) {
         this.lApi = lApi;
         this.log = log;
         this.localCommands = localCommands;
         this.globalCommandsOnDiscord = globalCommandsOnDiscord;
         this.guildCommandsOnDiscord = guildCommandsOnDiscord;
-        this.connectedCommands = connectedCommands;
+        this.commandLinks = commandLinks;
     }
 
     public @NotNull List<BaseCommand> getLocalCommands() {
         return localCommands;
     }
 
-    public @NotNull List<ApplicationCommand> getGlobalCommandsOnDiscord() {
+    public @Nullable List<ApplicationCommand> getGlobalCommandsOnDiscord() {
         return globalCommandsOnDiscord;
     }
 
-    public @NotNull Map<String, List<ApplicationCommand>> getGuildCommandsOnDiscord() {
+    public @Nullable List<ApplicationCommand> getGuildCommandsOnDiscord() {
         return guildCommandsOnDiscord;
     }
 
-    public @NotNull Map<String, BaseCommand> getConnectedCommands() {
-        return connectedCommands;
+    public @NotNull Map<String, BaseCommand> getCommandLinks() {
+        return commandLinks;
     }
 
     public @NotNull LogInstance getLog() {

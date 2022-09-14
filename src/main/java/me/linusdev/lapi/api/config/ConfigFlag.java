@@ -264,8 +264,17 @@ public enum ConfigFlag implements SimpleDatable {
 
     /**
      * <p>
-     *     Enables the {@link CommandManagerImpl}, so you can create your own {@link BaseCommand}s.
+     *     Enables the {@link CommandManagerImpl}, so you can create your own {@link BaseCommand commands}.
      * </p>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link #BASIC_CACHE}
+     *     </li>
+     *     <li>
+     *         {@link #ENABLE_GATEWAY}
+     *     </li>
+     * </ul>
      * @see LApi#getCommandManager()
      * @see BaseCommand
      */

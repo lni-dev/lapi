@@ -97,7 +97,7 @@ public abstract class BaseCommand implements HasLApi {
     protected LApi lApi;
 
     private @Nullable ApplicationCommandTemplate template;
-    private @NotNull List<ApplicationCommand> linkedApplicationCommands = new ArrayList<>();
+    private final @NotNull List<ApplicationCommand> linkedApplicationCommands = new ArrayList<>();
 
     @ApiStatus.OverrideOnly
     public @Nullable String getId() {

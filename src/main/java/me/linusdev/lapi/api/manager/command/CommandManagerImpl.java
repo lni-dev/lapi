@@ -17,13 +17,16 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.GuildCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
+import me.linusdev.lapi.api.manager.command.guild.GuildCommands;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.interaction.InteractionType;
@@ -39,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,50 +56,31 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    private final HashMap<String, BaseCommand> commandsMap;
+    private final @NotNull List<BaseCommand> localCommands;
+    private final @NotNull Map<String, BaseCommand> commandLinks;
+
+    private final @NotNull Map<String, GuildCommands> guildCommandsOnDiscord;
+    private final @NotNull Object guildCommandsOnDiscordWriteLock = new Object();
 
     public CommandManagerImpl(@NotNull LApiImpl lApi, @NotNull CommandProvider provider) throws IOException {
         this.lApi = lApi;
         this.provider = provider;
 
-        this.commandsMap = new HashMap<>();
+        this.localCommands = new ArrayList<>();
+        this.commandLinks = new ConcurrentHashMap<>();
+        this.guildCommandsOnDiscord = new ConcurrentHashMap<>();
 
-        //TODO: add as specified listener
-        lApi.getEventTransmitter().addListener(this);
-    }
+        lApi.getEventTransmitter().addSpecifiedListener(this,
+                EventIdentifier.GUILD_CREATE,
+                EventIdentifier.INTERACTION_CREATE,
+                EventIdentifier.CACHE_READY);
 
-    private @NotNull List<String> readServices() {
-        ArrayList<String> list = new ArrayList<>();
-
-        BufferedReader reader = null;
-        try{
-            InputStream inputStream = lApi.getCallerClass().getClassLoader().getResourceAsStream("META-INF/services/me.linusdev.lapi.api.manager.command.BaseCommand");
-            if(inputStream == null) return list;
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-
-            while((line =reader.readLine()) != null){
-                list.add(line);
-            }
-        }catch (IOException exception) {
-            Logger.getLogger(this).error(exception);
-        } finally {
-            if(reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ignored) {}
-            }
-        }
-
-        return list;
     }
 
     @ApiStatus.Internal
     @Override
     public void init(int initialCapacity) {
         if(isInitialized()) return;
-
-        ArrayList<BaseCommand> localCommands = new ArrayList<>();
 
         Future<ArrayList<ApplicationCommand>> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
 
@@ -116,7 +101,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 log.error("Exception while trying to load commands.");
                 log.error(t);
                 //break the loop, so that we do not have an infinite loop
-                return;
+                break;
             }
         }
 
@@ -148,19 +133,76 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
         }
 
         log.debug("starting to match commands.");
-        //TODO: Hashmap must be thread safe! (multiple threads adding and reading)
-        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, new HashMap<>(), commandsMap);
+        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, null, commandLinks);
         for(BaseCommand command : localCommands) {
-            if(!checkCommand(command, log)) continue;
+            if(!checkCommand(command, log) || command.getScope() != CommandScope.GLOBAL) continue;
             CommandUtils.matchCommand(info, command);
         }
 
-        initialized.set(true);
+        synchronized (initialized) {
+            initialized.set(true);
+            initialized.notifyAll();
+        }
+
+    }
+
+    private void initGuild(@NotNull String guildId) {
+        GuildCommands gc;
+        synchronized (guildCommandsOnDiscordWriteLock) {
+            //make sure that, this guild is not loaded twice
+            gc = this.guildCommandsOnDiscord.get(guildId);
+
+            if(gc != null && gc.isStarted()) return;
+
+            if(gc == null){
+                gc = new GuildCommands();
+                this.guildCommandsOnDiscord.put(guildId, gc);
+            }
+            gc.setStarted(true);
+        }
+
+        ArrayList<ApplicationCommand> guildCommandsOnDiscord = null;
+        try {
+            guildCommandsOnDiscord = this.lApi.getRequestFactory().getGuildApplicationCommands(guildId, true).queueAndWait();
+            gc.setCommands(guildCommandsOnDiscord);
+
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Could not fetch discord commands, command manager cannot initialize guild with id " + guildId + "!");
+            log.error(e);
+            return;
+        }
+
+        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, guildCommandsOnDiscord, commandLinks);
+        for(BaseCommand command : localCommands) {
+            if(!checkCommand(command, log) || command.getScope() != CommandScope.GUILD) continue;
+            CommandUtils.matchCommand(info, command);
+        }
+
+        gc.initialized();
     }
 
     @Override
     public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
         lApi.runSupervised(() -> init(0));
+        lApi.getEventTransmitter().removeSpecifiedListener(this, EventIdentifier.CACHE_READY);
+    }
+
+    @Override
+    public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
+        lApi.runSupervised(() -> {
+            try {
+                synchronized (initialized) {
+                    if(!initialized.get()) {
+                        initialized.wait();
+                    }
+                }
+
+                initGuild(event.getGuildId());
+
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -173,7 +215,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
         lApi.runSupervised(() -> {
             //check global commands
-            for(Map.Entry<String, BaseCommand> command : commandsMap.entrySet()) {
+            for(Map.Entry<String, BaseCommand> command : commandLinks.entrySet()) {
                 if(command.getKey().equals(commandId)) {
                     try {
                         InteractionResponseBuilder builder = new InteractionResponseBuilder(lApi, event.getInteraction());
@@ -199,12 +241,46 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 }
             }
         });
+    }
+
+    /**
+     * <p>
+     *     If the {@link BaseCommand} is already enabled for any of the guilds in the list, the method will return without
+     *     doing anything.
+     * </p>
+     * @param clazz {@link Class} of your {@link BaseCommand}
+     * @param guildId the ids of all guild to enable this command for
+     */
+    public void enabledCommandForGuilds(@NotNull Class<? extends BaseCommand> clazz, @NotNull String... guildId) {
+        lApi.runSupervised(() -> {
+            for(BaseCommand command : localCommands) {
+                if(command.getClass().equals(clazz)) {
+                    List<String> guildIds = List.of(guildId);
+                    for(String id : guildIds) {
+
+                        GuildCommands gc = guildCommandsOnDiscord.computeIfAbsent(id, s -> new GuildCommands());
+
+                        try {
+                            gc.awaitInit();
+                        } catch (InterruptedException e) {throw new RuntimeException(e);}
+
+                        if(command.forEachLinkedApplicationCommand(acmd -> acmd.getGuildId() != null && acmd.getGuildId().equals(id))) {
+                            return;
+                        }
+                    }
 
 
+                    MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, null, commandLinks);
+                    CommandUtils.createCommand(info, command, guildIds, false);
+
+                    return;
+                }
+            }
+        });
     }
 
     @Override
-    public boolean isInitialized() {
+    public synchronized boolean isInitialized() {
         return initialized.get();
     }
 

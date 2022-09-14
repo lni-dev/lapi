@@ -40,7 +40,7 @@ public enum CommandScope {
 
                         } else {
                             command.linkWith(created);
-                            info.getConnectedCommands().put(created.getId(), command);
+                            info.getCommandLinks().put(created.getId(), command);
 
                         }
                     });
@@ -81,7 +81,7 @@ public enum CommandScope {
                                 command.onError(error.getThrowable());
                             } else {
                                 command.linkWith(created);
-                                info.getConnectedCommands().put(created.getId(), command);
+                                info.getCommandLinks().put(created.getId(), command);
                             }
                         });
             }
@@ -106,8 +106,6 @@ public enum CommandScope {
                                 command.onError(error.getThrowable());
                             }
                         });
-                //TODO: maybe remove?
-                command.linkWith(match);
             }
         }
     }),

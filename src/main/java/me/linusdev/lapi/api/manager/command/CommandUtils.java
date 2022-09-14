@@ -17,18 +17,23 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import me.linusdev.lapi.log.LogInstance;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -93,7 +98,7 @@ public class CommandUtils {
             } else {
                 info.getLog().debug("Linking command.");
                 for(ApplicationCommand match : matches) {
-                    info.getConnectedCommands().put(match.getId(), command);
+                    info.getCommandLinks().put(match.getId(), command);
                     command.linkWith(match);
                 }
                 info.getLog().debug("Command linked.");
@@ -105,7 +110,7 @@ public class CommandUtils {
 
     /**
      * Will edit the given matches and add the edited {@link ApplicationCommand}'s {@link ApplicationCommand#getId() ids}
-     * to {@link MatchingInformation#getConnectedCommands()}.
+     * to {@link MatchingInformation#getCommandLinks()}.
      *
      * @param info {@link MatchingInformation}
      * @param matches {@link ApplicationCommand}s to edit
@@ -131,7 +136,7 @@ public class CommandUtils {
 
                         } else {
                             command.linkWith(returnCommand);
-                            info.getConnectedCommands().put(returnCommand.getId(), command);
+                            info.getCommandLinks().put(returnCommand.getId(), command);
 
                         }
                     });
@@ -154,7 +159,7 @@ public class CommandUtils {
 
                             } else {
                                 command.linkWith(returnCommand);
-                                info.getConnectedCommands().put(returnCommand.getId(), command);
+                                info.getCommandLinks().put(returnCommand.getId(), command);
 
                             }
                         });
@@ -317,13 +322,9 @@ public class CommandUtils {
             if (template != null) {
                 //match by template
                 info.getLog().debug("Matching by template: type=" + template.getType() + ", name=" + template.getName());
-
-                ApplicationCommand match;
-                for (Map.Entry<String, List<ApplicationCommand>> entry : info.getGuildCommandsOnDiscord().entrySet()) {
-                    match = matchInList(entry.getValue(), ac -> ac.getType() == template.getType() && ac.getName().equals(template.getName()));
-                    if (match == null) continue;
-                    matches.add(match);
-                }
+                ApplicationCommand match = matchInList(info.getGuildCommandsOnDiscord(), ac ->
+                        ac.getType() == template.getType() && ac.getName().equals(template.getName()));
+                if(match != null) matches.add(match);
 
                 info.getLog().debug(matches.size() + " matches found.");
                 return matches.isEmpty() ? null : matches;
@@ -331,14 +332,9 @@ public class CommandUtils {
             } else if (type != null && name != null) {
                 //match by scope, type and name
                 info.getLog().debug("Matching by type=" + type + " and name=" + name);
-
-                ApplicationCommand match;
-                for(Map.Entry<String, List<ApplicationCommand>> entry : info.getGuildCommandsOnDiscord().entrySet()) {
-                    match = matchInList(entry.getValue(), applicationCommand ->
+                ApplicationCommand match = matchInList(info.getGuildCommandsOnDiscord(), applicationCommand ->
                             applicationCommand.getType() == type && applicationCommand.getName().equals(name));
-                    if (match == null) continue;
-                    matches.add(match);
-                }
+                if (match != null) matches.add(match);
 
                 info.getLog().debug(matches.size() + " matches found.");
                 return matches.isEmpty() ? null : matches;
@@ -359,7 +355,8 @@ public class CommandUtils {
      * @param matchFunction function used to match
      * @return {@link ApplicationCommand} match or {@code null} if none matched.
      */
-    private static @Nullable ApplicationCommand matchInList(@NotNull List<ApplicationCommand> list, @NotNull Predicate<ApplicationCommand> matchFunction) {
+    private static @Nullable ApplicationCommand matchInList(@Nullable List<ApplicationCommand> list, @NotNull Predicate<ApplicationCommand> matchFunction) {
+        if(list == null) return null;
         Iterator<ApplicationCommand> iterator = list.iterator();
         if (list.isEmpty()) return null;
 
@@ -373,5 +370,34 @@ public class CommandUtils {
         }
 
         return null;
+    }
+
+
+
+
+    static @NotNull List<String> readServices(@NotNull LApiImpl lApi) {
+        ArrayList<String> list = new ArrayList<>();
+
+        BufferedReader reader = null;
+        try{
+            InputStream inputStream = lApi.getCallerClass().getClassLoader().getResourceAsStream("META-INF/services/me.linusdev.lapi.api.manager.command.BaseCommand");
+            if(inputStream == null) return list;
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+
+            while((line =reader.readLine()) != null){
+                list.add(line);
+            }
+        }catch (IOException exception) {
+            Logger.getLogger(CommandUtils.class).error(exception);
+        } finally {
+            if(reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {}
+            }
+        }
+
+        return list;
     }
 }
