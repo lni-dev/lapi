@@ -60,9 +60,8 @@ public interface AbstractEventTransmitter extends HasLApi {
      *
      * @param listener the listener
      * @param specifications to which Events the listener shall listen to
-     * @return true if all {@link ArrayList#add(Object)} calls returned true
      */
-    boolean addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications);
+    void addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications);
 
     /**
      *

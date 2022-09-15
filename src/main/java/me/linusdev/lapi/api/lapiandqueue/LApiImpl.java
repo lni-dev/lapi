@@ -52,6 +52,7 @@ import java.net.URLConnection;
 import java.net.http.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.function.BiConsumer;
@@ -63,6 +64,9 @@ import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.*
  * See {@link LApi}
  */
 public class LApiImpl implements LApi {
+
+
+    public static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
     /**
      * The Discord id of the creator of this api UwU
@@ -378,11 +382,15 @@ public class LApiImpl implements LApi {
 
     @Override
     public void runSupervised(@NotNull Runnable runnable) {
+
+        //Can not be null because this is not the main method.
+        @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
+
         executor.execute(() -> {
             try {
                 runnable.run();
             }catch (Throwable t) {
-                LogInstance log = Logger.getLogger("Supervised Runnable");
+                LogInstance log = Logger.getLogger("SR (" + frame.getClassName() + ":" + frame.getLineNumber() + ")");
                 log.error(t);
             }
         });

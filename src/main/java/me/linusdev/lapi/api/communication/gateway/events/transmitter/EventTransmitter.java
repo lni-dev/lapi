@@ -88,7 +88,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
      * <br><br>
      * TODO: This LinkedHashMap could be replaced with an Array with the amount of different EventIdentifier as size
      */
-    private final LinkedHashMap<EventIdentifier, ArrayList<EventListener>> specifiedListeners = new LinkedHashMap<>();
+    private final LinkedHashMap<EventIdentifier, LinusLinkedList<EventListener>> specifiedListeners = new LinkedHashMap<>();
 
     private final AtomicBoolean triggeredGuildsReadyEvent = new AtomicBoolean(false);
     private final AtomicBoolean triggeredLApiReadyEvent = new AtomicBoolean(false);
@@ -117,16 +117,11 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
      * @see AbstractEventTransmitter#addSpecifiedListener(EventListener, EventIdentifier...)
      */
     @Override
-    public boolean addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
-
-        boolean r = true;
-
+    public void addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
         for(EventIdentifier spec : specifications){
-            ArrayList<EventListener> listeners = specifiedListeners.computeIfAbsent(spec, k -> new ArrayList<>());
-            r = r && listeners.add(listener);
+            LinusLinkedList<EventListener> listeners = specifiedListeners.computeIfAbsent(spec, k -> new LinusLinkedList<>());
+            listeners.add(listener);
         }
-
-        return r;
     }
 
 
@@ -138,7 +133,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         boolean r = true;
 
         for(EventIdentifier spec : specifications){
-            ArrayList<EventListener> listeners = specifiedListeners.get(spec);
+            LinusLinkedList<EventListener> listeners = specifiedListeners.get(spec);
             if(listeners == null){
                 r = false;
                 continue;
@@ -170,7 +165,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(UNKNOWN);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(UNKNOWN);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -198,7 +193,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -222,7 +217,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -247,7 +242,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(LAPI_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -269,7 +264,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_REGION_MANAGER_READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_REGION_MANAGER_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -291,7 +286,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(CACHE_READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CACHE_READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -313,7 +308,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(RESUMED);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(RESUMED);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -335,7 +330,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -357,7 +352,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -379,7 +374,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -401,7 +396,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -423,7 +418,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -445,7 +440,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -467,7 +462,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_LIST_SYNC);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_LIST_SYNC);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -489,7 +484,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBER_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBER_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -511,7 +506,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBERS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBERS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -533,7 +528,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(CHANNEL_PINS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_PINS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -556,7 +551,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -585,7 +580,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -614,7 +609,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -637,7 +632,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_JOINED);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_JOINED);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -660,7 +655,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_LEFT);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_LEFT);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try{
@@ -683,7 +678,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_UNAVAILABLE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_UNAVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -705,7 +700,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_AVAILABLE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_AVAILABLE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -727,7 +722,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_ADD);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_ADD);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -749,7 +744,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_REMOVE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_REMOVE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -771,7 +766,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -793,7 +788,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -815,7 +810,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_INTEGRATIONS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_INTEGRATIONS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -837,7 +832,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_ADD);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_ADD);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -859,7 +854,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -881,7 +876,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_REMOVE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_REMOVE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -903,7 +898,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBERS_CHUNK);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBERS_CHUNK);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -925,7 +920,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -947,7 +942,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -969,7 +964,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -991,7 +986,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1013,7 +1008,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1035,7 +1030,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1057,7 +1052,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_ADD);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_ADD);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1079,7 +1074,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_REMOVE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_REMOVE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1101,7 +1096,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1123,7 +1118,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1145,7 +1140,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INTEGRATION_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1167,7 +1162,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INVITE_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INVITE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1189,7 +1184,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INVITE_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INVITE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1212,7 +1207,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(READY);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(READY);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1239,7 +1234,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(NON_GUILD_MESSAGE_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(NON_GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1262,7 +1257,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(GUILD_MESSAGE_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MESSAGE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1284,7 +1279,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1306,7 +1301,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1328,7 +1323,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE_BULK);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE_BULK);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1350,7 +1345,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_ADD);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_ADD);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1372,7 +1367,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1394,7 +1389,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_ALL);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_ALL);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1416,7 +1411,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_EMOJI);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_EMOJI);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1438,7 +1433,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(PRESENCE_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(PRESENCE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1460,7 +1455,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1482,7 +1477,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_DELETE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_DELETE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1504,7 +1499,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1526,7 +1521,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(TYPING_START);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(TYPING_START);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1548,7 +1543,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(USER_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(USER_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1570,7 +1565,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1592,7 +1587,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_STATE_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_STATE_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1614,7 +1609,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(VOICE_SERVER_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_SERVER_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1636,7 +1631,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(WEBHOOKS_UPDATE);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(WEBHOOKS_UPDATE);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -1658,7 +1653,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        ArrayList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
