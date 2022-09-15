@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.manager.command.guild;
 
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -44,7 +45,7 @@ public class GuildCommands {
         this.notifyAll();
     }
 
-    public synchronized void setCommands(List<ApplicationCommand> commands) {
+    public synchronized void setCommands(@NotNull List<ApplicationCommand> commands) {
         this.commands = commands;
     }
 

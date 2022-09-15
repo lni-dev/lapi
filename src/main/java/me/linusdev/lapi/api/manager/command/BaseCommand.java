@@ -55,7 +55,7 @@ import java.util.function.Predicate;
  *
  * If your command is registered, it will be automatically managed by {@link LApi}.
  *
- * <h2>Requirements</h2>
+ * <br><br><h2>Requirements</h2>
  * <b>All</b> of the following requirements must always be met:
  * <ul>
  *     <li>
@@ -74,7 +74,7 @@ import java.util.function.Predicate;
  *     </li>
  *     <li>
  *         Your command is already uploaded to discord and you a have overwritten the {@link #getId()} function to
- *         return your command's id.
+ *         return your command's id. (Only for {@link CommandScope#GLOBAL global} commands)
  *     </li>
  *     <li>
  *         Your command is already uploaded to discord and you have overwritten the functions
@@ -83,6 +83,55 @@ import java.util.function.Predicate;
  *
  * </ul>
  *
+ * <h2>Enable Guild Commands</h2>
+ * <p>
+ *     A {@link CommandScope#GUILD guild} command must be enabled for each guild individually using
+ *     {@link CommandManager#enabledCommandForGuilds(Class, String...)}.<br>
+ *     For Example:
+ *     <pre>{@code lApi.getCommandManager().enabledCommandForGuilds(YourGuildCommand.class, "someGuildId");}</pre>
+ *     Note: If you enable a command for a guild, which it has already been enable for, nothing will happen.
+ * </p>
+ *
+ * <br><br><h2>Changing the Command</h2>
+ * <p>
+ *     How you change your command depends on what you want to change.
+ * </p>
+ * <br>
+ * <h3>Changing Name or Scope</h3>
+ * <p>
+ * If you want to change the {@link #getScope() scope} or the {@link #getName() name} of the command, you must use the
+ * {@link #refactor()} method. The {@link Refactor} must contain the old value and your {@link ApplicationCommandTemplate} must
+ * return the new value.
+ * </p>
+ * <p>
+ * For example if you want to change your command's name from 'oldName' to 'newName' your {@link #refactor()}
+ * method should return:
+ * <pre>{@code new Refactor<>(this, RefactorType.RENAME, "oldName");}</pre>
+ * And your {@link #create()} method would return a template with the name set to 'newName':
+ * <pre>{@code applicationCommandBuilder.setName("newName")}</pre>
+ * </p>
+ * <p>
+ *     Note: You <b>cannot</b> have another command that matches either the old or the new command!
+ *     Matches means {@link #getScope() scope}, {@link #getType() type} and {@link #getName()} are the same.
+ * </p>
+ * <br>
+ * <h3>Changing Type</h3>
+ * <p>
+ * {@link #getType() Type} can currently not be changed.
+ * </p>
+ * <br>
+ * <h3>Changing Anything else</h3>
+ * <p>
+ *     If you want to change anything except {@link #getScope() scope}, {@link #getName() name} or {@link #getType() type},
+ *     you can just change it in your {@link #create()} template and it will automatically be changed the next time you
+ *     run your program.
+ * </p>
+ *
+ * <br><h2>Deleting the Command</h2>
+ * The command can be easily deleted by overwriting {@link #delete()} to return {@code true}.
+ * After running your program, {@link LApi} will automatically delete the command. If the command is already deleted,
+ * nothing will happen.
+ *
  */
 @Command
 public abstract class BaseCommand implements HasLApi {
@@ -90,28 +139,31 @@ public abstract class BaseCommand implements HasLApi {
     /**
      * Will be available, after the {@link CommandManagerImpl} has called {@link #setlApi(LApi)}.<br><br>
      * Will always be {@code null} in the constructor!<br>
-     * Will never be {@code null} in {@link #getId()}, {@link #getName()}, {@link #getScope()}, {@link #getType()},
-     * {@link #getTemplate()}, {@link #create()} and {@link #onInteract(InteractionCreateEvent, SelectedOptions, InteractionResponseBuilder)}.
-     * (given that these functions are only called by the {@link CommandManagerImpl})
+     * Will never be after that.
+     * (given that this class is only used by the {@link CommandManagerImpl})
      */
     protected LApi lApi;
 
     private @Nullable ApplicationCommandTemplate template;
     private final @NotNull List<ApplicationCommand> linkedApplicationCommands = new ArrayList<>();
 
+    /**
+     * The id of your {@link ApplicationCommand}. Usually not required. see {@link BaseCommand} for more information.
+     * @return The id of your {@link ApplicationCommand}.
+     */
     @ApiStatus.OverrideOnly
     public @Nullable String getId() {
         return null;
     }
 
+    /**
+     * The name of your command. Only required if {@link #create()} is not overwritten.<br>
+     * Note: if you have both {@link #getName()} and {@link #create()} overwritten, they must both always have the same name.
+     * @return The name of your command.
+     */
     @ApiStatus.OverrideOnly
     public @Nullable String getName() {
-
-        if(getTemplate() == null) {
-            return getNameFromLinkedApplicationCommands();
-        }
-
-        return getTemplate().getName();
+        return null;
     }
 
     @Nullable String getNameFromLinkedApplicationCommands() {
@@ -121,12 +173,35 @@ public abstract class BaseCommand implements HasLApi {
         return null;
     }
 
+    @Nullable String getName0() {
+        if(getName() != null) return getName();
+        if(getTemplate() == null) {
+            return getNameFromLinkedApplicationCommands();
+        }
+
+        return getTemplate().getName();
+    }
+
     /**
-     *
-     * @return {@link ApplicationCommandType}
+     * The type of your command. Only required if {@link #create()} is not overwritten.<br>
+     * Note: if you have both {@link #getType()} ()} and {@link #create()} overwritten, they must both always have the same type.
+     * @return The type of your command.
      */
     @ApiStatus.OverrideOnly
     public @Nullable ApplicationCommandType getType() {
+        return null;
+    }
+
+    @Nullable ApplicationCommandType getTypeFromLinkedApplicationCommands() {
+        if(!linkedApplicationCommands.isEmpty()) {
+            return linkedApplicationCommands.get(0).getType();
+        }
+        return null;
+    }
+
+    @Nullable ApplicationCommandType getType0() {
+        if(getType() != null) return getType();
+
         if(getTemplate() == null) {
             return getTypeFromLinkedApplicationCommands();
         }
@@ -139,22 +214,17 @@ public abstract class BaseCommand implements HasLApi {
         return type;
     }
 
-    @Nullable ApplicationCommandType getTypeFromLinkedApplicationCommands() {
-        if(!linkedApplicationCommands.isEmpty()) {
-            return linkedApplicationCommands.get(0).getType();
-        }
-        return null;
-    }
-
     /**
-     * @return {@link CommandScope}
+     * The scope of your command ({@link CommandScope#GUILD GUILD} or {@link CommandScope#GLOBAL GLOBAL}.
+     * @return  The {@link CommandScope scope} of your command .
+     * @see CommandScope
      */
     @ApiStatus.OverrideOnly
     public abstract @NotNull CommandScope getScope();
 
 
     @ApiStatus.Internal
-    final @Nullable ApplicationCommandTemplate getTemplate() {
+    @Nullable ApplicationCommandTemplate getTemplate() {
         if(template == null) template = create();
         return template;
     }
@@ -165,23 +235,34 @@ public abstract class BaseCommand implements HasLApi {
      * @throws LApiIllegalStateException if {@link #getTemplate()} is not null.
      */
     @ApiStatus.Internal
-    final void setTemplate(@NotNull ApplicationCommandTemplate newTemplate) {
+    void setTemplate(@NotNull ApplicationCommandTemplate newTemplate) {
         if(this.template != null) throw new LApiIllegalStateException("Setting template even though it is not null.");
         this.template = newTemplate;
     }
 
     /**
+     * The valid template of your command.
+     * <br><br>
      * You can easily create a {@link ApplicationCommandTemplate} using a {@link ApplicationCommandBuilder}.
      * @return your {@link ApplicationCommandTemplate}
      */
     @ApiStatus.OverrideOnly
     protected abstract @Nullable ApplicationCommandTemplate create();
 
+    /**
+     * If you want to change {@link #getScope() scope} or {@link #getName() name} of your command, you
+     * must use this method. Read more {@link BaseCommand here}.
+     * @return {@link Refactor refactor information}
+     */
     @ApiStatus.OverrideOnly
     public @Nullable Refactor<?> refactor(){
         return null;
     }
 
+    /**
+     * If you want to delete your command make this method return {@code true}.
+     * @return whether this command should be deleted.
+     */
     @ApiStatus.OverrideOnly
     public boolean delete() {
         return false;
@@ -228,7 +309,7 @@ public abstract class BaseCommand implements HasLApi {
     }
 
     @ApiStatus.Internal
-    final void linkWith(@NotNull ApplicationCommand command) {
+    void linkWith(@NotNull ApplicationCommand command) {
         linkedApplicationCommands.add(command);
     }
 
@@ -237,7 +318,7 @@ public abstract class BaseCommand implements HasLApi {
      * @param command {@link ApplicationCommand} to check
      * @return {@code true} if the {@link ApplicationCommand} is already linked to this {@link BaseCommand}
      */
-    final boolean isLinkedWith(@NotNull ApplicationCommand command) {
+    public final boolean isLinkedWith(@NotNull ApplicationCommand command) {
         return forEachLinkedApplicationCommand(c -> c.getId().equals(command.getId()));
     }
 

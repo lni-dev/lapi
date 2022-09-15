@@ -17,9 +17,19 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.objects.HasLApi;
+import org.jetbrains.annotations.NotNull;
 
 public interface CommandManager extends HasLApi {
 
     //TODO: add functions to get BaseCommands by id or iterate over them
 
+    /**
+     * <p>
+     *     If the {@link BaseCommand} is already enabled for any of the guilds in the list, the method will return without
+     *     doing anything.
+     * </p>
+     * @param clazz {@link Class} of your {@link BaseCommand}
+     * @param guildId the ids of all guild to enable this command for
+     */
+    void enabledCommandForGuilds(@NotNull Class<? extends BaseCommand> clazz, @NotNull String... guildId);
 }

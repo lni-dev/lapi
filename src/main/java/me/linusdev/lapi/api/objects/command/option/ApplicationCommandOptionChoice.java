@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure" target="_top">Application Command Option Choice Structure</a>
  */
@@ -123,5 +125,24 @@ public class ApplicationCommandOptionChoice implements Datable {
         data.add(VALUE_KEY, value);
 
         return data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ApplicationCommandOptionChoice that = (ApplicationCommandOptionChoice) o;
+
+        if (!name.equals(that.name)) return false;
+        if (!LocalizationDictionary.equalsContent(nameLocalizations, that.nameLocalizations)) return false;
+        return value.equals(that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + value.hashCode();
+        return result;
     }
 }

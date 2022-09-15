@@ -30,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  *
@@ -306,5 +308,64 @@ public class ApplicationCommandOption implements Datable, HasLApi {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ApplicationCommandOption option = (ApplicationCommandOption) o;
+
+        if (!type.equals(option.type)) return false;
+        if (!name.equals(option.name)) return false;
+        if (!LocalizationDictionary.equalsContent(nameLocalizations, option.nameLocalizations))
+            return false;
+        if (!description.equals(option.description)) return false;
+        if (!LocalizationDictionary.equalsContent(descriptionLocalizations, option.descriptionLocalizations))
+            return false;
+        if (!Objects.equals(required, option.required)) return false;
+
+        if (!Arrays.equals(choices, option.choices)) return false;
+        if (!optionsEquals(options, option.options)) return false;
+        if (!Arrays.equals(channelTypes, option.channelTypes)) return false;
+        if (!Objects.equals(minValue, option.minValue)) return false;
+        if (!Objects.equals(maxValue, option.maxValue)) return false;
+        if (!Objects.equals(minLength, option.minLength)) return false;
+        if (!Objects.equals(maxLength, option.maxLength)) return false;
+        return Objects.equals(autocomplete, option.autocomplete);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + name.hashCode();
+
+        result = 31 * result + description.hashCode();
+
+        result = 31 * result + (required != null ? required.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(choices);
+        result = 31 * result + Arrays.hashCode(options);
+        result = 31 * result + Arrays.hashCode(channelTypes);
+        result = 31 * result + (minValue != null ? minValue.hashCode() : 0);
+        result = 31 * result + (maxValue != null ? maxValue.hashCode() : 0);
+        result = 31 * result + (minLength != null ? minLength.hashCode() : 0);
+        result = 31 * result + (maxLength != null ? maxLength.hashCode() : 0);
+        result = 31 * result + (autocomplete != null ? autocomplete.hashCode() : 0);
+        return result;
+    }
+
+    public static boolean optionsEquals(@Nullable ApplicationCommandOption[] os1, @Nullable ApplicationCommandOption[] os2) {
+        if (os1 != null) {
+            if (os2 == null) return false;
+            if (os1.length != os2.length) return false;
+
+            for (int i = 0; i < os1.length; i++) {
+                if (!Objects.equals(os1[i], os2[i])) return false;
+            }
+
+
+        } else if (os2 != null) return false;
+        return true;
     }
 }

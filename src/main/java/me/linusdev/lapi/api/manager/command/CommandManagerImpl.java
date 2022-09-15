@@ -93,7 +93,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 command.setlApi(lApi);
 
                 log.debug(String.format("command '%s' loaded: %s %s %s",
-                        command.getClass().getCanonicalName(), command.getScope(), command.getType(), command.getName()));
+                        command.getClass().getCanonicalName(), command.getScope(), command.getType0(), command.getName0()));
 
                 localCommands.add(command);
 
@@ -243,16 +243,27 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
         });
     }
 
+    private void awaitInitialized() throws InterruptedException {
+        synchronized (initialized) {
+            if(!initialized.get()) {
+                initialized.wait();
+            }
+        }
+    }
+
     /**
-     * <p>
-     *     If the {@link BaseCommand} is already enabled for any of the guilds in the list, the method will return without
-     *     doing anything.
-     * </p>
+     *
      * @param clazz {@link Class} of your {@link BaseCommand}
-     * @param guildId the ids of all guild to enable this command for
+     * @param guildId the ids of all guild to enable this command for. The list may not contain the same id twice.
      */
+    @Override
     public void enabledCommandForGuilds(@NotNull Class<? extends BaseCommand> clazz, @NotNull String... guildId) {
         lApi.runSupervised(() -> {
+
+            try {
+                awaitInitialized();
+            } catch (InterruptedException e) {throw new RuntimeException(e);}
+
             for(BaseCommand command : localCommands) {
                 if(command.getClass().equals(clazz)) {
                     List<String> guildIds = List.of(guildId);

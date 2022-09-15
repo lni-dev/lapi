@@ -20,6 +20,8 @@ import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
+import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
+import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -34,6 +36,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 @ApiStatus.Internal
@@ -76,7 +79,7 @@ public class CommandUtils {
 
         } else {
             info.getLog().debug("Normal Matching...");
-            matches = match(info, command.getScope(), command.getId(), command.getTemplate(), command.getType(), command.getName());
+            matches = match(info, command.getScope(), command.getId(), command.getTemplate(), command.getType0(), command.getName0());
         }
 
 
@@ -98,8 +101,17 @@ public class CommandUtils {
             } else {
                 info.getLog().debug("Linking command.");
                 for(ApplicationCommand match : matches) {
-                    info.getCommandLinks().put(match.getId(), command);
-                    command.linkWith(match);
+
+                    if(checkIfTemplateChanged(command, match)) {
+                        editCommand(info, matches, command);
+                        break;
+                    } else {
+                        info.getCommandLinks().put(match.getId(), command);
+                        command.linkWith(match);
+
+                    }
+
+
                 }
                 info.getLog().debug("Command linked.");
 
@@ -107,6 +119,32 @@ public class CommandUtils {
 
         }
     }
+
+    /**
+     * Checks if the template of the {@link BaseCommand} is different of the {@link ApplicationCommand}.<br>
+     * Scope, type and name will not be checked.
+     * @param command {@link BaseCommand}
+     * @param match {@link ApplicationCommand}
+     * @return {@code true} if the template has changed.
+     */
+    static boolean checkIfTemplateChanged(@NotNull BaseCommand command, @NotNull ApplicationCommand match) {
+
+        ApplicationCommandTemplate template = command.create();
+        if(template == null) return false;
+
+        //scope, type and name and  will not be checked
+
+        if(!ApplicationCommandOption.optionsEquals(template.getOptions(), match.getOptions())) return false;
+
+        return !Objects.equals(template.getDescription(), match.getDescription()) &&
+                !Objects.equals(template.getDefaultMemberPermissions(), match.getDefaultMemberPermissions()) &&
+                !LocalizationDictionary.equalsContent(template.getDescriptionLocalisations(), match.getDescriptionLocalizations()) &&
+                !LocalizationDictionary.equalsContent(template.getNameLocalisations(), match.getNameLocalizations()) &&
+                !Objects.equals(template.getDmPermissions(), match.getDmPermission());
+
+    }
+
+
 
     /**
      * Will edit the given matches and add the edited {@link ApplicationCommand}'s {@link ApplicationCommand#getId() ids}
@@ -213,7 +251,7 @@ public class CommandUtils {
     static boolean checkCommand(@NotNull BaseCommand command, @NotNull LogInstance log) {
         if (command.getId() == null
                 && command.getTemplate() == null
-                && (command.getType() == null || command.getName() == null)) {
+                && (command.getType0() == null || command.getName0() == null)) {
             //This command cannot be matched
             log.error(String.format("command '%s' does not meet the requirements.", command.getClass().getCanonicalName()));
             command.onError(new LApiIllegalStateException("Your command does not meet the requirements."));

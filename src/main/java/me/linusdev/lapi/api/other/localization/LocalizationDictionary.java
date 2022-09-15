@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * This stores localizations for different {@link Locale locales}.
@@ -99,5 +100,19 @@ public class LocalizationDictionary implements Datable, Iterable<Localization> {
                 return new Localization(entry.getKey(), entry.getValue().toString());
             }
         };
+    }
+
+    public static boolean equalsContent(@Nullable LocalizationDictionary first, @Nullable LocalizationDictionary other) {
+        if (first == other) return true;
+        if (other == null || first == null) return false;
+
+        for(Entry<String, Object> entry : first.data) {
+            if(!Objects.equals(other.getData().get(entry.getKey()), entry.getValue())) {
+                return false;
+            }
+        }
+
+
+        return true;
     }
 }
