@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
+import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
 import me.linusdev.lapi.api.manager.command.guild.GuildCommands;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
@@ -36,6 +37,7 @@ import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -121,6 +123,8 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
         });
 
         log.debug("successfully sorted commands.");
+
+        lApi.transmitEvent().onLocalCommandsInitialized(lApi, new LocalCommandsInitializedEvent(lApi));
 
         ArrayList<ApplicationCommand> globalCommandsOnDiscord = null;
         try {
@@ -246,9 +250,24 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     private void awaitInitialized() throws InterruptedException {
         synchronized (initialized) {
             if(!initialized.get()) {
+                lApi.checkQueueThread();
                 initialized.wait();
             }
         }
+    }
+
+    @Override
+    public @Nullable BaseCommand getCommandByClass(@NotNull Class<? extends BaseCommand> clazz) {
+        //TODO: make this return a Future or something similar
+        try {
+            lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).awaitFirst();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        for(BaseCommand command : localCommands) {
+            if(command.getClass().equals(clazz)) return command;
+        }
+        return null;
     }
 
     /**

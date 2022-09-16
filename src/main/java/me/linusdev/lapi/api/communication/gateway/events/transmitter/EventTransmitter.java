@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
@@ -62,33 +63,27 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateE
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.list.LinusLinkedList;
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
+
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier.*;
 
+@ApiStatus.Internal
 public class EventTransmitter implements HasLApi, EventListener, AbstractEventTransmitter {
 
     private final @NotNull LApiImpl lApi;
 
+    private final LinusLinkedList<AnyEventListener> anyEventListeners = new LinusLinkedList<>();
     private final LinusLinkedList<EventListener> listeners = new LinusLinkedList<>();
-
-    /**
-     * This stores the specified EventListener. For each {@link EventIdentifier} there is an array of Listener.
-     * <br><br>
-     * TODO: This LinkedHashMap could be replaced with an Array with the amount of different EventIdentifier as size
-     */
-    private final LinkedHashMap<EventIdentifier, LinusLinkedList<EventListener>> specifiedListeners = new LinkedHashMap<>();
+    private final EventIdentifierList specifiedListeners = new EventIdentifierList();
 
     private final AtomicBoolean triggeredGuildsReadyEvent = new AtomicBoolean(false);
     private final AtomicBoolean triggeredLApiReadyEvent = new AtomicBoolean(false);
@@ -97,37 +92,33 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         this.lApi = lApi;
     }
 
-    /**
-     * @see AbstractEventTransmitter#addListener(EventListener)
-     */
     @Override
-    public boolean addListener(@NotNull EventListener listener){
-        return listeners.add(listener);
+    public void addListener(@NotNull EventListener listener){
+        listeners.add(listener);
     }
 
-    /**
-     * @see AbstractEventTransmitter#removeListener(EventListener)
-     */
     @Override
     public boolean removeListener(@NotNull EventListener listener){
         return listeners.remove(listener);
     }
 
-    /**
-     * @see AbstractEventTransmitter#addSpecifiedListener(EventListener, EventIdentifier...)
-     */
+    @Override
+    public void addAnyEventListener(@NotNull AnyEventListener listener) {
+        anyEventListeners.add(listener);
+    }
+
+    @Override
+    public void removeAnyEventListener(@NotNull AnyEventListener listener) {
+        anyEventListeners.remove(listener);
+    }
+
     @Override
     public void addSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
         for(EventIdentifier spec : specifications){
-            LinusLinkedList<EventListener> listeners = specifiedListeners.computeIfAbsent(spec, k -> new LinusLinkedList<>());
-            listeners.add(listener);
+            specifiedListeners.put(spec, listener);
         }
     }
 
-
-    /**
-     * @see AbstractEventTransmitter#removeSpecifiedListener(EventListener, EventIdentifier...)
-     */
     @Override
     public boolean removeSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications){
         boolean r = true;
@@ -144,17 +135,48 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         return r;
     }
 
+    private <E extends Event> void transmitForEachListener(@NotNull E event, @NotNull EventIdentifier identifier, @NotNull EventConsumer<E> consumer) {
+        if(anyEventListeners.size() > 0) {
+            for(AnyEventListener listener : anyEventListeners) {
+                try {
+                    listener.onEvent(lApi, event, identifier);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+
+        for(EventListener listener : listeners){
+            try {
+                consumer.accept(listener, lApi, event);
+            } catch (Throwable t) {
+                listener.onUncaughtException(t);
+            }
+        }
+
+        LinusLinkedList<EventListener> listeners = specifiedListeners.get(identifier);
+        if(listeners != null){
+            for(EventListener listener : listeners){
+                try {
+                    consumer.accept(listener, lApi, event);
+                } catch (Throwable t) {
+                    listener.onUncaughtException(t);
+                }
+            }
+        }
+    }
 
 
 
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                            Events                             *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-
-
-
-
-    @ApiStatus.Internal
     @Override
     public void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload) {
         for(EventListener listener : listeners){
@@ -177,56 +199,20 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
-    @ApiStatus.Internal
     @Override
     public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
         //Reset this here, so a new GuildsReady event can occur
         //This is required, if the gateway has reconnected
         triggeredGuildsReadyEvent.set(false);
 
-
-        for(EventListener listener : listeners){
-            try{
-                listener.onReady(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onReady(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, READY, EventListener::onReady);
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {
         triggeredGuildsReadyEvent.set(true);
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildsReady(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
 
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILDS_READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildsReady(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILDS_READY, EventListener::onGuildsReady);
     }
 
     @Override
@@ -234,333 +220,83 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         //make sure this event is only called once
         if(triggeredLApiReadyEvent.get()) return;
         triggeredLApiReadyEvent.set(true);
-        for(EventListener listener : listeners){
-            try{
-                listener.onLApiReady(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
 
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(LAPI_READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onLApiReady(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, LAPI_READY, EventListener::onLApiReady);
     }
 
     @Override
     public void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onVoiceRegionManagerReady(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_REGION_MANAGER_READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onVoiceRegionManagerReady(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, VOICE_REGION_MANAGER_READY, EventListener::onVoiceRegionManagerReady);
     }
 
     @Override
     public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onCacheReady(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
+        transmitForEachListener(event, CACHE_READY, EventListener::onCacheReady);
+    }
 
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CACHE_READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onCacheReady(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+    @Override
+    public void onLocalCommandsInitialized(@NotNull LApi lApi, @NotNull LocalCommandsInitializedEvent event) {
+        transmitForEachListener(event, LOCAL_COMMANDS_INITIALIZED, EventListener::onLocalCommandsInitialized);
     }
 
     @Override
     public void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onResumed(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(RESUMED);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onResumed(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, RESUMED, EventListener::onResumed);
     }
 
     @Override
     public void onChannelCreate(@NotNull LApi lApi, @NotNull ChannelCreateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onChannelCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onChannelCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, CHANNEL_CREATE, EventListener::onChannelCreate);
     }
 
     @Override
     public void onChannelUpdate(@NotNull LApi lApi, @NotNull ChannelUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onChannelUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onChannelUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, CHANNEL_UPDATE, EventListener::onChannelUpdate);
     }
 
     @Override
     public void onChannelDelete(@NotNull LApi lApi, @NotNull ChannelDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onChannelDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onChannelDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, CHANNEL_DELETE, EventListener::onChannelDelete);
     }
 
     @Override
     public void onThreadCreate(@NotNull LApi lApi, @NotNull ThreadCreateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_CREATE, EventListener::onThreadCreate);
     }
 
     @Override
     public void onThreadUpdate(@NotNull LApi lApi, @NotNull ThreadUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_UPDATE, EventListener::onThreadUpdate);
     }
 
     @Override
     public void onThreadDelete(@NotNull LApi lApi, @NotNull ThreadDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_DELETE, EventListener::onThreadDelete);
     }
 
     @Override
     public void onThreadListSync(@NotNull LApi lApi, @NotNull ThreadListSyncEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadListSync(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_LIST_SYNC);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadListSync(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_LIST_SYNC, EventListener::onThreadListSync);
     }
 
     @Override
     public void onThreadMemberUpdate(@NotNull LApi lApi, @NotNull ThreadMemberUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadMemberUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBER_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadMemberUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_MEMBER_UPDATE, EventListener::onThreadMemberUpdate);
     }
 
     @Override
     public void onThreadMembersUpdate(@NotNull LApi lApi, @NotNull ThreadMembersUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onThreadMembersUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(THREAD_MEMBERS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onThreadMembersUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, THREAD_MEMBERS_UPDATE, EventListener::onThreadMembersUpdate);
     }
 
     @Override
     public void onChannelPinsUpdate(@NotNull LApi lApi, @NotNull ChannelPinsUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onChannelPinsUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(CHANNEL_PINS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onChannelPinsUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, CHANNEL_PINS_UPDATE, EventListener::onChannelPinsUpdate);
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_CREATE, EventListener::onGuildCreate);
 
         //Sub-events
         if(!triggeredGuildsReadyEvent.get() && this.lApi.getGuildManager() != null && this.lApi.getGuildManager().allGuildsReceivedEvent()){
@@ -569,27 +305,9 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildDelete(@NotNull LApi lApi, @NotNull GuildDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_DELETE, EventListener::onGuildDelete);
 
         //Sub-events
         if(!triggeredGuildsReadyEvent.get() && this.lApi.getGuildManager() != null && this.lApi.getGuildManager().allGuildsReceivedEvent()){
@@ -598,1073 +316,252 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         }
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildUpdate(@NotNull LApi lApi, @NotNull GuildUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_UPDATE, EventListener::onGuildUpdate);
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildJoined(@NotNull LApi lApi, @NotNull GuildJoinedEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildJoined(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_JOINED);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildJoined(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_JOINED, EventListener::onGuildJoined);
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildLeft(@NotNull LApi lApi, @NotNull GuildLeftEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildLeft(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_LEFT);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try{
-                    listener.onGuildLeft(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_LEFT, EventListener::onGuildLeft);
     }
 
-    @ApiStatus.Internal
     @Override
     public void onGuildUnavailable(@NotNull LApi lApi, @NotNull GuildUnavailableEvent event) {
-        for(EventListener listener : listeners){
-            try{
-                listener.onGuildUnavailable(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_UNAVAILABLE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildUnavailable(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_UNAVAILABLE, EventListener::onGuildUnavailable);
     }
 
     @Override
     public void onGuildAvailable(@NotNull LApi lApi, @NotNull GuildAvailableEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildAvailable(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_AVAILABLE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildAvailable(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_AVAILABLE, EventListener::onGuildAvailable);
     }
 
     @Override
     public void onGuildBanAdd(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildBanAdd(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_ADD);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildBanAdd(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_BAN_ADD, EventListener::onGuildBanAdd);
     }
 
     @Override
     public void onGuildBanRemove(@NotNull LApi lApi, @NotNull GuildBanEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildBanRemove(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_BAN_REMOVE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildBanRemove(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_BAN_REMOVE, EventListener::onGuildBanRemove);
     }
 
     @Override
     public void onGuildEmojisUpdate(@NotNull LApi lApi, @NotNull GuildEmojisUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildEmojisUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_EMOJIS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildEmojisUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_EMOJIS_UPDATE, EventListener::onGuildEmojisUpdate);
     }
 
     @Override
     public void onGuildStickersUpdate(@NotNull LApi lApi, @NotNull GuildStickersUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildStickersUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_STICKERS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildStickersUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_STICKERS_UPDATE, EventListener::onGuildStickersUpdate);
     }
 
     @Override
     public void onGuildIntegrationsUpdate(@NotNull LApi lApi, @NotNull GuildIntegrationsUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildIntegrationsUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_INTEGRATIONS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildIntegrationsUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_INTEGRATIONS_UPDATE, EventListener::onGuildIntegrationsUpdate);
     }
 
     @Override
     public void onGuildMemberAdd(@NotNull LApi lApi, @NotNull GuildMemberAddEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildMemberAdd(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_ADD);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildMemberAdd(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_MEMBER_ADD, EventListener::onGuildMemberAdd);
     }
 
     @Override
     public void onGuildMemberUpdate(@NotNull LApi lApi, @NotNull GuildMemberUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildMemberUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildMemberUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_MEMBER_UPDATE, EventListener::onGuildMemberUpdate);
     }
 
     @Override
     public void onGuildMemberRemove(@NotNull LApi lApi, @NotNull GuildMemberRemoveEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildMemberRemove(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBER_REMOVE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildMemberRemove(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_MEMBER_REMOVE, EventListener::onGuildMemberRemove);
     }
 
     @Override
     public void onGuildMembersChunk(@NotNull LApi lApi, @NotNull GuildMembersChunkEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildMembersChunk(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MEMBERS_CHUNK);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildMembersChunk(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_MEMBERS_CHUNK, EventListener::onGuildMembersChunk);
     }
 
     @Override
     public void onGuildRoleCreate(@NotNull LApi lApi, @NotNull GuildRoleCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildRoleCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildRoleCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_ROLE_CREATE, EventListener::onGuildRoleCreate);
     }
 
     @Override
     public void onGuildRoleUpdate(@NotNull LApi lApi, @NotNull GuildRoleUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildRoleUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildRoleUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_ROLE_UPDATE, EventListener::onGuildRoleUpdate);
     }
 
     @Override
     public void onGuildRoleDelete(@NotNull LApi lApi, @NotNull GuildRoleDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildRoleDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_ROLE_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildRoleDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_ROLE_DELETE, EventListener::onGuildRoleDelete);
     }
 
     @Override
     public void onGuildScheduledEventCreate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildScheduledEventCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildScheduledEventCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_SCHEDULED_EVENT_CREATE, EventListener::onGuildScheduledEventCreate);
     }
 
     @Override
     public void onGuildScheduledEventUpdate(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildScheduledEventUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildScheduledEventUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_SCHEDULED_EVENT_UPDATE, EventListener::onGuildScheduledEventUpdate);
     }
 
     @Override
     public void onGuildScheduledEventDelete(@NotNull LApi lApi, @NotNull GuildScheduledEventEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildScheduledEventDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildScheduledEventDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_SCHEDULED_EVENT_DELETE, EventListener::onGuildScheduledEventDelete);
     }
 
     @Override
     public void onGuildScheduledEventUserAdd(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildScheduledEventUserAdd(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_ADD);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildScheduledEventUserAdd(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_SCHEDULED_EVENT_USER_ADD, EventListener::onGuildScheduledEventUserAdd);
     }
 
     @Override
     public void onGuildScheduledEventUserRemove(@NotNull LApi lApi, @NotNull GuildScheduledEventUserEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildScheduledEventUserRemove(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_SCHEDULED_EVENT_USER_REMOVE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildScheduledEventUserRemove(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_SCHEDULED_EVENT_USER_REMOVE, EventListener::onGuildScheduledEventUserRemove);
     }
 
     @Override
     public void onIntegrationCreate(@NotNull LApi lApi, @NotNull IntegrationCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onIntegrationCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onIntegrationCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INTEGRATION_CREATE, EventListener::onIntegrationCreate);
     }
 
     @Override
     public void onIntegrationUpdate(@NotNull LApi lApi, @NotNull IntegrationUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onIntegrationUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onIntegrationUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INTEGRATION_UPDATE, EventListener::onIntegrationUpdate);
     }
 
     @Override
     public void onIntegrationDelete(@NotNull LApi lApi, @NotNull IntegrationDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onIntegrationDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTEGRATION_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onIntegrationDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INTEGRATION_DELETE, EventListener::onIntegrationDelete);
     }
 
     @Override
     public void onInviteCreate(@NotNull LApi lApi, @NotNull InviteCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onInviteCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INVITE_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onInviteCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INVITE_CREATE, EventListener::onInviteCreate);
     }
 
     @Override
     public void onInviteDelete(@NotNull LApi lApi, @NotNull InviteDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onInviteDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INVITE_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onInviteDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INVITE_DELETE, EventListener::onInviteDelete);
     }
 
     @ApiStatus.Internal
     @Override
     public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(READY);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_CREATE, EventListener::onMessageCreate);
 
         //Sub-events
-        if(event.isGuildEvent()) onGuildMessageCreate(lApi, new GuildMessageCreateEvent(event));
+        if (event.isGuildEvent()) onGuildMessageCreate(lApi, new GuildMessageCreateEvent(event));
         else onNonGuildMessageCreate(lApi, event);
     }
 
     @ApiStatus.Internal
     @Override
     public void onNonGuildMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onNonGuildMessageCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(NON_GUILD_MESSAGE_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onNonGuildMessageCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, NON_GUILD_MESSAGE_CREATE, EventListener::onNonGuildMessageCreate);
     }
 
     @ApiStatus.Internal
     @Override
     public void onGuildMessageCreate(@NotNull LApi lApi, @NotNull GuildMessageCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onGuildMessageCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(GUILD_MESSAGE_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onGuildMessageCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, GUILD_MESSAGE_CREATE, EventListener::onGuildMessageCreate);
     }
 
     @Override
     public void onMessageUpdate(@NotNull LApi lApi, @NotNull MessageUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_UPDATE, EventListener::onMessageUpdate);
     }
 
     @Override
     public void onMessageDelete(@NotNull LApi lApi, @NotNull MessageDeleteEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_DELETE, EventListener::onMessageDelete);
     }
 
     @Override
     public void onMessageDeleteBulk(@NotNull LApi lApi, @NotNull MessageDeleteBulkEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageDeleteBulk(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_DELETE_BULK);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageDeleteBulk(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_DELETE_BULK, EventListener::onMessageDeleteBulk);
     }
 
     @Override
     public void onMessageReactionAdd(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageReactionAdd(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_ADD);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageReactionAdd(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_REACTION_ADD, EventListener::onMessageReactionAdd);
     }
 
     @Override
     public void onMessageReactionRemove(@NotNull LApi lApi, @NotNull MessageReactionEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageReactionRemove(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageReactionRemove(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_REACTION_REMOVE, EventListener::onMessageReactionRemove);
     }
 
     @Override
     public void onMessageReactionRemoveAll(@NotNull LApi lApi, @NotNull MessageReactionRemoveAllEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageReactionRemoveAll(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_ALL);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageReactionRemoveAll(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_REACTION_REMOVE_ALL, EventListener::onMessageReactionRemoveAll);
     }
 
     @Override
     public void onMessageReactionRemoveEmoji(@NotNull LApi lApi, @NotNull MessageReactionRemoveEmojiEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onMessageReactionRemoveEmoji(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(MESSAGE_REACTION_REMOVE_EMOJI);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onMessageReactionRemoveEmoji(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, MESSAGE_REACTION_REMOVE_EMOJI, EventListener::onMessageReactionRemoveEmoji);
     }
 
     @Override
     public void onPresenceUpdate(@NotNull LApi lApi, @NotNull PresenceUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onPresenceUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(PRESENCE_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onPresenceUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, PRESENCE_UPDATE, EventListener::onPresenceUpdate);
     }
 
     @Override
     public void onStageInstanceCreate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onStageInstanceCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onStageInstanceCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, STAGE_INSTANCE_CREATE, EventListener::onStageInstanceCreate);
     }
 
     @Override
     public void onStageInstanceDelete(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onStageInstanceDelete(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_DELETE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onStageInstanceDelete(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, STAGE_INSTANCE_DELETE, EventListener::onStageInstanceDelete);
     }
 
     @Override
     public void onStageInstanceUpdate(@NotNull LApi lApi, @NotNull StageInstanceEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onStageInstanceUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(STAGE_INSTANCE_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onStageInstanceUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, STAGE_INSTANCE_UPDATE, EventListener::onStageInstanceUpdate);
     }
 
     @Override
     public void onTypingStart(@NotNull LApi lApi, @NotNull TypingStartEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onTypingStart(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(TYPING_START);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onTypingStart(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, TYPING_START, EventListener::onTypingStart);
     }
 
     @Override
     public void onUserUpdate(@NotNull LApi lApi, @NotNull UserUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onUserUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(USER_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onUserUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, USER_UPDATE, EventListener::onUserUpdate);
     }
 
     @Override
     public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onInteractionCreate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(INTERACTION_CREATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onInteractionCreate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, INTERACTION_CREATE, EventListener::onInteractionCreate);
     }
 
     @Override
     public void onVoiceStateUpdate(@NotNull LApi lApi, @NotNull VoiceStateUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onVoiceStateUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_STATE_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onVoiceStateUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, VOICE_STATE_UPDATE, EventListener::onVoiceStateUpdate);
     }
 
     @Override
     public void onVoiceServerUpdate(@NotNull LApi lApi, @NotNull VoiceServerUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onVoiceServerUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(VOICE_SERVER_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onVoiceServerUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, VOICE_SERVER_UPDATE, EventListener::onVoiceServerUpdate);
     }
 
     @Override
     public void onWebhooksUpdate(@NotNull LApi lApi, @NotNull WebhooksUpdateEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onWebhooksUpdate(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(WEBHOOKS_UPDATE);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onWebhooksUpdate(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, WEBHOOKS_UPDATE, EventListener::onWebhooksUpdate);
     }
 
     @Override
     public void onLApiError(@NotNull LApi lApi, @NotNull LApiErrorEvent event) {
-        for(EventListener listener : listeners){
-            try {
-                listener.onLApiError(lApi, event);
-            } catch (Throwable t) {
-                listener.onUncaughtException(t);
-            }
-        }
-
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(LAPI_ERROR);
-        if(listeners != null){
-            for(EventListener listener : listeners){
-                try {
-                    listener.onLApiError(lApi, event);
-                } catch (Throwable t) {
-                    listener.onUncaughtException(t);
-                }
-            }
-        }
+        transmitForEachListener(event, LAPI_ERROR, EventListener::onLApiError);
     }
-
 
     @Override
     public @NotNull LApi getLApi() {

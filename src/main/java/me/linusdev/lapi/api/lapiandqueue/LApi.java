@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.lapiandqueue;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
+import me.linusdev.lapi.api.event.ReadyEventAwaiter;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
@@ -198,6 +199,8 @@ public interface LApi extends HasLApi {
 
     @NotNull RequestFactory getRequestFactory();
 
+    @NotNull ReadyEventAwaiter getReadyEventAwaiter();
+
     /**
      * <p>
      *     The event transmitter is used to listen to events from Discord. For more information on
@@ -231,19 +234,19 @@ public interface LApi extends HasLApi {
      *
      * @return {@link GatewayWebSocket} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY ENABLE_GATEWAY} is not enabled.
      */
-    @Nullable GatewayWebSocket getGateway();
+    GatewayWebSocket getGateway();
 
     /**
      *
      * @return {@link Cache} or {@code null} if {@link ConfigFlag#BASIC_CACHE} is not enabled.
      */
-    @Nullable Cache getCache();
+    Cache getCache();
 
     /**
      *
      * @return {@link CommandManagerImpl} or {@code null} if {@link ConfigFlag#COMMAND_MANAGER} is not enabled.
      */
-    @Nullable CommandManager getCommandManager();
+    CommandManager getCommandManager();
 
     /**
      *

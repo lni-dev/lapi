@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
-public class LApiRuntimeException extends RuntimeException{
+import me.linusdev.lapi.api.communication.gateway.events.Event;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import org.jetbrains.annotations.NotNull;
 
-    public LApiRuntimeException(){super();}
+@FunctionalInterface
+public interface EventConsumer<E extends Event> {
 
-    public LApiRuntimeException(String message){
-        super(message);
-    }
+    void accept(@NotNull EventListener listener, @NotNull LApi lApi, @NotNull E event);
 
-    public LApiRuntimeException(Throwable cause) {
-        super(cause);
-    }
 }

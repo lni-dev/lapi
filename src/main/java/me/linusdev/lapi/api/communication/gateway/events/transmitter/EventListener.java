@@ -61,6 +61,7 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdate
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -95,29 +96,9 @@ import org.jetbrains.annotations.Nullable;
  *
  *
  */
-public interface EventListener {
-
-    /**
-     * This will be called, if an {@link Exception} or {@link Throwable} was thrown inside this
-     * {@link EventListener EventListener's} methods.<br>
-     * Note: This method should <b>never</b> throw an Exception!
-     * @param uncaught {@link Throwable} that was not caught.
-     */
-    default void onUncaughtException(Throwable uncaught) {
-        try{
-            LogInstance log = Logger.getLogger(this.getClass());
-            log.error("Uncaught exception in an event listener:");
-            log.error(uncaught);
-        }catch (Throwable printToConsole){
-            printToConsole.printStackTrace();
-        }
-    }
-
-
+public interface EventListener extends UncaughtExceptionListener {
 
     default void onUnknownEvent(@NotNull LApi lApi, @Nullable GatewayEvent type, @Nullable GatewayPayloadAbstract payload){}
-
-
 
     default void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {}
 
@@ -126,6 +107,7 @@ public interface EventListener {
      * has been retrieved.<br>
      * This can also happen randomly, if the gateway
      * {@link me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket#reconnect(boolean) reconnects}.
+     * @see EventIdentifier#GUILDS_READY
      */
     default void onGuildsReady(@NotNull LApi lApi, @NotNull GuildsReadyEvent event) {}
 
@@ -137,6 +119,8 @@ public interface EventListener {
     default void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {}
 
     default void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {}
+
+    default void onLocalCommandsInitialized(@NotNull LApi lApi, @NotNull LocalCommandsInitializedEvent event) {}
 
     default void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {}
 

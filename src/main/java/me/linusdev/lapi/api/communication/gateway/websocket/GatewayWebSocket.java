@@ -1558,7 +1558,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                     {
                         MessageImplementation msg = Message.fromData(lApi, data);
                         transmitter.onMessageUpdate(lApi, new MessageUpdateEvent(lApi, payload, msg));
-                        //TODO: This may has to be changed. The Message in the MESSAGE_UPDATE event, can have all fields
+                        //TODO: This may has to be changed. The Message in the MESSAGE_UPDATE event, can have all fields null
+                        //see https://discord.com/developers/docs/topics/gateway#message-update
                         //missing, except id and channel_id
                     }
                     break;

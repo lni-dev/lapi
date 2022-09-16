@@ -36,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -167,8 +168,10 @@ public abstract class BaseCommand implements HasLApi {
     }
 
     @Nullable String getNameFromLinkedApplicationCommands() {
-        if(!linkedApplicationCommands.isEmpty()) {
-            return linkedApplicationCommands.get(0).getName();
+        synchronized (linkedApplicationCommands) {
+            if (!linkedApplicationCommands.isEmpty()) {
+                return linkedApplicationCommands.get(0).getName();
+            }
         }
         return null;
     }
@@ -193,8 +196,10 @@ public abstract class BaseCommand implements HasLApi {
     }
 
     @Nullable ApplicationCommandType getTypeFromLinkedApplicationCommands() {
-        if(!linkedApplicationCommands.isEmpty()) {
-            return linkedApplicationCommands.get(0).getType();
+        synchronized (linkedApplicationCommands) {
+            if (!linkedApplicationCommands.isEmpty()) {
+                return linkedApplicationCommands.get(0).getType();
+            }
         }
         return null;
     }
@@ -302,15 +307,19 @@ public abstract class BaseCommand implements HasLApi {
      * @return return value of your consumer for the last element iterated over.
      */
     public final boolean forEachLinkedApplicationCommand(Predicate<ApplicationCommand> consumer) {
-        for(ApplicationCommand command : linkedApplicationCommands) {
-            if(consumer.test(command)) return true;
+        synchronized (linkedApplicationCommands) {
+            for(ApplicationCommand command : linkedApplicationCommands) {
+                if(consumer.test(command)) return true;
+            }
         }
         return false;
     }
 
     @ApiStatus.Internal
     void linkWith(@NotNull ApplicationCommand command) {
-        linkedApplicationCommands.add(command);
+        synchronized (linkedApplicationCommands) {
+            linkedApplicationCommands.add(command);
+        }
     }
 
     /**

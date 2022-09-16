@@ -48,6 +48,7 @@ public class GatewayConfig {
     private final @Nullable Integer numShards;
     private final @NotNull SelfUserPresenceUpdater startupPresence;
     private final @NotNull GatewayIntent[] intents;
+    private final int intentsAsInt;
     private final @NotNull ExceptionConverter<String, GatewayPayloadAbstract, ? extends Throwable> jsonToPayloadConverter;
     private final @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> etfToPayloadConverter;
     private final @NotNull GatewayWebSocket.UnexpectedEventHandler unexpectedEventHandler;
@@ -64,6 +65,7 @@ public class GatewayConfig {
         this.numShards = numShards;
         this.startupPresence = startupPresence;
         this.intents = intents;
+        this.intentsAsInt = GatewayIntent.toInt(intents);
         this.jsonToPayloadConverter = jsonToPayloadConverter;
         this.etfToPayloadConverter = etfToPayloadConverter;
         this.unexpectedEventHandler = unexpectedEventHandler;
@@ -105,6 +107,14 @@ public class GatewayConfig {
 
     public GatewayIntent[] getIntents() {
         return intents;
+    }
+
+    public int getIntentsAsInt() {
+        return intentsAsInt;
+    }
+
+    public boolean hasIntent(@NotNull GatewayIntent intent) {
+        return intent.isSet(getIntentsAsInt());
     }
 
     public @Nullable ExceptionConverter<ArrayList<ByteBuffer>, GatewayPayloadAbstract, ? extends Throwable> getEtfToPayloadConverter() {

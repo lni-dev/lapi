@@ -60,9 +60,20 @@ import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdate
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.interfaces.Requireable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.manager.command.BaseCommand;
+import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+
+import static me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent.*;
+import static me.linusdev.lapi.api.config.ConfigFlag.*;
 
 /**
  * <p>
@@ -100,7 +111,7 @@ import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
  * </ul>
  *
  */
-public enum EventIdentifier{
+public enum EventIdentifier implements Requireable {
 
     /**
      * LApi specific
@@ -118,7 +129,7 @@ public enum EventIdentifier{
     /**
      * identifier for {@link EventListener#onReady(LApi, ReadyEvent)}.
      */
-    READY,
+    READY(true, true, ENABLE_GATEWAY),
 
     /**
      * identifier for {@link EventListener#onGuildsReady(LApi, GuildsReadyEvent)}.
@@ -133,7 +144,7 @@ public enum EventIdentifier{
      *     </li>
      * </ul>
      */
-    GUILDS_READY,
+    GUILDS_READY(true, true, CACHE_GUILDS, GUILDS),
 
     /**
      * identifier for {@link EventListener#onLApiReady(LApi, LApiReadyEvent)}.
@@ -149,7 +160,7 @@ public enum EventIdentifier{
      *     or listening to this event.
      * </p>
      */
-    LAPI_READY,
+    LAPI_READY(true, false),
 
     /**
      * identifier for {@link EventListener#onVoiceRegionManagerReady(LApi, VoiceRegionManagerReadyEvent)}.
@@ -166,7 +177,7 @@ public enum EventIdentifier{
      *     </li>
      * </ul>
      */
-    VOICE_REGION_MANAGER_READY,
+    VOICE_REGION_MANAGER_READY(true, true, CACHE_VOICE_REGIONS),
 
     /**
      * identifier for {@link EventListener#onCacheReady(LApi, CacheReadyEvent)}.
@@ -182,7 +193,25 @@ public enum EventIdentifier{
      *     </li>
      * </ul>
      */
-    CACHE_READY,
+    CACHE_READY(true, true, BASIC_CACHE),
+
+    /**
+     * identifier for {@link EventListener#onCacheReady(LApi, CacheReadyEvent)}.
+     * <br><br>
+     * <p>
+     *     Triggers, when the {@link CommandManager} has loaded all {@link BaseCommand command} classes.
+     * </p>
+     * <br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#COMMAND_MANAGER}
+     *     </li>
+     * </ul>
+     * @see LApi#getCommandManager()
+     * @see BaseCommand
+     */
+    LOCAL_COMMANDS_INITIALIZED(true, true, COMMAND_MANAGER),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
@@ -946,4 +975,53 @@ public enum EventIdentifier{
      * identifier for {@link EventListener#onLApiError(LApi, LApiErrorEvent)}.
      */
     LAPI_ERROR,
+    ;
+
+    public final static EventIdentifier[] REQUIRED_FOR_LAPI_READY = Arrays
+                    .stream(values())
+                    .filter(EventIdentifier::isRequiredForLApiReady)
+                    .toArray(EventIdentifier[]::new);
+
+    public final static EventIdentifier[] READY_EVENTS = Arrays
+            .stream(values())
+            .filter(EventIdentifier::isReadyEvent)
+            .toArray(EventIdentifier[]::new);
+
+    private final @Nullable Requireable[] requires;
+    private final boolean isReadyEvent;
+    private final boolean requiredForLApiReady;
+
+    EventIdentifier() {
+        this.requires = null;
+        this.isReadyEvent = false;
+        this.requiredForLApiReady = false;
+    }
+
+    EventIdentifier(boolean isReadyEvent, boolean requiredForLApiReady, @Nullable Requireable... requires) {
+        this.isReadyEvent = isReadyEvent;
+        this.requiredForLApiReady = requiredForLApiReady;
+        this.requires = requires;
+    }
+
+    @Override
+    public @Nullable Requireable[] requires() {
+        return requires;
+    }
+
+    @Override
+    public boolean isPresent(@NotNull LApiImpl lApi) {
+        if(requires == null) return true;
+        for(Requireable r : requires) {
+            if(!r.isPresent(lApi)) return false;
+        }
+        return true;
+    }
+
+    public boolean isReadyEvent() {
+        return isReadyEvent;
+    }
+
+    public boolean isRequiredForLApiReady() {
+        return requiredForLApiReady;
+    }
 }

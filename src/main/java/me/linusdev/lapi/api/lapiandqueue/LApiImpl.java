@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.cache.Cache;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
+import me.linusdev.lapi.api.event.ReadyEventAwaiter;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
@@ -115,6 +117,7 @@ public class LApiImpl implements LApi {
 
     //LApiReadyEventListener
     @NotNull final LApiReadyListener lApiReadyListener;
+    @NotNull final ReadyEventAwaiter readyEventAwaiter;
 
     //Gateway
     @NotNull final EventTransmitter eventTransmitter;
@@ -208,6 +211,7 @@ public class LApiImpl implements LApi {
 
         requestFactory = new RequestFactory(this);
         eventTransmitter = new EventTransmitter(this);
+        readyEventAwaiter = new ReadyEventAwaiter(this);
         lApiReadyListener = new LApiReadyListener(this);
 
         if(config.isFlagSet(ConfigFlag.BASIC_CACHE)){
@@ -377,7 +381,7 @@ public class LApiImpl implements LApi {
 
     @Override
     public void waitUntilLApiReadyEvent() throws InterruptedException {
-        lApiReadyListener.waitUntilLApiReadyEvent();
+        readyEventAwaiter.getAwaiter(EventIdentifier.LAPI_READY).awaitFirst();
     }
 
     @Override
@@ -407,6 +411,11 @@ public class LApiImpl implements LApi {
     @Override
     public @NotNull RequestFactory getRequestFactory() {
         return requestFactory;
+    }
+
+    @Override
+    public @NotNull ReadyEventAwaiter getReadyEventAwaiter() {
+        return readyEventAwaiter;
     }
 
     @Override

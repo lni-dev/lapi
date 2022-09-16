@@ -18,10 +18,14 @@ package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface CommandManager extends HasLApi {
 
     //TODO: add functions to get BaseCommands by id or iterate over them
+
+
+    @Nullable BaseCommand getCommandByClass(@NotNull Class<? extends BaseCommand> clazz);
 
     /**
      * <p>

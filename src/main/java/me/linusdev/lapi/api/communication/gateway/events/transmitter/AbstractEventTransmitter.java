@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface AbstractEventTransmitter extends HasLApi {
 
@@ -30,16 +31,27 @@ public interface AbstractEventTransmitter extends HasLApi {
      * Adds a listener, which will listen to all events.
      *
      * @param listener the {@link EventListener} to add
-     * @return {@link ArrayList#add(Object)}
      */
-    boolean addListener(@NotNull EventListener listener);
+    void addListener(@NotNull EventListener listener);
 
     /**
      * This will not remove {@link #addSpecifiedListener(EventListener, EventIdentifier...) specified listener}!
      * @param listener the {@link EventListener} to remove
-     * @return {@link ArrayList#remove(Object)}
+     * @return {@code true} if the listener was removed.
      */
     boolean removeListener(@NotNull EventListener listener);
+
+    /**
+     * Adds a {@link AnyEventListener}, which will listen to all events expect {@link EventIdentifier#UNKNOWN UNKNOWN} events
+     * @param listener {@link AnyEventListener} to add
+     */
+    void addAnyEventListener(@NotNull AnyEventListener listener);
+
+    /**
+     * Removes given {@link AnyEventListener}.
+     * @param listener {@link AnyEventListener} to remove
+     */
+    void removeAnyEventListener(@NotNull AnyEventListener listener);
 
     /**
      *
@@ -67,7 +79,7 @@ public interface AbstractEventTransmitter extends HasLApi {
      *
      * @param listener the listener to remove
      * @param specifications to which Events the listener shall not listen to anymore
-     * @return true if all {@link ArrayList#remove(Object)} calls returned true
+     * @return true if all {@link List#remove(Object) remove} calls returned true
      */
     boolean removeSpecifiedListener(@NotNull EventListener listener, @NotNull EventIdentifier... specifications);
 }

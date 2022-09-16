@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.communication.gateway.enums;
 
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
+import me.linusdev.lapi.api.interfaces.Requireable;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,7 +92,7 @@ import java.util.stream.Collectors;
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateway-intents" target="_top">Gateway Intents</a>
  */
 @SuppressWarnings("PointlessBitwiseExpression")
-public enum GatewayIntent implements SimpleDatable {
+public enum GatewayIntent implements Requireable, SimpleDatable {
 
     /**
      * <ul>
@@ -381,10 +383,18 @@ public enum GatewayIntent implements SimpleDatable {
 
     private final int value;
     private final boolean privileged;
+    private final @Nullable Requireable[] requires;
 
     GatewayIntent(int value, boolean privileged) {
         this.value = value;
         this.privileged = privileged;
+        this.requires = null;
+    }
+
+    GatewayIntent(int value, boolean privileged, @Nullable Requireable[] requires) {
+        this.value = value;
+        this.privileged = privileged;
+        this.requires = requires;
     }
 
     /**
@@ -447,5 +457,15 @@ public enum GatewayIntent implements SimpleDatable {
     @Override
     public Object simplify() {
         return toString();
+    }
+
+    @Override
+    public @Nullable Requireable[] requires() {
+        return requires;
+    }
+
+    @Override
+    public boolean isPresent(@NotNull LApiImpl lApi) {
+        return lApi.getConfig().getGatewayConfig().hasIntent(this);
     }
 }

@@ -20,7 +20,9 @@ import me.linusdev.data.SimpleDatable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.interfaces.Requireable;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
@@ -33,9 +35,10 @@ import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("PointlessBitwiseExpression")
-public enum ConfigFlag implements SimpleDatable {
+public enum ConfigFlag implements Requireable, SimpleDatable {
     /**
      * This flag has no effects
      */
@@ -278,13 +281,20 @@ public enum ConfigFlag implements SimpleDatable {
      * @see LApi#getCommandManager()
      * @see BaseCommand
      */
-    COMMAND_MANAGER(1 << 26),
+    COMMAND_MANAGER(1 << 26, BASIC_CACHE, ENABLE_GATEWAY),
     ;
 
     private final long value;
+    private final @Nullable Requireable[] requires;
 
     ConfigFlag(long value) {
         this.value = value;
+        this.requires = null;
+    }
+
+    ConfigFlag(long value, @Nullable Requireable... requires) {
+        this.value = value;
+        this.requires = requires;
     }
 
     public static long fromData(@NotNull SOData data){
@@ -352,5 +362,15 @@ public enum ConfigFlag implements SimpleDatable {
     @Override
     public String toString() {
         return name();
+    }
+
+    @Override
+    public @Nullable Requireable[] requires() {
+        return requires;
+    }
+
+    @Override
+    public boolean isPresent(@NotNull LApiImpl lApi) {
+        return lApi.getConfig().isFlagSet(this);
     }
 }
