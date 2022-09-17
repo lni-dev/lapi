@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.async;
 
+import me.linusdev.lapi.api.async.error.Error;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -17,15 +17,29 @@
 package me.linusdev.lapi.api.async;
 
 import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ErrorConsumer <R, S> {
-
+public interface ResultAndErrorConsumer<R, S> extends ResultConsumer<R, S> {
+    @Override
     default void onError(@NotNull Error error, @NotNull Task<R, S> task, @NotNull S secondary) {
-        LogInstance log = Logger.getLogger(this);
-        log.error("Error while completing task " + task.getName());
-        error.log(log);
+        consume(null, secondary, error);
     }
+
+    @Override
+    default void consume(@NotNull R result, @NotNull S secondary) {
+        consume(result, secondary, null);
+    }
+
+
+    /**
+     * One of result or error are always {@code null}. <br>
+     * If result is not {@code null}, error will be {@code null}.<br>
+     * If error is not {@code null}, result will be {@code null}.
+     *
+     * @param result {@link R} result
+     * @param secondary {@link S} secondary result
+     * @param error {@link Error}
+     */
+    void consume(R result, @NotNull S secondary, @Nullable Error error);
 }

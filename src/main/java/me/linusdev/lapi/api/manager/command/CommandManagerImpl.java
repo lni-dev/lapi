@@ -16,6 +16,15 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Nothing;
+import me.linusdev.lapi.api.async.ResultAndErrorConsumer;
+import me.linusdev.lapi.api.async.Task;
+import me.linusdev.lapi.api.async.error.Error;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.conditioned.Condition;
+import me.linusdev.lapi.api.async.tasks.SupervisedAsyncTask;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.GuildCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
@@ -39,10 +48,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
@@ -257,56 +263,92 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     }
 
     @Override
-    public @Nullable BaseCommand getCommandByClass(@NotNull Class<? extends BaseCommand> clazz) {
-        //TODO: make this return a Future or something similar
-        try {
-            lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).awaitFirst();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        for(BaseCommand command : localCommands) {
-            if(command.getClass().equals(clazz)) return command;
-        }
-        return null;
+    public @NotNull me.linusdev.lapi.api.async.Future<BaseCommand, CommandManager> getCommandByClass(@NotNull Class<? extends BaseCommand> clazz) {
+
+        final @NotNull CommandManager cm = this;
+
+        Task<BaseCommand, CommandManager> task = new SupervisedAsyncTask<>(lApi) {
+            @Override
+            public @NotNull Condition getCondition() {
+                return new Condition() {
+                    @Override
+                    public boolean check() {
+                        return lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).hasTriggered();
+                    }
+
+                    @Override
+                    public void await() throws InterruptedException {
+                        lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).awaitFirst();
+                    }
+                };
+            }
+
+            @Override
+            public @NotNull ComputationResult<BaseCommand, CommandManager> execute() {
+                for (BaseCommand command : localCommands) {
+                    if (command.getClass().equals(clazz)) return new ComputationResult<>(command, cm, null);
+                }
+
+                return new ComputationResult<>(null, cm, new MessageError("Command not found.", StandardErrorTypes.COMMAND_NOT_FOUND));
+            }
+        };
+
+        return task.queue();
     }
 
     /**
-     *
-     * @param clazz {@link Class} of your {@link BaseCommand}
+     * @param clazz   {@link Class} of your {@link BaseCommand}
      * @param guildId the ids of all guild to enable this command for. The list may not contain the same id twice.
+     * @return
      */
     @Override
-    public void enabledCommandForGuilds(@NotNull Class<? extends BaseCommand> clazz, @NotNull String... guildId) {
-        lApi.runSupervised(() -> {
+    public @NotNull me.linusdev.lapi.api.async.Future<Nothing, CommandManager> enabledCommandForGuild(@NotNull Class<? extends BaseCommand> clazz, @NotNull String guildId) {
 
-            try {
-                awaitInitialized();
-            } catch (InterruptedException e) {throw new RuntimeException(e);}
+        final @NotNull CommandManager cm = this;
 
-            for(BaseCommand command : localCommands) {
-                if(command.getClass().equals(clazz)) {
-                    List<String> guildIds = List.of(guildId);
-                    for(String id : guildIds) {
+        Task<Nothing, CommandManager> task = new SupervisedAsyncTask<>(lApi) {
+            @Override
+            public @NotNull Condition getCondition() {
+                return new Condition() {
+                    @Override
+                    public boolean check() {
+                        return isInitialized();
+                    }
 
-                        GuildCommands gc = guildCommandsOnDiscord.computeIfAbsent(id, s -> new GuildCommands());
+                    @Override
+                    public void await() throws InterruptedException {
+                        awaitInitialized();
+                    }
+                };
+            }
+
+            @Override
+            public @NotNull ComputationResult<Nothing, CommandManager> execute() {
+                for(BaseCommand command : localCommands) {
+                    if(command.getClass().equals(clazz)) {
+
+                        GuildCommands gc = guildCommandsOnDiscord.computeIfAbsent(guildId, s -> new GuildCommands());
 
                         try {
                             gc.awaitInit();
                         } catch (InterruptedException e) {throw new RuntimeException(e);}
 
-                        if(command.forEachLinkedApplicationCommand(acmd -> acmd.getGuildId() != null && acmd.getGuildId().equals(id))) {
-                            return;
+
+                        if(command.forEachLinkedApplicationCommand(acmd -> acmd.getGuildId() != null && acmd.getGuildId().equals(guildId))) {
+                            return new ComputationResult<>(null, cm, new MessageError("Command is already enabled for given guild", StandardErrorTypes.COMMAND_ALREADY_ENABLED));
                         }
+
+                        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, null, commandLinks);
+                        CommandUtils.createCommand(info, command, List.of(guildId), false);
+
+                        return new ComputationResult<>(Nothing.instance, cm, null);
                     }
-
-
-                    MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, null, commandLinks);
-                    CommandUtils.createCommand(info, command, guildIds, false);
-
-                    return;
                 }
+                return new ComputationResult<>(null, cm, new MessageError("Command not found.", StandardErrorTypes.COMMAND_NOT_FOUND));
             }
-        });
+        };
+
+        return task.queue();
     }
 
     @Override

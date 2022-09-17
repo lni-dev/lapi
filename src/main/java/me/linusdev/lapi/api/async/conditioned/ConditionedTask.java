@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.conditioned;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.async.Task;
+import org.jetbrains.annotations.NotNull;
 
-public class ErrorException extends LApiRuntimeException {
+public interface ConditionedTask<R, S> extends Task<R, S> {
 
-    private final Error error;
+    @NotNull Condition getCondition();
 
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
-    }
-
-    @Override
-    public String getMessage() {
-        return error.getMessage();
-    }
 }

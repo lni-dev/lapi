@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import org.jetbrains.annotations.NotNull;
 
-public class ErrorException extends LApiRuntimeException {
+@SuppressWarnings("InstantiationOfUtilityClass")
+public final class Nothing {
 
-    private final Error error;
+    public final static @NotNull Nothing instance = new Nothing();
 
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
+    public static @NotNull Nothing getInstance() {
+        return instance;
     }
 
-    @Override
-    public String getMessage() {
-        return error.getMessage();
+    private Nothing() {
+
     }
+
 }

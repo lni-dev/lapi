@@ -25,11 +25,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public abstract class AbstractFuture<R, S> implements Future<R, S>{
+public abstract class AbstractFuture<R, S, T extends Task<R, S>> implements Future<R, S>{
 
     public static final @NotNull LogInstance log = Logger.getLogger(AbstractFuture.class.getSimpleName());
 
-    private final @NotNull Task<R, S> task;
+    private final @NotNull T task;
     private volatile boolean canceled = false;
     private volatile boolean started = false;
     private volatile boolean done = false;
@@ -41,17 +41,27 @@ public abstract class AbstractFuture<R, S> implements Future<R, S>{
 
     private volatile @Nullable ComputationResult<R, S> result;
 
-    public AbstractFuture(@NotNull Task<R, S> task) {
+    public AbstractFuture(@NotNull T task) {
         this.task = task;
     }
 
-    protected @NotNull Task<R, S> getTask() {
+    protected @NotNull T getTask() {
         return task;
     }
 
+    /**
+     * Checks if this {@link Future} can execute now.
+     * @return {@code true} if this future can be executed
+     */
+    public abstract boolean isExecutable();
 
-
-    public void completeHere() {
+    /**
+     * Executes the {@link Future} if it has not been {@link #cancel() canceled} and is not {@link #isDone() done} or
+     * {@link #started}.
+     * <br><br>
+     * If the {@link Future} is not {@link #isExecutable() executable}, this function will wait until it is executable.
+     */
+    public void completeHere() throws InterruptedException {
 
         synchronized (lock) {
             if (isDone() || hasStarted()) return;
@@ -83,7 +93,11 @@ public abstract class AbstractFuture<R, S> implements Future<R, S>{
 
         try {
             final ResultConsumer<R, S> then = this.then;
-            if(then != null) then.consume(result.getResult(), result.getSecondary());
+            if(then != null) {
+                if(result.getResult() != null)
+                    then.consume(result.getResult(), result.getSecondary());
+                else then.onError(result.getError(), task, result.getSecondary());
+            }
         } catch (Throwable t) {
             log.error("Unexpected Exception in a Future then listener.");
             log.error(t);

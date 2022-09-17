@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.conditioned;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.async.Task;
 
-public class ErrorException extends LApiRuntimeException {
+public interface Condition {
 
-    private final Error error;
+    /**
+     * Check whether the condition is met. Once a condition is met, this method must return {@code true} until
+     * the corresponding {@link Task} has completed execution.
+     * @return {@code true}  if the condition is met. {@code false} otherwise.
+     */
+    boolean check();
 
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
-    }
+    /**
+     * Waits the current thread until the condition is met.
+     * @throws InterruptedException if interrupted while waiting.
+     */
+    void await() throws InterruptedException;
 
-    @Override
-    public String getMessage() {
-        return error.getMessage();
-    }
 }

@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.error;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.data.SimpleDatable;
+import org.jetbrains.annotations.NotNull;
 
-public class ErrorException extends LApiRuntimeException {
+public enum StandardErrorTypes implements ErrorType, SimpleDatable {
 
-    private final Error error;
+    EXCEPTION,
 
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
+    COMMAND_NOT_FOUND,
+    COMMAND_ALREADY_ENABLED,
+
+    ;
+
+    @Override
+    public String simplify() {
+        return this.toString();
     }
 
     @Override
-    public String getMessage() {
-        return error.getMessage();
+    public @NotNull String getName() {
+        return this.toString();
     }
 }

@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.async;
 
+import me.linusdev.lapi.api.async.error.Error;
 import me.linusdev.lapi.api.async.exception.CancellationException;
 import me.linusdev.lapi.api.async.exception.ErrorException;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -72,6 +73,16 @@ public interface Future<R, S> extends HasLApi {
      * @return the {@link Future} itself.
      */
     @NotNull Future<R, S> then(@NotNull ResultConsumer<R, S> consumer);
+
+    /**
+     * Given consumer will be called after {@link Future}'s execution has finished and result or error is ready.
+     * @param consumer {@link ResultAndErrorConsumer}
+     * @return the {@link Future} itself.
+     */
+    default @NotNull Future<R, S> then(@NotNull ResultAndErrorConsumer<R, S> consumer) {
+        then((ResultConsumer<R, S>) consumer);
+        return this;
+    }
 
     /**
      * Given consumer will be called after {@link Future}'s execution has finished and result or error is ready.

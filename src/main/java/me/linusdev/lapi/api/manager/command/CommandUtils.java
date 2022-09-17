@@ -84,8 +84,15 @@ public class CommandUtils {
 
 
         if (matches == null) {
-            info.getLog().debug("No matches found. Creating new command...");
+
+            if(command.getScope() == CommandScope.GUILD) {
+                //Guild Commands have to be enabled per guild. there is no need to call createCommand.
+                info.getLog().debug("No matches found for a GUILD command.");
+                return;
+            }
+
             //This is a new command
+            info.getLog().debug("No matches found. Creating new command...");
             createCommand(info, command, null, true);
 
         } else {

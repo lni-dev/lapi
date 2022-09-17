@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async;
+package me.linusdev.lapi.api.async.error;
 
-import me.linusdev.lapi.log.LogInstance;
-import org.jetbrains.annotations.Contract;
+import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface Error {
+/**
+ * @see StandardErrorTypes
+ */
+public interface ErrorType extends SimpleDatable {
 
-    @Nullable Throwable getThrowable();
-
-    default boolean hasThrowable() {
-        return getThrowable() != null;
-    }
-
-    default String getMessage() {
-        if(!hasThrowable()) return "";
-        return getThrowable().getMessage();
-    }
-
-    default void log(@NotNull LogInstance log) {
-        log.error(getMessage());
-        if(hasThrowable()) log.error(getThrowable());
-    }
+    /**
+     * Name of this error type.
+     * @return {@link String} name
+     */
+    @NotNull String getName();
 
 }

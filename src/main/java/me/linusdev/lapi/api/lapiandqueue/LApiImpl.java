@@ -454,7 +454,7 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public @Nullable CommandManager getCommandManager() {
+    public CommandManager getCommandManager() {
         return commandManager;
     }
 

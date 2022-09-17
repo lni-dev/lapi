@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.conditioned;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
-
-public class ErrorException extends LApiRuntimeException {
-
-    private final Error error;
-
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
+public class NoCondition implements Condition{
+    @Override
+    public boolean check() {
+        return true;
     }
 
     @Override
-    public String getMessage() {
-        return error.getMessage();
+    public void await() throws InterruptedException {
+
     }
 }

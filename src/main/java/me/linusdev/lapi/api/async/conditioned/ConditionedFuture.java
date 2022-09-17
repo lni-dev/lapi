@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.conditioned;
 
-import me.linusdev.lapi.api.async.error.Error;
+import me.linusdev.lapi.api.async.AbstractFuture;
+import me.linusdev.lapi.api.async.Task;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import org.jetbrains.annotations.NotNull;
 
-public class ErrorException extends LApiRuntimeException {
-
-    private final Error error;
-
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
+public class ConditionedFuture<R, S, T extends ConditionedTask<R, S>> extends AbstractFuture<R, S, T> {
+    public ConditionedFuture(@NotNull T task) {
+        super(task);
     }
 
     @Override
-    public String getMessage() {
-        return error.getMessage();
+    public boolean isExecutable() {
+        return getTask().getCondition().check();
+    }
+
+    @Override
+    public void completeHere() throws InterruptedException {
+        if(isExecutable()) {
+            super.completeHere();
+        } else {
+            getTask().getCondition().await();
+            super.completeHere();
+        }
     }
 }

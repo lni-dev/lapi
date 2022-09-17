@@ -14,22 +14,30 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.exception;
+package me.linusdev.lapi.api.async.error;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.log.LogInstance;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ErrorException extends LApiRuntimeException {
+public interface Error {
 
-    private final Error error;
+    @Nullable Throwable getThrowable();
 
-    public ErrorException(Error error) {
-        super(error.getThrowable());
-        this.error = error;
+    default boolean hasThrowable() {
+        return getThrowable() != null;
     }
 
-    @Override
-    public String getMessage() {
-        return error.getMessage();
+    @NotNull ErrorType getType();
+
+    default @NotNull String getMessage() {
+        if(!hasThrowable()) return "";
+        return getThrowable().getMessage();
     }
+
+    default void log(@NotNull LogInstance log) {
+        log.error(getMessage());
+        if(hasThrowable()) log.error(getThrowable());
+    }
+
 }

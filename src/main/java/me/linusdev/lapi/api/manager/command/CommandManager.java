@@ -16,24 +16,27 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.Nothing;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface CommandManager extends HasLApi {
 
     //TODO: add functions to get BaseCommands by id or iterate over them
 
 
-    @Nullable BaseCommand getCommandByClass(@NotNull Class<? extends BaseCommand> clazz);
+    @NotNull Future<BaseCommand, CommandManager> getCommandByClass(@NotNull Class<? extends BaseCommand> clazz);
 
     /**
      * <p>
-     *     If the {@link BaseCommand} is already enabled for any of the guilds in the list, the method will return without
-     *     doing anything.
+     * If the {@link BaseCommand} is already enabled for any of the guilds in the list, the method will return without
+     * doing anything.
      * </p>
-     * @param clazz {@link Class} of your {@link BaseCommand}
+     *
+     * @param clazz   {@link Class} of your {@link BaseCommand}
      * @param guildId the ids of all guild to enable this command for
+     * @return
      */
-    void enabledCommandForGuilds(@NotNull Class<? extends BaseCommand> clazz, @NotNull String... guildId);
+    @NotNull Future<Nothing, CommandManager> enabledCommandForGuild(@NotNull Class<? extends BaseCommand> clazz, @NotNull String guildId);
 }

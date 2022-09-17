@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 import java.util.function.Predicate;
 
 /**
@@ -86,10 +87,10 @@ import java.util.function.Predicate;
  *
  * <h2>Enable Guild Commands</h2>
  * <p>
- *     A {@link CommandScope#GUILD guild} command must be enabled for each guild individually using
- *     {@link CommandManager#enabledCommandForGuilds(Class, String...)}.<br>
+ *     A {@link CommandScope#GUILD guild} command must be enabled for each guild individually
+ *     {@link CommandManager#enabledCommandForGuild(Class, String) using the command manager}.<br>
  *     For Example:
- *     <pre>{@code lApi.getCommandManager().enabledCommandForGuilds(YourGuildCommand.class, "someGuildId");}</pre>
+ *     <pre>{@code lApi.getCommandManager().enabledCommandForGuild(YourGuildCommand.class, "someGuildId");}</pre>
  *     Note: If you enable a command for a guild, which it has already been enable for, nothing will happen.
  * </p>
  *
@@ -146,7 +147,7 @@ public abstract class BaseCommand implements HasLApi {
     protected LApi lApi;
 
     private @Nullable ApplicationCommandTemplate template;
-    private final @NotNull List<ApplicationCommand> linkedApplicationCommands = new ArrayList<>();
+    private final @NotNull List<ApplicationCommand> linkedApplicationCommands = new Vector<>();
 
     /**
      * The id of your {@link ApplicationCommand}. Usually not required. see {@link BaseCommand} for more information.

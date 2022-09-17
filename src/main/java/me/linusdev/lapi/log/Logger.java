@@ -36,10 +36,11 @@ import java.util.Date;
 
 public class Logger {
 
-    public static final boolean ENABLE_LOG = true;
-    public static final boolean DEBUG_LOG = true && ENABLE_LOG;
-    public static final boolean DEBUG_DATA_LOG = false && ENABLE_LOG && DEBUG_LOG;
+    public static final boolean ENABLE_LOG =           true;
+    public static final boolean DEBUG_LOG =            true && ENABLE_LOG;
+    public static final boolean DEBUG_DATA_LOG =       false && ENABLE_LOG && DEBUG_LOG;
     public static final boolean SOUT_LOG =             true && ENABLE_LOG;
+    public static final boolean SERR_LOG =             true && ENABLE_LOG;
 
     public static ArrayList<String> allowedSources = new ArrayList<>();
     static {
@@ -148,12 +149,12 @@ public class Logger {
                     pre = String.format("(%s - %s) %s: %s: ", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name);
                 }
                 toLog = toLog.replace("\n", "\n" + " ".repeat(pre.length()));
-                finalLog(pre + toLog + "\n");
+                finalLog(type, pre + toLog + "\n");
             }else {
                 if (name == null) {
-                    finalLog(String.format("(%s - %s) %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, toLog));
+                    finalLog(type, String.format("(%s - %s) %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, toLog));
                 } else {
-                    finalLog(String.format("(%s - %s) %s: %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name, toLog));
+                    finalLog(type, String.format("(%s - %s) %s: %s: %s\n", logDateFormat.format(new Date(System.currentTimeMillis())), source, type, name, toLog));
                 }
             }
             if(writer != null) writer.flush();
@@ -162,8 +163,9 @@ public class Logger {
         }
     }
 
-    private static void finalLog(String s) throws IOException {
-        if(SOUT_LOG) System.out.print(s);
+    private static void finalLog(Type type, String s) throws IOException {
+        if(SERR_LOG && type == Type.ERROR) System.err.println(s);
+        else if(SOUT_LOG) System.out.print(s);
         if(writer != null) writer.append(s);
     }
 

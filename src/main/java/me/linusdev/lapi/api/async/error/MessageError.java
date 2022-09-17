@@ -14,18 +14,33 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async;
+package me.linusdev.lapi.api.async.error;
 
-import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public interface ErrorConsumer <R, S> {
+public class MessageError implements Error{
 
-    default void onError(@NotNull Error error, @NotNull Task<R, S> task, @NotNull S secondary) {
-        LogInstance log = Logger.getLogger(this);
-        log.error("Error while completing task " + task.getName());
-        error.log(log);
+    private final @NotNull String message;
+    private final @NotNull StandardErrorTypes type;
+
+    public MessageError(@NotNull String message, @NotNull StandardErrorTypes type) {
+        this.message = message;
+        this.type = type;
+    }
+
+    @Override
+    public @Nullable Throwable getThrowable() {
+        return null;
+    }
+
+    @Override
+    public @NotNull ErrorType getType() {
+        return type;
+    }
+
+    @Override
+    public @NotNull String getMessage() {
+        return message;
     }
 }
