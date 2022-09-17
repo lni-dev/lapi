@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.0'
+    annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.1'
     implementation 'io.github.lni-dev:lapi:[version]'
 }
 ```
