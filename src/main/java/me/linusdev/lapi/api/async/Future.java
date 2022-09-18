@@ -29,6 +29,53 @@ import java.util.function.Consumer;
 /**
  * A {@link Future} represents a {@link Task} that will be executed in the future and whose result or error will
  * be retrieved.
+ * <br><br>
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">
+ *     Before the {@link Task} bound to this future will supposedly start execution:
+ * </span><br>
+ * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     {@link #beforeExecution(Consumer) before execution} listener will be called before and can still {@link #cancel()} this future
+ * </p> <br>
+ *
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">
+ *     Once the future has finished (if it wasn't canceled):
+ * </span><br>
+ * Meaning that the {@link Task} has finished execution . The following actions will follow
+ * in the following order
+ * <ol style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     <li>
+ *         all Threads waiting on {@link #get()} will be notified
+ *     </li>
+ *     <li>
+ *         All result listeners ({@link #then(ResultConsumer) see}, {@link #then(SingleResultConsumer) see}, {@link #then(ResultAndErrorConsumer) see})
+ *         will be called in the order they have been added to this {@link Future}.
+ *     </li>
+ * </ol><br>
+ *
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">
+ *     If the future was {@link #cancel() canceled}:
+ * </span><br>
+ * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     <li>
+ *         All Threads waiting on {@link #get()} will be resumed and {@code null} will
+ *         be returned.
+ *     </li>
+ *     <li>
+ *         The {@link Task} will not be executed.
+ *     </li>
+ *     <li>
+ *         {@link #beforeExecution(Consumer)} listener will not be called.
+ *     </li>
+ * </ul><br>
+ *
+ * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">
+ *     If any then listener ({@link #then(ResultConsumer) see}, {@link #then(SingleResultConsumer) see}, {@link #then(ResultAndErrorConsumer) see})
+ *     is set after the {@link #get() result} has already been retrieved:
+ * </span><br>
+ * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
+ *     The listener will be called immediately in the setting thread
+ * </p>
+ *
  *
  * @param <R> the result type
  * @param <S> the secondary result type. usually contains information about the task's execution process.

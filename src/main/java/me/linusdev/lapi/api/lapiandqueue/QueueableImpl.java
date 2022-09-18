@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.conditioned;
+package me.linusdev.lapi.api.lapiandqueue;
 
-import me.linusdev.lapi.api.async.AbstractFuture;
 import me.linusdev.lapi.api.async.ExecutableTask;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.queue.QResponse;
+import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ConditionedFuture<R, S, T extends ConditionedTask<R, S> & ExecutableTask<R, S>> extends AbstractFuture<R, S, T> {
-    public ConditionedFuture(@NotNull T task) {
-        super(task);
-    }
+import java.util.function.Consumer;
 
-    @Override
-    public boolean isExecutable() {
-        return getTask().getCondition().check();
-    }
+public abstract class QueueableImpl<T> implements ExecutableTask<T, QResponse>, Queueable<T> {
 
     @Override
-    public void executeHere() throws InterruptedException {
-        if(isExecutable()) {
-            super.executeHere();
-        } else {
-            getTask().getCondition().await();
-            super.executeHere();
-        }
+    public @NotNull Future<T, QResponse> consumeAndQueue(@Nullable Consumer<Future<T, QResponse>> consumer) {
+        final QueueableFuture<T, QueueableImpl<T>> future = new QueueableFuture<>(this);
+        if(consumer != null) consumer.accept(future);
+        getLApi().queue(future);
+        return future;
     }
+
 }

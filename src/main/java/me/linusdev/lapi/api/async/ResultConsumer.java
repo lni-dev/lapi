@@ -16,19 +16,27 @@
 
 package me.linusdev.lapi.api.async;
 
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
+import me.linusdev.lapi.api.async.error.Error;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public interface ResultConsumer<R, S> extends ErrorConsumer<R, S> {
 
     void consume(@NotNull R result, @NotNull S secondary);
 
     default @NotNull ResultConsumer<R, S> thenConsume(@NotNull ResultConsumer<R, S> second) {
-        return (result, secondary) -> {
-            this.consume(result, secondary);
-            second.consume(result, secondary);
+        ResultConsumer<R, S> first = this;
+        return new ResultConsumer<>() {
+            @Override
+            public void consume(@NotNull R result, @NotNull S secondary) {
+                first.consume(result, secondary);
+                second.consume(result, secondary);
+            }
+
+            @Override
+            public void onError(@NotNull Error error, @NotNull Task<R, S> task, @NotNull S secondary) {
+                first.onError(error, task, secondary);
+                second.onError(error, task, secondary);
+            }
         };
     }
 

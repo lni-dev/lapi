@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
@@ -39,7 +40,6 @@ import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
-import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -54,11 +54,8 @@ import java.net.URLConnection;
 import java.net.http.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.*;
 
@@ -109,7 +106,7 @@ public class LApiImpl implements LApi {
     private final @NotNull RequestFactory requestFactory;
 
     //Queue
-    private final Queue<Future<?>> queue;
+    private final Queue<QueueableFuture<?, ?>> queue;
     private final ScheduledExecutorService scheduledExecutor;
     private final ExecutorService queueWorker;
     private volatile QueueThread queueThread;
@@ -176,29 +173,26 @@ public class LApiImpl implements LApi {
                 log.log("Started queue thread: " + queueThread.getName());
                 try {
                     while (true) {
-                        synchronized (queue) {
-                            if (queue.peek() == null) {
-                                try {
-                                    queueThread.wait(queue, 10000L);
-                                } catch (InterruptedException ignored) {
-                                    log.error("Queue thread interrupted");
-                                    log.error(ignored);
-                                }
-                            }
+                        try {
+                            queueThread.awaitNotifyIf(10000L, () -> queue.peek() == null);
+                        } catch (InterruptedException ignored) {
+                            log.error("Queue thread interrupted");
+                            log.error(ignored);
+                        }
 
-                            if (queue.peek() == null) continue;
+                        QueueableFuture<?, ?> future = queue.poll();
+                        if (future == null) {
+                            continue;
+                        }
 
-                            if(Logger.DEBUG_LOG){
-                                log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
-                                long millis = System.currentTimeMillis();
-                                //noinspection ConstantConditions
-                                queue.poll().completeHereAndIgnoreQueueThread();
-                                long finishMillis = System.currentTimeMillis() - millis;
-                                log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
-                            }else{
-                                queue.poll().completeHereAndIgnoreQueueThread();
-                            }
-
+                        if(Logger.DEBUG_LOG){
+                            log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
+                            long millis = System.currentTimeMillis();
+                            future.executeHere();
+                            long finishMillis = System.currentTimeMillis() - millis;
+                            log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
+                        }else{
+                            future.executeHere();
                         }
                     }
                 }catch (Throwable t){
@@ -249,56 +243,28 @@ public class LApiImpl implements LApi {
 
     @Override
     @ApiStatus.Internal
-    public  <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete){
-        final Future<T> future = new Future<T>(this, queueable);
-        if(beforeComplete != null) future.beforeComplete(beforeComplete);
-        if(then != null) future.then(then);
-        if(thenSingle != null) future.then(thenSingle);
-        this.queue(future);
-        return future;
-    }
-
-    @Override
-    @ApiStatus.Internal
-    public <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit){
-        final Future<T> future = new Future<T>(this, queueable);
-        scheduledExecutor.schedule(() -> {
-            try {
-                this.queue(future);
-            }catch (Throwable t){
-                //This is so any exceptions in this Thread are caught and printed.
-                //Otherwise, they would just vanish and no one would know what happened
-                log.error(t);
-            }
-        }, delay, timeUnit);
-        return future;
-    }
-
-    @ApiStatus.Internal
-    void queue(@NotNull final Future<?> future){
+    public <T> void queue(@NotNull QueueableFuture<T, QueueableImpl<T>> future) {
         queue.offer(future);
-        if(queueThread.isWaiting()){
-            //If the queue is waiting, notify it.
-            //If it is not waiting, it is currently working on something and will
-            //automatically move to the next entry ones it is free again
-            synchronized (queue){
-                queue.notifyAll();
-            }
-        }
+        //notify the queue in case it is waiting.
+        queueThread.notifyAllAwaiting();
     }
 
     public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, NoInternetException, ParseException, InterruptedException {
-        LApiHttpResponse response = retrieveResponse(request);
-
-        return response;
+        return retrieveResponse(request);
     }
 
-    private LApiHttpResponse retrieveResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException {
-        Throwable throwThrough = null;
+    private LApiHttpResponse retrieveResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, ParseException {
 
+        HttpRequest builtRequest;
         try {
-            HttpRequest builtRequest = request.getHttpRequest();
+            builtRequest = request.getHttpRequest();
+        }catch (Throwable tt) {
+            log.error("Error while building request");
+            log.error(tt);
+            throw tt;
+        }
 
+        while(true) {
             try {
                 return sendRequest(request, builtRequest);
             } catch (ConnectException | HttpTimeoutException exception) {
@@ -327,31 +293,24 @@ public class LApiImpl implements LApi {
                         log.debug("Internet is most likely not connected");
                         java.lang.Thread.sleep(notConnectedWaitMillis);
                         notConnectedWaitMillis = Math.min(NOT_CONNECTED_WAIT_MILLIS_MAX, notConnectedWaitMillis + NOT_CONNECTED_WAIT_MILLIS_INCREASE);
-                        throwThrough = new NoInternetException();
-                        throw (NoInternetException) throwThrough;
+                        //while loop will retry...
+                        continue;
                     }
 
                 } else if (cause instanceof UnresolvedAddressException) {
-                    throwThrough = exception;
                     throw exception;
                 }
 
-
+                log.error("Unexpected ConnectException or HttpTimeoutException while trying to send a http request.");
                 log.error(exception);
-                throwThrough = exception;
                 throw exception;
             } catch (Throwable e) {
-
+                log.error("Unexpected exception while trying to send a http request.");
                 log.error(e);
-                throwThrough = e;
                 throw e;
             }
-        }catch (Throwable tt) {
-            if(tt == throwThrough) throw tt; //ignore this one
-            log.error("Error while building request");
-            log.error(tt);
-            throw tt;
         }
+
     }
 
     @ApiStatus.Internal
@@ -373,7 +332,7 @@ public class LApiImpl implements LApi {
 
     public void checkQueueThread() throws LApiRuntimeException {
         if(java.lang.Thread.currentThread().equals(queueThread)){
-            throw new LApiRuntimeException("You cannot invoke Future.get() or Queueable.completeHere() on the queue-thread" +
+            throw new LApiRuntimeException("You cannot invoke Future.get() or Task.executeHere() on the queue-thread" +
                     ", because this could lead to an infinite wait loop. You should also not wait or sleep the " +
                     "queue-thread, because this will delay all other queued Futures");
         }

@@ -20,12 +20,13 @@ import me.linusdev.lapi.api.async.exception.CancellationException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-public abstract class AbstractFuture<R, S, T extends Task<R, S>> implements Future<R, S>{
+public abstract class AbstractFuture<R, S, T extends ExecutableTask<R, S>> implements Future<R, S>{
 
     public static final @NotNull LogInstance log = Logger.getLogger(AbstractFuture.class.getSimpleName());
 
@@ -61,7 +62,8 @@ public abstract class AbstractFuture<R, S, T extends Task<R, S>> implements Futu
      * <br><br>
      * If the {@link Future} is not {@link #isExecutable() executable}, this function will wait until it is executable.
      */
-    public void completeHere() throws InterruptedException {
+    @ApiStatus.Internal
+    public void executeHere() throws InterruptedException {
 
         synchronized (lock) {
             if (isDone() || hasStarted()) return;
@@ -109,6 +111,7 @@ public abstract class AbstractFuture<R, S, T extends Task<R, S>> implements Futu
     public @NotNull Future<R, S> cancel() {
         synchronized (lock) {
             canceled = true;
+            lock.notifyAll();
         }
         return this;
     }
@@ -142,6 +145,11 @@ public abstract class AbstractFuture<R, S, T extends Task<R, S>> implements Futu
     @Override
     public @NotNull Future<R, S> then(@NotNull ResultConsumer<R, S> consumer) {
         synchronized (lock) {
+            if(isDone()) {
+                if(result.getResult() != null)
+                    consumer.consume(result.getResult(), result.getSecondary());
+                else consumer.onError(result.getError(), task, result.getSecondary());
+            }
             if(then == null) then = consumer;
             else {
                 then = then.thenConsume(consumer);

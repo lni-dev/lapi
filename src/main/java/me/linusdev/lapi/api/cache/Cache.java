@@ -50,9 +50,9 @@ public class Cache implements EventListener, HasLApi {
             lApi.getEventTransmitter().addListener(this);
 
         } else {
-            lApi.getRequestFactory().getCurrentUser().queue((user, error) -> {
+            lApi.getRequestFactory().getCurrentUser().queue((user, response,  error) -> {
                 if(error != null) {
-                    Logger.getLogger(this).error(error.getThrowable());
+                    error.log(Logger.getLogger(this));
                     return;
                 }
 

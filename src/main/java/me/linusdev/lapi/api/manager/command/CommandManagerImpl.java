@@ -17,20 +17,19 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.Nothing;
-import me.linusdev.lapi.api.async.ResultAndErrorConsumer;
 import me.linusdev.lapi.api.async.Task;
-import me.linusdev.lapi.api.async.error.Error;
 import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.MessageError;
 import me.linusdev.lapi.api.async.conditioned.Condition;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.tasks.SupervisedAsyncTask;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.GuildCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
@@ -46,7 +45,6 @@ import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.*;
@@ -90,7 +88,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     public void init(int initialCapacity) {
         if(isInitialized()) return;
 
-        Future<ArrayList<ApplicationCommand>> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
+        Future<ArrayList<ApplicationCommand>, QResponse> request = this.lApi.getRequestFactory().getGlobalApplicationCommands(true).queue();
 
         log.debug("loading commands with the Provider '" + provider.getClass().getCanonicalName() + "'.");
         Iterator<BaseCommand> it = provider.iterator(lApi);
@@ -134,9 +132,9 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
         ArrayList<ApplicationCommand> globalCommandsOnDiscord = null;
         try {
-            globalCommandsOnDiscord = request.get();
+            globalCommandsOnDiscord = request.getResult();
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             log.error("Could not fetch discord commands, command manager cannot initialize!");
             log.error(e);
             return;
@@ -176,7 +174,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
             guildCommandsOnDiscord = this.lApi.getRequestFactory().getGuildApplicationCommands(guildId, true).queueAndWait();
             gc.setCommands(guildCommandsOnDiscord);
 
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
             log.error("Could not fetch discord commands, command manager cannot initialize guild with id " + guildId + "!");
             log.error(e);
             return;

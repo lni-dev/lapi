@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.error;
+package me.linusdev.lapi.api.async.queue;
 
-import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.async.AbstractFuture;
+import me.linusdev.lapi.api.async.ExecutableTask;
+import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import org.jetbrains.annotations.NotNull;
 
-public enum StandardErrorTypes implements ErrorType, SimpleDatable {
+public class QueueableFuture<R, T extends ExecutableTask<R, QResponse>> extends AbstractFuture<R, QResponse, T> {
 
-    THROWABLE,
-
-    COMMAND_NOT_FOUND,
-    COMMAND_ALREADY_ENABLED,
-
-    FILE_ALREADY_EXISTS,
-
-    HTTP_ERROR_MESSAGE,
-
-    ;
-
-    @Override
-    public String simplify() {
-        return this.toString();
+    public QueueableFuture(@NotNull T task) {
+        super(task);
     }
 
     @Override
-    public @NotNull String getName() {
-        return this.toString();
+    public boolean isExecutable() {
+        return true;
     }
 }

@@ -18,19 +18,22 @@ package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.ResultAndErrorConsumer;
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
+import me.linusdev.lapi.api.async.error.ThrowableError;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
@@ -58,6 +61,7 @@ public abstract class DataRetriever<T> extends Retriever<T>{
 
     protected abstract @Nullable T processData(@NotNull SOData data) throws InvalidDataException;
 
+
     /**
      *
      * This will write the {@link SOData data}, that was retrieved.<br>
@@ -69,32 +73,28 @@ public abstract class DataRetriever<T> extends Retriever<T>{
      * @return {@link Future}
      */
     @Override
-    public @NotNull Future<T> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<T, Error> after) {
-        return queue(new BiConsumer<T, Error>() {
-            @Override
-            public void accept(T t, Error error) {
+    public @NotNull Future<T, QResponse> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable ResultAndErrorConsumer<T, QResponse> after) {
+        return queue((result, s, error) -> {
+            if(error != null){
+                if(after != null) after.onError(error, this, s);
+                return;
+            }
 
-                if(error != null){
-                    if(after != null) after.accept(t, error);
+            if(Files.exists(file)){
+                if(!overwriteIfExists){
+                    if(after != null) after.onError(new MessageError("File " + file + " already exists.", StandardErrorTypes.FILE_ALREADY_EXISTS), this, s);
                     return;
                 }
+            }
 
-                if(Files.exists(file)){
-                    if(!overwriteIfExists){
-                        if(after != null) after.accept(t, new Error(new FileAlreadyExistsException(file + " already exists.")));
-                        return;
-                    }
-                }
+            try {
+                Files.deleteIfExists(file);
+                Files.writeString(file, data.toJsonString());
+                if(after != null) after.consume(result, s, null);
 
-                try {
-                    Files.deleteIfExists(file);
-                    Files.writeString(file, data.toJsonString());
-                    if(after != null) after.accept(t, null);
-
-                } catch (IOException e) {
-                    Logger.getLogger(this.getClass()).error(e);
-                    if(after != null) after.accept(t, new Error(e));
-                }
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass()).error(e);
+                if(after != null) after.onError(new ThrowableError(e), this, s);
             }
         });
     }

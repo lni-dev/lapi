@@ -174,10 +174,10 @@ public class CommandUtils {
                 throw new LApiIllegalStateException("multiple matches for a global command.");
 
             info.getLApi().getRequestFactory().editGlobalApplicationCommand(matches.get(0).getId(), command.getTemplate().toEditTemplate()).queue(
-                    (returnCommand, error) -> {
+                    (returnCommand, response, error) -> {
                         if (error != null) {
                             info.getLog().error(String.format("Could not edit command %s.", command.getClass().getCanonicalName()));
-                            command.onError(error.getThrowable());
+                            command.onError(error.asThrowable());
 
                         } else {
                             command.linkWith(returnCommand);
@@ -197,10 +197,10 @@ public class CommandUtils {
                 }
 
                 info.getLApi().getRequestFactory().editGuildApplicationCommand(match.getGuildId(), match.getId(), command.getTemplate().toEditTemplate()).queue(
-                        (returnCommand, error) -> {
+                        (returnCommand, response, error) -> {
                             if (error != null) {
                                 info.getLog().error(String.format("Could not edit command %s.", command.getClass().getCanonicalName()));
-                                command.onError(error.getThrowable());
+                                command.onError(error.asThrowable());
 
                             } else {
                                 command.linkWith(returnCommand);

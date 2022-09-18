@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BooleanSupplier;
+import java.util.function.Predicate;
 
 /**
  * This is a special thread for the {@link LApi#queue}.
@@ -28,7 +30,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class QueueThread extends Thread{
 
-    private final AtomicBoolean isWaiting;
+    private final @NotNull AtomicBoolean isWaiting;
+    private final @NotNull Object waitingLock = new Object();
 
     public QueueThread(@Nullable ThreadGroup group, @NotNull Runnable target, @NotNull String name) {
         super(group, target, name);
@@ -42,29 +45,37 @@ public class QueueThread extends Thread{
     }
 
     /**
-     * This will wait an additional 2 milliseconds after the first wait, to assure every notify call coming through.
-     * Because some thread could call {@link #isWaiting()} right before when {@link #isWaiting} is set to {@code false} and then
-     * do some stuff. But when this stuff is happening, the thread isn't actually waiting anymore, which could be fatal.
      *
-     * @param lock the object to use {@link #wait()} on
      * @param timeoutMillis how long to wait
+     * @param check {@link BooleanSupplier}. Only if {@code true} is returned the queue will wait.
      */
-    public void wait(Object lock, long timeoutMillis) throws InterruptedException {
-        try {
-            isWaiting.set(true);
-            lock.wait(timeoutMillis);
-            isWaiting.set(false);
-            lock.wait(2); //to make sure, every notify call gets through while waiting
-        }finally {
-            isWaiting.set(false);
+    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check) throws InterruptedException {
+        synchronized (waitingLock) {
+            if(!check.getAsBoolean()) return;
+            try {
+                isWaiting.set(true);
+                waitingLock.wait(timeoutMillis);
+                isWaiting.set(false);
+            }finally {
+                isWaiting.set(false);
+            }
+        }
+
+    }
+
+    public boolean notifyIfWaiting() {
+        synchronized (waitingLock) {
+            if(isWaiting.get()) {
+                waitingLock.notifyAll();
+                return true;
+            }
+            return false;
         }
     }
 
-    /**
-     *
-     * @return true if {@link #wait(Object, long)} has been called and has not yet timed out, notified or interrupted
-     */
-    public boolean isWaiting(){
-        return isWaiting.get();
+    public void notifyAllAwaiting() {
+        synchronized (waitingLock) {
+            waitingLock.notifyAll();
+        }
     }
 }

@@ -16,6 +16,8 @@
 
 package me.linusdev.lapi.api.async.error;
 
+import me.linusdev.lapi.api.async.exception.ErrorException;
+import me.linusdev.lapi.api.communication.retriever.response.body.HttpErrorMessage;
 import me.linusdev.lapi.log.LogInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +25,12 @@ import org.jetbrains.annotations.Nullable;
 public interface Error {
 
     @Nullable Throwable getThrowable();
+
+    default @NotNull Throwable asThrowable() {
+        if(hasThrowable()) //noinspection ConstantConditions
+            return getThrowable();
+        return new ErrorException(this);
+    }
 
     default boolean hasThrowable() {
         return getThrowable() != null;
@@ -38,6 +46,27 @@ public interface Error {
     default void log(@NotNull LogInstance log) {
         log.error(getMessage());
         if(hasThrowable()) log.error(getThrowable());
+    }
+
+    static @NotNull Error of(HttpErrorMessage errorMessage) {
+        return new Error() {
+            @Override
+            public @Nullable Throwable getThrowable() {
+                return null;
+            }
+
+            @Override
+            public @NotNull ErrorType getType() {
+                return StandardErrorTypes.HTTP_ERROR_MESSAGE;
+            }
+
+            @Override
+            public @NotNull String getMessage() {
+                return "HttpErrorMessage from Discord: code: " + errorMessage.getCode()
+                        + ", message: " + errorMessage.getMessage() +
+                        (errorMessage.getErrors() != null ? ", errors:" + errorMessage.getErrors().toJsonString() : "");
+            }
+        };
     }
 
 }

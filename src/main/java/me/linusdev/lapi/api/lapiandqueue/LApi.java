@@ -17,6 +17,9 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.async.ExecutableTask;
+import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
@@ -37,12 +40,10 @@ import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.objects.HasLApi;
-import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.api.request.RequestFactory;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.concurrent.*;
@@ -116,45 +117,27 @@ public interface LApi extends HasLApi {
 
     /**
      *
-     * This queues a {@link Queueable} in the {@link LApiImpl#queue Queue}.<br>
-     * This is used for sending a lot of {@link LApiHttpRequest} after each is other and not at the same time.
-     * This will NOT wait the Thread until the {@link Queueable} has been completed.
+     * This queues a {@link QueueableFuture} in the {@link LApiImpl#queue Queue}.<br>
+     * This is used for sending all {@link LApiHttpRequest}.
+     * This will NOT wait the Thread until the {@link QueueableFuture} has been completed.
      * <br><br>
      * If you want to wait your Thread you could use:
      * <ul>
      *     <li>
-     *         {@link Future#get()}, to wait until the {@link Queueable} has been gone through the {@link #queue} and {@link Queueable#completeHereAndIgnoreQueueThread() completed}
+     *         {@link Future#get()}, to wait until the {@link Queueable}'s {@link QueueableImpl#execute() execution} has completed.
      *     </li>
      *     <li>
-     *          {@link Queueable#completeHere()}, to wait until the {@link Queueable} has been {@link Queueable#completeHereAndIgnoreQueueThread() completed}.
-     *          This wont assure, that several {@link LApiHttpRequest LApiHttpRequests} are sent at the same time
+     *          {@link Queueable#executeHere()} to execute it in the current thread.
      *     </li>
      * </ul>
      *
      *
      * @param queueable {@link Queueable}
-     * @param beforeComplete {@link Future#beforeComplete(Consumer)} will be set with given {@link Consumer}, if beforeComplete is not {@code null}
-     * @param then {@link Future#then(BiConsumer)} will be set with given {@link BiConsumer}, if then is not {@code null}
-     * @param thenSingle {@link Future#then(Consumer)} will be set with given {@link Consumer}, if thenSingle is not {@code null}
      * @param <T> Return Type of {@link Queueable}
-     * @return {@link Future<T>}
      */
     @ApiStatus.Internal
-    <T> @NotNull Future<T> queue(@NotNull Queueable<T> queueable, @Nullable BiConsumer<T, Error> then, @Nullable Consumer<T> thenSingle, @Nullable Consumer<Future<T>> beforeComplete);
+    <T> void queue(@NotNull QueueableFuture<T, QueueableImpl<T>> queueable);
 
-    /**
-     * Queues given {@link Queueable} after a given amount of time. see {@link LApiImpl#queue(Queueable, BiConsumer, Consumer, Consumer)}
-     *
-     * @param queueable {@link Queueable}
-     * @param delay the delay to wait before queueing
-     * @param timeUnit the {@link TimeUnit} for the delay
-     * @param <T> Return Type of {@link Queueable}
-     * @return {@link Future<T>}
-     * @see #queue(Queueable, BiConsumer, Consumer, Consumer)
-     * @see Queueable#queueAfter(long, TimeUnit)
-     */
-    @ApiStatus.Internal
-    <T> @NotNull Future<T> queueAfter(@NotNull Queueable<T> queueable, long delay, TimeUnit timeUnit);
 
     LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException;
 

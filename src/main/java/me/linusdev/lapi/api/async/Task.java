@@ -16,36 +16,102 @@
 
 package me.linusdev.lapi.api.async;
 
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
+import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.exception.ErrorException;
+import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  *
  * @param <R> the result type
  * @param <S> the secondary result type. usually contains information about the task's execution process.
+ * @see Future
  */
 public interface Task<R, S> extends HasLApi {
 
+    /**
+     * @return {@link String} name of the task.
+     */
     default @NotNull String getName() {
         return this.getClass().getSimpleName();
     }
 
-    @NotNull ComputationResult<R, S> execute();
+    /**
+     * Executes this task in the current thread.
+     * @return {@link ComputationResult} result.
+     * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkQueueThread()}.
+     */
+    @NotNull ComputationResult<R, S>  executeHere();
+
+    /**
+     *
+     * @param consumer {@link Consumer} to set listeners before the Future is queued.
+     * @return {@link Future}
+     */
+    @ApiStatus.Internal
+    @NotNull Future<R, S> consumeAndQueue(@Nullable Consumer<Future<R, S>> consumer);
 
     /**
      * Queues the {@link Task} for future execution. That does not mean, that the {@link Task}
      * actually ends up in a queue, but that the {@link Task} will be executed at any point in time in the future.
      * @return {@link Future}
      */
-    @NotNull Future<R, S> queue();
-
-    default @NotNull Future<R, S> queue(ResultConsumer<R, S> consumer) {
-        return queue().then(consumer);
+    default @NotNull Future<R, S> queue() {
+        return consumeAndQueue(null);
     }
 
-    default @NotNull Future<R, S> queue(SingleResultConsumer<R, S> consumer) {
-        return queue().then(consumer);
+    /**
+     *
+     * @param consumer {@link Consumer} listener to be called before execution starts.
+     * @return {@link Future}
+     * @see #queue()
+     */
+    default @NotNull Future<R, S> queueAndSetBeforeExecutionListener(@NotNull Consumer<Future<R, S>> consumer) {
+        return consumeAndQueue(future -> future.beforeExecution(consumer));
+    }
+
+    /**
+     *
+     * @param consumer {@link ResultConsumer} listener to be called when the result is ready.
+     * @return {@link Future}
+     * @see #queue()
+     */
+    default @NotNull Future<R, S> queue(@NotNull ResultConsumer<R, S> consumer) {
+        return consumeAndQueue(future -> future.then(consumer));
+    }
+
+    /**
+     *
+     * @param consumer {@link SingleResultConsumer} listener to be called when the result is ready.
+     * @return {@link Future}
+     * @see #queue()
+     */
+    default @NotNull Future<R, S> queue(@NotNull SingleResultConsumer<R, S> consumer) {
+        return consumeAndQueue(future -> future.then(consumer));
+    }
+
+    /**
+     *
+     * @param consumer {@link ResultAndErrorConsumer} listener to be called when the result is ready.
+     * @return {@link Future}
+     * @see #queue()
+     */
+    default @NotNull Future<R, S> queue(@NotNull ResultAndErrorConsumer<R, S> consumer) {
+        return consumeAndQueue(future -> future.then(consumer));
     }
 
     /**
@@ -56,6 +122,43 @@ public interface Task<R, S> extends HasLApi {
      */
     default @NotNull R queueAndWait() throws InterruptedException, ErrorException {
         return queue().getResult();
+    }
+
+    /**
+     *
+     * @param file {@link Path} of the file to write to.
+     * @param overwriteIfExists if the file should be overwritten if it already exists.
+     * @param after {@link ResultAndErrorConsumer} to consume the result after it has been written to the file.
+     * @return {@link Future}
+     */
+    default @NotNull Future<R, S> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists,
+                                                      @Nullable ResultAndErrorConsumer<R, S> after) {
+        return queue((result, secondary, error) -> {
+
+            if(error != null) {
+                if(after != null) after.onError(error, this, secondary);
+                return;
+            }
+
+            if (Files.exists(file)) {
+                if (!overwriteIfExists) {
+                    if (after != null)
+                        after.onError(new MessageError("File " + file + " already exists.", StandardErrorTypes.FILE_ALREADY_EXISTS), this, secondary);
+                    return;
+                }
+            }
+
+            try {
+                Files.deleteIfExists(file);
+                Files.writeString(file, Objects.toString(result), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
+                if (after != null) after.consume(result, secondary);
+
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass()).error(e);
+                if (after != null) after.onError(new ThrowableError(e), this, secondary);
+            }
+
+        });
     }
 
 }

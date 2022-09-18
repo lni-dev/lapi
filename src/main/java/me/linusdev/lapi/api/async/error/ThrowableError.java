@@ -16,29 +16,24 @@
 
 package me.linusdev.lapi.api.async.error;
 
-import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public enum StandardErrorTypes implements ErrorType, SimpleDatable {
+public class ThrowableError implements Error{
 
-    THROWABLE,
+    private final @NotNull Throwable t;
 
-    COMMAND_NOT_FOUND,
-    COMMAND_ALREADY_ENABLED,
-
-    FILE_ALREADY_EXISTS,
-
-    HTTP_ERROR_MESSAGE,
-
-    ;
-
-    @Override
-    public String simplify() {
-        return this.toString();
+    public ThrowableError(@NotNull Throwable t) {
+        this.t = t;
     }
 
     @Override
-    public @NotNull String getName() {
-        return this.toString();
+    public @Nullable Throwable getThrowable() {
+        return t;
+    }
+
+    @Override
+    public @NotNull ErrorType getType() {
+        return StandardErrorTypes.THROWABLE;
     }
 }

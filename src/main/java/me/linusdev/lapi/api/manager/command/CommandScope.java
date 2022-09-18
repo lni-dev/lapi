@@ -33,10 +33,10 @@ public enum CommandScope {
                 throw new LApiIllegalStateException("command template cannot be null");
 
             info.getLApi().getRequestFactory()
-                    .createGlobalApplicationCommand(command.getTemplate()).queue((created, error) -> {
+                    .createGlobalApplicationCommand(command.getTemplate()).queue((created, response, error) -> {
                         if (error != null) {
                             info.getLog().error(String.format("Could not create command %s.", command.getClass().getCanonicalName()));
-                            command.onError(error.getThrowable());
+                            command.onError(error.asThrowable());
 
                         } else {
                             command.linkWith(created);
@@ -53,10 +53,10 @@ public enum CommandScope {
                 throw new LApiIllegalStateException("multiple matches for a global command.");
 
             info.getLApi().getRequestFactory().deleteGlobalApplicationCommand(matches.get(0).getId()).queue(
-                    (lApiHttpResponse, error) -> {
+                    (lApiHttpResponse, response, error) -> {
                         if (error != null) {
                             info.getLog().error(String.format("Could not delete command %s.", command.getClass().getCanonicalName()));
-                            command.onError(error.getThrowable());
+                            command.onError(error.asThrowable());
                         }
                     });
 
@@ -75,10 +75,10 @@ public enum CommandScope {
 
             for (String guildId : guildIds) {
                 info.getLApi().getRequestFactory()
-                        .createGuildApplicationCommand(guildId, command.getTemplate()).queue((created, error) -> {
+                        .createGuildApplicationCommand(guildId, command.getTemplate()).queue((created, response, error) -> {
                             if (error != null) {
                                 info.getLog().error(String.format("Could not create command %s.", command.getClass().getCanonicalName()));
-                                command.onError(error.getThrowable());
+                                command.onError(error.asThrowable());
                             } else {
                                 command.linkWith(created);
                                 info.getCommandLinks().put(created.getId(), command);
@@ -100,10 +100,10 @@ public enum CommandScope {
                 }
 
                 info.getLApi().getRequestFactory().deleteGuildApplicationCommand(match.getId(), match.getGuildId()).queue(
-                        (lApiHttpResponse, error) -> {
+                        (lApiHttpResponse, response, error) -> {
                             if (error != null) {
                                 info.getLog().error(String.format("Could not delete command %s.", command.getClass().getCanonicalName()));
-                                command.onError(error.getThrowable());
+                                command.onError(error.asThrowable());
                             }
                         });
             }

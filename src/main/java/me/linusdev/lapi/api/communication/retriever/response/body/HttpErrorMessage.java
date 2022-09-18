@@ -20,7 +20,7 @@ import me.linusdev.data.so.SOData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ErrorMessage {
+public class HttpErrorMessage {
 
     public static final String CODE_KEY = "code";
     public static final String ERRORS_KEY = "errors";
@@ -30,13 +30,13 @@ public class ErrorMessage {
     private final @Nullable SOData errors;
     private final @Nullable String message;
 
-    public ErrorMessage(@NotNull Long code, @Nullable SOData errors, @Nullable String message) {
+    public HttpErrorMessage(@NotNull Long code, @Nullable SOData errors, @Nullable String message) {
         this.code = code;
         this.errors = errors;
         this.message = message;
     }
 
-    public static @Nullable ErrorMessage fromData(@Nullable SOData data) {
+    public static @Nullable HttpErrorMessage fromData(@Nullable SOData data) {
         if(data == null) return null;
 
         Long code = (Long) data.get(CODE_KEY);
@@ -46,7 +46,7 @@ public class ErrorMessage {
         SOData errors = (SOData) data.get(ERRORS_KEY);
         String message = (String) data.get(MESSAGE_KEY);
 
-        return new ErrorMessage(code, errors, message);
+        return new HttpErrorMessage(code, errors, message);
     }
 
     public @NotNull Long getCode() {

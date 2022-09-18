@@ -20,15 +20,10 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.lapiandqueue.Future;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.other.Error;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.function.BiConsumer;
 
 public class NoContentRetriever extends Retriever<LApiHttpResponse> {
     /**
@@ -41,10 +36,5 @@ public class NoContentRetriever extends Retriever<LApiHttpResponse> {
     @Override
     protected @Nullable LApiHttpResponse process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException {
         return response;
-    }
-
-    @Override
-    public @NotNull Future<LApiHttpResponse> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<LApiHttpResponse, Error> after) {
-        return null;
     }
 }

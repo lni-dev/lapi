@@ -18,13 +18,15 @@ package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.error.Error;
+import me.linusdev.lapi.api.async.error.ThrowableError;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.other.Container;
-import me.linusdev.lapi.api.other.Error;
+import me.linusdev.lapi.api.lapiandqueue.QueueableImpl;
 import me.linusdev.lapi.api.lapiandqueue.Queueable;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.objects.HasLApi;
@@ -42,7 +44,7 @@ import java.util.function.Consumer;
  * It is used to retrieve an Object from Discords endpoint ({@link ConvertingRetriever for example a Message}).
  * @param <T> the class of the Object that should be retrieved
  */
-public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
+public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
     protected final @NotNull LApi lApi;
     protected final @NotNull Query query;
 
@@ -75,35 +77,42 @@ public abstract class Retriever<T> extends Queueable<T> implements HasLApi {
     protected @Nullable abstract T process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
-    protected @NotNull Container<T> completeHereAndIgnoreQueueThread() throws NoInternetException {
-        Container<T> container;
+    public @NotNull ComputationResult<T, QResponse> execute() {
+        ComputationResult<T, QResponse> result;
+
+        LApiHttpResponse response;
         try {
-            LApiHttpResponse response = retrieve();
-            if(response.isError()){
-                container = new Container<T>(null, new Error(response.getErrorMessage()));
-            } else {
-                container = new Container<T>(process(response), null);
-            }
-
-        } catch (NoInternetException noInternetException){
-            throw noInternetException; // future will catch this and queue again...
-
-        } catch (InvalidDataException invalidDataException){
-            LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
-            log.error("InvalidDataException while trying to retrieve " + query.toString());
-            log.error(invalidDataException);
-            log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().toJsonString().toString(), "Data: ");
-            container = new Container<T>(null, new Error(invalidDataException));
-
-        } catch (Throwable t) {
+            response = retrieve();
+        }  catch (Throwable t) {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("Exception while trying to retrieve " + query.toString());
             log.error(t);
-            container = new Container<T>(null, new Error(t));
-
+            result = new ComputationResult<>(null, new QResponse(t), new ThrowableError(t));
+            return result;
         }
 
-        return container;
+        try {
+            if(response.isError()){
+                result = new ComputationResult<>(null, new QResponse(response), Error.of(response.getErrorMessage()));
+            } else {
+                result = new ComputationResult<>(process(response), new QResponse(response), null);
+            }
+
+        } catch (InvalidDataException invalidDataException){
+            LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
+            log.error("InvalidDataException while trying to process result of " + query.toString());
+            log.error(invalidDataException);
+            log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().toJsonString().toString(), "Data: ");
+            return new ComputationResult<>(null, new QResponse(response), new ThrowableError(invalidDataException));
+
+        }  catch (Throwable t) {
+            LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
+            log.error("Exception while trying to process result of " + query.toString());
+            log.error(t);
+            return new ComputationResult<>(null, new QResponse(response), new ThrowableError(t));
+        }
+
+        return result;
     }
 
     @Override

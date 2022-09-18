@@ -20,12 +20,12 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.lapi.api.lapiandqueue.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
@@ -91,7 +91,7 @@ public class ConfigBuilder implements Datable {
     private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
-    private Supplier<Queue<Future<?>>> queueSupplier = null;
+    private Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private @Nullable CommandProvider commandProvider;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
@@ -286,7 +286,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      * @param queueSupplier queue supplier
      */
-    public ConfigBuilder setQueueSupplier(Supplier<Queue<Future<?>>> queueSupplier) {
+    public ConfigBuilder setQueueSupplier(Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier) {
         this.queueSupplier = queueSupplier;
         return this;
     }

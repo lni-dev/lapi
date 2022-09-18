@@ -17,16 +17,18 @@
 package me.linusdev.lapi.api.async.tasks;
 
 import me.linusdev.lapi.api.async.AbstractFuture;
-import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.ExecutableTask;
 import me.linusdev.lapi.api.async.Future;
-import me.linusdev.lapi.api.async.conditioned.Condition;
 import me.linusdev.lapi.api.async.conditioned.ConditionedFuture;
 import me.linusdev.lapi.api.async.conditioned.ConditionedTask;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class SupervisedAsyncTask<R, S> implements ConditionedTask<R, S> {
+import java.util.function.Consumer;
+
+public abstract class SupervisedAsyncTask<R, S> implements ExecutableTask<R, S>, ConditionedTask<R, S> {
 
     private final @NotNull LApi lApi;
 
@@ -35,13 +37,15 @@ public abstract class SupervisedAsyncTask<R, S> implements ConditionedTask<R, S>
     }
 
     @Override
-    public @NotNull Future<R, S> queue() {
+    public @NotNull Future<R, S> consumeAndQueue(@Nullable Consumer<Future<R, S>> consumer) {
 
         final @NotNull AbstractFuture<R, S, SupervisedAsyncTask<R, S>> future = new ConditionedFuture<>(this);
 
+        if(consumer != null) consumer.accept(future);
+
         lApi.runSupervised(() -> {
             try {
-                future.completeHere();
+                future.executeHere();
             } catch (InterruptedException e) {
                 throw new LApiRuntimeException(e);
             }

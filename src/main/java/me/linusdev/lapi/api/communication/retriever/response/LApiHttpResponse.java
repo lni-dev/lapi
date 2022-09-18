@@ -22,7 +22,7 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.response.body.ErrorMessage;
+import me.linusdev.lapi.api.communication.retriever.response.body.HttpErrorMessage;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +43,7 @@ public class LApiHttpResponse {
     private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
 
-    private @Nullable ErrorMessage error;
+    private @Nullable HttpErrorMessage error;
     private @Nullable SOData data;
     /**
      * The array key used to load above data
@@ -61,7 +61,7 @@ public class LApiHttpResponse {
             this.contentType = ContentType.of(contentTypeHeader.get());
             if(contentType == ContentType.APPLICATION_JSON){
                 //try to read an error from the data. will return null if it fails
-                this.error = ErrorMessage.fromData(getData());
+                this.error = HttpErrorMessage.fromData(getData());
 
             }
         } else {
@@ -139,9 +139,9 @@ public class LApiHttpResponse {
 
     /**
      *
-     * @return {@link ErrorMessage} if the body contains an error message. {@code null} otherwise.
+     * @return {@link HttpErrorMessage} if the body contains an error message. {@code null} otherwise.
      */
-    public @Nullable ErrorMessage getErrorMessage() {
+    public @Nullable HttpErrorMessage getErrorMessage() {
         return error;
     }
 

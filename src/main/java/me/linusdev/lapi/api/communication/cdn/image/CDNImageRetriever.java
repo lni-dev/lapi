@@ -17,11 +17,15 @@
 package me.linusdev.lapi.api.communication.cdn.image;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.ResultAndErrorConsumer;
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
+import me.linusdev.lapi.api.async.error.ThrowableError;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.Retriever;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.lapiandqueue.Future;
-import me.linusdev.lapi.api.other.Error;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,10 +33,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.BiConsumer;
 
 public class CDNImageRetriever extends Retriever<InputStream>  {
 
@@ -86,44 +88,40 @@ public class CDNImageRetriever extends Retriever<InputStream>  {
      *
      * @param file Path to the file to save to
      * @param overwriteIfExists whether to overwrite the file if it already exists.
-     * @param after {@link BiConsumer}, what to do after the file as been written or an error has occurred. the InputStream will already be closed.
+     * @param after {@link ResultAndErrorConsumer}, what to do after the file as been written or an error has occurred. the InputStream will already be closed.
      * @return {@link Future}
      */
     @Override
-    public @NotNull Future<InputStream> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable BiConsumer<InputStream, Error> after) {
-        return queue(new BiConsumer<InputStream, Error>() {
-            @Override
-            public void accept(InputStream t, Error error) {
+    public @NotNull Future<InputStream, QResponse> queueAndWriteToFile(@NotNull Path file, boolean overwriteIfExists, @Nullable ResultAndErrorConsumer<InputStream, QResponse> after) {
+        return queue((result, s, error) -> {
+            if(error != null){
+                if(after != null) after.onError(error, this, s);
+                return;
+            }
 
-                if(error != null){
-                    if(after != null) after.accept(t, error);
+            if(Files.exists(file)){
+                if(!overwriteIfExists){
+                    if(after != null) after.onError(new MessageError("File " + file + " already exists.", StandardErrorTypes.FILE_ALREADY_EXISTS), this, s);
                     return;
                 }
+            }
 
-                if(Files.exists(file)){
-                    if(!overwriteIfExists){
-                        if(after != null) after.accept(t, new Error(new FileAlreadyExistsException(file + " already exists.")));
-                        return;
-                    }
-                }
+            OutputStream out = null;
+            try {
+                Files.deleteIfExists(file);
+                out = Files.newOutputStream(file);
+                result.transferTo(out);
+                if(after != null) after.consume(result, s, null);
 
-                OutputStream out = null;
-                try {
-                    Files.deleteIfExists(file);
-                    out = Files.newOutputStream(file);
-                    t.transferTo(out);
-                    if(after != null) after.accept(t, null);
-
-                } catch (IOException e) {
-                    Logger.getLogger(this.getClass()).error(e);
-                    if(after != null) after.accept(t, new Error(e));
-                }finally {
-                    if(out != null && t != null) {
-                        try {
-                            out.close();
-                            t.close();
-                        } catch (IOException ignored) {  }
-                    }
+            } catch (IOException e) {
+                Logger.getLogger(this.getClass()).error(e);
+                if(after != null) after.onError(new ThrowableError(e), this, s);
+            }finally {
+                if(out != null && result != null) {
+                    try {
+                        out.close();
+                        result.close();
+                    } catch (IOException ignored) {  }
                 }
             }
         });

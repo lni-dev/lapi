@@ -348,11 +348,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
             // If we have no internet connection, LApi will automatically delay this request
             // until we have internet connection again
-            lApi.getRequestFactory().getGatewayBot().queue((getGatewayResponse, error) -> {
+            lApi.getRequestFactory().getGatewayBot().queue((getGatewayResponse, response, error) -> {
                 try {
                     if (error != null) {
-                        logger.error(error.getThrowable());
-                        if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error.getThrowable());
+                        error.log(logger);
+                        if (unexpectedEventHandler != null) unexpectedEventHandler.handleError(lApi, this, error.asThrowable());
                         return;
                     }
 

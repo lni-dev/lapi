@@ -25,6 +25,8 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListen
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -70,6 +72,19 @@ public class Examples {
                     lApi.getRequestFactory().createMessage(event.getChannelId(), "Hi").queue();
                 }
             }
+        });
+
+
+        Queueable<MessageImplementation> msgRetriever = lApi.getRequestFactory().getChannelMessage("channelId", "messageId");
+
+        msgRetriever.queue((result, response, error) -> {
+            if(error != null) {
+                System.out.println("could not get message.");
+                return;
+            }
+
+            System.out.println("Message content: " + result.getContent());
+
         });
 
 
