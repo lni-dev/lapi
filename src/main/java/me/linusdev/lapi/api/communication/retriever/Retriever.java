@@ -36,12 +36,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
- * A Retriever is a {@link Queueable} that can be {@link LApi#queue(Queueable, BiConsumer, Consumer, Consumer) queued}.
- * It is used to retrieve an Object from Discords endpoint ({@link ConvertingRetriever for example a Message}).
+ * A Retriever is a {@link Queueable} that can be {@link #queue() queued}.
+ * It is used to retrieve an Object from Discords endpoints.
  * @param <T> the class of the Object that should be retrieved
  */
 public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
@@ -60,10 +58,7 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
 
     /**
      * Retrieves the Object. This will happen on the current Thread! <br>
-     * I suggest you use {@link Queueable#queue()} or {@link #completeHere()} instead!
      * @return retrieved Object
-     * @see Queueable#queue()
-     * @see #completeHereAndIgnoreQueueThread()
      */
     protected @NotNull LApiHttpResponse retrieve() throws LApiException, IOException, ParseException, InterruptedException {
         return lApi.getResponse(query.getLApiRequest());

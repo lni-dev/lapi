@@ -19,8 +19,19 @@ package me.linusdev.lapi.api.async.conditioned;
 import me.linusdev.lapi.api.async.Task;
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * A {@link ConditionedTask} is a {@link Task} that will only be executed after a certain {@link #getCondition() condition}
+ * hast been met.
+ *
+ * @param <R> result
+ * @param <S> secondary result
+ */
 public interface ConditionedTask<R, S> extends Task<R, S> {
 
+    /**
+     * @return {@link Condition} which must be met to start execution of this {@link Task}.
+     */
     @NotNull Condition getCondition();
 
 }

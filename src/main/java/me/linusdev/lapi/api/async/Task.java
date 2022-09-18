@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
+ * A {@link Task} can be executed {@link #queue() asynchronous} or {@link #executeHere() in the current thread}.
  *
  * @param <R> the result type
  * @param <S> the secondary result type. usually contains information about the task's execution process.
@@ -52,8 +53,11 @@ public interface Task<R, S> extends HasLApi {
 
     /**
      * Executes this task in the current thread.
+     * <br><br>
+     * For asynchronous execution see {@link #queue()}.
      * @return {@link ComputationResult} result.
      * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkQueueThread()}.
+     * @see #queue()
      */
     @NotNull ComputationResult<R, S>  executeHere();
 
@@ -66,9 +70,15 @@ public interface Task<R, S> extends HasLApi {
     @NotNull Future<R, S> consumeAndQueue(@Nullable Consumer<Future<R, S>> consumer);
 
     /**
-     * Queues the {@link Task} for future execution. That does not mean, that the {@link Task}
+     * Queues the {@link Task} for future asynchronous execution. That does not mean, that the {@link Task}
      * actually ends up in a queue, but that the {@link Task} will be executed at any point in time in the future.
      * @return {@link Future}
+     * @see #queue(SingleResultConsumer)
+     * @see #queue(ResultConsumer)
+     * @see #queue(ResultAndErrorConsumer)
+     * @see #queueAndWait()
+     * @see #queueAndWriteToFile(Path, boolean, ResultAndErrorConsumer)
+     * @see #queueAndSetBeforeExecutionListener(Consumer)
      */
     default @NotNull Future<R, S> queue() {
         return consumeAndQueue(null);
@@ -125,6 +135,7 @@ public interface Task<R, S> extends HasLApi {
     }
 
     /**
+     * What exactly will be written to the file, depends on the implementation.
      *
      * @param file {@link Path} of the file to write to.
      * @param overwriteIfExists if the file should be overwritten if it already exists.

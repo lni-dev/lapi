@@ -41,7 +41,7 @@ import java.util.function.BiConsumer;
 public abstract class DataRetriever<T> extends Retriever<T>{
 
     protected LApiHttpResponse response;
-    protected @NotNull SOData data;
+    protected SOData data;
 
     /**
      * @param lApi  {@link LApi}
