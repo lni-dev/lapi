@@ -119,6 +119,7 @@ import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -315,7 +316,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         this.encoding = encoding;
         this.compression = compression;
 
-        this.heartbeatExecutor = Executors.newSingleThreadScheduledExecutor();
+        this.heartbeatExecutor = Executors.newSingleThreadScheduledExecutor(new LApiThreadFactory(lApi, true, "Gateway Heartbeat Thread"));
 
         this.logger = Logger.getLogger(GatewayWebSocket.class.getSimpleName(), Logger.Type.DEBUG);
 
@@ -2198,7 +2199,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      * sends a Heartbeat to discord
      */
     protected void sendHeartbeat() {
-
         long sequence = dispatchEventQueue.getLastSequence();
 
         GatewayPayload payload = GatewayPayload.newHeartbeat(sequence);

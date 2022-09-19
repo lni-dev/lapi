@@ -27,17 +27,19 @@ public class LApiThreadFactory implements ThreadFactory {
     private final @NotNull LApiImpl lApi;
     private final @NotNull LApiThreadGroup group;
     private final boolean allowBlockingOperations;
+    private final @NotNull String name;
 
-    public LApiThreadFactory(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, boolean allowBlockingOperations) {
+    public LApiThreadFactory(@NotNull LApiImpl lApi, boolean allowBlockingOperations, @NotNull String name) {
         this.lApi = lApi;
-        this.group = group;
+        this.group = lApi.getLApiThreadGroup();
         this.allowBlockingOperations = allowBlockingOperations;
+        this.name = name;
     }
 
 
     @Override
     public Thread newThread(@NotNull Runnable r) {
-        return new LApiThread(lApi, group, "factorized-lapi-thread") {
+        return new LApiThread(lApi, group, name) {
             @Override
             public boolean allowBlockingOperations() {
                 return allowBlockingOperations;

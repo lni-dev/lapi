@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
+import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ import java.util.concurrent.Executors;
 
 public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor implements EventListener {
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor;
     private final LogInstance logger;
 
     private final ArrayList<ReceivedPayload> postponedEvents;
@@ -43,6 +44,7 @@ public class SingleThreadDispatchEventProcessor extends DispatchEventProcessor i
         super(lApi, queue, gateway);
         this.logger = Logger.getLogger(this);
         this.postponedEvents = new ArrayList<>();
+        executor = Executors.newSingleThreadExecutor(new LApiThreadFactory(lApi, false, "Dispatch Event Processor"));
     }
 
     @Override

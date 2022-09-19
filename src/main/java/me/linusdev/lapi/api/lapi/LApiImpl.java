@@ -119,7 +119,7 @@ public class LApiImpl implements LApi {
     @Nullable final GatewayWebSocket gateway;
 
     //Executor
-    private final ThreadPoolExecutor executor;
+    private final ThreadPoolExecutor supervisedRunnableExecutor;
 
     //Cache
     private final @Nullable Cache cache;
@@ -155,7 +155,7 @@ public class LApiImpl implements LApi {
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
 
         //Executor
-        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(new LApiThreadFactory(this, lApiThreadGroup, true));
+        this.supervisedRunnableExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool(new LApiThreadFactory(this, true, "supervised-runnable-thread"));
 
         //Queue
         this.queue = config.getNewQueue();
@@ -319,7 +319,7 @@ public class LApiImpl implements LApi {
         //Can not be null because this is not the main method.
         @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
 
-        executor.execute(() -> {
+        supervisedRunnableExecutor.execute(() -> {
             try {
                 runnable.run();
             }catch (Throwable t) {
@@ -406,6 +406,15 @@ public class LApiImpl implements LApi {
     @ApiStatus.Internal
     public @NotNull EventTransmitter transmitEvent() {
         return eventTransmitter;
+    }
+
+    /**
+     *
+     * @return {@link LApiThreadGroup} for threads of lapi.
+     */
+    @ApiStatus.Internal
+    public LApiThreadGroup getLApiThreadGroup() {
+        return lApiThreadGroup;
     }
 
     /**

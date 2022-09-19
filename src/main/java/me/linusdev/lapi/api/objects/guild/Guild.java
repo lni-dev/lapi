@@ -227,7 +227,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
      * 	voice region for the guild (deprecated).
      *  <br><br>
      *  All {@link VoiceRegion VoiceRegions} are managed by the {@link VoiceRegionManager VoiceRegionManager}.
-     *  See {@link VoiceRegionManager#getVoiceRegionById(String) getVoiceRegionById()} for more information.
+     *  See {@link VoiceRegionManager#getVoiceRegionById(LApi, String) getVoiceRegionById()} for more information.
      */
     @Deprecated
     @Nullable VoiceRegion getRegion();

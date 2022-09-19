@@ -30,6 +30,7 @@ import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
@@ -255,7 +256,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
             this.permissions = permissions;
             if(this.permissionsAsList != null) this.permissionsAsList.set(permissions);
         });
-        data.processIfContained(REGION_KEY, (String region) -> this.region = lApi.getVoiceRegionManager().getVoiceRegionById(region));
+        data.processIfContained(REGION_KEY, (String region) -> this.region = VoiceRegionManager.getVoiceRegionById(lApi, region));
         data.processIfContained(AFK_CHANNEL_ID_KEY, (String id) -> this.afkChannelId = Snowflake.fromString(id));
         data.processIfContained(AFK_TIMEOUT_KEY, (Long timeout) -> this.afkTimeout = timeout.intValue());
         data.processIfContained(WIDGET_ENABLED_KEY, (Boolean enabled) -> this.widgetEnabled = enabled);

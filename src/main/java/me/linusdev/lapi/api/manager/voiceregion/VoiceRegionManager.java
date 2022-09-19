@@ -127,10 +127,10 @@ public class VoiceRegionManager implements Manager, HasLApi {
      * @return {@link VoiceRegion} with given id
      */
     @NotNull
-    public VoiceRegion getVoiceRegionById(@NotNull String id){
-
-        if(regions != null){
-            for(VoiceRegion region : regions){
+    public static VoiceRegion getVoiceRegionById(@NotNull LApi lApi, @NotNull String id){
+        VoiceRegionManager vrm = lApi.getVoiceRegionManager();
+        if(vrm != null && vrm.regions != null){
+            for(VoiceRegion region : vrm.regions){
                 if(region.equalsId(id))
                     return region;
             }
