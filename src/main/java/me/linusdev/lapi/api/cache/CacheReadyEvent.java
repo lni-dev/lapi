@@ -16,12 +16,9 @@
 
 package me.linusdev.lapi.api.cache;
 
-import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class CacheReadyEvent extends Event {
 

@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.manager.command.provider;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import org.jetbrains.annotations.NotNull;
 

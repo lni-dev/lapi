@@ -21,18 +21,12 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserAddRemoveData;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
-import me.linusdev.lapi.api.manager.list.ListUpdate;
-import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.LApiImplConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public interface GuildScheduledEventManager extends Manager, GuildScheduledEventPool {
 

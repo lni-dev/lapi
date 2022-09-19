@@ -19,8 +19,9 @@ package me.linusdev.lapi.api.manager.guild.member;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.log.Logger;
@@ -31,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class MemberManagerImpl implements MemberManager{
 
-    private final @NotNull LApi lApi;
+    private final @NotNull LApiImpl lApi;
     private boolean initialized = false;
 
     private @Nullable ConcurrentHashMap<String, Member> members;
@@ -75,7 +76,7 @@ public class MemberManagerImpl implements MemberManager{
             return null;
         }
 
-        if(!lApi.isCopyOldMemberOnUpdateEventEnabled()){
+        if(!lApi.getConfig().isFlagSet(ConfigFlag.COPY_MEMBER_ON_UPDATE_EVENT)){
             member.updateSelfByData(data);
             return new Update<>(null, member);
         }

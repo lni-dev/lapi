@@ -20,7 +20,7 @@ import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.sticker.Sticker;

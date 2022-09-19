@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.list.ListPool;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

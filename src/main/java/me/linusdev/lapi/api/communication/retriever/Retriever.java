@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.async.queue.Queueable;
@@ -72,18 +72,23 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
     protected @Nullable abstract T process(@NotNull LApiHttpResponse response) throws LApiException, IOException, ParseException, InterruptedException;
 
     @Override
-    public @NotNull ComputationResult<T, QResponse> execute() {
+    public @NotNull ComputationResult<T, QResponse> execute() throws InterruptedException{
         ComputationResult<T, QResponse> result;
 
         LApiHttpResponse response;
         try {
             response = retrieve();
+
+        } catch (InterruptedException e) {
+            throw e;
+
         }  catch (Throwable t) {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("Exception while trying to retrieve " + query.toString());
             log.error(t);
             result = new ComputationResult<>(null, new QResponse(t), new ThrowableError(t));
             return result;
+
         }
 
         try {

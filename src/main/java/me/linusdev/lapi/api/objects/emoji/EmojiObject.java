@@ -21,7 +21,7 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.objects.HasLApi;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -31,7 +31,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

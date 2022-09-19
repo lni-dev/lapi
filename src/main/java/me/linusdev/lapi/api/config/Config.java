@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.config;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.ManagerFactory;

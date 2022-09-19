@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.exception.ErrorException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -56,10 +56,10 @@ public interface Task<R, S> extends HasLApi {
      * <br><br>
      * For asynchronous execution see {@link #queue()}.
      * @return {@link ComputationResult} result.
-     * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkQueueThread()}.
+     * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkThread()}.
      * @see #queue()
      */
-    @NotNull ComputationResult<R, S>  executeHere();
+    @NotNull ComputationResult<R, S>  executeHere() throws InterruptedException;
 
     /**
      *

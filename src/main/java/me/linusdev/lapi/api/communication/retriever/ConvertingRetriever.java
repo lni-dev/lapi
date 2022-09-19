@@ -20,7 +20,6 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

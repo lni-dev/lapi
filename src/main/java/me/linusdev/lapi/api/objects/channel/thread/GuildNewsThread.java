@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.objects.channel.thread;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -29,8 +29,6 @@ import me.linusdev.lapi.api.objects.enums.ChannelType;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 public class GuildNewsThread extends Channel<GuildNewsThread> implements Thread<GuildNewsThread>, GuildChannel {
 

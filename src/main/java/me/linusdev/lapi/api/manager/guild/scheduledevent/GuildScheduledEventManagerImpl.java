@@ -16,25 +16,19 @@
 
 package me.linusdev.lapi.api.manager.guild.scheduledevent;
 
-import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.events.guild.scheduledevent.GuildScheduledEventUserAddRemoveData;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
-import me.linusdev.lapi.api.other.LApiImplConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.function.Supplier;
 
 public class GuildScheduledEventManagerImpl extends ListManager<GuildScheduledEvent> implements GuildScheduledEventManager{
 
 
     public GuildScheduledEventManagerImpl(@NotNull LApiImpl lApi) {
-        super(lApi, GuildScheduledEvent.ID_KEY, GuildScheduledEvent::fromData, lApi::isCopyOldGuildScheduledEventOnUpdateEventEnabled);
+        super(lApi, GuildScheduledEvent.ID_KEY, GuildScheduledEvent::fromData,() -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE));
     }
 
     public @Nullable GuildScheduledEvent onUserAdd(@NotNull GuildScheduledEventUserAddRemoveData data) {

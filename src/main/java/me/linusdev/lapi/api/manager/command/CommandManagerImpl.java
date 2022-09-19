@@ -27,15 +27,13 @@ import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.tasks.SupervisedAsyncTask;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
-import me.linusdev.lapi.api.communication.gateway.events.guild.GuildCreateEvent;
-import me.linusdev.lapi.api.communication.gateway.events.guild.GuildDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.event.EventAwaiter;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
@@ -331,7 +329,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
             }
 
             @Override
-            public @NotNull ComputationResult<BaseCommand, CommandManager> execute() {
+            public @NotNull ComputationResult<BaseCommand, CommandManager> execute() throws InterruptedException {
                 for (BaseCommand command : localCommands) {
                     if (command.getClass().equals(clazz)) return new ComputationResult<>(command, cm, null);
                 }
@@ -370,7 +368,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
             }
 
             @Override
-            public @NotNull ComputationResult<Nothing, CommandManager> execute() {
+            public @NotNull ComputationResult<Nothing, CommandManager> execute() throws InterruptedException {
                 try {
                     for(BaseCommand command : localCommands) {
                         if(command.getClass().equals(clazz)) {
@@ -397,7 +395,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                     }
                     return new ComputationResult<>(null, cm, new MessageError("Command not found.", StandardErrorTypes.COMMAND_NOT_FOUND));
 
-                }catch (Throwable t) {
+                } catch (Throwable t) {
                     return new ComputationResult<>(null, cm, new ThrowableError(t));
 
                 }

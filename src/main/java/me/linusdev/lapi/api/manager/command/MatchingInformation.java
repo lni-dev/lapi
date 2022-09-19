@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.async.Future;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.log.LogInstance;

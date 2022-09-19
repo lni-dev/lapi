@@ -21,7 +21,7 @@ import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The different api versions of discord. As of writing this enum, the api version {@link me.linusdev.lapi.api.lapiandqueue.LApi LApi}
+ * The different api versions of discord. As of writing this enum, the api version {@link me.linusdev.lapi.api.lapi.LApi LApi}
  * uses for its HttpRequests is always {@link #V9}. So this enum is only useful for the {@link me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket Gateway}
  * @see <a href="https://discord.com/developers/docs/reference#api-versioning-api-versions" target="_top">API Versions</a>
  */

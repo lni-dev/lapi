@@ -60,7 +60,7 @@ import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;

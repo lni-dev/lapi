@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.guild.enums.DefaultMessageNotificationLevel;

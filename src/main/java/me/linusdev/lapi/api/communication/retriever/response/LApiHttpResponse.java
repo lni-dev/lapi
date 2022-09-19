@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.retriever.response.body.HttpErrorMessage;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.storage;
 
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 

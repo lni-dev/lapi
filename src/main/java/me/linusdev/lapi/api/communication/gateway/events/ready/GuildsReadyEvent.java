@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.events.ready;
 
 import me.linusdev.lapi.api.communication.gateway.events.Event;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.guild.GuildPool;
 import org.jetbrains.annotations.NotNull;
 

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects;
 
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;
 
 public interface HasLApi {

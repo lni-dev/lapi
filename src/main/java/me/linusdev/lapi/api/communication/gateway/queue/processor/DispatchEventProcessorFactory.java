@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.communication.gateway.queue.processor;
 
 import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import org.jetbrains.annotations.NotNull;
 
 public interface DispatchEventProcessorFactory {

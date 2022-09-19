@@ -19,17 +19,14 @@ package me.linusdev.lapi.api.event;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AnyEventListener;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
-import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class ReadyEventAwaiter implements AnyEventListener {
 

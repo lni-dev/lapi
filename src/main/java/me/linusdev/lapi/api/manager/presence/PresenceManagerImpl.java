@@ -19,8 +19,9 @@ package me.linusdev.lapi.api.manager.presence;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +66,7 @@ public class PresenceManagerImpl implements PresenceManager{
             return new Update<>(presence, true);
         }
 
-        if(lApi.isCopyOldPresenceOnUpdateEventEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT)) {
             return new Update<>(cached, data);
         }
 
