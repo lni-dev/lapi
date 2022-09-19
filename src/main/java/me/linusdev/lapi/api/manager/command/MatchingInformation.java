@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class MatchingInformation implements HasLApi {
 
@@ -38,15 +40,18 @@ public class MatchingInformation implements HasLApi {
 
     private final @NotNull Map<String, BaseCommand> commandLinks;
 
+    private final @NotNull ConcurrentLinkedDeque<Future<?, ?>> responses;
+
     public MatchingInformation(@NotNull LApi lApi, @NotNull LogInstance log, @NotNull List<BaseCommand> localCommands,
                                @Nullable List<ApplicationCommand> globalCommandsOnDiscord,
-                               @Nullable List<ApplicationCommand> guildCommandsOnDiscord, @NotNull Map<String, BaseCommand> commandLinks) {
+                               @Nullable List<ApplicationCommand> guildCommandsOnDiscord, @NotNull Map<String, BaseCommand> commandLinks, @NotNull ConcurrentLinkedDeque<Future<?, ?>> responses) {
         this.lApi = lApi;
         this.log = log;
         this.localCommands = localCommands;
         this.globalCommandsOnDiscord = globalCommandsOnDiscord;
         this.guildCommandsOnDiscord = guildCommandsOnDiscord;
         this.commandLinks = commandLinks;
+        this.responses = responses;
     }
 
     public @NotNull List<BaseCommand> getLocalCommands() {

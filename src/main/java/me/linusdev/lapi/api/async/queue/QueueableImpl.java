@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.lapiandqueue;
+package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.async.ExecutableTask;
 import me.linusdev.lapi.api.async.Future;
-import me.linusdev.lapi.api.async.queue.QResponse;
-import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

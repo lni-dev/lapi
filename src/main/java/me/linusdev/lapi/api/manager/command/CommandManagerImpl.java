@@ -23,21 +23,27 @@ import me.linusdev.lapi.api.async.Task;
 import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.MessageError;
 import me.linusdev.lapi.api.async.conditioned.Condition;
+import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.tasks.SupervisedAsyncTask;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.guild.GuildCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.guild.GuildDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
+import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
+import me.linusdev.lapi.api.event.EventAwaiter;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
-import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.command.guild.GuildCommands;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
+import me.linusdev.lapi.api.objects.guild.UnavailableGuild;
 import me.linusdev.lapi.api.objects.interaction.InteractionType;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
 import me.linusdev.lapi.api.objects.interaction.response.data.AutocompleteBuilder;
@@ -49,7 +55,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static me.linusdev.lapi.api.manager.command.CommandUtils.*;
@@ -61,25 +67,35 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
     private final AtomicBoolean initialized = new AtomicBoolean(false);
+    private final EventAwaiter commandManagerInitEvent;
+    private final EventAwaiter commandManagerReadyEvent;
 
     private final @NotNull List<BaseCommand> localCommands;
     private final @NotNull Map<String, BaseCommand> commandLinks;
 
     private final @NotNull Map<String, GuildCommands> guildCommandsOnDiscord;
+    private final @NotNull AtomicBoolean guildCommandsOnDiscordInitialized = new AtomicBoolean(false);
     private final @NotNull Object guildCommandsOnDiscordWriteLock = new Object();
+
+    private final @NotNull ConcurrentLinkedDeque<Future<?, ?>> responses;
 
     public CommandManagerImpl(@NotNull LApiImpl lApi, @NotNull CommandProvider provider) throws IOException {
         this.lApi = lApi;
+        this.commandManagerInitEvent = lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.COMMAND_MANAGER_INITIALIZED);
+        this.commandManagerReadyEvent = lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.COMMAND_MANAGER_READY);
         this.provider = provider;
 
         this.localCommands = new ArrayList<>();
         this.commandLinks = new ConcurrentHashMap<>();
         this.guildCommandsOnDiscord = new ConcurrentHashMap<>();
 
+        responses = new ConcurrentLinkedDeque<>();
+
         lApi.getEventTransmitter().addSpecifiedListener(this,
-                EventIdentifier.GUILD_CREATE,
+                EventIdentifier.READY,
                 EventIdentifier.INTERACTION_CREATE,
                 EventIdentifier.CACHE_READY);
+
 
     }
 
@@ -128,8 +144,6 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
         log.debug("successfully sorted commands.");
 
-        lApi.transmitEvent().onLocalCommandsInitialized(lApi, new LocalCommandsInitializedEvent(lApi));
-
         ArrayList<ApplicationCommand> globalCommandsOnDiscord = null;
         try {
             globalCommandsOnDiscord = request.getResult();
@@ -141,19 +155,52 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
         }
 
         log.debug("starting to match commands.");
-        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, null, commandLinks);
+        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, globalCommandsOnDiscord, null, commandLinks, responses);
         for(BaseCommand command : localCommands) {
             if(!checkCommand(command, log) || command.getScope() != CommandScope.GLOBAL) continue;
             CommandUtils.matchCommand(info, command);
         }
 
-        synchronized (initialized) {
-            initialized.set(true);
-            initialized.notifyAll();
+        //wait until ready event listener is done
+        log.debug("Waiting until the ready event listener is done initializing the guild commands on discord");
+        synchronized (guildCommandsOnDiscordInitialized) {
+            if(!guildCommandsOnDiscordInitialized.get()) {
+                try {
+                    guildCommandsOnDiscordInitialized.wait();
+                } catch (InterruptedException e) {throw new RuntimeException(e);}
+            }
         }
 
+        //init done. Transmit event...
+        log.debug("Command Manager successfully initialized. Transmitting event...");
+        initialized.set(true);
+        lApi.transmitEvent().onCommandManagerInitialized(lApi, new CommandManagerInitializedEvent(lApi));
+
+        //wait until all guild commands are retrieved.
+        log.debug("Waiting until all GuildCommands are initialized (matched).");
+        for(Map.Entry<String, GuildCommands> entry : guildCommandsOnDiscord.entrySet()) {
+            try {
+                entry.getValue().awaitInit();
+            } catch (InterruptedException e) {throw new RuntimeException(e);}
+        }
+
+        //wait until all Futures have finished
+        log.debug("Waiting until all Futures have finished.");
+        while (responses.peek() != null) {
+            try {
+                responses.poll().get();
+            } catch (InterruptedException ignored) {}
+        }
+
+        //command manager is now ready.
+        log.debug("Transmitting command manager ready event.");
+        lApi.transmitEvent().onCommandManagerReady(lApi, new CommandManagerReadyEvent(lApi));
     }
 
+    /**
+     * This method may only be called if {@link #commandManagerInitEvent} is has been triggered.
+     * @param guildId id of the guild to load commands for.
+     */
     private void initGuild(@NotNull String guildId) {
         GuildCommands gc;
         synchronized (guildCommandsOnDiscordWriteLock) {
@@ -162,7 +209,9 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
 
             if(gc != null && gc.isStarted()) return;
 
+            //This should never happen
             if(gc == null){
+                log.warning("initGuild for an unknown guild id!");
                 gc = new GuildCommands();
                 this.guildCommandsOnDiscord.put(guildId, gc);
             }
@@ -180,7 +229,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
             return;
         }
 
-        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, guildCommandsOnDiscord, commandLinks);
+        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, guildCommandsOnDiscord, commandLinks, responses);
         for(BaseCommand command : localCommands) {
             if(!checkCommand(command, log) || command.getScope() != CommandScope.GUILD) continue;
             CommandUtils.matchCommand(info, command);
@@ -190,22 +239,23 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     }
 
     @Override
-    public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
-        lApi.runSupervised(() -> init(0));
-        lApi.getEventTransmitter().removeSpecifiedListener(this, EventIdentifier.CACHE_READY);
-    }
+    public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
+        synchronized (guildCommandsOnDiscordWriteLock) {
+            for(UnavailableGuild guild : event.getGuilds()) {
+                guildCommandsOnDiscord.put(guild.getId(), new GuildCommands());
+            }
+        }
+        synchronized (guildCommandsOnDiscordInitialized) {
+            guildCommandsOnDiscordInitialized.set(true);
+            guildCommandsOnDiscordInitialized.notifyAll();
+        }
 
-    @Override
-    public void onGuildCreate(@NotNull LApi lApi, @NotNull GuildCreateEvent event) {
         lApi.runSupervised(() -> {
             try {
-                synchronized (initialized) {
-                    if(!initialized.get()) {
-                        initialized.wait();
-                    }
+                commandManagerInitEvent.awaitFirst();
+                for(UnavailableGuild guild : event.getGuilds()) {
+                    initGuild(guild.getId());
                 }
-
-                initGuild(event.getGuildId());
 
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -214,7 +264,15 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     }
 
     @Override
+    public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
+        lApi.runSupervised(() -> init(0));
+        lApi.getEventTransmitter().removeSpecifiedListener(this, EventIdentifier.CACHE_READY);
+    }
+
+    @Override
     public void onInteractionCreate(@NotNull LApi lApi, @NotNull InteractionCreateEvent event) {
+        //If the command manager is not ready, we cannot compute interactions.
+        if(!commandManagerReadyEvent.hasTriggered()) return;
         if(event.getType() != InteractionType.APPLICATION_COMMAND && event.getType() != InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE)
             return;
         if(!event.hasCommandId()) return;
@@ -251,17 +309,8 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
         });
     }
 
-    private void awaitInitialized() throws InterruptedException {
-        synchronized (initialized) {
-            if(!initialized.get()) {
-                lApi.checkQueueThread();
-                initialized.wait();
-            }
-        }
-    }
-
     @Override
-    public @NotNull me.linusdev.lapi.api.async.Future<BaseCommand, CommandManager> getCommandByClass(@NotNull Class<? extends BaseCommand> clazz) {
+    public @NotNull Future<BaseCommand, CommandManager> getCommandByClass(@NotNull Class<? extends BaseCommand> clazz) {
 
         final @NotNull CommandManager cm = this;
 
@@ -271,12 +320,12 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 return new Condition() {
                     @Override
                     public boolean check() {
-                        return lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).hasTriggered();
+                        return commandManagerInitEvent.hasTriggered();
                     }
 
                     @Override
                     public void await() throws InterruptedException {
-                        lApi.getReadyEventAwaiter().getAwaiter(EventIdentifier.LOCAL_COMMANDS_INITIALIZED).awaitFirst();
+                        commandManagerInitEvent.awaitFirst();
                     }
                 };
             }
@@ -300,7 +349,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
      * @return
      */
     @Override
-    public @NotNull me.linusdev.lapi.api.async.Future<Nothing, CommandManager> enabledCommandForGuild(@NotNull Class<? extends BaseCommand> clazz, @NotNull String guildId) {
+    public @NotNull Future<Nothing, CommandManager> enabledCommandForGuild(@NotNull Class<? extends BaseCommand> clazz, @NotNull String guildId) {
 
         final @NotNull CommandManager cm = this;
 
@@ -310,39 +359,48 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
                 return new Condition() {
                     @Override
                     public boolean check() {
-                        return isInitialized();
+                        return commandManagerInitEvent.hasTriggered();
                     }
 
                     @Override
                     public void await() throws InterruptedException {
-                        awaitInitialized();
+                        commandManagerInitEvent.awaitFirst();
                     }
                 };
             }
 
             @Override
             public @NotNull ComputationResult<Nothing, CommandManager> execute() {
-                for(BaseCommand command : localCommands) {
-                    if(command.getClass().equals(clazz)) {
+                try {
+                    for(BaseCommand command : localCommands) {
+                        if(command.getClass().equals(clazz)) {
 
-                        GuildCommands gc = guildCommandsOnDiscord.computeIfAbsent(guildId, s -> new GuildCommands());
+                            GuildCommands gc = guildCommandsOnDiscord.get(guildId);
+                            if(gc == null) {
+                                return new ComputationResult<>(null, cm, new MessageError("Unknown guild.", StandardErrorTypes.UNKNOWN_GUILD));
+                            }
 
-                        try {
-                            gc.awaitInit();
-                        } catch (InterruptedException e) {throw new RuntimeException(e);}
+                            try {
+                                gc.awaitInit();
+                            } catch (InterruptedException e) {throw new RuntimeException(e);}
 
 
-                        if(command.forEachLinkedApplicationCommand(acmd -> acmd.getGuildId() != null && acmd.getGuildId().equals(guildId))) {
-                            return new ComputationResult<>(null, cm, new MessageError("Command is already enabled for given guild", StandardErrorTypes.COMMAND_ALREADY_ENABLED));
+                            if(command.forEachLinkedApplicationCommand(acmd -> acmd.getGuildId() != null && acmd.getGuildId().equals(guildId))) {
+                                return new ComputationResult<>(null, cm, new MessageError("Command is already enabled for given guild", StandardErrorTypes.COMMAND_ALREADY_ENABLED));
+                            }
+
+                            MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, null, commandLinks, responses);
+                            CommandUtils.createCommand(info, command, List.of(guildId), false);
+
+                            return new ComputationResult<>(Nothing.instance, cm, null);
                         }
-
-                        MatchingInformation info = new MatchingInformation(lApi, log, localCommands, null, null, commandLinks);
-                        CommandUtils.createCommand(info, command, List.of(guildId), false);
-
-                        return new ComputationResult<>(Nothing.instance, cm, null);
                     }
+                    return new ComputationResult<>(null, cm, new MessageError("Command not found.", StandardErrorTypes.COMMAND_NOT_FOUND));
+
+                }catch (Throwable t) {
+                    return new ComputationResult<>(null, cm, new ThrowableError(t));
+
                 }
-                return new ComputationResult<>(null, cm, new MessageError("Command not found.", StandardErrorTypes.COMMAND_NOT_FOUND));
             }
         };
 
@@ -350,7 +408,7 @@ public class CommandManagerImpl implements CommandManager, Manager, EventListene
     }
 
     @Override
-    public synchronized boolean isInitialized() {
+    public boolean isInitialized() {
         return initialized.get();
     }
 

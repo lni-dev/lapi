@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.request;
 
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 
 import me.linusdev.lapi.api.request.requests.*;

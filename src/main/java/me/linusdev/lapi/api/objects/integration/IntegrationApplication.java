@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.objects.integration;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -125,7 +126,7 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofApplicationIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the icon
+     * @return {@link Queueable Queueable} to retrieve the icon
      */
     public @NotNull CDNImageRetriever getIcon(int desiredSize, @NotNull AbstractFileType fileType){
         if(getIconHash() == null) throw new IllegalArgumentException("This application object has no icon hash");
@@ -135,7 +136,7 @@ public class IntegrationApplication implements Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param fileType see {@link CDNImage#ofApplicationIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the icon
+     * @return {@link Queueable Queueable} to retrieve the icon
      */
     public @NotNull CDNImageRetriever getIcon(@NotNull AbstractFileType fileType){
         if(getIconHash() == null) throw new IllegalArgumentException("This application object has no icon hash");

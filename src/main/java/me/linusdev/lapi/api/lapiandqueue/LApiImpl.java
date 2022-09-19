@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
@@ -208,14 +209,19 @@ public class LApiImpl implements LApi {
         readyEventAwaiter = new ReadyEventAwaiter(this);
         lApiReadyListener = new LApiReadyListener(this);
 
+        //Basic Cache
         if(config.isFlagSet(ConfigFlag.BASIC_CACHE)){
             cache = new Cache(this);
         } else {
             cache = null;
         }
 
-        commandManager = new CommandManagerImpl(this, config.getCommandProvider());
-
+        //Command Manager
+        if(config.isFlagSet(ConfigFlag.COMMAND_MANAGER)) {
+            commandManager = new CommandManagerImpl(this, config.getCommandProvider());
+        } else  {
+            commandManager = null;
+        }
 
         //VoiceRegions
         this.voiceRegionManager = new VoiceRegionManager(this);

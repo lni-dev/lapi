@@ -26,6 +26,8 @@ public enum StandardErrorTypes implements ErrorType, SimpleDatable {
     COMMAND_NOT_FOUND,
     COMMAND_ALREADY_ENABLED,
 
+    UNKNOWN_GUILD,
+
     FILE_ALREADY_EXISTS,
 
     HTTP_ERROR_MESSAGE,

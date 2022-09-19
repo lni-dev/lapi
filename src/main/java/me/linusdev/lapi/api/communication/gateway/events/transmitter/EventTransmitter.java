@@ -63,7 +63,8 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateE
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
-import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.list.LinusLinkedList;
@@ -235,8 +236,13 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
     }
 
     @Override
-    public void onLocalCommandsInitialized(@NotNull LApi lApi, @NotNull LocalCommandsInitializedEvent event) {
-        transmitForEachListener(event, LOCAL_COMMANDS_INITIALIZED, EventListener::onLocalCommandsInitialized);
+    public void onCommandManagerInitialized(@NotNull LApi lApi, @NotNull CommandManagerInitializedEvent event) {
+        transmitForEachListener(event, COMMAND_MANAGER_INITIALIZED, EventListener::onCommandManagerInitialized);
+    }
+
+    @Override
+    public void onCommandManagerReady(@NotNull LApi lApi, @NotNull CommandManagerReadyEvent event) {
+        transmitForEachListener(event, COMMAND_MANAGER_READY, EventListener::onCommandManagerReady);
     }
 
     @Override

@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.retriever.response.body.ListThreadsResponseBody;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
@@ -63,7 +63,6 @@ public interface ChannelRequests extends HasLApi {
      * @param channelId the id of the {@link Channel}, which should be retrieved
      * @return {@link Queueable} which can retrieve the {@link Channel}
      * @see Queueable#queue()
-     * @see Queueable#completeHereAndIgnoreQueueThread()
      */
     default @NotNull Queueable<Channel<?>> getChannel(@NotNull String channelId){
         return new ConvertingRetriever<>(

@@ -65,6 +65,8 @@ import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import org.jetbrains.annotations.NotNull;
@@ -196,10 +198,11 @@ public enum EventIdentifier implements Requireable {
     CACHE_READY(true, true, BASIC_CACHE),
 
     /**
-     * identifier for {@link EventListener#onCacheReady(LApi, CacheReadyEvent)}.
+     * identifier for {@link EventListener#onCommandManagerInitialized(LApi, CommandManagerInitializedEvent)}.
      * <br><br>
      * <p>
-     *     Triggers, when the {@link CommandManager} has loaded all {@link BaseCommand command} classes.
+     *     Triggers, when the {@link CommandManager} has loaded all {@link BaseCommand command} classes and received
+     *     the {@link #READY} event.
      * </p>
      * <br>
      * requires:
@@ -209,9 +212,29 @@ public enum EventIdentifier implements Requireable {
      *     </li>
      * </ul>
      * @see LApi#getCommandManager()
+     * @see CommandManager
      * @see BaseCommand
      */
-    LOCAL_COMMANDS_INITIALIZED(true, true, COMMAND_MANAGER),
+    COMMAND_MANAGER_INITIALIZED(true, true, COMMAND_MANAGER),
+
+    /**
+     * identifier for {@link EventListener#onCommandManagerReady(LApi, CommandManagerReadyEvent)}.
+     * <br><br>
+     * <p>
+     *     Triggers, when the {@link CommandManager} has tried to link all commands.
+     * </p>
+     * <br>
+     * requires:
+     * <ul>
+     *     <li>
+     *         {@link ConfigFlag#COMMAND_MANAGER}
+     *     </li>
+     * </ul>
+     * @see LApi#getCommandManager()
+     * @see CommandManager
+     * @see BaseCommand
+     */
+    COMMAND_MANAGER_READY(true, true, COMMAND_MANAGER),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

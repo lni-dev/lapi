@@ -16,6 +16,8 @@
 
 package me.linusdev.lapi.api.event;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventAwaiter {
@@ -26,19 +28,37 @@ public class EventAwaiter {
         this.bool = new AtomicBoolean(false);
     }
 
+    /**
+     * Waits for the first occurrence of this event. If the event has already occurred before the message call,
+     * this method will return immediately without blocking the current thread.
+     * @throws InterruptedException if interrupted.
+     */
     public synchronized void awaitFirst() throws InterruptedException {
         if(bool.get()) return;
         this.wait();
     }
 
+    /**
+     * Waits until the next occurrence of this event.
+     * @throws InterruptedException if interrupted.
+     */
     public synchronized void await() throws InterruptedException {
         this.wait();
     }
 
+    /**
+     *
+     * @return {@code true} if this event has already triggered before this method call. {@code false} otherwise.
+     */
     public synchronized boolean hasTriggered() {
         return bool.get();
     }
 
+    /**
+     * After this method call {@link #hasTriggered()} will return {@code true} and all threads waiting on this event
+     * will be notified.
+     */
+    @ApiStatus.Internal
     synchronized void trigger() {
         bool.set(true);
         this.notifyAll();

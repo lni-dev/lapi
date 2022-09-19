@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.templates.message.builder;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LimitException;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;

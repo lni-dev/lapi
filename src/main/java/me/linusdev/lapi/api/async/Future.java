@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  *     Before the {@link Task} bound to this future will supposedly start execution:
  * </span><br>
  * <p style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
- *     {@link #beforeExecution(Consumer) before execution} listener will be called before and can still {@link #cancel()} this future
+ *     {@link #beforeExecution(Consumer) before execution} listener will be called before and can still {@link #cancel()} this future.
  * </p> <br>
  *
  * <span style="margin-bottom:0;padding-bottom:0;font-size:10px;font-weight:'bold';">

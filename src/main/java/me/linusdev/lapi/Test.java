@@ -18,6 +18,7 @@ package me.linusdev.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
@@ -72,6 +73,8 @@ import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
@@ -133,6 +136,7 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.CACHE_PRESENCES)
                 .enable(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT)
+                .enable(ConfigFlag.COMMAND_MANAGER)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
                             .setApiVersion(ApiVersion.V10)
@@ -212,6 +216,21 @@ public class Test implements EventListener{
     @Override
     public void onVoiceRegionManagerReady(@NotNull LApi lApi, @NotNull VoiceRegionManagerReadyEvent event) {
         System.out.println("onLApiReady");
+    }
+
+    @Override
+    public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
+        System.out.println("onCacheReady");
+    }
+
+    @Override
+    public void onCommandManagerInitialized(@NotNull LApi lApi, @NotNull CommandManagerInitializedEvent event) {
+        System.out.println("onCommandManagerInitialized");
+    }
+
+    @Override
+    public void onCommandManagerReady(@NotNull LApi lApi, @NotNull CommandManagerReadyEvent event) {
+        System.out.println("onCommandManagerReady");
     }
 
     @Override

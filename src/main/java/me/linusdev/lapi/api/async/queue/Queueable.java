@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.lapiandqueue;
+package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.ResultConsumer;
 import me.linusdev.lapi.api.async.Task;
-import me.linusdev.lapi.api.async.queue.QResponse;
-import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
 
 

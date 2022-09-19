@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.async.queue;
+package me.linusdev.lapi.api.manager.command.event;
 
-import me.linusdev.lapi.api.async.AbstractFuture;
-import me.linusdev.lapi.api.async.ExecutableTask;
+import me.linusdev.lapi.api.communication.gateway.events.Event;
+import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.manager.command.CommandManager;
 import org.jetbrains.annotations.NotNull;
 
-public class QueueableFuture<R, T extends ExecutableTask<R, QResponse>> extends AbstractFuture<R, QResponse, T> {
-
-    public QueueableFuture(@NotNull T task) {
-        super(task);
+public class CommandManagerInitializedEvent extends Event {
+    public CommandManagerInitializedEvent(@NotNull LApi lApi) {
+        super(lApi, null, null);
     }
 
-    @Override
-    public boolean isExecutable() {
-        return true;
+    public @NotNull CommandManager getCommandManager() {
+        return lApi.getCommandManager();
     }
 }

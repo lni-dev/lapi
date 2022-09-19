@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.objects.guild;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -120,7 +121,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofGuildIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getIcon(int desiredSize, @NotNull AbstractFileType fileType){
         if(getIconHash() == null) throw new IllegalArgumentException("This guild object has no icon hash");
@@ -130,7 +131,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param fileType see {@link CDNImage#ofGuildIcon(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getIcon(@NotNull AbstractFileType fileType){
         if(getIconHash() == null) throw new IllegalArgumentException("This guild object has no icon hash");
@@ -143,7 +144,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofGuildSplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getSplash(int desiredSize, @NotNull AbstractFileType fileType){
         if(getSplashHash() == null) throw new IllegalArgumentException("This guild object has no splash hash");
@@ -153,7 +154,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param fileType see {@link CDNImage#ofGuildSplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getSplash(@NotNull AbstractFileType fileType) {
         if (getSplashHash() == null) throw new IllegalArgumentException("This guild object has no splash hash");
@@ -166,7 +167,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofGuildDiscoverySplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getDiscoverySplash(int desiredSize, @NotNull AbstractFileType fileType){
         if(getDiscoverySplashHash() == null) throw new IllegalArgumentException("This guild object has no discovery splash hash");
@@ -176,7 +177,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     /**
      *
      * @param fileType see {@link CDNImage#ofGuildDiscoverySplash(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     default @NotNull CDNImageRetriever getDiscoverySplash(@NotNull AbstractFileType fileType) {
         if (getDiscoverySplashHash() == null) throw new IllegalArgumentException("This guild object has no discovery splash hash");

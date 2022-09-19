@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.objects.user;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -272,7 +273,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofUserBanner(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     public @NotNull CDNImageRetriever getBanner(int desiredSize, @NotNull AbstractFileType fileType){
         if(getBannerHash() == null) throw new IllegalArgumentException("This user object has no banner hash");
@@ -282,7 +283,7 @@ public class User implements BasicUserInformation, SnowflakeAble, Datable, HasLA
     /**
      *
      * @param fileType see {@link CDNImage#ofUserBanner(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the banner
+     * @return {@link Queueable Queueable} to retrieve the banner
      */
     public @NotNull CDNImageRetriever getBanner(@NotNull AbstractFileType fileType){
         if(getBannerHash() == null) throw new IllegalArgumentException("This user object has no banner hash");

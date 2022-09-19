@@ -17,9 +17,10 @@
 package me.linusdev.lapi.api.lapiandqueue;
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.lapi.api.async.ExecutableTask;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
@@ -46,9 +47,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.concurrent.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * <h2 style="margin:0;padding:0;">What is LApi?</h2>
@@ -181,6 +179,10 @@ public interface LApi extends HasLApi {
     @NotNull ApiVersion getHttpRequestApiVersion();
 
     @NotNull RequestFactory getRequestFactory();
+
+    default @NotNull RequestFactory requests() {
+        return getRequestFactory();
+    }
 
     @NotNull ReadyEventAwaiter getReadyEventAwaiter();
 

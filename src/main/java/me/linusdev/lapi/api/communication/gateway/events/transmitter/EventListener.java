@@ -61,10 +61,9 @@ import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdate
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.manager.command.event.LocalCommandsInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
+import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
-import me.linusdev.lapi.log.LogInstance;
-import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -120,7 +119,9 @@ public interface EventListener extends UncaughtExceptionListener {
 
     default void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {}
 
-    default void onLocalCommandsInitialized(@NotNull LApi lApi, @NotNull LocalCommandsInitializedEvent event) {}
+    default void onCommandManagerInitialized(@NotNull LApi lApi, @NotNull CommandManagerInitializedEvent event) {}
+
+    default void onCommandManagerReady(@NotNull LApi lApi, @NotNull CommandManagerReadyEvent event) {}
 
     default void onResumed(@NotNull LApi lApi, @NotNull ResumedEvent event) {}
 

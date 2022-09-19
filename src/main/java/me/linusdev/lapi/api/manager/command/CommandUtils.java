@@ -16,6 +16,9 @@
 
 package me.linusdev.lapi.api.manager.command;
 
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.Task;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
@@ -157,11 +160,12 @@ public class CommandUtils {
      * Will edit the given matches and add the edited {@link ApplicationCommand}'s {@link ApplicationCommand#getId() ids}
      * to {@link MatchingInformation#getCommandLinks()}.
      *
-     * @param info {@link MatchingInformation}
+     * @param info    {@link MatchingInformation}
      * @param matches {@link ApplicationCommand}s to edit
      * @param command {@link BaseCommand} to get the new {@link ApplicationCommandTemplate}
+     * @return {@link Future} of the editing {@link Task} or {@code null} if no command was edited.
      */
-    static void editCommand(@NotNull MatchingInformation info, @NotNull List<ApplicationCommand> matches, @NotNull BaseCommand command) {
+    static @Nullable Future<ApplicationCommand, QResponse> editCommand(@NotNull MatchingInformation info, @NotNull List<ApplicationCommand> matches, @NotNull BaseCommand command) {
 
         if(command.getTemplate() == null) {
             info.getLog().error("Command is missing a template. Cannot edit.");
@@ -169,11 +173,11 @@ public class CommandUtils {
         }
 
         if(command.getScope() == CommandScope.GLOBAL) {
-            if(matches.isEmpty()) return;
+            if(matches.isEmpty()) return null;
             if(matches.size() != 1)
                 throw new LApiIllegalStateException("multiple matches for a global command.");
 
-            info.getLApi().getRequestFactory().editGlobalApplicationCommand(matches.get(0).getId(), command.getTemplate().toEditTemplate()).queue(
+            return info.getLApi().getRequestFactory().editGlobalApplicationCommand(matches.get(0).getId(), command.getTemplate().toEditTemplate()).queue(
                     (returnCommand, response, error) -> {
                         if (error != null) {
                             info.getLog().error(String.format("Could not edit command %s.", command.getClass().getCanonicalName()));
@@ -187,7 +191,7 @@ public class CommandUtils {
                     });
 
         } else if (command.getScope() == CommandScope.GUILD) {
-            if(matches.isEmpty()) return;
+            if(matches.isEmpty()) return null;
 
             for(ApplicationCommand match : matches) {
 
@@ -196,7 +200,7 @@ public class CommandUtils {
                     throw new LApiIllegalStateException("Match missing guild id. Cannot edit.");
                 }
 
-                info.getLApi().getRequestFactory().editGuildApplicationCommand(match.getGuildId(), match.getId(), command.getTemplate().toEditTemplate()).queue(
+                return info.getLApi().getRequestFactory().editGuildApplicationCommand(match.getGuildId(), match.getId(), command.getTemplate().toEditTemplate()).queue(
                         (returnCommand, response, error) -> {
                             if (error != null) {
                                 info.getLog().error(String.format("Could not edit command %s.", command.getClass().getCanonicalName()));
@@ -214,19 +218,20 @@ public class CommandUtils {
             throw new LApiIllegalStateException("Unknown command scope.");
 
         }
+        return null;
     }
 
     /**
-     *
-     * @param info {@link MatchingInformation}
-     * @param command {@link BaseCommand} to create
+     * @param info          {@link MatchingInformation}
+     * @param command       {@link BaseCommand} to create
      * @param checkRefactor whether to check if this could command should be refactored, not created.
-     *                     Will call {@link BaseCommand#onError(Throwable)} if it should be refactored and not created.
+     *                      Will call {@link BaseCommand#onError(Throwable)} if it should be refactored and not created.
+     * @return {@link Future} of the editing {@link Task} or {@code null} if no command was created.
      */
-    static void createCommand(@NotNull MatchingInformation info, @NotNull BaseCommand command,
-                                      @Nullable List<String> guildIds, boolean checkRefactor) {
+    static @Nullable Future<ApplicationCommand, QResponse> createCommand(@NotNull MatchingInformation info, @NotNull BaseCommand command,
+                                                               @Nullable List<String> guildIds, boolean checkRefactor) {
         //check if this command should be deleted. If so, we do not need to do anything
-        if (command.delete()) return;
+        if (command.delete()) return null;
 
         if (checkRefactor && command.refactor() != null) {
             //This is bad: we cant find a match for the old or the new command...
@@ -234,7 +239,7 @@ public class CommandUtils {
                     " Cannot refactor command.", command.getClass().getCanonicalName()));
             command.onError(new LApiIllegalStateException("Your command cannot be found on discord" +
                     " and that's why it cannot be refactored."));
-            return;
+            return null;
         }
 
         if (command.getTemplate() == null) {
@@ -242,10 +247,10 @@ public class CommandUtils {
                     " Cannot create command.", command.getClass().getCanonicalName()));
             command.onError(new LApiIllegalStateException("Your command cannot be found on discord" +
                     " and that's why it needs a template to be created."));
-            return;
+            return null;
         }
 
-        command.getScope().create(info, command, guildIds);
+        return command.getScope().create(info, command, guildIds);
     }
 
     /**

@@ -16,16 +16,13 @@
 
 package me.linusdev.lapi.api.manager.command.event;
 
-import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapiandqueue.LApi;
 import me.linusdev.lapi.api.manager.command.CommandManager;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class LocalCommandsInitializedEvent extends Event {
-    public LocalCommandsInitializedEvent(@NotNull LApi lApi) {
+public class CommandManagerReadyEvent extends Event {
+    public CommandManagerReadyEvent(@NotNull LApi lApi) {
         super(lApi, null, null);
     }
 

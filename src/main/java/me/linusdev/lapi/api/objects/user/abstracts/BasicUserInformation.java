@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.objects.user.abstracts;
 
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
 import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
 import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
@@ -65,7 +66,7 @@ public interface BasicUserInformation extends SnowflakeAble, HasLApi {
      *
      * @param desiredSize the desired file size, a power of 2 between {@value ImageQuery#SIZE_QUERY_PARAM_MIN} and {@value ImageQuery#SIZE_QUERY_PARAM_MAX}
      * @param fileType see {@link CDNImage#ofUserAvatar(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the avatar
+     * @return {@link Queueable Queueable} to retrieve the avatar
      */
     default CDNImageRetriever getAvatar(int desiredSize, @NotNull AbstractFileType fileType){
         if(getAvatarHash() == null) throw new IllegalArgumentException("This user object has no avatar hash");
@@ -75,7 +76,7 @@ public interface BasicUserInformation extends SnowflakeAble, HasLApi {
     /**
      *
      * @param fileType see {@link CDNImage#ofUserAvatar(LApi, String, String, AbstractFileType) restrictions} and {@link me.linusdev.lapi.api.communication.file.types.FileType FileType}
-     * @return {@link me.linusdev.lapi.api.lapiandqueue.Queueable Queueable} to retrieve the avatar
+     * @return {@link Queueable Queueable} to retrieve the avatar
      */
     default CDNImageRetriever getAvatar(@NotNull AbstractFileType fileType){
         if(getAvatarHash() == null) throw new IllegalArgumentException("This user object has no avatar hash");

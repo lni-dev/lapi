@@ -25,7 +25,6 @@ import java.util.function.Predicate;
 
 /**
  * This is a special thread for the {@link LApi#queue}.
- * This thread has special {@link #wait(Object, long)} and {@link #isWaiting()} methods used by {@link LApi} to avoid some bugs
  * Only one instance of this Thread should be alive at the same time.
  */
 public class QueueThread extends Thread{

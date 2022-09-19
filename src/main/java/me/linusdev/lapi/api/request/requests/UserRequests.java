@@ -20,7 +20,7 @@ import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
-import me.linusdev.lapi.api.lapiandqueue.Queueable;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
