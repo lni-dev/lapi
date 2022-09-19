@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.1'
-    implementation 'io.github.lni-dev:lapi:1.0.3'
+    implementation 'io.github.lni-dev:lapi:1.0.4'
 }
 ```
 (Tested on gradle 7.5.1)
@@ -61,7 +61,7 @@ repositories {
 
 dependencies {
     annotationProcessor 'io.github.lni-dev:lapi-annotation-processor:1.0.1'
-    implementation 'io.github.lni-dev:lapi:1.0.3'
+    implementation 'io.github.lni-dev:lapi:1.0.4'
 }
 ```
 This will then add a gradle task called shadowJar, which will build an executable jar for you.
