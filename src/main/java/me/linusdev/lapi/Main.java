@@ -18,47 +18,20 @@ package me.linusdev.lapi;
 
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
-import me.linusdev.lapi.api.communication.PlaceHolder;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.gateway.events.ready.GuildsReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
-import me.linusdev.lapi.api.communication.retriever.query.Link;
-import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.config.ConfigBuilder;
-import me.linusdev.lapi.api.config.ConfigFlag;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.emoji.EmojiObject;
-import me.linusdev.lapi.api.objects.invite.Invite;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.Reaction;
-import me.linusdev.lapi.api.objects.message.embed.Embed;
-import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
-import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.api.templates.message.builder.MentionType;
-import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
-import me.linusdev.lapi.api.templates.message.builder.TimestampStyle;
 import me.linusdev.lapi.helper.Helper;
-import me.linusdev.lapi.list.LinusLinkedList;
-import me.linusdev.lapi.list.LinusLinkedListEntry;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class Main {

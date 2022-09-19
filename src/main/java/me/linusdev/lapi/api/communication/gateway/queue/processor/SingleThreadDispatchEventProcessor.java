@@ -22,8 +22,8 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListen
 import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;

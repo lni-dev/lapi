@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.manager.command;
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.interaction.InteractionCreateEvent;
 import me.linusdev.lapi.api.config.ConfigBuilder;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;

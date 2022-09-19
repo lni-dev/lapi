@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.conditioned.ConditionedFuture;
 import me.linusdev.lapi.api.async.conditioned.ConditionedTask;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

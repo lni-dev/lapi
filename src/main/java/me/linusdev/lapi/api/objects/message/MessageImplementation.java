@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.objects.message;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.channel.ChannelMention;
@@ -36,7 +36,6 @@ import me.linusdev.lapi.api.objects.sticker.StickerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.async;
 
 import me.linusdev.lapi.api.async.exception.CancellationException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;

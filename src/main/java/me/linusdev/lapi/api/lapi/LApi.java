@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.lapiandqueue;
+package me.linusdev.lapi.api.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.async.queue.Queueable;
@@ -42,6 +42,7 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.request.RequestFactory;
+import me.linusdev.lapi.api.thread.LApiThread;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -110,7 +111,7 @@ public interface LApi extends HasLApi {
 
     @Contract(value = "_ -> new", pure = true)
     static LApi newInstance(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
-        return new LApiImpl(config);
+        return new LApiImpl(config, StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
     }
 
     /**
@@ -148,10 +149,12 @@ public interface LApi extends HasLApi {
     LApiHttpRequest appendHeader(@NotNull LApiHttpRequest request);
 
     /**
-     * This checks whether the currentThread is the queue-thread and throws an {@link LApiRuntimeException} if that is the case
-     * @throws LApiRuntimeException if the currentThread is the queue Thread
+     * This throws a {@link LApiRuntimeException} if the {@link Thread#currentThread() current thread} is a {@link LApiThread}
+     * and {@link LApiThread#allowBlockingOperations() does not allow blocking operations}.
+     *
+     * @throws LApiRuntimeException if the currentThread is a {@link LApiThread} and {@link LApiThread#allowBlockingOperations() does not allow blocking operations}.
      */
-    void checkQueueThread() throws LApiRuntimeException;
+    void checkThread() throws LApiRuntimeException;
 
     /**
      * waits the current thread until {@link EventIdentifier#LAPI_READY LAPI_READY} event hast been triggered.
@@ -232,133 +235,5 @@ public interface LApi extends HasLApi {
      * @return {@link CommandManagerImpl} or {@code null} if {@link ConfigFlag#COMMAND_MANAGER} is not enabled.
      */
     CommandManager getCommandManager();
-
-    /**
-     *
-     * @see ConfigFlag#ENABLE_GATEWAY
-     */
-    boolean isGatewayEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_VOICE_REGIONS
-     */
-    boolean isCacheVoiceRegionsEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_ROLES
-     */
-    boolean isCacheRolesEnabled();
-
-    /**
-     *
-     * @see ConfigFlag#COPY_ROLE_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldRolesOnUpdateEventEnabled();
-
-    /**
-     *
-     * @see ConfigFlag#CACHE_GUILDS
-     */
-    boolean isCacheGuildsEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_GUILD_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldGuildOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_EMOJIS
-     */
-    boolean isCacheEmojisEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_EMOJI_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldEmojiOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_STICKERS
-     */
-    boolean isCacheStickersEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_STICKER_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldStickerOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_VOICE_STATES
-     */
-    boolean isCacheVoiceStatesEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_VOICE_STATE_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldVoiceStateOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_MEMBERS
-     */
-    boolean isCacheMembersEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_MEMBER_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldMemberOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_CHANNELS
-     */
-    boolean isCacheChannelsEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_CHANNEL_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldChannelOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_THREADS
-     */
-    boolean isCacheThreadsEnabled();
-
-    /**
-     * @see ConfigFlag#DO_NOT_REMOVE_ARCHIVED_THREADS
-     */
-    boolean isDoNotRemoveArchivedThreadsEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_THREAD_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldThreadOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_PRESENCES
-     */
-    boolean isCachePresencesEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_PRESENCE_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldPresenceOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_STAGE_INSTANCES
-     */
-    boolean isCacheStageInstancesEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_STAGE_INSTANCE_ON_UPDATE_EVENT
-     */
-    boolean isCopyOldStageInstanceOnUpdateEventEnabled();
-
-    /**
-     * @see ConfigFlag#CACHE_GUILD_SCHEDULED_EVENTS
-     */
-    boolean isCacheGuildScheduledEventsEnabled();
-
-    /**
-     * @see ConfigFlag#COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE
-     */
-    boolean isCopyOldGuildScheduledEventOnUpdateEventEnabled();
 
 }

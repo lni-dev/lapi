@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.templates.commands;
 
 import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandException;
 import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandOptionException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
@@ -32,7 +32,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 

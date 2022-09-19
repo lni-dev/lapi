@@ -17,28 +17,28 @@
 package me.linusdev.lapi.api.async;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 public interface ExecutableTask<R, S> extends Task<R, S> {
 
     /**
-     * Executes this task in the current thread. Does not call {@link LApi#checkQueueThread()}.
+     * Executes this task in the current thread. Does not call {@link LApi#checkThread()}.
      * @return {@link ComputationResult} result.
      */
     @ApiStatus.Internal
-    @NotNull ComputationResult<R, S> execute();
+    @NotNull ComputationResult<R, S> execute() throws InterruptedException;
 
     /**
      * Executes this task in the current thread.
      * @return {@link ComputationResult} result.
-     * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkQueueThread()}.
+     * @throws LApiRuntimeException if the current thread is a thread of {@link LApi} and should not be blocked. See {@link LApi#checkThread()}.
      */
     @NotNull
     @Override
-    default ComputationResult<R, S>  executeHere() throws LApiRuntimeException {
-        getLApi().checkQueueThread();
+    default ComputationResult<R, S> executeHere() throws LApiRuntimeException, InterruptedException {
+        getLApi().checkThread();
         return execute();
     }
 

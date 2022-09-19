@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager;
 
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import org.jetbrains.annotations.NotNull;
 
 public interface ManagerFactory<M> {

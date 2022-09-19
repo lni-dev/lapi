@@ -22,7 +22,9 @@ import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadListSyncData;
 import me.linusdev.lapi.api.communication.gateway.events.thread.ThreadMembersUpdateData;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
@@ -48,7 +50,7 @@ public class ThreadManagerImpl implements ThreadManager{
 
     public static final String NEWLY_CREATED_KEY = "newly_created";
 
-    private final @NotNull LApi lApi;
+    private final @NotNull LApiImpl lApi;
 
     private boolean initialized = false;
     private int channelHashMapInitialCapacity = CHANNEL_HASHMAP_STANDARD_INITIAL_CAPACITY;
@@ -56,7 +58,7 @@ public class ThreadManagerImpl implements ThreadManager{
     private @Nullable ConcurrentHashMap<String, ConcurrentHashMap<String, Thread<?>>> channels;
     private @Nullable ConcurrentHashMap<String, Thread<?>> threads;
 
-    public ThreadManagerImpl(@NotNull LApi lApi) {
+    public ThreadManagerImpl(@NotNull LApiImpl lApi) {
         this.lApi = lApi;
     }
 
@@ -152,10 +154,10 @@ public class ThreadManagerImpl implements ThreadManager{
         }
 
         boolean wasArchived = thread.getThreadMetadata().isArchived();
-        Thread<?> copy = lApi.isCopyOldThreadOnUpdateEventEnabled() ? thread.copy() : null;
+        Thread<?> copy = lApi.getConfig().isFlagSet(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT) ? thread.copy() : null;
         thread.updateSelfByData(data);
 
-        if(!lApi.isDoNotRemoveArchivedThreadsEnabled() && thread.getThreadMetadata().isArchived()) {
+        if(!lApi.getConfig().isFlagSet(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS) && thread.getThreadMetadata().isArchived()) {
             //remove thread if it was archived
             threads.remove(threadId);
             ConcurrentHashMap<String, Thread<?>> threadsInChannel = channels.get(thread.getParentId());
@@ -196,7 +198,7 @@ public class ThreadManagerImpl implements ThreadManager{
     public synchronized @NotNull ListUpdate<Thread<?>> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) throws InvalidDataException{
         if(channels == null || threads == null) throw new UnsupportedOperationException("init() not yet called");
 
-        if(lApi.isDoNotRemoveArchivedThreadsEnabled() || threads.isEmpty()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS) || threads.isEmpty()) {
             @NotNull ArrayList<Thread<?>> finalAdded = threads.isEmpty() ? new ArrayList<>(threadListSyncData.getThreads().size()) : new ArrayList<>();
             for(Thread<?> thread : threadListSyncData.getThreads()) {
                 threads.computeIfAbsent(thread.getId(), s -> {
@@ -223,7 +225,7 @@ public class ThreadManagerImpl implements ThreadManager{
 
         for(Thread<?> thread : threadListSyncData.getThreads()) {
             //We shouldn't receive archived Threads, but let's check it anyway
-            if(!lApi.isDoNotRemoveArchivedThreadsEnabled() && thread.getThreadMetadata().isArchived()) continue;
+            if(!lApi.getConfig().isFlagSet(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS) && thread.getThreadMetadata().isArchived()) continue;
 
             processed.computeIfAbsent(thread.getParentId(), s -> new LinkedList<>())
                     .add(thread);

@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.lapihttprequest.Method;
 import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

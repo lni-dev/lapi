@@ -19,8 +19,8 @@ package me.linusdev.lapi.api.async.queue;
 import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.ResultConsumer;
 import me.linusdev.lapi.api.async.Task;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
 
 

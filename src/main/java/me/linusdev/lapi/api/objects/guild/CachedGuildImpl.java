@@ -19,9 +19,10 @@ package me.linusdev.lapi.api.objects.guild;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.scheduledevent.GuildScheduledEventManager;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
@@ -34,7 +35,6 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
-import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.local.Locale;
 import me.linusdev.lapi.api.objects.permission.Permissions;
@@ -124,43 +124,43 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         this.awaitingEvent = awaitingEvent;
         this.removed = unavailable == null;
 
-        if(lApi.isCacheRolesEnabled()){
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_ROLES)){
             this.roleManager = lApi.getConfig().getRoleManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheEmojisEnabled()){
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_EMOJIS)){
             this.emojiManager = lApi.getConfig().getEmojiManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheStickersEnabled()){
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_STICKERS)){
             this.stickerManager = lApi.getConfig().getStickerManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheVoiceStatesEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_VOICE_STATES)) {
             this.voiceStatesManager = lApi.getConfig().getVoiceStateManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheMembersEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_MEMBERS)) {
             this.memberManager = lApi.getConfig().getMemberManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheChannelsEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_CHANNELS)) {
             this.channelManager = lApi.getConfig().getChannelManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheThreadsEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_THREADS)) {
             this.threadsManager = lApi.getConfig().getThreadsManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCachePresencesEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_PRESENCES)) {
             this.presenceManager = lApi.getConfig().getPresenceManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheStageInstancesEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_STAGE_INSTANCES)) {
             this.stageInstanceManager = lApi.getConfig().getStageInstanceManagerFactory().newInstance(lApi);
         }
 
-        if(lApi.isCacheGuildScheduledEventsEnabled()) {
+        if(lApi.getConfig().isFlagSet(ConfigFlag.CACHE_GUILD_SCHEDULED_EVENTS)) {
             this.scheduledEventManager = lApi.getConfig().getGuildScheduledEventManagerFactory().newInstance(lApi);
         }
 

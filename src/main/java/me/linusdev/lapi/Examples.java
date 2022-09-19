@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.events.message.MessageUpdateEv
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import org.jetbrains.annotations.NotNull;

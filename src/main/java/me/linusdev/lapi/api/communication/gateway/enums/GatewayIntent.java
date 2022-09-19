@@ -19,12 +19,11 @@ package me.linusdev.lapi.api.communication.gateway.enums;
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
 import me.linusdev.lapi.api.interfaces.Requireable;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * * {@link GatewayEvent#THREAD_MEMBERS_UPDATE THREAD_MEMBERS_UPDATE} contains different data depending on which intents are used.<br>

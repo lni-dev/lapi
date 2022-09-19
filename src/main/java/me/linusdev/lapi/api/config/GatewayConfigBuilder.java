@@ -26,15 +26,13 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.gateway.identify.Identify;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
-import me.linusdev.lapi.api.communication.gateway.queue.DispatchEventQueue;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessorFactory;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.SingleThreadDispatchEventProcessor;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayCompression;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayEncoding;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.*;
 
 import java.nio.ByteBuffer;

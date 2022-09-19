@@ -18,17 +18,13 @@ package me.linusdev.lapi.api.communication.gateway.events.interaction;
 
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.objects.command.ApplicationCommandInteractionDataOption;
-import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.interaction.InteractionData;
 import me.linusdev.lapi.api.objects.interaction.InteractionType;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 public class InteractionCreateEvent extends Event {
 

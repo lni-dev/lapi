@@ -21,8 +21,8 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.interfaces.Requireable;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
@@ -46,7 +46,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
 
     /**
      * <p>
-     *     retrieves and caches all voice regions when {@link me.linusdev.lapi.api.lapiandqueue.LApiImpl LApi} starts.
+     *     retrieves and caches all voice regions when {@link me.linusdev.lapi.api.lapi.LApiImpl LApi} starts.
      * </p>
      * @see VoiceRegionManager VoiceRegionManager
      */

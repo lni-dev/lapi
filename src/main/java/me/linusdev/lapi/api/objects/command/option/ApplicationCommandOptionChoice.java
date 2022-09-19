@@ -19,13 +19,11 @@ package me.linusdev.lapi.api.objects.command.option;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-choice-structure" target="_top">Application Command Option Choice Structure</a>

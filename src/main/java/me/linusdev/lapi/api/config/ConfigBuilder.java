@@ -26,8 +26,8 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.Command;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
@@ -631,15 +631,15 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
-                Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, lApi::isCopyOldEmojiOnUpdateEventEnabled)),
-                Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, lApi::isCopyOldStickerOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(emojiManagerFactory, lApi -> new ListManager<>(lApi, EmojiObject.ID_KEY, EmojiObject::fromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_EMOJI_ON_UPDATE_EVENT))),
+                Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_STICKER_ON_UPDATE_EVENT))),
                 Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
                 Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
-                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, lApi::isCopyOldChannelOnUpdateEventEnabled)),
+                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT))),
                 Objects.requireNonNullElse(threadManagerFactory, lApi -> new ThreadManagerImpl(lApi)),
                 Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi)),
                 Objects.requireNonNullElse(stageInstanceManagerFactory,
-                        lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), lApi::isCopyOldStageInstanceOnUpdateEventEnabled)),
+                        lApi -> new ListManager<>(lApi, StageInstance.ID_KEY, (lApi1, convertible) -> StageInstance.fromData(convertible), () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_STAGE_INSTANCE_ON_UPDATE_EVENT))),
                 Objects.requireNonNullElse(guildScheduledEventManagerFactory, lApi -> new GuildScheduledEventManagerImpl(lApi)));
     }
 
@@ -650,7 +650,7 @@ public class ConfigBuilder implements Datable {
      * @return {@link LApi}
      */
     public @NotNull LApi buildLApi() throws LApiException, IOException, ParseException, InterruptedException {
-        return new LApiImpl(build());
+        return new LApiImpl(build(), StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
     }
 
     /**

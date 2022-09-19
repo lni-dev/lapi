@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
 import me.linusdev.lapi.api.communication.gateway.events.Event;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface

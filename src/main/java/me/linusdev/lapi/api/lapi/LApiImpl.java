@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.lapiandqueue;
+package me.linusdev.lapi.api.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
@@ -42,6 +42,10 @@ import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.request.RequestFactory;
+import me.linusdev.lapi.api.thread.LApiThread;
+import me.linusdev.lapi.api.thread.LApiThreadFactory;
+import me.linusdev.lapi.api.thread.LApiThreadGroup;
+import me.linusdev.lapi.api.thread.QueueThread;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -90,14 +94,6 @@ public class LApiImpl implements LApi {
     private @NotNull final String token;
     private @NotNull final Config config;
 
-    private final boolean cacheVoiceRegions;
-    private final boolean cacheRoles;
-    private final boolean copyOldRolesOnUpdateEvent;
-    private final boolean cacheGuilds;
-    private final boolean copyOldGuildOnUpdateEvent;
-    private final boolean cacheEmojis;
-    private final boolean copyOldEmojisOnUpdateEvent;
-
     //Http
     private final LApiHttpHeader authorizationHeader;
     private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
@@ -106,11 +102,12 @@ public class LApiImpl implements LApi {
     private final HttpClient client = HttpClient.newHttpClient();
     private final @NotNull RequestFactory requestFactory;
 
+    //Threads
+    private final @NotNull LApiThreadGroup lApiThreadGroup;
+
     //Queue
     private final Queue<QueueableFuture<?, ?>> queue;
-    private final ScheduledExecutorService scheduledExecutor;
-    private final ExecutorService queueWorker;
-    private volatile QueueThread queueThread;
+    private final QueueThread queueThread;
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
     //LApiReadyEventListener
@@ -125,13 +122,13 @@ public class LApiImpl implements LApi {
     private final ThreadPoolExecutor executor;
 
     //Cache
-    private final @NotNull Cache cache;
+    private final @Nullable Cache cache;
 
     //Command Manager
-    private final @NotNull CommandManagerImpl commandManager;
+    private final @Nullable CommandManagerImpl commandManager;
 
     //stores and manages the voice regions
-    private final @NotNull VoiceRegionManager voiceRegionManager;
+    private final @Nullable VoiceRegionManager voiceRegionManager;
 
     //guild manager
     /**
@@ -143,66 +140,27 @@ public class LApiImpl implements LApi {
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
-    public LApiImpl(@NotNull Config config) throws LApiException, IOException, ParseException, InterruptedException {
+    public LApiImpl(@NotNull Config config, @NotNull Class<?> callerClass) throws LApiException, IOException, ParseException, InterruptedException {
         //Caller Class
-        this.callerClass = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass();
+        this.callerClass = callerClass;
 
         //Config
         this.token = config.getToken();
         this.config = config;
 
-        this.cacheVoiceRegions = config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS);
-        this.cacheRoles = config.isFlagSet(ConfigFlag.CACHE_ROLES);
-        this.copyOldRolesOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT);
-        this.cacheGuilds = config.isFlagSet(ConfigFlag.CACHE_GUILDS);
-        this.copyOldGuildOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_GUILD_ON_UPDATE_EVENT);
-        this.cacheEmojis = config.isFlagSet(ConfigFlag.CACHE_EMOJIS);
-        this.copyOldEmojisOnUpdateEvent = config.isFlagSet(ConfigFlag.COPY_EMOJI_ON_UPDATE_EVENT);
+        //Thread
+        this.lApiThreadGroup = new LApiThreadGroup(this);
 
+        //http
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
-        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
+        //Executor
+        this.executor = (ThreadPoolExecutor) Executors.newCachedThreadPool(new LApiThreadFactory(this, lApiThreadGroup, true));
 
         //Queue
         this.queue = config.getNewQueue();
-        this.scheduledExecutor = Executors.newScheduledThreadPool(1);
-        this.queueWorker = Executors.newSingleThreadExecutor(new QueueThreadFactory());
-        this.queueWorker.submit(new Runnable() {
-            @Override
-            @SuppressWarnings({"InfiniteLoopStatement"})
-            public void run() {
-                queueThread = (QueueThread) java.lang.Thread.currentThread();
-                log.log("Started queue thread: " + queueThread.getName());
-                try {
-                    while (true) {
-                        try {
-                            queueThread.awaitNotifyIf(10000L, () -> queue.peek() == null);
-                        } catch (InterruptedException ignored) {
-                            log.error("Queue thread interrupted");
-                            log.error(ignored);
-                        }
-
-                        QueueableFuture<?, ?> future = queue.poll();
-                        if (future == null) {
-                            continue;
-                        }
-
-                        if(Logger.DEBUG_LOG){
-                            log.debug("queue.poll().completeHereAndIgnoreQueueThread()");
-                            long millis = System.currentTimeMillis();
-                            future.executeHere();
-                            long finishMillis = System.currentTimeMillis() - millis;
-                            log.debug("queue.poll().completeHereAndIgnoreQueueThread() finished in " + finishMillis + " milliseconds");
-                        }else{
-                            future.executeHere();
-                        }
-                    }
-                }catch (Throwable t){
-                    //This is so any exceptions in this Thread are caught and printed.
-                    //Otherwise, they would just vanish and no one would know what happened
-                    log.error(t);
-                }
-            }
-        });
+        this.queueThread = new QueueThread(this, lApiThreadGroup, queue);
+        this.queueThread.start();
 
         requestFactory = new RequestFactory(this);
         eventTransmitter = new EventTransmitter(this);
@@ -224,12 +182,17 @@ public class LApiImpl implements LApi {
         }
 
         //VoiceRegions
-        this.voiceRegionManager = new VoiceRegionManager(this);
-        if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS))
+
+        if(this.config.isFlagSet(ConfigFlag.CACHE_VOICE_REGIONS)){
+            this.voiceRegionManager = new VoiceRegionManager(this);
             this.voiceRegionManager.init(0);
+        } else {
+            this.voiceRegionManager = null;
+        }
+
 
         //GuildImpl Manager
-        if(isCacheGuildsEnabled()){
+        if(getConfig().isFlagSet(ConfigFlag.CACHE_GUILDS)){
             this.guildManager = config.getGuildManagerFactory().newInstance(this);
             this.guildManager.init(16);
         }else{
@@ -237,7 +200,7 @@ public class LApiImpl implements LApi {
         }
 
         //Gateway
-        if(isGatewayEnabled()){
+        if(config.isFlagSet(ConfigFlag.ENABLE_GATEWAY)){
             this.gateway = new GatewayWebSocket(this, eventTransmitter, config);
             gateway.start();
         }else{
@@ -336,11 +299,12 @@ public class LApiImpl implements LApi {
     }
 
 
-    public void checkQueueThread() throws LApiRuntimeException {
-        if(java.lang.Thread.currentThread().equals(queueThread)){
-            throw new LApiRuntimeException("You cannot invoke Future.get() or Task.executeHere() on the queue-thread" +
-                    ", because this could lead to an infinite wait loop. You should also not wait or sleep the " +
-                    "queue-thread, because this will delay all other queued Futures");
+    public void checkThread() throws LApiRuntimeException {
+        if(Thread.currentThread() instanceof LApiThread) {
+            LApiThread thread = (LApiThread) Thread.currentThread();
+            if(!thread.allowBlockingOperations()) {
+                throw new LApiRuntimeException("This thread does not allow blocking operations.");
+            }
         }
     }
 
@@ -366,7 +330,6 @@ public class LApiImpl implements LApi {
     }
 
     //Getter
-
 
     @Override
     public @NotNull ApiVersion getHttpRequestApiVersion() {
@@ -398,23 +361,23 @@ public class LApiImpl implements LApi {
      * @return {@link SelfUserPresenceUpdater} or {@code null} if {@link ConfigFlag#ENABLE_GATEWAY} is not set.
      */
     @Override
-    public @Nullable SelfUserPresenceUpdater getSelfPresenceUpdater(){
+    public SelfUserPresenceUpdater getSelfPresenceUpdater(){
         if(gateway == null) return null;
         return gateway.getSelfUserPresenceUpdater();
     }
 
     @Override
-    public @NotNull VoiceRegionManager getVoiceRegionManager() {
+    public VoiceRegionManager getVoiceRegionManager() {
         return voiceRegionManager;
     }
 
     @Override
-    public @Nullable GatewayWebSocket getGateway() {
+    public GatewayWebSocket getGateway() {
         return gateway;
     }
 
     @Override
-    public @Nullable Cache getCache() {
+    public Cache getCache() {
         return cache;
     }
 
@@ -427,132 +390,6 @@ public class LApiImpl implements LApi {
     public @NotNull LApi getLApi() {
         return this;
     }
-
-    @Override
-    public boolean isGatewayEnabled() {
-        return config.isFlagSet(ConfigFlag.ENABLE_GATEWAY);
-    }
-
-    @Override
-    public boolean isCacheVoiceRegionsEnabled() {
-        return cacheVoiceRegions;
-    }
-
-    @Override
-    public boolean isCacheRolesEnabled() {
-        return cacheRoles;
-    }
-
-    @Override
-    public boolean isCopyOldRolesOnUpdateEventEnabled() {
-        return copyOldRolesOnUpdateEvent;
-    }
-
-    @Override
-    public boolean isCacheGuildsEnabled(){
-        return cacheGuilds;
-    }
-
-    @Override
-    public boolean isCopyOldGuildOnUpdateEventEnabled(){
-        return copyOldGuildOnUpdateEvent;
-    }
-
-    @Override
-    public boolean isCacheEmojisEnabled() {
-        return cacheEmojis;
-    }
-
-    @Override
-    public boolean isCopyOldEmojiOnUpdateEventEnabled() {
-        return copyOldEmojisOnUpdateEvent;
-    }
-
-    @Override
-    public boolean isCacheStickersEnabled(){
-        return config.isFlagSet(ConfigFlag.CACHE_STICKERS);
-    }
-
-    @Override
-    public boolean isCopyOldStickerOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_STICKER_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheVoiceStatesEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_VOICE_STATES);
-    }
-
-    @Override
-    public boolean isCopyOldVoiceStateOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_VOICE_STATE_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheMembersEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_MEMBERS);
-    }
-
-    @Override
-    public boolean isCopyOldMemberOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_MEMBER_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheChannelsEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_CHANNELS);
-    }
-
-    @Override
-    public boolean isCopyOldChannelOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheThreadsEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_THREADS);
-    }
-
-    @Override
-    public boolean isDoNotRemoveArchivedThreadsEnabled() {
-        return config.isFlagSet(ConfigFlag.DO_NOT_REMOVE_ARCHIVED_THREADS);
-    }
-
-    @Override
-    public boolean isCopyOldThreadOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_THREAD_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCachePresencesEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_PRESENCES);
-    }
-
-    @Override
-    public boolean isCopyOldPresenceOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheStageInstancesEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_STAGE_INSTANCES);
-    }
-
-    @Override
-    public boolean isCopyOldStageInstanceOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_STAGE_INSTANCE_ON_UPDATE_EVENT);
-    }
-
-    @Override
-    public boolean isCacheGuildScheduledEventsEnabled() {
-        return config.isFlagSet(ConfigFlag.CACHE_GUILD_SCHEDULED_EVENTS);
-    }
-
-    @Override
-    public boolean isCopyOldGuildScheduledEventOnUpdateEventEnabled() {
-        return config.isFlagSet(ConfigFlag.COPY_GUILD_SCHEDULED_EVENTS_ON_UPDATE);
-    }
-
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

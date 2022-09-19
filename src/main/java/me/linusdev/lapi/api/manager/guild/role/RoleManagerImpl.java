@@ -19,8 +19,9 @@ package me.linusdev.lapi.api.manager.guild.role;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.lapiandqueue.LApi;
-import me.linusdev.lapi.api.lapiandqueue.LApiImpl;
+import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.HasLApi;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.log.Logger;
@@ -87,7 +88,7 @@ public class RoleManagerImpl implements RoleManager, HasLApi {
             return null;
         }
 
-        if(lApi.isCopyOldRolesOnUpdateEventEnabled()){
+        if(lApi.getConfig().isFlagSet(ConfigFlag.COPY_ROLE_ON_UPDATE_EVENT)){
             return new Update<Role, Role>(role, updateData);
         }else {
             return new Update<Role, Role>(null, role);
