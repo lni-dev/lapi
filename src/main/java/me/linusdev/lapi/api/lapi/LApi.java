@@ -40,7 +40,7 @@ import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.thread.LApiThread;
 import org.jetbrains.annotations.ApiStatus;

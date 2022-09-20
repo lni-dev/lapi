@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;

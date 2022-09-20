@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.http.response.body.ListThreadsResponseBody;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;

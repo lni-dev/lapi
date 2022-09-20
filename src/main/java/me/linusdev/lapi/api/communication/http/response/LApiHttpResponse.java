@@ -22,8 +22,10 @@ import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
+import me.linusdev.lapi.api.communication.http.HeaderType;
 import me.linusdev.lapi.api.communication.http.HeaderTypes;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitScope;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.response.body.HttpErrorMessage;
 import me.linusdev.lapi.api.lapi.LApi;
@@ -35,7 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackReader;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -45,12 +49,15 @@ public class LApiHttpResponse {
 
     private final @NotNull LogInstance log = Logger.getLogger(LApiHttpResponse.class.getSimpleName());
 
+    private final @NotNull HttpHeaders headers;
+
     private final InputStream inputStream;
     private final @NotNull HttpResponseCode responseCode;
     private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
 
     private @Nullable HttpErrorMessage error;
+    private @Nullable RateLimitScope rateLimitScope;
     private @Nullable RateLimitResponse rateLimit;
 
     private @Nullable SOData data;
@@ -64,6 +71,7 @@ public class LApiHttpResponse {
     private boolean noContent = false;
 
     public LApiHttpResponse(HttpResponse<InputStream> source) throws IOException, ParseException {
+        this.headers = source.headers();
         this.inputStream = source.body();
         this.responseCodeAsInt = source.statusCode();
         this.responseCode = HttpResponseCode.fromValue(this.responseCodeAsInt);
@@ -73,14 +81,18 @@ public class LApiHttpResponse {
 
 
         if(this.responseCode == HttpResponseCode.TOO_MANY_REQUESTS) {
-
             try {
                 this.rateLimit = RateLimitResponse.fromData(getData());
-                log.error("We Hit a rate limit!: " + rateLimit.getMessage());
+                this.rateLimitScope = RateLimitScope.of(getHeaderFirstValue(HeaderTypes.X_RATE_LIMIT_SCOPE));
+                if(rateLimitScope == RateLimitScope.SHARED) {
+                    log.warning("LApi hit a shared rate limit: " + rateLimit.getMessage());
+                } else {
+                    log.error("LApi Hit a " + rateLimitScope + " rate limit: " + rateLimit.getMessage());
+                }
+
             } catch (InvalidDataException e) {
                log.error(e);
             }
-
 
         }
 
@@ -88,6 +100,11 @@ public class LApiHttpResponse {
             //try to read an error from the data. will return null if it fails
             this.error = HttpErrorMessage.fromData(getData());
         }
+
+    }
+
+    public @Nullable String getHeaderFirstValue(@NotNull HeaderType type) {
+        return headers.firstValue(type.getName()).orElse(null);
     }
 
     /**

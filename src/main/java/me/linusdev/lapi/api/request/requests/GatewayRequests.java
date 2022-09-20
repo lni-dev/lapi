@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 public interface GatewayRequests extends HasLApi {

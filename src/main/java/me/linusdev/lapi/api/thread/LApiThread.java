@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.thread;
 
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class LApiThread extends Thread implements HasLApi {

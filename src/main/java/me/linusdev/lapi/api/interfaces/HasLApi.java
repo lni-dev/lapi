@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects;
+package me.linusdev.lapi.api.interfaces;
 
 import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.NotNull;

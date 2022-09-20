@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.objects.application;
 
 import me.linusdev.data.Datable;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 

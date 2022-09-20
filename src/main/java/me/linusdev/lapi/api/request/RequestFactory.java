@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.request;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 
 import me.linusdev.lapi.api.request.requests.*;
 import org.jetbrains.annotations.NotNull;

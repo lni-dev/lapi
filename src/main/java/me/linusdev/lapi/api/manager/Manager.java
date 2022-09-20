@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.manager;
 
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 
 public interface Manager extends HasLApi {
 

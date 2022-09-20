@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.async.ResultConsumer;
 import me.linusdev.lapi.api.async.Task;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 
 
 /**

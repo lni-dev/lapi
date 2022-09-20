@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 import me.linusdev.lapi.api.communication.gateway.events.message.GuildMessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

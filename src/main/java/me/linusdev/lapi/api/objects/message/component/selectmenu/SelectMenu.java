@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.objects.message.component.selectmenu;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.interaction.Interaction;

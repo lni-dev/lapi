@@ -17,6 +17,8 @@
 package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.retriever.query.Query;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -25,17 +27,28 @@ import org.jetbrains.annotations.Nullable;
  */
 public class QResponse {
 
+    private final @NotNull Query query;
     private final @Nullable LApiHttpResponse response;
     private final @Nullable Throwable exception;
 
-    public QResponse(@Nullable LApiHttpResponse response) {
+    public QResponse(@NotNull Query query, @NotNull LApiHttpResponse response) {
+        this.query = query;
         this.response = response;
         this.exception = null;
     }
 
-    public QResponse(@Nullable Throwable exception) {
+    public QResponse(@NotNull Query query, @NotNull Throwable exception) {
+        this.query = query;
         this.response = null;
         this.exception = exception;
+    }
+
+    /**
+     * {@link Query} used to send the http request.
+     * @return {@link Query}
+     */
+    public @NotNull Query getQuery() {
+        return query;
     }
 
     /**

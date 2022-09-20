@@ -26,7 +26,7 @@ import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
 import me.linusdev.lapi.api.objects.guild.enums.ExplicitContentFilterLevel;
 import me.linusdev.lapi.api.objects.guild.enums.VerificationLevel;

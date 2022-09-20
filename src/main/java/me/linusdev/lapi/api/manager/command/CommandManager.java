@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.manager.command;
 
 import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.Nothing;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 public interface CommandManager extends HasLApi {

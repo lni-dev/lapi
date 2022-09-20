@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListen
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;

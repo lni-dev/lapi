@@ -66,7 +66,7 @@ import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.list.LinusLinkedList;
 
 import org.jetbrains.annotations.ApiStatus;

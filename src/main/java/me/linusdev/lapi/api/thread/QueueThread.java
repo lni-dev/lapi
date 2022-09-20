@@ -16,10 +16,13 @@
 
 package me.linusdev.lapi.api.thread;
 
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -64,16 +67,22 @@ public class QueueThread extends LApiThread implements HasLApi {
                 QueueableFuture<?, ?> future = queue.poll();
                 if (future == null) continue;
 
+                ComputationResult<?, QResponse> result;
                 if(Logger.DEBUG_LOG){
                     log.debug("queue.poll().executeHere()");
                     long millis = System.currentTimeMillis();
-                    future.executeHere();
+                    result = future.executeHere();
                     long finishMillis = System.currentTimeMillis() - millis;
                     log.debug("queue.poll().executeHere() finished in " + finishMillis + " milliseconds");
 
                 }else{
-                    future.executeHere();
+                    result = future.executeHere();
 
+                }
+
+                if(result != null) {
+                    LApiHttpResponse response = result.getSecondary().getResponse();
+                    if(response == null) continue;
                 }
             }
         } catch (InterruptedException e) {

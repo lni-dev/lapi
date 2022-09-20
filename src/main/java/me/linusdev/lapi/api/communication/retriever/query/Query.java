@@ -19,12 +19,10 @@ package me.linusdev.lapi.api.communication.retriever.query;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 
 /**
- * A {@link Query} is used to build a {@link LApiHttpRequest HttpRequest}.<br>
- * The name query might be a bit misleading. As this is not only a GET request.
- * POST, PUT, DELETE, ... may also be represented by a {@link Query}
+ * A {@link Query} is used to build a {@link LApiHttpRequest HttpRequest}.
  */
 public interface Query extends HasLApi {
 

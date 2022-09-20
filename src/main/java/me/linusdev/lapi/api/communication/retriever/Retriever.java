@@ -29,7 +29,7 @@ import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -86,16 +86,16 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("Exception while trying to retrieve " + query.toString());
             log.error(t);
-            result = new ComputationResult<>(null, new QResponse(t), new ThrowableError(t));
+            result = new ComputationResult<>(null, new QResponse(query, t), new ThrowableError(t));
             return result;
 
         }
 
         try {
             if(response.isError()){
-                result = new ComputationResult<>(null, new QResponse(response), Error.of(response.getErrorMessage()));
+                result = new ComputationResult<>(null, new QResponse(query, response), Error.of(response.getErrorMessage()));
             } else {
-                result = new ComputationResult<>(process(response), new QResponse(response), null);
+                result = new ComputationResult<>(process(response), new QResponse(query, response), null);
             }
 
         } catch (InvalidDataException invalidDataException){
@@ -103,13 +103,13 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
             log.error("InvalidDataException while trying to process result of " + query.toString());
             log.error(invalidDataException);
             log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().toJsonString().toString(), "Data: ");
-            return new ComputationResult<>(null, new QResponse(response), new ThrowableError(invalidDataException));
+            return new ComputationResult<>(null, new QResponse(query, response), new ThrowableError(invalidDataException));
 
         }  catch (Throwable t) {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
             log.error("Exception while trying to process result of " + query.toString());
             log.error(t);
-            return new ComputationResult<>(null, new QResponse(response), new ThrowableError(t));
+            return new ComputationResult<>(null, new QResponse(query, response), new ThrowableError(t));
         }
 
         return result;

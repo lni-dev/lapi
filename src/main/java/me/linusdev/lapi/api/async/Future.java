@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.async;
 import me.linusdev.lapi.api.async.error.Error;
 import me.linusdev.lapi.api.async.exception.CancellationException;
 import me.linusdev.lapi.api.async.exception.ErrorException;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 

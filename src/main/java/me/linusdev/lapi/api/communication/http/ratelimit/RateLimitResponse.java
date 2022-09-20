@@ -76,6 +76,12 @@ public class RateLimitResponse implements Datable {
 
     @Override
     public SOData getData() {
-        return null;
+        SOData data = SOData.newOrderedDataWithKnownSize(3);
+
+        data.add(MESSAGE_KEY, message);
+        data.add(RETRY_AFTER_KEY, retryAfter);
+        data.add(GLOBAL_KEY, global);
+
+        return data;
     }
 }

@@ -61,12 +61,13 @@ public abstract class AbstractFuture<R, S, T extends ExecutableTask<R, S>> imple
      * {@link #started}.
      * <br><br>
      * If the {@link Future} is not {@link #isExecutable() executable}, this function will wait until it is executable.
+     * @return {@link ComputationResult result} or {@code null} if this future was {@link #isCanceled() canceled}.
      */
     @ApiStatus.Internal
-    public void executeHere() throws InterruptedException {
+    public @Nullable ComputationResult<R, S> executeHere() throws InterruptedException {
 
         synchronized (lock) {
-            if (isDone() || hasStarted()) return;
+            if (isDone() || hasStarted()) return result;
         }
 
         try {
@@ -80,7 +81,7 @@ public abstract class AbstractFuture<R, S, T extends ExecutableTask<R, S>> imple
         synchronized (lock) {
             if(isCanceled()) {
                 lock.notifyAll();
-                return;
+                return null;
             }
             started = true;
         }
@@ -105,6 +106,7 @@ public abstract class AbstractFuture<R, S, T extends ExecutableTask<R, S>> imple
             log.error(t);
         }
 
+        return result;
     }
 
     @Override

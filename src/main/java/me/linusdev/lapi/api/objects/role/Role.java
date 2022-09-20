@@ -30,7 +30,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.updatable.IsUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.NotUpdatable;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;

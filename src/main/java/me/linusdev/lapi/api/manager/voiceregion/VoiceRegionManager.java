@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.Manager;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.voice.region.VoiceRegion;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;

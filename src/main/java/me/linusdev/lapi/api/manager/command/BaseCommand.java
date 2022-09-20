@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.manager.command.autocomplete.SelectedOptions;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
-import me.linusdev.lapi.api.objects.HasLApi;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;

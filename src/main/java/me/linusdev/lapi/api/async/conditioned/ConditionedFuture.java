@@ -17,8 +17,11 @@
 package me.linusdev.lapi.api.async.conditioned;
 
 import me.linusdev.lapi.api.async.AbstractFuture;
+import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.ExecutableTask;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ConditionedFuture<R, S, T extends ConditionedTask<R, S> & ExecutableTask<R, S>> extends AbstractFuture<R, S, T> {
     public ConditionedFuture(@NotNull T task) {
@@ -31,12 +34,15 @@ public class ConditionedFuture<R, S, T extends ConditionedTask<R, S> & Executabl
     }
 
     @Override
-    public void executeHere() throws InterruptedException {
+    @ApiStatus.Internal
+    public @Nullable ComputationResult<R, S> executeHere() throws InterruptedException {
         if(isExecutable()) {
-            super.executeHere();
+            return super.executeHere();
         } else {
+            //waiting may take a while, this should not be done on blocking threads.
+            getLApi().checkThread();
             getTask().getCondition().await();
-            super.executeHere();
+            return super.executeHere();
         }
     }
 }
