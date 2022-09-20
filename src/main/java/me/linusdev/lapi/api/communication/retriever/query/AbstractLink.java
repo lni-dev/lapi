@@ -32,4 +32,10 @@ public interface AbstractLink {
      * The url, may still be missing placeholders!
      */
     @NotNull String getLink(@NotNull ApiVersion apiVersion);
+
+    /**
+     *
+     * @return Whether this endpoint is bound to the global rate limits for the bot.
+     */
+    boolean isBoundToGlobalRateLimit();
 }

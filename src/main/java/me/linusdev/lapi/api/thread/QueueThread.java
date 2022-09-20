@@ -19,7 +19,9 @@ package me.linusdev.lapi.api.thread;
 import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.interfaces.HasLApi;
@@ -38,7 +40,7 @@ import java.util.function.BooleanSupplier;
 public class QueueThread extends LApiThread implements HasLApi {
 
     private final @NotNull LApiImpl lApi;
-    private final @NotNull Queue<QueueableFuture<?, ?>> queue;
+    private final @NotNull Queue<QueueableFuture<?>> queue;
 
     private final @NotNull AtomicBoolean stopIfEmpty = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean stopImmediately = new AtomicBoolean(false);
@@ -48,7 +50,7 @@ public class QueueThread extends LApiThread implements HasLApi {
 
     private final LogInstance log = Logger.getLogger(this);
 
-    public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?, ?>> queue) {
+    public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?>> queue) {
         super(lApi, group, "queue-thread");
         this.lApi = lApi;
         this.queue = queue;
@@ -64,8 +66,14 @@ public class QueueThread extends LApiThread implements HasLApi {
                 if(queue.peek() == null && stopIfEmpty.get()) break;
                 awaitNotifyIf(10000L, () -> queue.peek() == null);
 
-                QueueableFuture<?, ?> future = queue.poll();
+                QueueableFuture<?> future = queue.poll();
                 if (future == null) continue;
+
+                QueueableImpl<?> task = future.getTask();
+                Query query = task.getQuery();
+                if(query.getLink().isBoundToGlobalRateLimit()) {
+                    //TODO: check if globally rate limited and add to a different queue
+                }
 
                 ComputationResult<?, QResponse> result;
                 if(Logger.DEBUG_LOG){
@@ -83,6 +91,11 @@ public class QueueThread extends LApiThread implements HasLApi {
                 if(result != null) {
                     LApiHttpResponse response = result.getSecondary().getResponse();
                     if(response == null) continue;
+                    if(response.isRateLimitResponse()) {
+                        if(response.getRateLimitResponse().isGlobal()) {
+                            //TODO: we got globally rate limited...
+                        }
+                    }
                 }
             }
         } catch (InterruptedException e) {

@@ -44,7 +44,7 @@ import java.util.function.Supplier;
 public class Config {
 
     private final long flags;
-    private final @NotNull Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier;
+    private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
     private final @NotNull String token;
     private final @Nullable Snowflake applicationId;
     private final @NotNull ApiVersion apiVersion;
@@ -62,7 +62,7 @@ public class Config {
     private final @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory;
     private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
-    public Config(long flags, @NotNull Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier, @NotNull String token,
+    public Config(long flags, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
                   @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
@@ -100,7 +100,7 @@ public class Config {
     /**
      * The Queue used by {@link LApi} to queue any {@link Queueable}
      */
-    public Queue<QueueableFuture<?, ?>> getNewQueue() {
+    public Queue<QueueableFuture<?>> getNewQueue() {
         return queueSupplier.get();
     }
 

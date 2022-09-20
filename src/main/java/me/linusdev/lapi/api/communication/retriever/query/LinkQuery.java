@@ -96,6 +96,11 @@ public class LinkQuery implements Query, HasLApi {
     }
 
     @Override
+    public @NotNull AbstractLink getLink() {
+        return link;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }

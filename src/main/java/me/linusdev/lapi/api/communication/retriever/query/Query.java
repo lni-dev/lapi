@@ -20,6 +20,7 @@ import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link Query} is used to build a {@link LApiHttpRequest HttpRequest}.
@@ -42,4 +43,10 @@ public interface Query extends HasLApi {
      * usually the method and the url of this query. This should NOT be used to build a http-request
      */
     String asString();
+
+    /**
+     * link used to create this query.
+     * @return {@link AbstractLink}
+     */
+    @NotNull AbstractLink getLink();
 }

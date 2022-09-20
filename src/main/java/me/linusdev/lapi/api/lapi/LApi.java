@@ -135,7 +135,7 @@ public interface LApi extends HasLApi {
      * @param <T> Return Type of {@link Queueable}
      */
     @ApiStatus.Internal
-    <T> void queue(@NotNull QueueableFuture<T, QueueableImpl<T>> queueable);
+    <T> void queue(@NotNull QueueableFuture<T> queueable);
 
 
     LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, InterruptedException, NoInternetException, ParseException;

@@ -18,6 +18,8 @@ package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.async.ExecutableTask;
 import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.communication.retriever.query.Query;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +29,13 @@ public abstract class QueueableImpl<T> implements ExecutableTask<T, QResponse>, 
 
     @Override
     public @NotNull Future<T, QResponse> consumeAndQueue(@Nullable Consumer<Future<T, QResponse>> consumer) {
-        final QueueableFuture<T, QueueableImpl<T>> future = new QueueableFuture<>(this);
+        final QueueableFuture<T> future = new QueueableFuture<>(this);
         if(consumer != null) consumer.accept(future);
         getLApi().queue(future);
         return future;
     }
+
+    @ApiStatus.Internal
+    public abstract @NotNull Query getQuery();
 
 }

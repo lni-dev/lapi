@@ -42,13 +42,13 @@ import static me.linusdev.lapi.api.communication.PlaceHolder.*;
  */
 public enum Link implements AbstractLink{
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                      Application Commands                     *
-     *                                                               *
-     *  Done: 02.09.2022                                             *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                             Application Commands                                          *
+     *                                                                                                           *
+     *  Done: 02.09.2022                                                                                         *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      *
@@ -197,13 +197,15 @@ public enum Link implements AbstractLink{
     @Deprecated
     BATCH_EDIT_APPLICATION_COMMAND_PERMISSIONS(Method.PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/permissions"),
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                   Receiving and Responding                    *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                           Receiving and Responding                                        *
+     *                                                                                                           *
+     *  The Interaction endpoints below are not bound to the application's Global Rate Limit.                    *
+     *  see https://discord.com/developers/docs/interactions/receiving-and-responding#endpoints                  *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Create a response to an Interaction from the gateway. Body is an interaction response. Returns 204 No Content.<br>
@@ -214,7 +216,7 @@ public enum Link implements AbstractLink{
      * @see PlaceHolder#INTERACTION_TOKEN
      * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
      */
-    CREATE_INTERACTION_RESPONSE(Method.POST, "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback"),
+    CREATE_INTERACTION_RESPONSE(Method.POST, "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback", false),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *
@@ -636,10 +638,18 @@ public enum Link implements AbstractLink{
 
     private final @NotNull Method method;
     private final @NotNull String link;
+    private final boolean boundToGlobalRateLimits;
 
     Link(@NotNull Method method, @NotNull String link){
         this.method = method;
         this.link = DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK + link;
+        this.boundToGlobalRateLimits = true;
+    }
+
+    Link(@NotNull Method method, @NotNull String link, boolean boundToGlobalRateLimits){
+        this.method = method;
+        this.link = DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK + link;
+        this.boundToGlobalRateLimits = boundToGlobalRateLimits;
     }
 
     @Override
@@ -650,5 +660,10 @@ public enum Link implements AbstractLink{
     @Override
     public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
         return link.replace(DISCORD_API_VERSION_NUMBER, apiVersion.getVersionNumber());
+    }
+
+    @Override
+    public boolean isBoundToGlobalRateLimit() {
+        return boundToGlobalRateLimits;
     }
 }

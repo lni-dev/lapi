@@ -116,6 +116,11 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
     }
 
     @Override
+    public @NotNull Query getQuery() {
+        return query;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }

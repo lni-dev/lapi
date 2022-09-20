@@ -91,7 +91,7 @@ public class ConfigBuilder implements Datable {
     private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
-    private Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier = null;
+    private Supplier<Queue<QueueableFuture<?>>> queueSupplier = null;
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private @Nullable CommandProvider commandProvider;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
@@ -286,7 +286,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      * @param queueSupplier queue supplier
      */
-    public ConfigBuilder setQueueSupplier(Supplier<Queue<QueueableFuture<?, ?>>> queueSupplier) {
+    public ConfigBuilder setQueueSupplier(Supplier<Queue<QueueableFuture<?>>> queueSupplier) {
         this.queueSupplier = queueSupplier;
         return this;
     }

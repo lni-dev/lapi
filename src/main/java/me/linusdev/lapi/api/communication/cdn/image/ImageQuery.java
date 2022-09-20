@@ -101,6 +101,11 @@ public class ImageQuery implements Query {
     }
 
     @Override
+    public @NotNull AbstractLink getLink() {
+        return link;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }

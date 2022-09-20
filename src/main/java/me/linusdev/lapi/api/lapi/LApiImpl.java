@@ -106,7 +106,7 @@ public class LApiImpl implements LApi {
     private final @NotNull LApiThreadGroup lApiThreadGroup;
 
     //Queue
-    private final Queue<QueueableFuture<?, ?>> queue;
+    private final Queue<QueueableFuture<?>> queue;
     private final QueueThread queueThread;
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
@@ -212,7 +212,7 @@ public class LApiImpl implements LApi {
 
     @Override
     @ApiStatus.Internal
-    public <T> void queue(@NotNull QueueableFuture<T, QueueableImpl<T>> future) {
+    public <T> void queue(@NotNull QueueableFuture<T> future) {
         queue.offer(future);
         //notify the queue in case it is waiting.
         queueThread.notifyAllAwaiting();

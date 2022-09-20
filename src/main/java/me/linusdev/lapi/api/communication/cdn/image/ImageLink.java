@@ -73,4 +73,9 @@ public enum ImageLink implements AbstractLink {
         //The discord api version is not present in cdn links, so we do not need to replace it
         return link;
     }
+
+    @Override
+    public boolean isBoundToGlobalRateLimit() {
+        return true;
+    }
 }

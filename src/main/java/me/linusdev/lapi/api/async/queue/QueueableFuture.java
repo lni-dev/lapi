@@ -18,16 +18,23 @@ package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.async.AbstractFuture;
 import me.linusdev.lapi.api.async.ExecutableTask;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-public class QueueableFuture<R, T extends ExecutableTask<R, QResponse>> extends AbstractFuture<R, QResponse, T> {
+public class QueueableFuture<R> extends AbstractFuture<R, QResponse, QueueableImpl<R>> {
 
-    public QueueableFuture(@NotNull T task) {
+    public QueueableFuture(@NotNull QueueableImpl<R> task) {
         super(task);
     }
 
     @Override
     public boolean isExecutable() {
         return true;
+    }
+
+    @ApiStatus.Internal
+    @Override
+    public @NotNull QueueableImpl<R> getTask() {
+        return super.getTask();
     }
 }
