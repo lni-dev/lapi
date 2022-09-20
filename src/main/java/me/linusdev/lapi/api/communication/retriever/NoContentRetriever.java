@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.communication.retriever;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

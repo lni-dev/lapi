@@ -81,7 +81,7 @@ import me.linusdev.lapi.api.communication.gateway.queue.ReceivedPayload;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessorFactory;
 import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpHeader;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;

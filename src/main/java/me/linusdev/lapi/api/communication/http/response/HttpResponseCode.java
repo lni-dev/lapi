@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.response;
+package me.linusdev.lapi.api.communication.http.response;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;

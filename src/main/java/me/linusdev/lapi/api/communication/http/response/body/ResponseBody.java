@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.response.body;
+package me.linusdev.lapi.api.communication.http.response.body;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.communication.retriever.Retriever;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.HasLApi;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This is returned by some {@link me.linusdev.lapi.api.communication.retriever.Retriever retrievers}, if they retrieve more than one object
+ * This is returned by some {@link Retriever retrievers}, if they retrieve more than one object
  */
 public abstract class ResponseBody implements HasLApi {
 

@@ -17,8 +17,8 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.communication.lapihttprequest.Method;
-import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
+import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.objects.HasLApi;
 
 /**

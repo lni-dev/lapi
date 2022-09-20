@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.async.error.Error;
 import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;

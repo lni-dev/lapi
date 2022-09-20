@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest;
+package me.linusdev.lapi.api.communication.http.request;
+
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
 
 /**
  * Http request methods
@@ -25,7 +27,7 @@ public enum Method {
     //methods used by Discord
 
     /**
-     * The GET method requests an object from Discord. This method as no {@link me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody request body}
+     * The GET method requests an object from Discord. This method as no {@link LApiHttpBody request body}
      */
     GET("GET"),
 

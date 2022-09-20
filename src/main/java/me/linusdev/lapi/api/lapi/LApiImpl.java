@@ -34,10 +34,10 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEve
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
-import me.linusdev.lapi.api.communication.lapihttprequest.IllegalRequestMethodException;
-import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpHeader;
-import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.request.IllegalRequestMethodException;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpHeader;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
@@ -218,7 +218,7 @@ public class LApiImpl implements LApi {
         queueThread.notifyAllAwaiting();
     }
 
-    public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, NoInternetException, ParseException, InterruptedException {
+    public LApiHttpResponse getResponse(@NotNull LApiHttpRequest request) throws IllegalRequestMethodException, IOException, ParseException, InterruptedException {
         return retrieveResponse(request);
     }
 

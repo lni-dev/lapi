@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.objects.interaction.response;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
+import me.linusdev.lapi.api.communication.http.request.body.FilePart;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

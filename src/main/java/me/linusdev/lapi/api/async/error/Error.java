@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.async.error;
 
 import me.linusdev.lapi.api.async.exception.ErrorException;
-import me.linusdev.lapi.api.communication.retriever.response.body.HttpErrorMessage;
+import me.linusdev.lapi.api.communication.http.response.body.HttpErrorMessage;
 import me.linusdev.lapi.log.LogInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

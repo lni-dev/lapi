@@ -17,7 +17,8 @@
 package me.linusdev.lapi.api.templates.message;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
+import me.linusdev.lapi.api.communication.http.request.body.FilePart;
+import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.message.MessageReference;
 import me.linusdev.lapi.api.objects.message.component.Component;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 
 /**
  * <p>
- *     used to {@link me.linusdev.lapi.api.communication.retriever.query.Link#CREATE_MESSAGE create a message}
+ *     used to {@link Link#CREATE_MESSAGE create a message}
  * </p>
  * @see <a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params" target="_top">JSON/Form Params</a>
  */

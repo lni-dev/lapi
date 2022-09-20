@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.query;
+package me.linusdev.lapi.api.communication.http.ratelimit;
 
-import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.http.request.Method;
-import org.jetbrains.annotations.NotNull;
+import java.net.http.HttpHeaders;
 
-public interface AbstractLink {
+public class RateLimitHeaders {
 
-    /**
-     *
-     * @return the {@link Method} for this Link
-     */
-    @NotNull Method getMethod();
 
-    /**
-     * The url, may still be missing placeholders!
-     */
-    @NotNull String getLink(@NotNull ApiVersion apiVersion);
+
+    public RateLimitHeaders(HttpHeaders headers) {
+
+    }
+
 }

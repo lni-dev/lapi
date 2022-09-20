@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.query;
+package me.linusdev.lapi.api.communication.http.request;
 
-import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.http.request.Method;
-import org.jetbrains.annotations.NotNull;
+public class IllegalRequestMethodException extends LApiHttpRequestException{
+    public IllegalRequestMethodException() {
+    }
 
-public interface AbstractLink {
+    public IllegalRequestMethodException(String message) {
+        super(message);
+    }
 
-    /**
-     *
-     * @return the {@link Method} for this Link
-     */
-    @NotNull Method getMethod();
-
-    /**
-     * The url, may still be missing placeholders!
-     */
-    @NotNull String getLink(@NotNull ApiVersion apiVersion);
+    public IllegalRequestMethodException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

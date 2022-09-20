@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.retriever.response;
+package me.linusdev.lapi.api.communication.http.response;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
-import me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest;
-import me.linusdev.lapi.api.communication.retriever.response.body.HttpErrorMessage;
+import me.linusdev.lapi.api.communication.http.HeaderTypes;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
+import me.linusdev.lapi.api.communication.http.response.body.HttpErrorMessage;
 import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.log.LogInstance;
+import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,17 +43,24 @@ import java.util.Optional;
  */
 public class LApiHttpResponse {
 
+    private final @NotNull LogInstance log = Logger.getLogger(LApiHttpResponse.class.getSimpleName());
+
     private final InputStream inputStream;
     private final @NotNull HttpResponseCode responseCode;
     private final int responseCodeAsInt;
     private final @NotNull AbstractContentType contentType;
 
     private @Nullable HttpErrorMessage error;
+    private @Nullable RateLimitResponse rateLimit;
+
     private @Nullable SOData data;
     /**
      * The array key used to load above data
      */
     private @Nullable String usedArrayKey;
+    /**
+     * Only for json-body
+     */
     private boolean noContent = false;
 
     public LApiHttpResponse(HttpResponse<InputStream> source) throws IOException, ParseException {
@@ -56,16 +68,25 @@ public class LApiHttpResponse {
         this.responseCodeAsInt = source.statusCode();
         this.responseCode = HttpResponseCode.fromValue(this.responseCodeAsInt);
 
-        Optional<String> contentTypeHeader = source.headers().firstValue(LApiHttpRequest.CONTENT_TYPE_HEADER);
-        if(contentTypeHeader.isPresent()){
-            this.contentType = ContentType.of(contentTypeHeader.get());
-            if(contentType == ContentType.APPLICATION_JSON){
-                //try to read an error from the data. will return null if it fails
-                this.error = HttpErrorMessage.fromData(getData());
+        Optional<String> contentTypeHeader = source.headers().firstValue(HeaderTypes.CONTENT_TYPE.getName());
+        this.contentType = contentTypeHeader.map(ContentType::of).orElse(ContentType.UNKNOWN);
 
+
+        if(this.responseCode == HttpResponseCode.TOO_MANY_REQUESTS) {
+
+            try {
+                this.rateLimit = RateLimitResponse.fromData(getData());
+                log.error("We Hit a rate limit!: " + rateLimit.getMessage());
+            } catch (InvalidDataException e) {
+               log.error(e);
             }
-        } else {
-            this.contentType = ContentType.UNKNOWN;
+
+
+        }
+
+        if(contentType == ContentType.APPLICATION_JSON){
+            //try to read an error from the data. will return null if it fails
+            this.error = HttpErrorMessage.fromData(getData());
         }
     }
 
@@ -127,6 +148,14 @@ public class LApiHttpResponse {
 
     /**
      *
+     * @return {@code true} if this response contained a {@link RateLimitResponse}
+     */
+    public boolean isRateLimitResponse() {
+        return rateLimit != null;
+    }
+
+    /**
+     *
      * @return {@link HttpResponseCode}
      */
     public @NotNull HttpResponseCode getResponseCode() {
@@ -140,9 +169,19 @@ public class LApiHttpResponse {
     /**
      *
      * @return {@link HttpErrorMessage} if the body contains an error message. {@code null} otherwise.
+     * @see #isError()
      */
     public @Nullable HttpErrorMessage getErrorMessage() {
         return error;
+    }
+
+    /**
+     *
+     * @return {@link RateLimitResponse} if the body contains a rate limit response. {@code null} otherwise.
+     * @see #isRateLimitResponse()
+     */
+    public @Nullable RateLimitResponse getRateLimitResponse() {
+        return rateLimit;
     }
 
     public InputStream getInputStream() {

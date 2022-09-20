@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.communication.exceptions.UnsupportedFileTypeExceptio
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.file.types.FileType;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
+import me.linusdev.lapi.api.communication.http.request.body.FilePart;
 import me.linusdev.lapi.api.objects.attachment.PartialAttachment;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

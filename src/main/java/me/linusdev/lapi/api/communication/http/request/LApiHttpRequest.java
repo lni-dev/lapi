@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest;
+package me.linusdev.lapi.api.communication.http.request;
 
 import me.linusdev.data.entry.Entry;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpMultiPartBodyPublisher;
+import me.linusdev.lapi.api.communication.http.HeaderTypes;
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpMultiPartBodyPublisher;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +37,6 @@ import java.util.*;
 import java.util.concurrent.Flow;
 
 public class LApiHttpRequest {
-
-    public static final String CONTENT_TYPE_HEADER = "Content-Type";
 
     private final String uri;
     private final Method method;
@@ -131,10 +130,10 @@ public class LApiHttpRequest {
         if(body != null && method != Method.GET){
             if(body.isMultiPart()) {
                 LApiHttpMultiPartBodyPublisher publisher = new LApiHttpMultiPartBodyPublisher(body);
-                builder.header(CONTENT_TYPE_HEADER, "multipart/form-data; boundary=" + publisher.getBoundaryString());
+                builder.header(HeaderTypes.CONTENT_TYPE.getName(), "multipart/form-data; boundary=" + publisher.getBoundaryString());
                 builder.method(method.getMethod(), publisher);
             }else if(body.hasJsonPart()){
-                builder.header(CONTENT_TYPE_HEADER, "application/json");
+                builder.header(HeaderTypes.CONTENT_TYPE.getName(), "application/json");
                 builder.method(method.getMethod(), HttpRequest.BodyPublishers.ofString(body.getJsonPart().toJsonString().toString()));
             }else{
                 //TODO add the support of single file bodies

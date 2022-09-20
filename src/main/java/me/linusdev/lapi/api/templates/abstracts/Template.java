@@ -18,8 +18,8 @@ package me.linusdev.lapi.api.templates.abstracts;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.FilePart;
-import me.linusdev.lapi.api.communication.lapihttprequest.body.LApiHttpBody;
+import me.linusdev.lapi.api.communication.http.request.body.FilePart;
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
 
 /**
  * A {@link Template} is a template, which can be sent to Discord to create an object

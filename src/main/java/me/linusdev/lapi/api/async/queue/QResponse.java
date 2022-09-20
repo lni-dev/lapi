@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.async.queue;
 
-import me.linusdev.lapi.api.communication.retriever.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import org.jetbrains.annotations.Nullable;
 
 /**

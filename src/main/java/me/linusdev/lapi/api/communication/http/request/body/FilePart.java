@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest.body;
+package me.linusdev.lapi.api.communication.http.request.body;
 
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
+import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -24,7 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * A {@link FilePart} is used to upload files with a {@link me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest}.
+ * A {@link FilePart} is used to upload files with a {@link LApiHttpRequest}.
  * This is very much WIP
  */
 public interface FilePart {
@@ -40,7 +41,7 @@ public interface FilePart {
     @NotNull Path getPath();
 
     /**
-     * An Array of bytes to send in the {@link me.linusdev.lapi.api.communication.lapihttprequest.LApiHttpRequest HttpRequest}
+     * An Array of bytes to send in the {@link LApiHttpRequest HttpRequest}
      */
     default byte[] getBytes() throws IOException {
         return Files.readAllBytes(getPath());

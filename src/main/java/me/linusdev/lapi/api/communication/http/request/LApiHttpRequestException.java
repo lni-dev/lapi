@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest;
+package me.linusdev.lapi.api.communication.http.request;
 
-public class LApiHttpHeader {
-    private final String name;
-    private final String value;
+import me.linusdev.lapi.api.communication.exceptions.LApiException;
 
-    public LApiHttpHeader(String name, String value){
-        this.name = name;
-        this.value = value;
+public class LApiHttpRequestException extends LApiException {
+    public LApiHttpRequestException() {
     }
 
-    public String getName() {
-        return name;
+    public LApiHttpRequestException(String message) {
+        super(message);
     }
 
-    public String getValue() {
-        return value;
+    public LApiHttpRequestException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

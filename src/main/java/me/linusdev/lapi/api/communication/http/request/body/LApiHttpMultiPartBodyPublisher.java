@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest.body;
+package me.linusdev.lapi.api.communication.http.request.body;
 
-import me.linusdev.data.parser.JsonParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

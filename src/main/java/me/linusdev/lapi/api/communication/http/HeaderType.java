@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.lapihttprequest;
+package me.linusdev.lapi.api.communication.http;
 
-public class IllegalRequestMethodException extends LApiHttpRequestException{
-    public IllegalRequestMethodException() {
-    }
+import org.jetbrains.annotations.NotNull;
 
-    public IllegalRequestMethodException(String message) {
-        super(message);
-    }
+public interface HeaderType {
 
-    public IllegalRequestMethodException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    @NotNull String getName();
+
 }

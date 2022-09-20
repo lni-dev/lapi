@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.request;
 
-import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import org.jetbrains.annotations.NotNull;
 
 public enum AnchorType {
