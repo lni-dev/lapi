@@ -82,7 +82,7 @@ LApi lApi = ConfigBuilder.getDefault("TOKEN", true).buildLApi();
 ```
 `TOKEN` must be replaced with your bot token. The second boolean parameter specifies, whether
 you want the privileged intents enabled. Read more [here](https://discord.com/developers/docs/topics/gateway#privileged-intents).
-If you pass `true`, you have to enabled them for your application's bot [here](https://discord.com/developers/applications).
+If you pass `true`, you have to enable them for your application's bot [here](https://discord.com/developers/applications).
 <br><br>
 Now you can register an EventListener:
 ```java
