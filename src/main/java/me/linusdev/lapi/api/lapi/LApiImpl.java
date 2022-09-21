@@ -18,7 +18,6 @@ package me.linusdev.lapi.api.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
-import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
@@ -29,7 +28,6 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
-import me.linusdev.lapi.api.communication.exceptions.NoInternetException;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
@@ -45,7 +43,7 @@ import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
-import me.linusdev.lapi.api.thread.QueueThread;
+import me.linusdev.lapi.api.communication.http.queue.QueueThread;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -119,7 +117,7 @@ public class LApiImpl implements LApi {
     @Nullable final GatewayWebSocket gateway;
 
     //Executor
-    private final ThreadPoolExecutor supervisedRunnableExecutor;
+    private final ScheduledExecutorService supervisedRunnableExecutor;
 
     //Cache
     private final @Nullable Cache cache;
@@ -155,7 +153,7 @@ public class LApiImpl implements LApi {
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
 
         //Executor
-        this.supervisedRunnableExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool(new LApiThreadFactory(this, true, "supervised-runnable-thread"));
+        this.supervisedRunnableExecutor = Executors.newScheduledThreadPool(4, new LApiThreadFactory(this, true, "supervised-runnable-thread"));
 
         //Queue
         this.queue = config.getNewQueue();
@@ -314,19 +312,19 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public void runSupervised(@NotNull Runnable runnable) {
+    public void runSupervised(@NotNull Runnable runnable, long delay) {
 
         //Can not be null because this is not the main method.
         @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
 
-        supervisedRunnableExecutor.execute(() -> {
+        supervisedRunnableExecutor.schedule(() -> {
             try {
                 runnable.run();
             }catch (Throwable t) {
                 LogInstance log = Logger.getLogger("SR (" + frame.getClassName() + ":" + frame.getLineNumber() + ")");
                 log.error(t);
             }
-        });
+        }, delay, TimeUnit.MILLISECONDS);
     }
 
     //Getter

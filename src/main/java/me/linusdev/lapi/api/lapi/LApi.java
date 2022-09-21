@@ -170,9 +170,21 @@ public interface LApi extends HasLApi {
      *     This will run given {@link Runnable} in a new thread and if a {@link Throwable} is thrown it
      *     will be logged.
      * </p>
+     * @param delay runnable will run after given delay
      */
     @ApiStatus.Internal
-    void runSupervised(@NotNull Runnable runnable);
+    void runSupervised(@NotNull Runnable runnable, long delay);
+
+    /**
+     *
+     * @see #runSupervised(Runnable, long)
+     */
+    @ApiStatus.Internal
+    default void runSupervised(@NotNull Runnable runnable){
+        runSupervised(runnable, 0);
+    }
+
+
     //Getter
 
     /**

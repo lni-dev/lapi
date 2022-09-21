@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.thread;
+package me.linusdev.lapi.api.communication.http.queue;
 
 import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.queue.QResponse;
@@ -25,6 +25,8 @@ import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.thread.LApiThread;
+import me.linusdev.lapi.api.thread.LApiThreadGroup;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +44,8 @@ public class QueueThread extends LApiThread implements HasLApi {
     private final @NotNull LApiImpl lApi;
     private final @NotNull Queue<QueueableFuture<?>> queue;
 
+    private final @NotNull RateLimitQueue globalRateLimitQueue;
+
     private final @NotNull AtomicBoolean stopIfEmpty = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean stopImmediately = new AtomicBoolean(false);
 
@@ -56,6 +60,7 @@ public class QueueThread extends LApiThread implements HasLApi {
         this.queue = queue;
 
         isWaiting = new AtomicBoolean(false);
+        globalRateLimitQueue = new RateLimitQueue(lApi, queue);
     }
 
     @Override
@@ -71,8 +76,9 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                 QueueableImpl<?> task = future.getTask();
                 Query query = task.getQuery();
-                if(query.getLink().isBoundToGlobalRateLimit()) {
-                    //TODO: check if globally rate limited and add to a different queue
+                if(query.getLink().isBoundToGlobalRateLimit() && globalRateLimitQueue.add(future)) {
+                    //If add returns true, we have been globally rate limited...
+                    continue;
                 }
 
                 ComputationResult<?, QResponse> result;
@@ -93,7 +99,7 @@ public class QueueThread extends LApiThread implements HasLApi {
                     if(response == null) continue;
                     if(response.isRateLimitResponse()) {
                         if(response.getRateLimitResponse().isGlobal()) {
-                            //TODO: we got globally rate limited...
+                            globalRateLimitQueue.onRateLimit(future, 25, response.getRateLimitResponse().getRetryAfter());
                         }
                     }
                 }
