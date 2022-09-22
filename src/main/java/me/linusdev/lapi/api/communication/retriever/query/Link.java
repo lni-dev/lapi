@@ -18,7 +18,8 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Concatable;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
@@ -31,11 +32,12 @@ import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.invite.InviteMetadata;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.permission.Permission;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.templates.commands.ApplicationCommandTemplate;
 import org.jetbrains.annotations.NotNull;
 
-import static me.linusdev.lapi.api.communication.PlaceHolder.*;
+import static me.linusdev.lapi.api.other.placeholder.Name.*;
 
 /**
  * These are links to communicate with the official discord api.
@@ -70,7 +72,7 @@ public enum Link implements AbstractLink{
      *
      * </p>
      *
-     * @see PlaceHolder#APPLICATION_ID
+     * @see Name#APPLICATION_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-global-application-commands" target="_top">Discord Documentation</a>
      */
     GET_GLOBAL_APPLICATION_COMMANDS(Method.GET, "applications/" + APPLICATION_ID + "/commands"),
@@ -86,102 +88,102 @@ public enum Link implements AbstractLink{
      *     This can have json params. see {@link ApplicationCommandTemplate}.
      * </p>
      *
-     * @see PlaceHolder#APPLICATION_ID
+     * @see Name#APPLICATION_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#create-global-application-command" target="_top">Discord Documentation</a>
      */
     CREATE_GLOBAL_APPLICATION_COMMAND(Method.POST, "applications/" + APPLICATION_ID + "/commands"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-global-application-command" target="_top">Discord Documentation</a>
      */
     GET_GLOBAL_APPLICATION_COMMAND(Method.GET, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-global-application-command" target="_top">Discord Documentation</a>
      */
     EDIT_GLOBAL_APPLICATION_COMMAND(Method.PATCH, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#delete-global-application-command" target="_top">Discord Documentation</a>
      */
     DELETE_GLOBAL_APPLICATION_COMMAND(Method.DELETE, "applications/" + APPLICATION_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
+     * @see Name#APPLICATION_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands" target="_top">Discord Documentation</a>
      */
     BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS(Method.PUT, "applications/" + APPLICATION_ID + "/commands"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-commands" target="_top">Discord Documentation</a>
      */
     GET_GUILD_APPLICATION_COMMANDS(Method.GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#create-guild-application-command" target="_top">Discord Documentation</a>
      */
     CREATE_GUILD_APPLICATION_COMMAND(Method.POST, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command" target="_top">Discord Documentation</a>
      */
     GET_GUILD_APPLICATION_COMMAND(Method.GET, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-guild-application-command" target="_top">Discord Documentation</a>
      */
     EDIT_GUILD_APPLICATION_COMMAND(Method.PATCH, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#delete-guild-application-command" target="_top">Discord Documentation</a>
      */
     DELETE_GUILD_APPLICATION_COMMAND(Method.DELETE, "applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-guild-application-commands" target="_top">Discord Documentation</a>
      */
     BULK_OVERWRITE_GUILD_APPLICATION_COMMANDS(Method.PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-guild-application-command-permissions" target="_top">Discord Documentation</a>
      */
     GET_GUILD_APPLICATION_COMMAND_PERMISSIONS(Method.GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/permissions"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#get-application-command-permissions" target="_top">Discord Documentation</a>
      */
     GET_APPLICATION_COMMAND_PERMISSIONS(Method.GET, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
 
     /**
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
-     * @see PlaceHolder#COMMAND_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
+     * @see Name#COMMAND_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#edit-application-command-permissions" target="_top">Discord Documentation</a>
      */
     EDIT_APPLICATION_COMMAND_PERMISSIONS(Method.PUT, "/applications/" + APPLICATION_ID + "/guilds/" + GUILD_ID + "/commands/" + COMMAND_ID + "/permissions"),
@@ -190,8 +192,8 @@ public enum Link implements AbstractLink{
      * This endpoint has been disabled with updates to command permissions (Permissions v2).
      * Instead, you can edit each application command permissions (though you should be careful to handle any potential rate limits).
      *
-     * @see PlaceHolder#APPLICATION_ID
-     * @see PlaceHolder#GUILD_ID
+     * @see Name#APPLICATION_ID
+     * @see Name#GUILD_ID
      * @see <a href="https://discord.com/developers/docs/interactions/application-commands#batch-edit-application-command-permissions" target="_top">Discord Documentation</a>
      */
     @Deprecated
@@ -212,8 +214,8 @@ public enum Link implements AbstractLink{
      *
      * This endpoint also supports file attachments similar to the webhook endpoints. Refer to Uploading Files for details on uploading files and multipart/form-data requests.
      *
-     * @see PlaceHolder#INTERACTION_ID
-     * @see PlaceHolder#INTERACTION_TOKEN
+     * @see Name#INTERACTION_ID
+     * @see Name#INTERACTION_TOKEN
      * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
      */
     CREATE_INTERACTION_RESPONSE(Method.POST, "interactions/" + INTERACTION_ID + "/"  + INTERACTION_TOKEN + "/callback", false),
@@ -250,7 +252,7 @@ public enum Link implements AbstractLink{
      * If the channel is a {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread},
      * a {@link Thread#getMember() thread member} object is included in the returned result.
      *
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel" target="_top">Get Channel</a>
      */
     GET_CHANNEL(Method.GET, "channels/" + CHANNEL_ID),
@@ -288,7 +290,7 @@ public enum Link implements AbstractLink{
      * <p style="margin-top:0;padding-top:0;">
      *    The before, after, and around keys are mutually exclusive, only one may be passed at a time.
      * </p>
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-messages" target="_top">Get Channel Messages</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-messages-query-string-params" target="_top">Query String Params</a>
      */
@@ -301,8 +303,8 @@ public enum Link implements AbstractLink{
      *     permission to be present on the current user. Returns a {@link MessageImplementation message object} on success.
      * </p>
      *
-     * @see PlaceHolder#CHANNEL_ID
-     * @see PlaceHolder#MESSAGE_ID
+     * @see Name#CHANNEL_ID
+     * @see Name#MESSAGE_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-message" target="_top">Get Channel Message</a>
      */
     GET_CHANNEL_MESSAGE(Method.GET, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID),
@@ -310,7 +312,7 @@ public enum Link implements AbstractLink{
     /**
      * Post a message to a guild text or DM channel. Returns a {@link MessageImplementation message} object.
      *
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
      */
     CREATE_MESSAGE(Method.POST, "channels/" + CHANNEL_ID + "/messages"),
@@ -321,7 +323,7 @@ public enum Link implements AbstractLink{
 
     DELETE_OWN_REACTION(Method.DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI + "/@me"),
 
-    DELETE_USER_REACTION(Method.DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI + "/{user.id}"),
+    DELETE_USER_REACTION(Method.DELETE, "channels/" + CHANNEL_ID + "/messages/" + MESSAGE_ID + "/reactions/" + EMOJI + "/" + USER_ID),
 
     /**
      * <p>
@@ -345,9 +347,9 @@ public enum Link implements AbstractLink{
      *      </li>
      * </ul>
      *
-     * @see PlaceHolder#CHANNEL_ID
-     * @see PlaceHolder#MESSAGE_ID
-     * @see PlaceHolder#EMOJI
+     * @see Name#CHANNEL_ID
+     * @see Name#MESSAGE_ID
+     * @see Name#EMOJI
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-reactions" target="_top">Get Reactions</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-reactions-query-string-params" target="_top">Query String Params</a>
      */
@@ -373,7 +375,7 @@ public enum Link implements AbstractLink{
      *     {@link Permission#MANAGE_CHANNELS MANAGE_CHANNELS}
      *     permission.
      * </p>
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel-invites" target="_top">Get Channel Invites</a>
      */
     GET_CHANNEL_INVITES(Method.GET, "channels/" + CHANNEL_ID + "/invites"),
@@ -390,7 +392,7 @@ public enum Link implements AbstractLink{
      * <p>
      *     Returns all pinned messages in the channel as an array of {@link MessageImplementation message} objects.
      * </p>
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-pinned-messages" target="_top">Get Pinned Messages</a>
      */
     GET_PINNED_MESSAGES(Method.GET, "channels/" + CHANNEL_ID + "/pins"),
@@ -422,8 +424,8 @@ public enum Link implements AbstractLink{
      *     Returns a {@link ThreadMember thread member} object
      *     for the specified user if they are a member of the thread, returns a 404 response otherwise.
      * </p>
-     * @see PlaceHolder#CHANNEL_ID
-     * @see PlaceHolder#USER_ID
+     * @see Name#CHANNEL_ID
+     * @see Name#USER_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-thread-member" target="_top">Get Thread Member</a>
      */
     GET_THREAD_MEMBER(Method.GET, "channels/" + CHANNEL_ID + "/thread-members/" + USER_ID),
@@ -436,7 +438,7 @@ public enum Link implements AbstractLink{
      *     This endpoint is restricted according to whether the {@link GatewayIntent#GUILD_MEMBERS GUILD_MEMBERS}
      *     Privileged GatewayIntent is enabled for your application.
      * </p>
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-thread-members" target="_top">List Thread Members</a>
      */
     LIST_THREAD_MEMBERS(Method.GET, "channels/" + CHANNEL_ID + "/thread-members"),
@@ -449,7 +451,7 @@ public enum Link implements AbstractLink{
      *     This route is deprecated and will be removed in v10. It is replaced by List Active Guild Threads.
      * </p>
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-active-threads" target="_top">List Active Threads</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-active-threads-response-body" target="_top">Response Body</a>
      */
@@ -470,7 +472,7 @@ public enum Link implements AbstractLink{
      *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params" target="_top">Query String parameters</a>
      * </p>
      *
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads" target="_top"> List Public Archived Threads</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-response-body" target="_top"> Response Body</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-public-archived-threads-query-string-params" target="_top"> Query String Params</a>
@@ -489,7 +491,7 @@ public enum Link implements AbstractLink{
      *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params" target="_top">Query String parameters</a>
      * </p>
      *
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads" target="_top"> List Private Archived Threads</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-response-body" target="_top"> Response Body</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-private-archived-threads-query-string-params" target="_top"> Query String Params</a>
@@ -507,7 +509,7 @@ public enum Link implements AbstractLink{
      *     This can have <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params" target="_top">Query String parameters</a>
      * </p>
      *
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads" target="_top"> List Private Archived Threads</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-response-body" target="_top"> Response Body</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads-query-string-params" target="_top"> Query String Params</a>
@@ -569,7 +571,7 @@ public enum Link implements AbstractLink{
      * </p>
      *
      * @see <a href="https://discord.com/developers/docs/resources/user#get-user" target="_top">Get User</a>
-     * @see PlaceHolder#USER_ID
+     * @see Name#USER_ID
      */
     GET_USER(Method.GET, "users/" + USER_ID),
 
@@ -638,18 +640,32 @@ public enum Link implements AbstractLink{
 
     private final @NotNull Method method;
     private final @NotNull String link;
+    private final @NotNull Concatable[] concatables;
     private final boolean boundToGlobalRateLimits;
 
     Link(@NotNull Method method, @NotNull String link){
         this.method = method;
         this.link = DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK + link;
         this.boundToGlobalRateLimits = true;
+        this.concatables = null;
     }
 
     Link(@NotNull Method method, @NotNull String link, boolean boundToGlobalRateLimits){
         this.method = method;
         this.link = DiscordApiCommunicationHelper.O_DISCORD_API_VERSION_LINK + link;
         this.boundToGlobalRateLimits = boundToGlobalRateLimits;
+        this.concatables = null;
+    }
+
+    Link(@NotNull Method method, boolean boundToGlobalRateLimits, @NotNull Concatable... parts) {
+        this.method = method;
+        this.boundToGlobalRateLimits = boundToGlobalRateLimits;
+        this.concatables = parts;
+        this.link = null;
+    }
+
+    Link(@NotNull Method method, @NotNull Concatable... parts) {
+        this(method, true, parts);
     }
 
     @Override
@@ -659,7 +675,31 @@ public enum Link implements AbstractLink{
 
     @Override
     public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
-        return link.replace(DISCORD_API_VERSION_NUMBER, apiVersion.getVersionNumber());
+        return link.replace(DISCORD_API_VERSION_NUMBER.toString(), apiVersion.getVersionNumber());
+    }
+
+    @Override
+    public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders) {
+        StringBuilder sb = new StringBuilder();
+
+        LinkPart.PREFIX.concat(sb, apiVersion.getVersionNumber());
+
+        int i = 0;
+        for(Concatable concatable : concatables) {
+            if(concatable.isKey()) {
+                concatable.concat(sb, placeHolders[i].getValue());
+                //assert that the value was used for the correct placeHolder
+                assert concatable == placeHolders[i].getName();
+            } else {
+                concatable.concat(sb);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public Concatable[] getConcatables() {
+        return concatables;
     }
 
     @Override

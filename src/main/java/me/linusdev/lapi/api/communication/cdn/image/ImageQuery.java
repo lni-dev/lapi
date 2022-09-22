@@ -17,7 +17,9 @@
 package me.linusdev.lapi.api.communication.cdn.image;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.file.types.FileType;
@@ -79,7 +81,7 @@ public class ImageQuery implements Query {
         for(PlaceHolder p : placeHolders)
             uri = p.place(uri);
 
-        uri = new PlaceHolder(PlaceHolder.FILE_ENDING, fileType.getFileEndings()[0]).place(uri);
+        uri = new PlaceHolder(Name.FILE_ENDING, fileType.getFileEndings()[0]).place(uri);
 
         if(desiredSize != NO_DESIRED_SIZE) {
             SOData queryParamsData = SOData.newOrderedDataWithKnownSize(2);
@@ -103,6 +105,12 @@ public class ImageQuery implements Query {
     @Override
     public @NotNull AbstractLink getLink() {
         return link;
+    }
+
+    @Override
+    public @NotNull Identifier getSharedResourceIdentifier() {
+        //TOOD: implement
+        return null;
     }
 
     @Override

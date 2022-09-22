@@ -16,7 +16,8 @@
 
 package me.linusdev.lapi.api.request.requests;
 
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
@@ -74,7 +75,7 @@ public interface UserRequests extends HasLApi {
      */
     default @NotNull Queueable<User> getUser(@NotNull String userId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_USER,
-                new PlaceHolder(PlaceHolder.USER_ID, userId));
+                new PlaceHolder(Name.USER_ID, userId));
         return new ConvertingRetriever<>(query, User::fromData);
     }
 

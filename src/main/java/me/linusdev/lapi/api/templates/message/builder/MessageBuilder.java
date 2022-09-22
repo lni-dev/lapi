@@ -16,7 +16,8 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LimitException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
@@ -204,7 +205,8 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendUserMention(@NotNull String userId){
-        return appendMention(MentionType.USER, new PlaceHolder(PlaceHolder.USER_ID, userId));
+        return appendMention(MentionType.USER,
+                new PlaceHolder(Name.USER_ID, userId));
     }
 
     /**
@@ -224,7 +226,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendUserNickNameMention(@NotNull String userId){
-        return appendMention(MentionType.USER_NICKNAME, new PlaceHolder(PlaceHolder.USER_ID, userId));
+        return appendMention(MentionType.USER_NICKNAME, new PlaceHolder(Name.USER_ID, userId));
     }
 
     /**
@@ -244,7 +246,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendRoleMention(@NotNull String roleId){
-        return appendMention(MentionType.ROLE, new PlaceHolder(PlaceHolder.ROLE_ID, roleId));
+        return appendMention(MentionType.ROLE, new PlaceHolder(Name.ROLE_ID, roleId));
     }
 
     /**
@@ -264,7 +266,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendChannelMention(@NotNull String channelId){
-        return appendMention(MentionType.CHANNEL, new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+        return appendMention(MentionType.CHANNEL, new PlaceHolder(Name.CHANNEL_ID, channelId));
     }
 
     /**
@@ -380,13 +382,13 @@ public class MessageBuilder implements HasLApi {
         }else{
             if(emoji.isAnimated()){
                 content.append(MentionType.CUSTOM_EMOJI_ANIMATED.get(
-                        new PlaceHolder(PlaceHolder.EMOJI_NAME, emoji.getName()),
-                        new PlaceHolder(PlaceHolder.EMOJI_ID, emoji.getId()))
+                        new PlaceHolder(Name.EMOJI_NAME, emoji.getName()),
+                        new PlaceHolder(Name.EMOJI_ID, emoji.getId()))
                 );
             }else{
                 content.append(MentionType.CUSTOM_EMOJI.get(
-                        new PlaceHolder(PlaceHolder.EMOJI_NAME, emoji.getName()),
-                        new PlaceHolder(PlaceHolder.EMOJI_ID, emoji.getId()))
+                        new PlaceHolder(Name.EMOJI_NAME, emoji.getName()),
+                        new PlaceHolder(Name.EMOJI_ID, emoji.getId()))
                 );
             }
         }
@@ -414,13 +416,13 @@ public class MessageBuilder implements HasLApi {
     public MessageBuilder appendTimestamp(long time, @NotNull TimeUnit timeUnit, @Nullable TimestampStyle timestampStyle){
         if(timestampStyle == null){
             content.append(MentionType.TIMESTAMP.get(
-                    new PlaceHolder(PlaceHolder.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time)))
+                    new PlaceHolder(Name.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time)))
             ));
 
         }else {
             content.append(MentionType.TIMESTAMP_STYLED.get(
-                    new PlaceHolder(PlaceHolder.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time))),
-                    new PlaceHolder(PlaceHolder.TIMESTAMP_STYLE, timestampStyle.getValue())
+                    new PlaceHolder(Name.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time))),
+                    new PlaceHolder(Name.TIMESTAMP_STYLE, timestampStyle.getValue())
             ));
 
         }

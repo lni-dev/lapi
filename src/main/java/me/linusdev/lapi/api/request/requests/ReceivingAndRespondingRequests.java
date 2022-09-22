@@ -16,7 +16,8 @@
 
 package me.linusdev.lapi.api.request.requests;
 
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
@@ -49,8 +50,8 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
                                                                           @NotNull String interactionToken,
                                                                           @NotNull InteractionResponse response) {
         Query query = new LinkQuery(getLApi(), Link.CREATE_INTERACTION_RESPONSE, response.getBody(),
-                new PlaceHolder(PlaceHolder.INTERACTION_ID, interactionId),
-                new PlaceHolder(PlaceHolder.INTERACTION_TOKEN, interactionToken));
+                new PlaceHolder(Name.INTERACTION_ID, interactionId),
+                new PlaceHolder(Name.INTERACTION_TOKEN, interactionToken));
 
         return new NoContentRetriever(query);
     }

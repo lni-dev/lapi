@@ -16,7 +16,8 @@
 
 package me.linusdev.lapi.api.communication.cdn.image;
 
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
@@ -81,7 +82,7 @@ public interface CDNImage extends HasLApi {
      */
     @Contract(value = "_, _, _, -> new", pure = true)
     static @NotNull CDNImage ofCustomEmoji(final @NotNull LApi lApi, final @NotNull String emojiId, final @NotNull AbstractFileType fileType){
-        return of(lApi, ImageLink.CUSTOM_EMOJI, fileType, new PlaceHolder(PlaceHolder.EMOJI_ID, emojiId));
+        return of(lApi, ImageLink.CUSTOM_EMOJI, fileType, new PlaceHolder(Name.EMOJI_ID, emojiId));
     }
 
     /**
@@ -93,8 +94,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofGuildIcon(final @NotNull LApi lApi, final @NotNull String guildId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.GUILD_ICON, fileType,
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -106,8 +107,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofGuildSplash(final @NotNull LApi lApi, final @NotNull String guildId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.GUILD_SPLASH, fileType,
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -119,8 +120,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofGuildDiscoverySplash(final @NotNull LApi lApi, final @NotNull String guildId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.GUILD_DISCOVERY_SPLASH, fileType,
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -132,8 +133,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofGuildBanner(final @NotNull LApi lApi, final @NotNull String guildId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.GUILD_BANNER, fileType,
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -145,8 +146,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofUserBanner(final @NotNull LApi lApi, final @NotNull String userId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.USER_BANNER, fileType,
-                new PlaceHolder(PlaceHolder.USER_ID, userId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.USER_ID, userId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -160,8 +161,8 @@ public interface CDNImage extends HasLApi {
         final int discriminator = Integer.parseInt(UserDiscriminator) % 5;
 
         return of(lApi, ImageLink.DEFAULT_USER_AVATAR, fileType,
-                new PlaceHolder(PlaceHolder.USER_DISCRIMINATOR, String.valueOf(discriminator)),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.USER_DISCRIMINATOR, String.valueOf(discriminator)),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -173,8 +174,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofUserAvatar(final @NotNull LApi lApi, final @NotNull String userId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.USER_AVATAR, fileType,
-                new PlaceHolder(PlaceHolder.USER_ID, userId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.USER_ID, userId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -186,9 +187,9 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofGuildMemberAvatar(final @NotNull LApi lApi, final @NotNull String guildId, final @NotNull String userId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.GUILD_MEMBER_AVATAR, fileType,
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.USER_ID, userId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.USER_ID, userId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -200,8 +201,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofApplicationIcon(final @NotNull LApi lApi, final @NotNull String applicationId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.ACHIEVEMENT_ICON, fileType,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -213,8 +214,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofApplicationCover(final @NotNull LApi lApi, final @NotNull String applicationId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.APPLICATION_COVER, fileType,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -226,8 +227,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofApplicationAsset(final @NotNull LApi lApi, final @NotNull String applicationId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.APPLICATION_ASSET, fileType,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -239,9 +240,9 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofAchievementIcon(final @NotNull LApi lApi, final @NotNull String applicationId, final @NotNull String achievementId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.ACHIEVEMENT_ICON, fileType,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.ACHIEVEMENT_ID, achievementId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.ACHIEVEMENT_ID, achievementId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -253,7 +254,7 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, -> new", pure = true)
     static @NotNull CDNImage ofStickerPackBanner(final @NotNull LApi lApi, final @NotNull String stickerPackBannerAssetId, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.STICKER_PACK_BANNER, fileType,
-                new PlaceHolder(PlaceHolder.STICKER_PACK_BANNER_ASSET_ID, stickerPackBannerAssetId));
+                new PlaceHolder(Name.STICKER_PACK_BANNER_ASSET_ID, stickerPackBannerAssetId));
     }
 
     /**
@@ -265,8 +266,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofTeamIcon(final @NotNull LApi lApi, final @NotNull String teamId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.TEAM_ICON, fileType,
-                new PlaceHolder(PlaceHolder.TEAM_ID, teamId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.TEAM_ID, teamId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
     /**
@@ -284,7 +285,7 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, -> new", pure = true)
     static @NotNull CDNImage ofSticker(final @NotNull LApi lApi, final @NotNull String stickerId, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.STICKER, fileType,
-                new PlaceHolder(PlaceHolder.STICKER_ID, stickerId));
+                new PlaceHolder(Name.STICKER_ID, stickerId));
     }
 
     /**
@@ -296,8 +297,8 @@ public interface CDNImage extends HasLApi {
     @Contract(value = "_, _, _, _, -> new", pure = true)
     static @NotNull CDNImage ofRoleIcon(final @NotNull LApi lApi, final @NotNull String roleId, final @NotNull String hash, final @NotNull AbstractFileType fileType){
         return of(lApi, ImageLink.ROLE_ICON, fileType,
-                new PlaceHolder(PlaceHolder.ROLE_ID, roleId),
-                new PlaceHolder(PlaceHolder.HASH, hash));
+                new PlaceHolder(Name.ROLE_ID, roleId),
+                new PlaceHolder(Name.HASH, hash));
     }
 
 }

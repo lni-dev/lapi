@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
@@ -95,7 +95,7 @@ public class LApiImpl implements LApi {
     //Http
     private final LApiHttpHeader authorizationHeader;
     private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
-            ATTRIBUTE_USER_AGENT_VALUE.replace(PlaceHolder.LAPI_URL, LAPI_URL).replace(PlaceHolder.LAPI_VERSION, LAPI_VERSION));
+            ATTRIBUTE_USER_AGENT_VALUE.replace(Name.LAPI_URL.toString(), LAPI_URL).replace(Name.LAPI_VERSION.toString(), LAPI_VERSION));
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final @NotNull RequestFactory requestFactory;
@@ -150,7 +150,7 @@ public class LApiImpl implements LApi {
         this.lApiThreadGroup = new LApiThreadGroup(this);
 
         //http
-        this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(PlaceHolder.TOKEN, this.token));
+        this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(Name.TOKEN.toString(), this.token));
 
         //Executor
         this.supervisedRunnableExecutor = Executors.newScheduledThreadPool(4, new LApiThreadFactory(this, true, "supervised-runnable-thread"));

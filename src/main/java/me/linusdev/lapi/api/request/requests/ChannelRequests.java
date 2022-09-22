@@ -17,7 +17,8 @@
 package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
@@ -66,7 +67,8 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<Channel<?>> getChannel(@NotNull String channelId){
         return new ConvertingRetriever<>(
-                new LinkQuery(getLApi(), Link.GET_CHANNEL, new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId)),
+                new LinkQuery(getLApi(), Link.GET_CHANNEL,
+                        new PlaceHolder(Name.CHANNEL_ID, channelId)),
                 Channel::fromData);
     }
 
@@ -90,7 +92,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<MessageImplementation> getChannelMessage(@NotNull String channelId, @NotNull String messageId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGE,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId), new PlaceHolder(Name.MESSAGE_ID, messageId));
         return new ConvertingRetriever<>(query, MessageImplementation::new);
     }
 
@@ -142,7 +144,7 @@ public interface ChannelRequests extends HasLApi {
 
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGES, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ArrayRetriever<SOData, MessageImplementation>(query, MessageImplementation::new);
     }
 
@@ -201,7 +203,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
         Query query = new LinkQuery(getLApi(), Link.CREATE_MESSAGE, message.getBody(),
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
 
         return new ConvertingRetriever<>(query, MessageImplementation::new);
     }
@@ -335,9 +337,9 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_REACTIONS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId),
-                new PlaceHolder(PlaceHolder.MESSAGE_ID, messageId),
-                new PlaceHolder(PlaceHolder.EMOJI, emojiString));
+                new PlaceHolder(Name.CHANNEL_ID, channelId),
+                new PlaceHolder(Name.MESSAGE_ID, messageId),
+                new PlaceHolder(Name.EMOJI, emojiString));
         return new ArrayRetriever<>(query, User::fromData);
     }
 
@@ -400,7 +402,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ArrayList<Invite>> getChannelInvites(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_INVITES,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ArrayRetriever<>(query, Invite::fromData);
     }
 
@@ -455,7 +457,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessages(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_PINNED_MESSAGES,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ArrayRetriever<>(query, MessageImplementation::new);
     }
 
@@ -496,7 +498,8 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ThreadMember> getThreadMember(@NotNull String channelId, @NotNull String userId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_THREAD_MEMBER,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId), new PlaceHolder(PlaceHolder.USER_ID, userId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId),
+                new PlaceHolder(Name.USER_ID, userId));
         return new ConvertingRetriever<>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
@@ -514,7 +517,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembers(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_THREAD_MEMBERS,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ArrayRetriever<SOData, ThreadMember>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
@@ -561,7 +564,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
@@ -620,7 +623,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
@@ -678,7 +681,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
@@ -730,7 +733,7 @@ public interface ChannelRequests extends HasLApi {
     @Deprecated(since = "api v10", forRemoval = true)
     default @NotNull Queueable<ListThreadsResponseBody> listActiveThreads(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_ACTIVE_THREADS,
-                new PlaceHolder(PlaceHolder.CHANNEL_ID, channelId));
+                new PlaceHolder(Name.CHANNEL_ID, channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 

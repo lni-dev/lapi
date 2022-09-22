@@ -17,7 +17,8 @@
 package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
@@ -67,7 +68,7 @@ public interface ApplicationCommandRequests extends HasLApi {
         queryStringsData.add(WITH_LOCALIZATIONS_KEY, withLocalizations);
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMANDS, queryStringsData,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -109,7 +110,7 @@ public interface ApplicationCommandRequests extends HasLApi {
     default @NotNull Queueable<ApplicationCommand> createGlobalApplicationCommand(@NotNull String applicationId,
                                                                                   @NotNull ApplicationCommandTemplate template){
         LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GLOBAL_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -134,7 +135,7 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GLOBAL_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -151,8 +152,8 @@ public interface ApplicationCommandRequests extends HasLApi {
     default @NotNull Queueable<ApplicationCommand> getGlobalApplicationCommand(@NotNull String applicationId,
                                                                                @NotNull String commandId) {
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -174,8 +175,8 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GLOBAL_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -195,8 +196,8 @@ public interface ApplicationCommandRequests extends HasLApi {
                                                                                 @NotNull String commandId,
                                                                                 @NotNull EditApplicationCommandTemplate template){
         LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_GLOBAL_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -221,8 +222,8 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_GLOBAL_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -239,8 +240,8 @@ public interface ApplicationCommandRequests extends HasLApi {
     default @NotNull Queueable<LApiHttpResponse> deleteGlobalApplicationCommand(@NotNull String applicationId,
                                                                                 @NotNull String commandId) {
         LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_GLOBAL_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new NoContentRetriever(query);
     }
 
@@ -262,8 +263,8 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_GLOBAL_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new NoContentRetriever(query);
     }
 
@@ -287,7 +288,7 @@ public interface ApplicationCommandRequests extends HasLApi {
 
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS,
                 new LApiHttpBody(SOData.wrap(templates)),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -315,7 +316,7 @@ public interface ApplicationCommandRequests extends HasLApi {
 
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GLOBAL_APPLICATION_COMMANDS,
                 new LApiHttpBody(SOData.wrap(templates)),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -347,8 +348,8 @@ public interface ApplicationCommandRequests extends HasLApi {
         queryStringsData.add(WITH_LOCALIZATIONS_KEY, withLocalizations);
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GUILD_APPLICATION_COMMANDS, queryStringsData,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -377,8 +378,8 @@ public interface ApplicationCommandRequests extends HasLApi {
         queryStringsData.add(WITH_LOCALIZATIONS_KEY, withLocalizations);
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GUILD_APPLICATION_COMMANDS, queryStringsData,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -402,8 +403,8 @@ public interface ApplicationCommandRequests extends HasLApi {
                                                                                  @NotNull String guildId,
                                                                                  @NotNull ApplicationCommandTemplate template) {
         LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GUILD_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -432,8 +433,8 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.CREATE_GUILD_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -452,9 +453,9 @@ public interface ApplicationCommandRequests extends HasLApi {
                                                                               @NotNull String guildId,
                                                                               @NotNull String commandId) {
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GUILD_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -479,9 +480,9 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GUILD_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -504,9 +505,9 @@ public interface ApplicationCommandRequests extends HasLApi {
                                                                                @NotNull String commandId,
                                                                                @NotNull EditApplicationCommandTemplate template) {
         LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_GUILD_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -534,9 +535,9 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_GUILD_APPLICATION_COMMAND, template.getBody(),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new ConvertingRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -555,9 +556,9 @@ public interface ApplicationCommandRequests extends HasLApi {
                                                                                @NotNull String guildId,
                                                                                @NotNull String commandId) {
         LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_GUILD_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new NoContentRetriever(query);
     }
 
@@ -581,9 +582,9 @@ public interface ApplicationCommandRequests extends HasLApi {
             throw new LApiIllegalStateException("Application id is not cached, please wait for CACHE_READY or LAPI_READY. see LApi.waitUntilLApiReadyEvent().");
 
         LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_GUILD_APPLICATION_COMMAND,
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId),
-                new PlaceHolder(PlaceHolder.COMMAND_ID, commandId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId),
+                new PlaceHolder(Name.COMMAND_ID, commandId));
         return new NoContentRetriever(query);
     }
 
@@ -603,8 +604,8 @@ public interface ApplicationCommandRequests extends HasLApi {
             @NotNull String applicationId, @NotNull String guildId, @NotNull ApplicationCommandTemplate[] templates) {
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GUILD_APPLICATION_COMMANDS,
                 new LApiHttpBody(SOData.wrap(templates)),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, applicationId),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, applicationId),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 
@@ -631,8 +632,8 @@ public interface ApplicationCommandRequests extends HasLApi {
 
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_OVERWRITE_GUILD_APPLICATION_COMMANDS,
                 new LApiHttpBody(SOData.wrap(templates)),
-                new PlaceHolder(PlaceHolder.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
-                new PlaceHolder(PlaceHolder.GUILD_ID, guildId));
+                new PlaceHolder(Name.APPLICATION_ID, getLApi().getCache().getCurrentApplicationId()),
+                new PlaceHolder(Name.GUILD_ID, guildId));
         return new ArrayRetriever<>(query, ApplicationCommand::fromData);
     }
 

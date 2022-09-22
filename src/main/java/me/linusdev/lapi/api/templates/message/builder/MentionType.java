@@ -16,10 +16,11 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
-import static me.linusdev.lapi.api.communication.PlaceHolder.*;
+import static me.linusdev.lapi.api.other.placeholder.Name.*;
 
 /**
  * This class can give you a string to mention persons or objects<br><br>
@@ -39,52 +40,52 @@ import static me.linusdev.lapi.api.communication.PlaceHolder.*;
 public enum MentionType {
 
     /**
-     * @see PlaceHolder#USER_ID
+     * @see Name#USER_ID
      */
     USER                            ("<@" + USER_ID + ">"),
 
     /**
-     * @see PlaceHolder#USER_ID
+     * @see Name#USER_ID
      */
     USER_NICKNAME                   ("<@!" + USER_ID + ">"),
 
     /**
-     * @see PlaceHolder#CHANNEL_ID
+     * @see Name#CHANNEL_ID
      */
     CHANNEL                         ("<#" + CHANNEL_ID + ">"),
 
     /**
-     * @see PlaceHolder#ROLE_ID
+     * @see Name#ROLE_ID
      */
     ROLE                            ("<@&" + ROLE_ID + ">"),
 
     /**
-     * @see PlaceHolder#EMOJI
+     * @see Name#EMOJI
      */
-    STANDARD_EMOJI                  (EMOJI),
+    STANDARD_EMOJI                  (EMOJI.toString()),
 
     /**
-     * @see PlaceHolder#EMOJI_NAME
-     * @see PlaceHolder#EMOJI_ID
+     * @see Name#EMOJI_NAME
+     * @see Name#EMOJI_ID
      */
     CUSTOM_EMOJI                    ("<:" + EMOJI_NAME + ":" + EMOJI_ID +">"),
 
     /**
-     * @see PlaceHolder#EMOJI_NAME
-     * @see PlaceHolder#EMOJI_ID
+     * @see Name#EMOJI_NAME
+     * @see Name#EMOJI_ID
      */
     CUSTOM_EMOJI_ANIMATED           ("<a:" + EMOJI_NAME + ":" + EMOJI_ID +">"),
 
     /**
-     * @see PlaceHolder#TIMESTAMP
+     * @see Name#TIMESTAMP
      */
-    TIMESTAMP                       ("<t:" + PlaceHolder.TIMESTAMP +">"),
+    TIMESTAMP                       ("<t:" + Name.TIMESTAMP +">"),
 
     /**
-     * @see PlaceHolder#TIMESTAMP
-     * @see PlaceHolder#TIMESTAMP_STYLE
+     * @see Name#TIMESTAMP
+     * @see Name#TIMESTAMP_STYLE
      */
-    TIMESTAMP_STYLED                ("<t:" + PlaceHolder.TIMESTAMP +":" + TIMESTAMP_STYLE + ">"),
+    TIMESTAMP_STYLED                ("<t:" + Name.TIMESTAMP +":" + TIMESTAMP_STYLE + ">"),
 
 
     /**

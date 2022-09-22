@@ -45,7 +45,7 @@ import org.jetbrains.annotations.Nullable;
  * </p>
  *  <ol>
  *      <li>
- *          Names can contain most valid unicode characters. We limit some zero-width and non-rendering characters.
+ *          Name can contain most valid unicode characters. We limit some zero-width and non-rendering characters.
  *      </li>
  *      <li>
  *          Usernames must be between 2 and 32 characters long.
@@ -54,7 +54,7 @@ import org.jetbrains.annotations.Nullable;
  *          Nicknames must be between 1 and 32 characters long.
  *      </li>
  *      <li>
- *          Names are sanitized and trimmed of leading, trailing, and excessive internal whitespace.
+ *          Name are sanitized and trimmed of leading, trailing, and excessive internal whitespace.
  *      </li>
  *  </ol>
  *  <p>
@@ -62,10 +62,10 @@ import org.jetbrains.annotations.Nullable;
  *  </p>
  *  <ol>
  *      <li>
- *          Names cannot contain the following substrings: '@', '#', ':', '```'.
+ *          Name cannot contain the following substrings: '@', '#', ':', '```'.
  *      </li>
  *      <li>
- *          Names cannot be: 'discordtag', 'everyone', 'here'.
+ *          Name cannot be: 'discordtag', 'everyone', 'here'.
  *      </li>
  *  </ol>
  *

@@ -17,7 +17,8 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.PlaceHolder;
+import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
@@ -88,16 +89,18 @@ public class LinkQuery implements Query, HasLApi {
 
     @Override
     public String asString() {
-        String url = link.getLink(lApi.getHttpRequestApiVersion());
-        for(PlaceHolder p : placeHolders)
-            url = p.place(url);
-
-        return link.getMethod() + " " + url;
+        return link.getMethod() + " " + link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
     }
 
     @Override
     public @NotNull AbstractLink getLink() {
         return link;
+    }
+
+    @Override
+    public @NotNull Identifier getSharedResourceIdentifier() {
+        //TODO: implement
+        return null;
     }
 
     @Override

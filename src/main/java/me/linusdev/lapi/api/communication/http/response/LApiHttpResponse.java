@@ -107,6 +107,10 @@ public class LApiHttpResponse {
         return headers.firstValue(type.getName()).orElse(null);
     }
 
+    public RateLimitScope getRateLimitScope() {
+        return rateLimitScope;
+    }
+
     /**
      *
      * @return body-json as {@link SOData}. An Empty {@link SOData} will be returned,

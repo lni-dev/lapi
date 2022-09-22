@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.interfaces.HasLApi;
@@ -49,4 +50,6 @@ public interface Query extends HasLApi {
      * @return {@link AbstractLink}
      */
     @NotNull AbstractLink getLink();
+
+    @NotNull Identifier getSharedResourceIdentifier();
 }

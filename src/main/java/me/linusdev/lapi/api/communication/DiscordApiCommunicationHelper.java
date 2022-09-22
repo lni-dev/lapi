@@ -16,6 +16,8 @@
 
 package me.linusdev.lapi.api.communication;
 
+import me.linusdev.lapi.api.other.placeholder.Name;
+
 import java.time.Duration;
 
 
@@ -38,7 +40,7 @@ public class DiscordApiCommunicationHelper {
      * </a>
      */
     public static final String O_DISCORD_API_VERSION_LINK =
-            "https://discord.com/api/v" + PlaceHolder.DISCORD_API_VERSION_NUMBER + "/";
+            "https://discord.com/api/v" + Name.DISCORD_API_VERSION_NUMBER + "/";
 
     /**
      * <a href="https://discord.com/developers/docs/reference#image-formatting-image-base-url" target="_top">
@@ -51,13 +53,13 @@ public class DiscordApiCommunicationHelper {
      * <a href="https://discord.com/developers/docs/reference#authentication" target="_top">Authentication</a>
      */
     public static final String ATTRIBUTE_AUTHORIZATION_NAME = "Authorization";
-    public static final String ATTRIBUTE_AUTHORIZATION_VALUE = "Bot " + PlaceHolder.TOKEN;
+    public static final String ATTRIBUTE_AUTHORIZATION_VALUE = "Bot " + Name.TOKEN;
 
     /**
      * <a href="https://discord.com/developers/docs/reference#user-agent" target="_top">User Agent</a>
      */
     public static final String ATTRIBUTE_USER_AGENT_NAME = "User-Agent";
-    public static final String ATTRIBUTE_USER_AGENT_VALUE = "DiscordBot (" + PlaceHolder.LAPI_URL +", " + PlaceHolder.LAPI_VERSION + ")";
+    public static final String ATTRIBUTE_USER_AGENT_VALUE = "DiscordBot (" + Name.LAPI_URL +", " + Name.LAPI_VERSION + ")";
 
     /**
      * Time from 1. January 1970 to the first second of 2015

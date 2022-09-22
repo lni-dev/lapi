@@ -20,12 +20,14 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
-import static me.linusdev.lapi.api.communication.PlaceHolder.*;
+import static me.linusdev.lapi.api.other.placeholder.Name.*;
 
 /**
- * Every of these links always as the {@link me.linusdev.lapi.api.communication.PlaceHolder#FILE_ENDING file-ending placeholder}
+ * Every of these links always as the {@link Name#FILE_ENDING file-ending placeholder}
  *
  * @see <a href="https://discord.com/developers/docs/reference#image-formatting-cdn-endpoints" target="_top">CDN ENdpoints</a>
  */
@@ -72,6 +74,12 @@ public enum ImageLink implements AbstractLink {
     public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
         //The discord api version is not present in cdn links, so we do not need to replace it
         return link;
+    }
+
+    @Override
+    public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders) {
+        //TODO: implement
+        return null;
     }
 
     @Override

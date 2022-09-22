@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.http.request.Method;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
 public interface AbstractLink {
@@ -31,7 +32,10 @@ public interface AbstractLink {
     /**
      * The url, may still be missing placeholders!
      */
+    @Deprecated
     @NotNull String getLink(@NotNull ApiVersion apiVersion);
+
+    public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders);
 
     /**
      *
