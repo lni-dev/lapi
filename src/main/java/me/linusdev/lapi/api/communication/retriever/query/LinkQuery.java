@@ -78,11 +78,7 @@ public class LinkQuery implements Query, HasLApi {
 
     @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
-        String url = link.getLink(lApi.getHttpRequestApiVersion());
-        for(PlaceHolder p : placeHolders)
-            url = p.place(url);
-
-        LApiHttpRequest request = new LApiHttpRequest(url, getMethod(), body, queryStringsData);
+        LApiHttpRequest request = new LApiHttpRequest(link.construct(lApi.getHttpRequestApiVersion(), placeHolders), getMethod(), body, queryStringsData);
 
         return lApi.appendHeader(request);
     }

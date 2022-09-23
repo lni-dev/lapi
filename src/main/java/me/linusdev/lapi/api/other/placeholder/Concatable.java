@@ -31,6 +31,14 @@ public interface Concatable {
     void concat(@NotNull StringBuilder sb, @NotNull Object... value);
 
     /**
+     * Adds an optional connection after the last {@link Concatable}. This may only
+     * be called if something has already been concat to given {@link StringBuilder} and if
+     * {@link #concat(StringBuilder, Object...)} will be called afterwords.
+     * @param sb {@link StringBuilder} to concat to.
+     */
+    void connect(@NotNull StringBuilder sb);
+
+    /**
      *
      * @return {@link String} represented by this {@link Concatable}
      */

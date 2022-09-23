@@ -682,14 +682,15 @@ public enum Link implements AbstractLink{
     public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders) {
         StringBuilder sb = new StringBuilder();
 
-        LinkPart.PREFIX.concat(sb, apiVersion.getVersionNumber());
+        LinkPart.HTTP_PREFIX.concat(sb, apiVersion.getVersionNumber());
 
         int i = 0;
         for(Concatable concatable : concatables) {
+           concatable.connect(sb);
             if(concatable.isKey()) {
                 concatable.concat(sb, placeHolders[i].getValue());
                 //assert that the value was used for the correct placeHolder
-                assert concatable == placeHolders[i].getName();
+                assert concatable == placeHolders[i].getKey();
             } else {
                 concatable.concat(sb);
             }

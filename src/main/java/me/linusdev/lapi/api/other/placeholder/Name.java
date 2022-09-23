@@ -30,6 +30,7 @@ public enum Name implements Concatable{
     TEAM_ID("{team.id}"),
     OVERWRITE_ID("{overwrite.id}"),
     COMMAND_ID("{command.id}"),
+    SCHEDULED_EVENT_ID("{guild_scheduled_event.id}"),
 
     INTERACTION_ID("{interaction.id}"),
     INTERACTION_TOKEN("{interaction.token}"),
@@ -44,7 +45,17 @@ public enum Name implements Concatable{
     TIMESTAMP("{timestamp}"),
     TIMESTAMP_STYLE("{timestamp.style}"),
 
-    FILE_ENDING("<file-ending>"),
+    FILE_ENDING("<file-ending>") {
+        @Override
+        public void concat(@NotNull StringBuilder sb, @NotNull Object... value) {
+            sb.append(value[0]);
+        }
+
+        @Override
+        public void connect(@NotNull StringBuilder sb) {
+            sb.append('.');
+        }
+    },
     HASH("<hash>"),
 
     TOKEN("<token>"),
@@ -59,6 +70,10 @@ public enum Name implements Concatable{
 
     Name(@NotNull String placeholder) {
         this.placeholder = placeholder;
+    }
+
+    public @NotNull PlaceHolder withValue(@NotNull String value) {
+        return new PlaceHolder(this, value);
     }
 
     public @NotNull String getPlaceholder() {
@@ -78,6 +93,11 @@ public enum Name implements Concatable{
     @Override
     public void concat(@NotNull StringBuilder sb, @NotNull Object... value) {
         sb.append(value[0]);
+    }
+
+    @Override
+    public void connect(@NotNull StringBuilder sb) {
+        sb.append('/');
     }
 
     @Override

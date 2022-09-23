@@ -20,10 +20,13 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
+import me.linusdev.lapi.api.communication.retriever.query.LinkPart;
+import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
+import static me.linusdev.lapi.api.communication.retriever.query.LinkPart.*;
 import static me.linusdev.lapi.api.other.placeholder.Name.*;
 
 /**
@@ -33,36 +36,38 @@ import static me.linusdev.lapi.api.other.placeholder.Name.*;
  */
 public enum ImageLink implements AbstractLink {
 
-    CUSTOM_EMOJI                    ("emojis/" + EMOJI_ID),
+    CUSTOM_EMOJI                    (EMOJIS, EMOJI_ID),
 
-    GUILD_ICON                      ("icons/" + GUILD_ID + "/" + HASH),
-    GUILD_SPLASH                    ("splashes/" + GUILD_ID + "/" + HASH),
-    GUILD_DISCOVERY_SPLASH          ("discovery-splashes/" + GUILD_ID + "/" + HASH),
-    GUILD_BANNER                    ("banners/" + GUILD_ID + "/" + HASH),
+    GUILD_ICON                      (ICONS, GUILD_ID, HASH),
+    GUILD_SPLASH                    (SPLASHES, GUILD_ID, HASH),
+    GUILD_DISCOVERY_SPLASH          (DISCOVERY_SPLASHES, GUILD_ID, HASH),
+    GUILD_BANNER                    (BANNERS, GUILD_ID, HASH),
+    GUILD_SCHEDULED_EVENT_COVER     (GUILD_EVENTS, SCHEDULED_EVENT_ID, HASH),
 
-    GUILD_MEMBER_AVATAR             ("guilds/" + GUILD_ID + "/users/" + USER_ID + "/avatars/" + HASH),
-    USER_BANNER                     ("banners/" + USER_ID + "/" + HASH),
-    DEFAULT_USER_AVATAR             ("embed/avatars/" + USER_DISCRIMINATOR),
-    USER_AVATAR                     ("avatars/" + USER_ID + "/" + HASH),
+    GUILD_MEMBER_AVATAR             (GUILDS, GUILD_ID, USERS, USER_ID, AVATARS, HASH),
+    GUILD_MEMBER_BANNER             (GUILDS, GUILD_ID, USERS, USER_ID, BANNERS, HASH),
+    USER_BANNER                     (BANNERS, USER_ID, HASH),
+    DEFAULT_USER_AVATAR             (DEFAULT_AVATARS, USER_DISCRIMINATOR),
+    USER_AVATAR                     (AVATARS, USER_ID, HASH),
 
-    APPLICATION_ICON                ("app-icons/" + APPLICATION_ID + "/" + HASH),
-    APPLICATION_COVER               ("app-icons/" + APPLICATION_ID + "/" + HASH),
-    APPLICATION_ASSET               ("app-assets/" + APPLICATION_ID + "/" + HASH),
+    APPLICATION_ICON                (APP_ICONS, APPLICATION_ID, HASH),
+    APPLICATION_COVER               (APP_ICONS, APPLICATION_ID, HASH),
+    APPLICATION_ASSET               (APP_ASSETS, APPLICATION_ID, HASH),
 
-    ACHIEVEMENT_ICON                ("app-assets/" + APPLICATION_ID + "/achievements/" + ACHIEVEMENT_ID + "/icons/" + HASH),
+    ACHIEVEMENT_ICON                (APP_ASSETS, APPLICATION_ID, ACHIEVEMENTS, ACHIEVEMENT_ID, ICONS, HASH),
 
-    STICKER_PACK_BANNER             ("app-assets/710982414301790216/store/" + STICKER_PACK_BANNER_ASSET_ID),
-    STICKER                         ("stickers/" + STICKER_ID),
+    STICKER_PACK_BANNER             (STICKER_PACK_BANNERS, STICKER_PACK_BANNER_ASSET_ID),
+    STICKER                         (STICKERS, STICKER_ID),
 
-    TEAM_ICON                       ("team-icons/" + TEAM_ID + "/" + HASH),
+    TEAM_ICON                       (TEAM_ICONS, TEAM_ID, HASH),
 
-    ROLE_ICON                       ("role-icons/" + ROLE_ID + "/" + HASH),
+    ROLE_ICON                       (ROLE_ICONS, ROLE_ID, HASH),
     ;
 
-    private final String link;
+    private final @NotNull Concatable[] concatables;
 
-    ImageLink(String link) {
-        this.link = DiscordApiCommunicationHelper.O_DISCORD_CDN_LINK + link  + "." + FILE_ENDING;
+    ImageLink(Concatable... concatables) {
+        this.concatables = concatables;
     }
 
     @Override
@@ -72,14 +77,34 @@ public enum ImageLink implements AbstractLink {
 
     @Override
     public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
-        //The discord api version is not present in cdn links, so we do not need to replace it
-        return link;
+
+        return null;
     }
 
     @Override
     public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders) {
-        //TODO: implement
-        return null;
+        StringBuilder sb = new StringBuilder();
+
+        //The discord api version is not present in cdn links, so we do not need to replace it
+        LinkPart.CDN_PREFIX.concat(sb);
+
+        int i = 0;
+        boolean first = true;
+        for(Concatable concatable : concatables) {
+            concatable.connect(sb);
+            if(concatable.isKey()) {
+                concatable.concat(sb, placeHolders[i].getValue());
+                //assert that the value was used for the correct placeHolder
+                assert concatable == placeHolders[i].getKey();
+            } else {
+                concatable.concat(sb);
+            }
+        }
+
+        FILE_ENDING.concat(sb, placeHolders[++i].getValue());
+        assert FILE_ENDING == placeHolders[i].getKey();
+
+        return sb.toString();
     }
 
     @Override

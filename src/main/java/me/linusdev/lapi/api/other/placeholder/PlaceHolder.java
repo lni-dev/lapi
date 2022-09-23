@@ -20,28 +20,28 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlaceHolder {
 
-    private final @NotNull Name name;
+    private final @NotNull Name key;
     private final @NotNull String value;
 
     /**
      *
-     * @param name {@link Name}
+     * @param key {@link Name}
      * @param value the value the placeholder should be replaced with
      */
-    public PlaceHolder(@NotNull Name name, @NotNull String value){
-        this.name = name;
+    public PlaceHolder(@NotNull Name key, @NotNull String value){
+        this.key = key;
         this.value = value;
     }
 
     public String place(String in){
-        return in.replace(name.getPlaceholder(), value);
+        return in.replace(key.getPlaceholder(), value);
     }
 
     public @NotNull String getValue() {
         return value;
     }
 
-    public @NotNull Name getName() {
-        return name;
+    public @NotNull Name getKey() {
+        return key;
     }
 }

@@ -20,11 +20,12 @@ import me.linusdev.lapi.api.other.placeholder.Concatable;
 import org.jetbrains.annotations.NotNull;
 
 public enum LinkPart implements Concatable {
-    PREFIX("https://discord.com/api/v") {
+    CDN_PREFIX("https://cdn.discordapp.com/"),
+    HTTP_PREFIX("https://discord.com/api/v") {
         @Override
         public void concat(@NotNull StringBuilder sb, @NotNull Object... value) {
             sb.append(getString());
-            if(value.length > 0) sb.append(value[0]);
+            sb.append(value[0]);
         }
     },
 
@@ -48,6 +49,9 @@ public enum LinkPart implements Concatable {
     GATEWAY("gateway"),
     VOICE("voice"),
     REGIONS("regions"),
+    GUILD_EVENTS("guild-events"),
+
+
 
     ME("@me"),
     BOT("bot"),
@@ -60,6 +64,23 @@ public enum LinkPart implements Concatable {
     ARCHIVED("archived"),
     PUBLIC("public"),
     PRIVATE("private"),
+
+    //CDN
+
+    EMOJIS("emojis"),
+    ICONS("icons"),
+    SPLASHES("splashes"),
+    DISCOVERY_SPLASHES("discovery-splashes"),
+    BANNERS("banners"),
+    AVATARS("avatars"),
+    DEFAULT_AVATARS("embed/avatars"),
+    APP_ICONS("app-icons"),
+    APP_ASSETS("app-assets"),
+    STICKER_PACK_BANNERS("app-assets/710982414301790216/store/"),
+    STICKERS("stickers"),
+    TEAM_ICONS("team-icons"),
+    ROLE_ICONS("role-icons"),
+    ACHIEVEMENTS("achievements"),
 
     ;
 
@@ -77,5 +98,10 @@ public enum LinkPart implements Concatable {
     @Override
     public void concat(@NotNull StringBuilder sb, @NotNull Object... value) {
         sb.append(this.value);
+    }
+
+    @Override
+    public void connect(@NotNull StringBuilder sb) {
+        sb.append('/');
     }
 }

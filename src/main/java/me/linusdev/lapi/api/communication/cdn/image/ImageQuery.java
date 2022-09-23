@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.cdn.image;
 
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
@@ -48,7 +49,6 @@ public class ImageQuery implements Query {
     private final LApi lApi;
     private final AbstractLink link;
     private final int desiredSize;
-    private final AbstractFileType fileType;
     private final PlaceHolder[] placeHolders;
 
     /**
@@ -58,14 +58,12 @@ public class ImageQuery implements Query {
      * @param lApi {@link LApi}
      * @param link {@link ImageLink}
      * @param desiredSize The size, the retrieved image should be. any power of 2 between {@value #SIZE_QUERY_PARAM_MIN} and {@value #SIZE_QUERY_PARAM_MAX}. If you want to let Discord decide, use {@value #NO_DESIRED_SIZE}
-     * @param fileType The file-type you want to retrieve. Should be {@link FileType#PNG PNG}, {@link FileType#JPEG JPEG}, {@link FileType#GIF GIF}, {@link FileType#WEBP WEBP} or {@link FileType#LOTTIE LOTTIE}
      * @param placeHolders the placeholders required for given link
      */
-    public ImageQuery(@NotNull LApi lApi, @NotNull AbstractLink link, int desiredSize, AbstractFileType fileType, PlaceHolder... placeHolders ) {
+    public ImageQuery(@NotNull LApi lApi, @NotNull AbstractLink link, int desiredSize, PlaceHolder... placeHolders ) {
         this.lApi = lApi;
         this.link = link;
         this.desiredSize = desiredSize;
-        this.fileType = fileType;
         this.placeHolders = placeHolders;
     }
 
@@ -76,12 +74,7 @@ public class ImageQuery implements Query {
 
     @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
-        String uri = link.getLink(lApi.getHttpRequestApiVersion());
-
-        for(PlaceHolder p : placeHolders)
-            uri = p.place(uri);
-
-        uri = new PlaceHolder(Name.FILE_ENDING, fileType.getFileEndings()[0]).place(uri);
+        String uri = link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
 
         if(desiredSize != NO_DESIRED_SIZE) {
             SOData queryParamsData = SOData.newOrderedDataWithKnownSize(2);
@@ -94,12 +87,7 @@ public class ImageQuery implements Query {
 
     @Override
     public String asString() {
-        String uri = link.getLink(lApi.getHttpRequestApiVersion());
-
-        for(PlaceHolder p : placeHolders)
-            uri = p.place(uri);
-
-        return getMethod().toString() + " " + uri;
+        return getMethod().toString() + " " + link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
     }
 
     @Override
@@ -109,7 +97,7 @@ public class ImageQuery implements Query {
 
     @Override
     public @NotNull Identifier getSharedResourceIdentifier() {
-        //TOOD: implement
+        //TODO: implement
         return null;
     }
 

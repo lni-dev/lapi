@@ -31,4 +31,8 @@ public interface AbstractFileType {
      * @return array of possible file-endings for this file-type without a dot ("."). Must contain at least one ending!
      */
     @NotNull String[] getFileEndings();
+
+    default @NotNull String getFirstFileEnding() {
+        return getFileEndings()[0];
+    }
 }
