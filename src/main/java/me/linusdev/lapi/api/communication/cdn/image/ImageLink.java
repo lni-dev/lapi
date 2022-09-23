@@ -76,12 +76,6 @@ public enum ImageLink implements AbstractLink {
     }
 
     @Override
-    public @NotNull String getLink(@NotNull ApiVersion apiVersion) {
-
-        return null;
-    }
-
-    @Override
     public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders) {
         StringBuilder sb = new StringBuilder();
 
@@ -93,9 +87,9 @@ public enum ImageLink implements AbstractLink {
         for(Concatable concatable : concatables) {
             concatable.connect(sb);
             if(concatable.isKey()) {
-                concatable.concat(sb, placeHolders[i].getValue());
+                concatable.concat(sb, placeHolders[i++].getValue());
                 //assert that the value was used for the correct placeHolder
-                assert concatable == placeHolders[i].getKey();
+                assert concatable == placeHolders[i-1].getKey();
             } else {
                 concatable.concat(sb);
             }

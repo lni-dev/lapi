@@ -17,10 +17,15 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
+import me.linusdev.lapi.api.communication.cdn.image.ImageLink;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @see Link
+ * @see ImageLink
+ */
 public interface AbstractLink {
 
     /**
@@ -30,11 +35,12 @@ public interface AbstractLink {
     @NotNull Method getMethod();
 
     /**
-     * The url, may still be missing placeholders!
+     * Construct the {@link AbstractLink} with given {@link ApiVersion} and {@link PlaceHolder placeholders}. The required
+     * Placeholders depend on the specific {@link AbstractLink}.
+     * @param apiVersion {@link ApiVersion} to use when constructing the link.
+     * @param placeHolders {@link PlaceHolder} to fill ids, hashes, ...
+     * @return {@link String} built link (url)
      */
-    @Deprecated
-    @NotNull String getLink(@NotNull ApiVersion apiVersion);
-
     public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders);
 
     /**

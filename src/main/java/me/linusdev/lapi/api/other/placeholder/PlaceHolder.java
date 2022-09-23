@@ -27,13 +27,15 @@ public class PlaceHolder {
      *
      * @param key {@link Name}
      * @param value the value the placeholder should be replaced with
+     * @deprecated replaced by {@link Name#withValue(String)}
      */
+    @Deprecated
     public PlaceHolder(@NotNull Name key, @NotNull String value){
         this.key = key;
         this.value = value;
     }
 
-    public String place(String in){
+    public String place(@NotNull String in){
         return in.replace(key.getPlaceholder(), value);
     }
 

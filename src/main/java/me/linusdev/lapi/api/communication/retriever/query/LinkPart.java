@@ -50,6 +50,7 @@ public enum LinkPart implements Concatable {
     VOICE("voice"),
     REGIONS("regions"),
     GUILD_EVENTS("guild-events"),
+    CHANNELS("channels"),
 
 
 

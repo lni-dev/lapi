@@ -327,6 +327,21 @@ public class LApiImpl implements LApi {
         }, delay, TimeUnit.MILLISECONDS);
     }
 
+    @Override
+    public void runSupervised(@NotNull Runnable runnable) {
+        //Can not be null because this is not the main method.
+        @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
+
+        supervisedRunnableExecutor.execute(() -> {
+            try {
+                runnable.run();
+            }catch (Throwable t) {
+                LogInstance log = Logger.getLogger("SR (" + frame.getClassName() + ":" + frame.getLineNumber() + ")");
+                log.error(t);
+            }
+        });
+    }
+
     //Getter
 
     @Override

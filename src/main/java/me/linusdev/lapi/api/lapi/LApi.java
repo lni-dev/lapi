@@ -180,9 +180,7 @@ public interface LApi extends HasLApi {
      * @see #runSupervised(Runnable, long)
      */
     @ApiStatus.Internal
-    default void runSupervised(@NotNull Runnable runnable){
-        runSupervised(runnable, 0);
-    }
+    void runSupervised(@NotNull Runnable runnable);
 
 
     //Getter
