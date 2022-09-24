@@ -18,9 +18,16 @@ package me.linusdev.lapi.api.other.placeholder;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ *
+ */
 public enum Name implements Concatable{
-    GUILD_ID("{guild.id}"),
-    CHANNEL_ID("{channel.id}"),
+    GUILD_ID("{guild.id}", true),
+    CHANNEL_ID("{channel.id}", true),
+
+    WEBHOOK_ID("{webhook.id}", true),
+    WEBHOOK_TOKEN("{webhook.token}"),
+
     ROLE_ID("{role.id}"),
     MESSAGE_ID("{message.id}"),
     APPLICATION_ID("{application.id}"),
@@ -55,6 +62,11 @@ public enum Name implements Concatable{
         public void connect(@NotNull StringBuilder sb) {
             sb.append('.');
         }
+
+        @Override
+        public boolean isImportantForIdentifier() {
+            return false;
+        }
     },
     HASH("<hash>"),
 
@@ -66,10 +78,19 @@ public enum Name implements Concatable{
     DISCORD_API_VERSION_NUMBER("<vn>"),
     ;
 
+    public static final int amount = values().length;
+
     private final @NotNull String placeholder;
+    private final boolean topLevelResource;
 
     Name(@NotNull String placeholder) {
         this.placeholder = placeholder;
+        this.topLevelResource = false;
+    }
+
+    Name(@NotNull String placeholder, boolean topLevelResource) {
+        this.placeholder = placeholder;
+        this.topLevelResource = topLevelResource;
     }
 
     public @NotNull PlaceHolder withValue(@NotNull String value) {
@@ -103,5 +124,28 @@ public enum Name implements Concatable{
     @Override
     public boolean isKey() {
         return true;
+    }
+
+    public boolean isImportantForIdentifier() {
+        return true;
+    }
+
+    /**
+     * Rate Limits often account for top-level resources withing the path
+     * @return Whether this ia a top level resource id
+     * @see <a href="https://discord.com/developers/docs/topics/rate-limits#rate-limits">Discord Documentation</a>
+     */
+    public boolean isTopLevelResource() {
+        return topLevelResource;
+    }
+
+    /**
+     * Unique for this class and for all {@link Concatable}.
+     * @return int unique code
+     * @see Concatable#code()
+     */
+    @Override
+    public int code() {
+        return ordinal();
     }
 }

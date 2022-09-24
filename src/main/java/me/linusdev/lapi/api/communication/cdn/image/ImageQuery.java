@@ -17,13 +17,8 @@
 package me.linusdev.lapi.api.communication.cdn.image;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
-import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
-import me.linusdev.lapi.api.communication.file.types.FileType;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
@@ -73,6 +68,11 @@ public class ImageQuery implements Query {
     }
 
     @Override
+    public @NotNull PlaceHolder[] getPlaceHolders() {
+        return placeHolders;
+    }
+
+    @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
         String uri = link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
 
@@ -93,12 +93,6 @@ public class ImageQuery implements Query {
     @Override
     public @NotNull AbstractLink getLink() {
         return link;
-    }
-
-    @Override
-    public @NotNull Identifier getSharedResourceIdentifier() {
-        //TODO: implement
-        return null;
     }
 
     @Override

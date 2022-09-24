@@ -17,7 +17,6 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
@@ -38,6 +37,7 @@ public class LinkQuery implements Query, HasLApi {
     private final @Nullable LApiHttpBody body;
     private final @Nullable SOData queryStringsData;
     private final @NotNull PlaceHolder[] placeHolders;
+    private volatile @Nullable String constructed;
 
     public LinkQuery(@NotNull LApi lApi, @NotNull AbstractLink link, @Nullable LApiHttpBody body, @Nullable SOData queryStringsData, @NotNull PlaceHolder... placeHolders){
         this.lApi = lApi;
@@ -77,26 +77,30 @@ public class LinkQuery implements Query, HasLApi {
     }
 
     @Override
+    public @NotNull PlaceHolder[] getPlaceHolders() {
+        return placeHolders;
+    }
+
+    @Override
     public LApiHttpRequest getLApiRequest() throws LApiException {
-        LApiHttpRequest request = new LApiHttpRequest(link.construct(lApi.getHttpRequestApiVersion(), placeHolders), getMethod(), body, queryStringsData);
+        LApiHttpRequest request = new LApiHttpRequest(constructLink(), getMethod(), body, queryStringsData);
 
         return lApi.appendHeader(request);
     }
 
+    private @NotNull String constructLink() {
+        if(constructed == null) constructed = link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
+        return constructed;
+    }
+
     @Override
     public String asString() {
-        return link.getMethod() + " " + link.construct(lApi.getHttpRequestApiVersion(), placeHolders);
+        return link.getMethod() + " " + constructLink();
     }
 
     @Override
     public @NotNull AbstractLink getLink() {
         return link;
-    }
-
-    @Override
-    public @NotNull Identifier getSharedResourceIdentifier() {
-        //TODO: implement
-        return null;
     }
 
     @Override

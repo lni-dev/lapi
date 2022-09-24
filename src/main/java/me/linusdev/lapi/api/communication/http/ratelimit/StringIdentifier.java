@@ -16,22 +16,37 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
+import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.http.request.Method;
-import me.linusdev.lapi.api.interfaces.Unique;
+import org.jetbrains.annotations.NotNull;
 
-public class Identifier implements Unique {
+import java.util.Objects;
+
+public class StringIdentifier implements RateLimitId {
+
+
 
     private final String id;
+    private final int hash;
 
-    public Identifier(Method method, PlaceHolder... placeHolders) {
-        String id = method.toString();
-
-        for(PlaceHolder p : placeHolders) {
-
-        }
-
+    public StringIdentifier(String id, int hash) {
         this.id = id;
+        this.hash = hash;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StringIdentifier that = (StringIdentifier) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
 }

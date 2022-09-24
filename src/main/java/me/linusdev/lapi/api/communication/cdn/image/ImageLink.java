@@ -17,9 +17,9 @@
 package me.linusdev.lapi.api.communication.cdn.image;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
+import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkPart;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
@@ -64,10 +64,23 @@ public enum ImageLink implements AbstractLink {
     ROLE_ICON                       (ROLE_ICONS, ROLE_ID, HASH),
     ;
 
+    public static final int amount = values().length;
+
     private final @NotNull Concatable[] concatables;
+
+    private final boolean containsTopLevelResource;
 
     ImageLink(Concatable... concatables) {
         this.concatables = concatables;
+
+        boolean tlr = false;
+        for(Concatable c : concatables) {
+            if(c instanceof Name && ((Name) c).isTopLevelResource()){
+                tlr = true;
+                break;
+            }
+        }
+        this.containsTopLevelResource = tlr;
     }
 
     @Override
@@ -82,27 +95,32 @@ public enum ImageLink implements AbstractLink {
         //The discord api version is not present in cdn links, so we do not need to replace it
         LinkPart.CDN_PREFIX.concat(sb);
 
-        int i = 0;
-        boolean first = true;
-        for(Concatable concatable : concatables) {
-            concatable.connect(sb);
-            if(concatable.isKey()) {
-                concatable.concat(sb, placeHolders[i++].getValue());
-                //assert that the value was used for the correct placeHolder
-                assert concatable == placeHolders[i-1].getKey();
-            } else {
-                concatable.concat(sb);
-            }
-        }
+        int i = Concatable.construct(sb, concatables, placeHolders);
 
-        FILE_ENDING.concat(sb, placeHolders[++i].getValue());
+        FILE_ENDING.concat(sb, placeHolders[i].getValue());
         assert FILE_ENDING == placeHolders[i].getKey();
+        assert placeHolders.length-1 == i;
 
         return sb.toString();
+    }
+
+    @NotNull
+    public Concatable[] getConcatables() {
+        return concatables;
     }
 
     @Override
     public boolean isBoundToGlobalRateLimit() {
         return true;
+    }
+
+    @Override
+    public boolean containsTopLevelResource() {
+        return containsTopLevelResource;
+    }
+
+    @Override
+    public int uniqueId() {
+        return Link.amount + ordinal();
     }
 }

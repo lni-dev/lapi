@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.other.placeholder.Concatable;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import org.jetbrains.annotations.NotNull;
 
 public enum LinkPart implements Concatable {
@@ -104,5 +105,10 @@ public enum LinkPart implements Concatable {
     @Override
     public void connect(@NotNull StringBuilder sb) {
         sb.append('/');
+    }
+
+    @Override
+    public int code() {
+        return Name.amount + (ordinal() % (100-Name.amount));
     }
 }

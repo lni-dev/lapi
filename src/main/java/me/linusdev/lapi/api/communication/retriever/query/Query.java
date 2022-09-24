@@ -17,10 +17,10 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
-import me.linusdev.lapi.api.communication.http.ratelimit.Identifier;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,7 +31,9 @@ public interface Query extends HasLApi {
     /**
      * The method used for this {@link Query}
      */
-    Method getMethod();
+    @NotNull Method getMethod();
+
+    @NotNull PlaceHolder[] getPlaceHolders();
 
     /**
      *
@@ -50,6 +52,4 @@ public interface Query extends HasLApi {
      * @return {@link AbstractLink}
      */
     @NotNull AbstractLink getLink();
-
-    @NotNull Identifier getSharedResourceIdentifier();
 }

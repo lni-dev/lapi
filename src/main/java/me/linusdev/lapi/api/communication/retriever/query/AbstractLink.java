@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.communication.retriever.query;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.cdn.image.ImageLink;
 import me.linusdev.lapi.api.communication.http.request.Method;
+import me.linusdev.lapi.api.other.placeholder.Concatable;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,17 +37,43 @@ public interface AbstractLink {
     @NotNull Method getMethod();
 
     /**
+     * All non-common parts of this link. Common parts are considered to be in
+     * every link of a specific link class or enum.
+     * @return array of {@link Concatable}
+     */
+    @NotNull Concatable[] getConcatables();
+
+    /**
      * Construct the {@link AbstractLink} with given {@link ApiVersion} and {@link PlaceHolder placeholders}. The required
      * Placeholders depend on the specific {@link AbstractLink}.
      * @param apiVersion {@link ApiVersion} to use when constructing the link.
      * @param placeHolders {@link PlaceHolder} to fill ids, hashes, ...
      * @return {@link String} built link (url)
      */
-    public @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders);
+    @NotNull String construct(@NotNull ApiVersion apiVersion, @NotNull PlaceHolder... placeHolders);
 
     /**
      *
      * @return Whether this endpoint is bound to the global rate limits for the bot.
      */
     boolean isBoundToGlobalRateLimit();
+
+    /**
+     * @return Whether this link contains a {@link Name} that {@link Name#isTopLevelResource() is for a top level resource}.
+     * @see Name#isTopLevelResource()
+     */
+    boolean containsTopLevelResource();
+
+    /**
+     * <ul>
+     *     <li>
+     *         0 <= {@link Link#uniqueId()} < {@link Link#amount}
+     *     </li>
+     *     <li>
+     *         {@link Link#amount} <= {@link ImageLink#uniqueId()} < {@link ImageLink#amount}
+     *     </li>
+     * </ul>
+     * @return a unique integer for this link
+     */
+    int uniqueId();
 }

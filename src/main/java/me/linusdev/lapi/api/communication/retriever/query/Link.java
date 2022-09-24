@@ -17,7 +17,6 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -639,14 +638,27 @@ public enum Link implements AbstractLink{
     GET_VOICE_REGIONS(Method.GET, VOICE, REGIONS),
     ;
 
+    public static final int amount = values().length;
+
     private final @NotNull Method method;
     private final @NotNull Concatable[] concatables;
+
     private final boolean boundToGlobalRateLimits;
+    private final boolean containsTopLevelResource;
 
     Link(@NotNull Method method, boolean boundToGlobalRateLimits, @NotNull Concatable... parts) {
         this.method = method;
         this.boundToGlobalRateLimits = boundToGlobalRateLimits;
         this.concatables = parts;
+
+        boolean tlr = false;
+        for(Concatable c : parts) {
+            if(c instanceof Name && ((Name) c).isTopLevelResource()){
+                tlr = true;
+                break;
+            }
+        }
+        this.containsTopLevelResource = tlr;
     }
 
     Link(@NotNull Method method, @NotNull Concatable... parts) {
@@ -663,22 +675,13 @@ public enum Link implements AbstractLink{
         StringBuilder sb = new StringBuilder();
 
         LinkPart.HTTP_PREFIX.concat(sb, apiVersion.getVersionNumber());
-
-        int i = 0;
-        for(Concatable concatable : concatables) {
-           concatable.connect(sb);
-            if(concatable.isKey()) {
-                concatable.concat(sb, placeHolders[i++].getValue());
-                //assert that the value was used for the correct placeHolder
-                assert concatable == placeHolders[i-1].getKey();
-            } else {
-                concatable.concat(sb);
-            }
-        }
+        int i = Concatable.construct(sb, concatables, placeHolders);
+        assert placeHolders.length == i;
 
         return sb.toString();
     }
 
+    @NotNull
     public Concatable[] getConcatables() {
         return concatables;
     }
@@ -686,5 +689,15 @@ public enum Link implements AbstractLink{
     @Override
     public boolean isBoundToGlobalRateLimit() {
         return boundToGlobalRateLimits;
+    }
+
+    @Override
+    public boolean containsTopLevelResource() {
+        return containsTopLevelResource;
+    }
+
+    @Override
+    public int uniqueId() {
+        return ordinal();
     }
 }
