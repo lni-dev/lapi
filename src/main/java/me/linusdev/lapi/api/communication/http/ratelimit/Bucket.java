@@ -52,4 +52,8 @@ public class Bucket {
         //TODO: add to rate limit queue
         return false;
     }
+
+    public void onResponse(@NotNull QueueableFuture<?> future, @NotNull LApiHttpResponse response) {
+        //TODO: implement
+    }
 }
