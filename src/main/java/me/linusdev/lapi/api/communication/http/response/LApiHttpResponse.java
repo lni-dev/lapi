@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.http.HeaderType;
 import me.linusdev.lapi.api.communication.http.HeaderTypes;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitHeaders;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitScope;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
@@ -59,6 +60,7 @@ public class LApiHttpResponse {
     private @Nullable HttpErrorMessage error;
     private @Nullable RateLimitScope rateLimitScope;
     private @Nullable RateLimitResponse rateLimit;
+    private @Nullable RateLimitHeaders rateLimitHeaders;
 
     private @Nullable SOData data;
     /**
@@ -96,6 +98,8 @@ public class LApiHttpResponse {
 
         }
 
+        this.rateLimitHeaders = RateLimitHeaders.of(headers);
+
         if(contentType == ContentType.APPLICATION_JSON){
             //try to read an error from the data. will return null if it fails
             this.error = HttpErrorMessage.fromData(getData());
@@ -107,8 +111,12 @@ public class LApiHttpResponse {
         return headers.firstValue(type.getName()).orElse(null);
     }
 
-    public RateLimitScope getRateLimitScope() {
+    public @Nullable RateLimitScope getRateLimitScope() {
         return rateLimitScope;
+    }
+
+    public @Nullable RateLimitHeaders getRateLimitHeaders() {
+        return rateLimitHeaders;
     }
 
     /**

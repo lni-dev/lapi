@@ -20,6 +20,8 @@ import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
+import me.linusdev.lapi.api.communication.http.ratelimit.Bucket;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitId;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.lapi.LApi;
@@ -31,7 +33,10 @@ import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 
@@ -45,6 +50,8 @@ public class QueueThread extends LApiThread implements HasLApi {
     private final @NotNull Queue<QueueableFuture<?>> queue;
 
     private final @NotNull RateLimitQueue globalRateLimitQueue;
+    private final @NotNull Map<String, Bucket> buckets;
+    private final @NotNull Map<RateLimitId, List<Bucket>> bucketsForId;
 
     private final @NotNull AtomicBoolean stopIfEmpty = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean stopImmediately = new AtomicBoolean(false);
@@ -52,7 +59,7 @@ public class QueueThread extends LApiThread implements HasLApi {
     private final @NotNull AtomicBoolean isWaiting;
     private final @NotNull Object waitingLock = new Object();
 
-    private final LogInstance log = Logger.getLogger(this);
+    private final @NotNull LogInstance log = Logger.getLogger(this);
 
     public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?>> queue) {
         super(lApi, group, "queue-thread");
@@ -61,6 +68,9 @@ public class QueueThread extends LApiThread implements HasLApi {
 
         isWaiting = new AtomicBoolean(false);
         globalRateLimitQueue = new RateLimitQueue(lApi, queue);
+
+        this.buckets = new ConcurrentHashMap<>();
+        this.bucketsForId = new ConcurrentHashMap<>();
     }
 
     @Override

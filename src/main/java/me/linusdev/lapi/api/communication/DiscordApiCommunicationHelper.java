@@ -35,21 +35,6 @@ public class DiscordApiCommunicationHelper {
     public static final String DISCORD_COM = "https://discord.com";
 
     /**
-     * <a href="https://discord.com/developers/docs/reference#api-versioning" target="_top">
-     * API Versioning
-     * </a>
-     */
-    public static final String O_DISCORD_API_VERSION_LINK =
-            "https://discord.com/api/v" + Name.DISCORD_API_VERSION_NUMBER + "/";
-
-    /**
-     * <a href="https://discord.com/developers/docs/reference#image-formatting-image-base-url" target="_top">
-     *     Image Base Url
-     * </a>
-     */
-    public static final String O_DISCORD_CDN_LINK = "https://cdn.discordapp.com/";
-
-    /**
      * <a href="https://discord.com/developers/docs/reference#authentication" target="_top">Authentication</a>
      */
     public static final String ATTRIBUTE_AUTHORIZATION_NAME = "Authorization";

@@ -76,7 +76,7 @@ public class LApiImpl implements LApi {
     public static final String CREATOR_ID = "247421526532554752";
 
     public static final String LAPI_URL = "https://github.com/lni-dev/lapi";
-    public static final String LAPI_VERSION = "1.0.3";
+    public static final String LAPI_VERSION = "1.0.4";
     public static final String LAPI_NAME = "LApi";
 
     public static final ApiVersion DEFAULT_API_VERSION = ApiVersion.V10;
