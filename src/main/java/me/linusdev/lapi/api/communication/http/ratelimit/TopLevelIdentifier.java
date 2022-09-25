@@ -16,13 +16,30 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
-import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import org.jetbrains.annotations.NotNull;
 
 public class TopLevelIdentifier implements RateLimitId {
 
-    public TopLevelIdentifier(@NotNull Query query) {
-        assert query.getLink().containsTopLevelResource();
-        //TODO: implement
+    private final @NotNull String topLevelId;
+    private final @NotNull Name topLevelResource;
+
+    public TopLevelIdentifier(@NotNull String topLevelId, @NotNull Name topLevelResource) {
+        this.topLevelId = topLevelId;
+        this.topLevelResource = topLevelResource;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TopLevelIdentifier that = (TopLevelIdentifier) o;
+        return topLevelResource == that.topLevelResource && topLevelId.equals(that.topLevelId);
+    }
+
+    @Override
+    public int hashCode() {
+        return topLevelId.hashCode() + topLevelResource.code();
     }
 }

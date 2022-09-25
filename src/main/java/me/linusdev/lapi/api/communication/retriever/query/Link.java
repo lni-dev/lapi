@@ -645,6 +645,7 @@ public enum Link implements AbstractLink{
 
     private final boolean boundToGlobalRateLimits;
     private final boolean containsTopLevelResource;
+    private final boolean containsPlaceholders;
 
     Link(@NotNull Method method, boolean boundToGlobalRateLimits, @NotNull Concatable... parts) {
         this.method = method;
@@ -652,13 +653,18 @@ public enum Link implements AbstractLink{
         this.concatables = parts;
 
         boolean tlr = false;
-        for(Concatable c : parts) {
-            if(c instanceof Name && ((Name) c).isTopLevelResource()){
-                tlr = true;
-                break;
+        boolean placeholders = false;
+        for (Concatable c : parts) {
+            if (c instanceof Name) {
+                placeholders = true;
+                if (((Name) c).isTopLevelResource()){
+                    tlr = true;
+                    break;
+                }
             }
         }
         this.containsTopLevelResource = tlr;
+        this.containsPlaceholders = placeholders;
     }
 
     Link(@NotNull Method method, @NotNull Concatable... parts) {
@@ -694,6 +700,11 @@ public enum Link implements AbstractLink{
     @Override
     public boolean containsTopLevelResource() {
         return containsTopLevelResource;
+    }
+
+    @Override
+    public boolean containsPlaceholders() {
+        return containsPlaceholders;
     }
 
     @Override

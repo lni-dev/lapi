@@ -65,6 +65,12 @@ public interface AbstractLink {
     boolean containsTopLevelResource();
 
     /**
+     * Whether this link's {@link #getConcatables() concatables} contain placeholders.
+     * @return {@code true} if this link contains placeholders, {@code false otherwise}.
+     */
+    boolean containsPlaceholders();
+
+    /**
      * <ul>
      *     <li>
      *         0 <= {@link Link#uniqueId()} < {@link Link#amount}

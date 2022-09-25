@@ -16,68 +16,93 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
-import me.linusdev.lapi.api.communication.http.request.Method;
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.interfaces.Unique;
-import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Internal
 public interface RateLimitId extends Unique {
 
     static final LogInstance log = Logger.getLogger("StringIdentifier");
 
-    static @NotNull RateLimitId newLinkIdentifier(@NotNull Query query) {
+    /**
+     * Identifier for links without any {@link PlaceHolder}.
+     * @param query {@link Query}
+     * @return {@link LinkIdentifier}
+     */
+    private static @NotNull RateLimitId newLinkOnlyIdentifier(@NotNull Query query) {
         return new LinkIdentifier(query.getLink());
     }
 
-    static @NotNull RateLimitId newSharedResourceIdentifier(@NotNull Query query) {
-        @NotNull Method method = query.getMethod();
-        @NotNull Concatable[] concatables = query.getLink().getConcatables();
+    /**
+     * Identifier for links with {@link PlaceHolder}s.
+     * @param query {@link Query}
+     * @return {@link StringIdentifier}
+     */
+    private static @NotNull RateLimitId newCompleteLinkIdentifier(@NotNull Query query) {
         @NotNull PlaceHolder[] placeHolders = query.getPlaceHolders();
 
-        String idString;
+        int hash = query.getMethod().ordinal() +  query.getLink().uniqueId() * 10;
+        StringBuilder id = new StringBuilder(hash);
 
-
-        int hash = method.ordinal();
-        int factor = 10;
-        for (Concatable concatable : concatables) {
-            if (concatable.isKey()) continue;
-            hash += concatable.code() * factor;
-            factor *= 100;
-        }
-
-        boolean genId = false;
         for (PlaceHolder placeHolder : placeHolders) {
             if (!placeHolder.getKey().isImportantForIdentifier()) {
-                genId = true;
                 continue;
             }
             hash = 31 * hash + placeHolder.getValue().hashCode();
+            id.append("_").append(placeHolder.getValue());
         }
 
-        if (genId) {
-            StringBuilder id = new StringBuilder();
-            int i = 0;
-            for (Concatable concatable : concatables) {
-                concatable.connect(id);
-                if (concatable.isKey()) {
-                    concatable.concat(id, placeHolders[i].getKey().isImportantForIdentifier() ? placeHolders[i].getValue() : "");
-                    i++;
-                } else {
-                    concatable.concat(id);
-                }
+        log.debugAlign("Created complete link id for query " + query.asString() + ":\nid=" + id + "\nhash=" + hash);
+
+        return new StringIdentifier(id.toString(), hash);
+    }
+
+    /**
+     * Identifier for links with a top level resource id
+     * @param query {@link Query}
+     * @return {@link TopLevelIdentifier}
+     */
+    private static @NotNull RateLimitId newTopLevelIdentifier(@NotNull Query query) {
+        assert query.getLink().containsTopLevelResource();
+
+        for(PlaceHolder p : query.getPlaceHolders()) {
+            if(p.getKey().isTopLevelResource()) {
+                log.debugAlign("Created top level id for query " + query.asString() + ":\nname=" + p.getKey() + "\nresource-id=" + p.getValue());
+                return new TopLevelIdentifier(p.getValue(), p.getKey());
             }
-            log.debugAlign("Created shared resource id for query " + query.asString() + ":\nid=" + id + "\nhash=" + hash);
-
-            return new StringIdentifier(id.toString(), hash);
-        } else {
-            String id = query.asString();
-            log.debugAlign("Created shared resource id for query " + id + ":\nid=" + id + "\nhash=" + hash);
-            return new StringIdentifier(id, hash);
         }
+
+        throw new LApiIllegalStateException("Missing top level resource!");
+    }
+
+    /**
+     * A {@link RateLimitId} for a shared resource id.
+     * @param query {@link Query}
+     * @return the correct {@link RateLimitId} for given {@link Query}.
+     */
+    static @NotNull RateLimitId newSharedResourceIdentifier(@NotNull Query query) {
+        return newCompleteLinkIdentifier(query);
+    }
+
+    /**
+     *
+     * @param query {@link Query}
+     * @return the correct {@link RateLimitId} for given {@link Query}.
+     */
+    static @NotNull RateLimitId newIdentifier(@NotNull Query query) {
+        if(query.getLink().containsTopLevelResource())
+            return newTopLevelIdentifier(query);
+
+        if(!query.getLink().containsPlaceholders())
+            return newLinkOnlyIdentifier(query);
+
+        return newCompleteLinkIdentifier(query);
     }
 
 }
