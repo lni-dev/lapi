@@ -71,7 +71,7 @@ public class RateLimitQueue implements HasLApi {
     public boolean add(@NotNull QueueableFuture<?> rateLimitedFuture) {
         synchronized (lock) {
             if(!rateLimited) return false;
-            this.queue.add(rateLimitedFuture);
+            this.rateLimitedQueue.add(rateLimitedFuture);
         }
 
         return true;
@@ -84,10 +84,11 @@ public class RateLimitQueue implements HasLApi {
         for(int i = 0; i < retryAmount; i++) {
             QueueableFuture<?> future = rateLimitedQueue.poll();
             if(future == null) return;
+            queue.add(future);
         }
 
         synchronized (lock) {
-            if(queue.peek() != null) {
+            if(rateLimitedQueue.peek() != null) {
                 this.retryAt = System.currentTimeMillis() + this.retryIn;
                 lApi.runSupervised(this::retry, retryAt - System.currentTimeMillis());
             }

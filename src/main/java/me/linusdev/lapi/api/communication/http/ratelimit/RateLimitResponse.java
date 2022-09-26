@@ -35,11 +35,13 @@ public class RateLimitResponse implements Datable {
 
     private final @NotNull String message;
     private final double retryAfter;
+    private final long retryAtMillis;
     private final boolean global;
 
     public RateLimitResponse(@NotNull String message, double retryAfter, boolean global) {
         this.message = message;
         this.retryAfter = retryAfter;
+        this.retryAtMillis = System.currentTimeMillis() + Double.valueOf(retryAfter * 1000d).longValue();
         this.global = global;
     }
 
@@ -66,8 +68,15 @@ public class RateLimitResponse implements Datable {
         return message;
     }
 
+    /**
+     * The number of seconds to wait before submitting another request.
+     */
     public double getRetryAfter() {
         return retryAfter;
+    }
+
+    public long getRetryAtMillis() {
+        return retryAtMillis;
     }
 
     public boolean isGlobal() {

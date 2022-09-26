@@ -150,12 +150,12 @@ public class QueueThread extends LApiThread implements HasLApi {
                         } else if(response.getRateLimitScope() == RateLimitScope.SHARED) {
                             //TODO: get / create bucket
                             //response.getRateLimitHeaders().getBucket()
-                            //bucket.onResponse(future, response);
+                            //bucket.onRateLimit();
 
                         } else if(response.getRateLimitScope() == RateLimitScope.USER) {
                             //Bad
                             //TODO: what do we do?#
-                            //bucket.onResponse(future, response);
+                            //bucket.onRateLimit();
                         }
                     } else {
                         RateLimitHeaders headers = response.getRateLimitHeaders();
@@ -172,7 +172,7 @@ public class QueueThread extends LApiThread implements HasLApi {
                             continue workLoop;
                         }
 
-                        bucket.onResponse(future, response);
+                        bucket.onResponse(headers);
                     }
                 }
             }
