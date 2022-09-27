@@ -22,9 +22,7 @@ import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.net.ssl.SSLSocket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,6 +41,7 @@ public class Bucket {
     private volatile long limit;
     private volatile long remaining;
     private volatile long resetMillis;
+    private volatile long resetAfterMillis;
     private volatile String bucket;
 
     private final @NotNull Object assumedLock = new Object();
@@ -50,21 +49,13 @@ public class Bucket {
 
     private final boolean limitless;
 
-    private Bucket(@NotNull LApiImpl lApi, long limit) {
-        this.lApi = lApi;
-        this.assumed = true;
-        this.limit = limit;
-        this.resetMillis = -1L;
-        this.remaining = limit;
-        this.limitless = false;
-        queue = new ConcurrentLinkedQueue<>();
-    }
 
-    private Bucket(@NotNull LApiImpl lApi, long limit, long remaining, long resetMillis, String bucket, boolean assumed, boolean limitless) {
+    private Bucket(@NotNull LApiImpl lApi, long limit, long remaining, long resetMillis, long resetAfterMillis, String bucket, boolean assumed, boolean limitless) {
         this.lApi = lApi;
         this.limit = limit;
         this.remaining = remaining;
         this.resetMillis = resetMillis;
+        this.resetAfterMillis = resetAfterMillis;
         this.bucket = bucket;
         this.assumed = assumed;
         this.limitless = limitless;
@@ -73,11 +64,31 @@ public class Bucket {
 
     public static @NotNull Bucket newAssumedBucket(@NotNull LApiImpl lApi) {
         //TODO: add assumed bucket limit to config.
-        return new Bucket(lApi, 3);
+        return new Bucket(lApi, 3, 3, -1L, -1L, null,true, false);
     }
 
-    public static @NotNull Bucket newLimitlessBucket(@NotNull LApiImpl lApi, @NotNull String bucket) {
-        return new Bucket(lApi, 0L, 1L, -1L, bucket, false, true);
+    /**
+     *
+     * @param lApi {@link LApiImpl}
+     * @param limit how many to queue at once after a rate limit. The queue itself is limitless
+     * @param bucket {@link String} name
+     * @return new limitless {@link Bucket}
+     */
+    public static @NotNull Bucket newLimitlessBucket(@NotNull LApiImpl lApi, long limit, @NotNull String bucket) {
+        return new Bucket(lApi, limit, 1L, -1L, -1L, bucket, false, true);
+    }
+
+    public static @NotNull Bucket newGlobalBucket(@NotNull LApiImpl lApi) {
+        //TODO: add below limit to config
+        long globalBucketRetryLimit = 25;
+        return newLimitlessBucket(lApi, globalBucketRetryLimit, "global");
+    }
+
+    public static @NotNull Bucket newSharedResourceBucket(@NotNull LApiImpl lApi, @NotNull QueueableFuture<?> future,
+                                                          @NotNull RateLimitResponse rateLimitResponse) {
+        Bucket bucket = newLimitlessBucket(lApi, -1L, "sharedResourceBucket_" + future.getTask().getName());
+        bucket.onRateLimit(future, rateLimitResponse);
+        return bucket;
     }
 
     /**
@@ -92,14 +103,16 @@ public class Bucket {
                 return true;
 
             } else if (resetMillis > 0L && resetMillis <= System.currentTimeMillis()) {
-                resetMillis = -1L;
-                remaining = limitless ? 1L : limit-1L;
-                return true;
-
+                synchronized (queueSize) {
+                    if(queueSize.get() == 0) {
+                        reset(false);
+                        return canSendOrAddToQueue(future);
+                    }
+                }
             }
         }
 
-        queue.add(future);
+        add(future);
         return false;
     }
 
@@ -109,12 +122,16 @@ public class Bucket {
                 adjustLimit(headers.getLimit());
             checkRemaining(headers.getRemaining());
             this.resetMillis = headers.getResetMillis();
+            this.resetAfterMillis = this.resetMillis - System.currentTimeMillis();
         }
     }
 
-    public void onRateLimit(@NotNull QueueableFuture<?> future, @NotNull LApiHttpResponse response, @NotNull RateLimitResponse rateLimitResponse) {
-        this.remaining = 0L;
-        this.resetMillis = rateLimitResponse.getRetryAtMillis();
+    public void onRateLimit(@NotNull QueueableFuture<?> future, @NotNull RateLimitResponse rateLimitResponse) {
+        synchronized (limitLock) {
+            this.remaining = 0L;
+            this.resetMillis = rateLimitResponse.getRetryAtMillis();
+            this.resetAfterMillis = rateLimitResponse.getRetryAfterMillis();
+        }
         add(future);
     }
 
@@ -123,12 +140,10 @@ public class Bucket {
             synchronized (limitLock) {
                 this.assumed = false;
                 this.remaining = headers.getLimit() - this.limit - this.remaining;
-                if(this.remaining > headers.getRemaining()) {
-                    log.error("Bucket remaining miscalculation: calculated=" + this.remaining + ", received: " + headers.getRemaining());
-                    this.remaining = headers.getRemaining();
-                }
+                checkRemaining(headers.getRemaining());
                 if(!limitless) this.limit = headers.getLimit();
                 this.resetMillis = headers.getResetMillis();
+                this.resetAfterMillis = this.resetMillis - System.currentTimeMillis();
                 this.bucket = bucket;
             }
         }
@@ -136,30 +151,55 @@ public class Bucket {
 
     private void add(@NotNull QueueableFuture<?> future) {
         synchronized (queueSize) {
-            if(queueSize.get() == 0) {
-                //TODO: async reset()
+            queue.add(future);
+            if(queueSize.incrementAndGet() == 1) {
+                asyncReset(System.currentTimeMillis() - resetMillis);
             }
-
-            queueSize.incrementAndGet();
         }
-        queue.add(future);
     }
 
-    private void reset() {
+    private void reset(boolean emptyQueue) {
         //remaining will be reset in canSendOrAddToQueue
-
-        for(int i = 0; i < limit; i++){
-            QueueableFuture<?> future = queue.poll();
-            if(future == null) return;
-            lApi.queue(future);
+        synchronized (limitLock){
+            if(resetMillis != -1) resetMillis += resetAfterMillis;
+            remaining = limitless ? 1L : limit-1L;
         }
 
-        synchronized (queue) {
-            if(queue.peek() != null) {
-                //TODO: async reset()
+        if(emptyQueue) {
+            emptyQueue();
+        }
+    }
+
+    private void incrementRemaining() {
+        synchronized (limitLock) {
+            remaining++;
+        }
+        synchronized (queueSize) {
+            if(queueSize.get() > 0) {
+                assert queue.peek() != null;
+                lApi.queue(queue.poll());
+                queueSize.decrementAndGet();
             }
         }
+    }
 
+    private void emptyQueue() {
+        synchronized (queueSize) {
+            for (int i = 0; limit < 0 || i < limit; i++) {
+                QueueableFuture<?> future = queue.poll();
+                queueSize.decrementAndGet();
+                if (future == null) return;
+                lApi.queue(future);
+            }
+
+            if (queue.peek() != null) {
+                asyncReset(resetAfterMillis);
+            }
+        }
+    }
+
+    private void asyncReset(long delay) {
+        lApi.runSupervised(() -> reset(true), Math.max(0, delay));
     }
 
     private void adjustLimit(long newLimit) {

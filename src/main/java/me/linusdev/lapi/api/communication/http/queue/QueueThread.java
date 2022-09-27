@@ -108,8 +108,10 @@ public class QueueThread extends LApiThread implements HasLApi {
                     sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
                     List<Bucket> buckets = bucketsForId.get(sharedResourceId);
                     if(buckets != null){
-                        for(int i = 0; i < buckets.size(); i++)
+                        for(int i = 0; i < buckets.size(); i++) {
+                            //TODO: increment the once that we decremented before
                             if(!buckets.get(i).canSendOrAddToQueue(future)) continue workLoop;
+                        }
                     }
                 }
 
@@ -121,7 +123,10 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                 } else {
                     for(int i = 0; i < buckets.size(); i++)
-                        if(!buckets.get(i).canSendOrAddToQueue(future)) continue workLoop;
+                        if(!buckets.get(i).canSendOrAddToQueue(future)){
+                            //TODO: increment the once that we decremented before
+                            continue workLoop;
+                        }
 
                 }
 
@@ -141,7 +146,12 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                 if(result != null) {
                     LApiHttpResponse response = result.getSecondary().getResponse();
-                    if(response == null) continue;
+                    if(response == null) {
+                        //It could not send the request for some reason. It's important that we increment the remaining
+                        //amount for the bucket of this id. Otherwise the bucket might never reset, and request could get stuck
+                        //TODO: increment remaining
+                        continue;
+                    }
                     if(response.isRateLimitResponse()) {
                         if(response.getRateLimitResponse().isGlobal()) {
                             //TODO: add retry amount to config
@@ -161,6 +171,7 @@ public class QueueThread extends LApiThread implements HasLApi {
                         RateLimitHeaders headers = response.getRateLimitHeaders();
                         if(headers == null) {
                             log.warning("Received response without rate limit headers");
+                            //TODO: what to do with the bucket?
                             continue workLoop;
                         }
 
@@ -190,6 +201,10 @@ public class QueueThread extends LApiThread implements HasLApi {
             log.error(t);
 
         }
+    }
+
+    private void addBucket(@NotNull RateLimitId id, @NotNull Bucket bucket) {
+
     }
 
     public void stopIfEmpty() {

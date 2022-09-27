@@ -75,6 +75,10 @@ public class RateLimitResponse implements Datable {
         return retryAfter;
     }
 
+    public long getRetryAfterMillis() {
+        return Double.valueOf(retryAfter * 1000d).longValue();
+    }
+
     public long getRetryAtMillis() {
         return retryAtMillis;
     }
