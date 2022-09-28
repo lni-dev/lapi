@@ -22,6 +22,7 @@ import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -42,15 +43,19 @@ public class Bucket {
     private volatile long remaining;
     private volatile long resetMillis;
     private volatile long resetAfterMillis;
-    private volatile String bucket;
+    private volatile @Nullable String bucket;
 
     private final @NotNull Object assumedLock = new Object();
+    /**
+     * Over the lifetime of a {@link Bucket} this variable may only change from {@code true} to {@code false}, but
+     * never wise-versa!
+     */
     private volatile boolean assumed;
 
     private final boolean limitless;
 
 
-    private Bucket(@NotNull LApiImpl lApi, long limit, long remaining, long resetMillis, long resetAfterMillis, String bucket, boolean assumed, boolean limitless) {
+    private Bucket(@NotNull LApiImpl lApi, long limit, long remaining, long resetMillis, long resetAfterMillis, @Nullable String bucket, boolean assumed, boolean limitless) {
         this.lApi = lApi;
         this.limit = limit;
         this.remaining = remaining;
@@ -132,6 +137,23 @@ public class Bucket {
         add(future);
     }
 
+    public void onRateLimitAndMakeConcrete(@NotNull QueueableFuture<?> future, @NotNull RateLimitResponse rateLimitResponse,
+                                           @NotNull String bucket, @NotNull RateLimitHeaders headers) {
+        //This is not synchronized, to avoid unnecessary synchronization:
+        //assumed is volatile and will only change from true to false, but never from false to true!
+        //This means, if the below if-statement evaluates to true, assumed will remain definitely constant
+        if(!assumed) onRateLimit(future, rateLimitResponse);
+
+        //now synchronize on assumedLock too.
+        //assumed is checked again in makeConcrete, because it may have changed from true to false!
+        synchronized (assumedLock) {
+            synchronized (limitLock) {
+                makeConcrete(bucket, headers);
+                onRateLimit(future, rateLimitResponse);
+            }
+        }
+    }
+
     /**
      *
      * @param bucket {@link String} bucket name
@@ -153,6 +175,14 @@ public class Bucket {
         }
 
         return true;
+    }
+
+    public void delete() {
+        synchronized (queueSize) {
+            for(QueueableFuture<?> future : queue) {
+                lApi.queue(future);
+            }
+        }
     }
 
     private void add(@NotNull QueueableFuture<?> future) {
@@ -226,7 +256,7 @@ public class Bucket {
         }
     }
 
-    public String getBucket() {
+    public @Nullable String getBucket() {
         return bucket;
     }
 }
