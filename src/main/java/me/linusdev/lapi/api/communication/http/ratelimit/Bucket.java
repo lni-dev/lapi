@@ -84,11 +84,8 @@ public class Bucket {
         return newLimitlessBucket(lApi, globalBucketRetryLimit, "global");
     }
 
-    public static @NotNull Bucket newSharedResourceBucket(@NotNull LApiImpl lApi, @NotNull QueueableFuture<?> future,
-                                                          @NotNull RateLimitResponse rateLimitResponse) {
-        Bucket bucket = newLimitlessBucket(lApi, -1L, "sharedResourceBucket_" + future.getTask().getName());
-        bucket.onRateLimit(future, rateLimitResponse);
-        return bucket;
+    public static @NotNull Bucket newSharedResourceBucket(@NotNull LApiImpl lApi, @NotNull QueueableFuture<?> future) {
+        return newLimitlessBucket(lApi, -1L, "sharedResourceBucket_" + future.getTask().getName());
     }
 
     /**

@@ -142,7 +142,7 @@ public class QueueThread extends LApiThread implements HasLApi {
                     LApiHttpResponse response = result.getSecondary().getResponse();
                     if(response == null) {
                         //It could not send the request for some reason. It's important that we increment the remaining
-                        //amount for the bucket of this id. Otherwise the bucket might never reset, and request could get stuck
+                        //amount for the bucket of this id. Otherwise, the bucket might never reset, and request could get stuck
                         bucket.incrementRemaining();
                         if(sharedResourceBucket != null) sharedResourceBucket.incrementRemaining();
                         continue;
@@ -153,10 +153,8 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                         } else if(response.getRateLimitScope() == RateLimitScope.SHARED) {
                             if(sharedResourceId == null) sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
-                            computeBucket(sharedResourceId, () -> Bucket.newSharedResourceBucket(lApi, future, response.getRateLimitResponse()));
-                            //TODO: get / create bucket
-                            //response.getRateLimitHeaders().getBucket()
-                            //bucket.onRateLimit();
+                            Bucket sRBucket = computeBucket(sharedResourceId, () -> Bucket.newSharedResourceBucket(lApi, future));
+                            sRBucket.onRateLimit(future, response.getRateLimitResponse());
 
                         } else if(response.getRateLimitScope() == RateLimitScope.USER) {
                             //Bad
