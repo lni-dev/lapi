@@ -135,8 +135,15 @@ public class Bucket {
         add(future);
     }
 
-    public void makeConcrete(@NotNull String bucket, @NotNull RateLimitHeaders headers) {
+    /**
+     *
+     * @param bucket {@link String} bucket name
+     * @param headers {@link RateLimitHeaders} of response
+     * @return {@code false} if the bucket was not an assumed bucket. {@code true} if this bucket was assumed before this call.
+     */
+    public boolean makeConcrete(@NotNull String bucket, @NotNull RateLimitHeaders headers) {
         synchronized (assumedLock) {
+            if(!assumed) return false;
             synchronized (limitLock) {
                 this.assumed = false;
                 this.remaining = headers.getLimit() - this.limit - this.remaining;
@@ -147,6 +154,8 @@ public class Bucket {
                 this.bucket = bucket;
             }
         }
+
+        return true;
     }
 
     private void add(@NotNull QueueableFuture<?> future) {
@@ -170,7 +179,7 @@ public class Bucket {
         }
     }
 
-    private void incrementRemaining() {
+    public void incrementRemaining() {
         synchronized (limitLock) {
             remaining++;
         }
@@ -220,5 +229,7 @@ public class Bucket {
         }
     }
 
-
+    public String getBucket() {
+        return bucket;
+    }
 }

@@ -16,10 +16,13 @@
 
 package me.linusdev.lapi.list;
 
+import me.linusdev.lapi.api.communication.http.ratelimit.Bucket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class LinusLinkedList<O> implements List<O> {
 
@@ -31,6 +34,16 @@ public class LinusLinkedList<O> implements List<O> {
 
     public LinusLinkedList(){
 
+    }
+
+    /**
+     * Executes given consumer synchronized on this list's lock
+     * @param function {@link Function}
+     */
+    public <R> R doSynchronized(@NotNull Function<LinusLinkedList<O>, R> function) {
+        synchronized (lock) {
+            return function.apply(this);
+        }
     }
 
     @Override

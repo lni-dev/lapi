@@ -31,6 +31,7 @@ import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
+import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
  * This is a special thread for the {@link LApi#queue}.
@@ -53,9 +55,13 @@ public class QueueThread extends LApiThread implements HasLApi {
     private final @NotNull LApiImpl lApi;
     private final @NotNull Queue<QueueableFuture<?>> queue;
 
+    //TODO: remove
     private final @NotNull RateLimitQueue globalRateLimitQueue;
+
+    private final @NotNull Bucket globalBucket;
     private final @NotNull Map<String, Bucket> buckets;
-    private final @NotNull Map<RateLimitId, List<Bucket>> bucketsForId;
+    private final @NotNull Map<RateLimitId, Bucket> bucketsForId;
+    private final @NotNull Object bucketsWriteLock = new Object();
     private final @NotNull AtomicInteger sharedResourceRateLimitSize = new AtomicInteger(0);
 
     private final @NotNull AtomicBoolean stopIfEmpty = new AtomicBoolean(false);
@@ -74,6 +80,7 @@ public class QueueThread extends LApiThread implements HasLApi {
         this.isWaiting = new AtomicBoolean(false);
         this.globalRateLimitQueue = new RateLimitQueue(lApi, queue);
 
+        this.globalBucket = Bucket.newGlobalBucket(lApi);
         this.buckets = new ConcurrentHashMap<>();
         this.bucketsForId = new ConcurrentHashMap<>();
     }
@@ -83,20 +90,19 @@ public class QueueThread extends LApiThread implements HasLApi {
         log.log("Started queue thread.");
         try {
             boolean hasSRRL;
-            @Nullable RateLimitId sharedResourceId;
             @NotNull RateLimitId id;
 
             workLoop: while (!stopImmediately.get()) {
                 if(queue.peek() == null && stopIfEmpty.get()) break;
                 awaitNotifyIf(10000L, () -> queue.peek() == null);
 
-                QueueableFuture<?> future = queue.poll();
+                //noinspection ConstantConditions: checked by below if
+                final @NotNull QueueableFuture<?> future = queue.poll();
                 if (future == null) continue;
 
-                QueueableImpl<?> task = future.getTask();
-                Query query = task.getQuery();
-                if(query.getLink().isBoundToGlobalRateLimit() && globalRateLimitQueue.add(future)) {
-                    //If add returns true, we have been globally rate limited...
+                final @NotNull QueueableImpl<?> task = future.getTask();
+                final @NotNull Query query = task.getQuery();
+                if(query.getLink().isBoundToGlobalRateLimit() && !globalBucket.canSendOrAddToQueue(future)) {
                     continue workLoop;
                 }
 
@@ -104,31 +110,19 @@ public class QueueThread extends LApiThread implements HasLApi {
                     hasSRRL = sharedResourceRateLimitSize.get() > 1;
                 }
 
+                @Nullable RateLimitId sharedResourceId = null;
+                @Nullable Bucket sharedResourceBucket = null;
                 if(hasSRRL) {
                     sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
-                    List<Bucket> buckets = bucketsForId.get(sharedResourceId);
-                    if(buckets != null){
-                        for(int i = 0; i < buckets.size(); i++) {
-                            //TODO: increment the once that we decremented before
-                            if(!buckets.get(i).canSendOrAddToQueue(future)) continue workLoop;
-                        }
+                    sharedResourceBucket = bucketsForId.get(sharedResourceId);
+                    if(sharedResourceBucket != null){
+                        if(!sharedResourceBucket.canSendOrAddToQueue(future)) continue workLoop;
                     }
                 }
 
                 id = RateLimitId.newIdentifier(query);
-                List<Bucket> buckets = bucketsForId.get(id);
-
-                if(buckets == null) {
-                    //TODO: create "Future" Bucket
-
-                } else {
-                    for(int i = 0; i < buckets.size(); i++)
-                        if(!buckets.get(i).canSendOrAddToQueue(future)){
-                            //TODO: increment the once that we decremented before
-                            continue workLoop;
-                        }
-
-                }
+                Bucket bucket = computeBucket(id, () -> Bucket.newAssumedBucket(lApi));
+                if (!bucket.canSendOrAddToQueue(future)) continue workLoop;
 
 
                 ComputationResult<?, QResponse> result;
@@ -149,15 +143,17 @@ public class QueueThread extends LApiThread implements HasLApi {
                     if(response == null) {
                         //It could not send the request for some reason. It's important that we increment the remaining
                         //amount for the bucket of this id. Otherwise the bucket might never reset, and request could get stuck
-                        //TODO: increment remaining
+                        bucket.incrementRemaining();
+                        if(sharedResourceBucket != null) sharedResourceBucket.incrementRemaining();
                         continue;
                     }
                     if(response.isRateLimitResponse()) {
                         if(response.getRateLimitResponse().isGlobal()) {
-                            //TODO: add retry amount to config
-                            globalRateLimitQueue.onRateLimit(future, 25, response.getRateLimitResponse().getRetryAfter());
+                            globalBucket.onRateLimit(future, response.getRateLimitResponse());
 
                         } else if(response.getRateLimitScope() == RateLimitScope.SHARED) {
+                            if(sharedResourceId == null) sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
+                            computeBucket(sharedResourceId, () -> Bucket.newSharedResourceBucket(lApi, future, response.getRateLimitResponse()));
                             //TODO: get / create bucket
                             //response.getRateLimitHeaders().getBucket()
                             //bucket.onRateLimit();
@@ -174,16 +170,8 @@ public class QueueThread extends LApiThread implements HasLApi {
                             //TODO: what to do with the bucket?
                             continue workLoop;
                         }
-
-                        Bucket bucket = this.buckets.get(headers.getBucket());
-
-                        if(bucket == null) {
-                            //should never happen
-                            //TODO: create new bucket
-                            continue workLoop;
-                        }
-
-                        bucket.onResponse(headers);
+                        if(!bucket.makeConcrete(headers.getBucket(), headers))
+                            bucket.onResponse(headers);
                     }
                 }
             }
@@ -203,8 +191,10 @@ public class QueueThread extends LApiThread implements HasLApi {
         }
     }
 
-    private void addBucket(@NotNull RateLimitId id, @NotNull Bucket bucket) {
-
+    private @NotNull Bucket computeBucket(@NotNull RateLimitId id, @NotNull Supplier<Bucket> supplier) {
+        synchronized (bucketsWriteLock) {
+            return bucketsForId.computeIfAbsent(id, rateLimitId -> supplier.get());
+        }
     }
 
     public void stopIfEmpty() {
