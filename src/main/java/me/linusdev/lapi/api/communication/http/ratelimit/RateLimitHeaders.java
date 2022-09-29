@@ -53,9 +53,9 @@ public class RateLimitHeaders {
         if(opRemaining.isEmpty()) return null;
         remaining = opRemaining.getAsLong();
 
-        OptionalLong opReset = headers.firstValueAsLong(HeaderTypes.X_RATE_LIMIT_RESET.getName());
+        Optional<String> opReset = headers.firstValue(HeaderTypes.X_RATE_LIMIT_RESET.getName());
         if(opReset.isEmpty()) return null;
-        resetMillis = opReset.getAsLong();
+        resetMillis = ((Double)(Double.parseDouble(opReset.get()) * 1000d)).longValue();
 
         Optional<String> opBucket = headers.firstValue(HeaderTypes.X_RATE_LIMIT_BUCKET.getName());
         if(opBucket.isEmpty()) return null;

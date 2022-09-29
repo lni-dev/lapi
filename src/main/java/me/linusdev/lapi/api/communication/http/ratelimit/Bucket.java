@@ -54,6 +54,7 @@ public class Bucket {
 
     private final boolean limitless;
 
+    private volatile boolean deleted = false;
 
     private Bucket(@NotNull LApiImpl lApi, long limit, long remaining, long resetMillis, long resetAfterMillis, @Nullable String bucket, boolean assumed, boolean limitless) {
         this.lApi = lApi;
@@ -164,9 +165,8 @@ public class Bucket {
             if(!assumed) return false;
             synchronized (limitLock) {
                 this.assumed = false;
-                this.remaining = headers.getLimit() - this.limit - this.remaining;
+                adjustLimit(headers.getLimit());
                 checkRemaining(headers.getRemaining());
-                if(!limitless) this.limit = headers.getLimit();
                 this.resetMillis = headers.getResetMillis();
                 this.resetAfterMillis = this.resetMillis - System.currentTimeMillis();
                 this.bucket = bucket;
@@ -182,6 +182,30 @@ public class Bucket {
                 lApi.queue(future);
             }
         }
+        this.deleted = true;
+    }
+
+    /**
+     * Not probably synchronized and should not be used for program logic without extra synchronization!
+     */
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+
+    /**
+     * Not probably synchronized and should not be used for program logic without extra synchronization!
+     */
+    public boolean isAssumed() {
+        return assumed;
+    }
+
+
+    /**
+     * Not probably synchronized and should not be used for program logic without extra synchronization!
+     */
+    public int getQueueSize() {
+        return queueSize.get();
     }
 
     private void add(@NotNull QueueableFuture<?> future) {
@@ -257,5 +281,19 @@ public class Bucket {
 
     public @Nullable String getBucket() {
         return bucket;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%sBucket '%s'%s:\n" +
+                "   limit=%d" +
+                "   remaining=%d",
+                (assumed ? "Assumed " : "") + (limitless ? "Limitless " : ""),
+                bucket,
+                limitless || resetMillis < 0 ? "" : String.format(" resets in %.2fs", ((Long) (resetMillis - System.currentTimeMillis())).doubleValue() / 1000d),
+                limit,
+                remaining) +
+                (queueSize.get() > 0 ? "    queueSize=" + queueSize.get() : "");
     }
 }

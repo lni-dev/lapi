@@ -64,6 +64,8 @@ public class QueueThread extends LApiThread implements HasLApi {
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
+    private final BucketDebugger d;
+
     public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?>> queue) {
         super(lApi, group, "queue-thread");
         this.lApi = lApi;
@@ -74,6 +76,7 @@ public class QueueThread extends LApiThread implements HasLApi {
         this.globalBucket = Bucket.newGlobalBucket(lApi);
         this.buckets = new ConcurrentHashMap<>();
         this.bucketsForId = new ConcurrentHashMap<>();
+        d = new BucketDebugger(bucketsForId, globalBucket);
     }
 
     @Override
