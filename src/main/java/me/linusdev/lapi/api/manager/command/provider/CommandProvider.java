@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 /**
- * This provider is used to manually add your {@link BaseCommand}s to the {@link CommandManagerImpl}.
+ * This provider is used to manually adds your {@link BaseCommand}s to the {@link CommandManagerImpl}.
  * {@link #iterator(LApi)} must return an instance for each class extending {@link BaseCommand}.
  */
 public interface CommandProvider {
