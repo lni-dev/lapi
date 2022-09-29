@@ -68,8 +68,8 @@ public class Bucket {
     }
 
     public static @NotNull Bucket newAssumedBucket(@NotNull LApiImpl lApi) {
-        //TODO: add assumed bucket limit to config.
-        return new Bucket(lApi, 3, 3, -1L, -1L, null,true, false);
+        long limit = lApi.getConfig().getHttpRateLimitAssumedBucketLimit();
+        return new Bucket(lApi, limit, limit, -1L, -1L, null,true, false);
     }
 
     /**
@@ -84,8 +84,7 @@ public class Bucket {
     }
 
     public static @NotNull Bucket newGlobalBucket(@NotNull LApiImpl lApi) {
-        //TODO: add below limit to config
-        long globalBucketRetryLimit = 25;
+        long globalBucketRetryLimit = lApi.getConfig().getGlobalHttpRateLimitRetryLimit();
         return newLimitlessBucket(lApi, globalBucketRetryLimit, "global");
     }
 

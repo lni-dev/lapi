@@ -80,6 +80,8 @@ public class LApiImpl implements LApi {
     public static final String LAPI_NAME = "LApi";
 
     public static final ApiVersion DEFAULT_API_VERSION = ApiVersion.V10;
+    public static final long DEFAULT_GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT = 40;
+    public static final long DEFAULT_HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT = 3;
 
     public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;

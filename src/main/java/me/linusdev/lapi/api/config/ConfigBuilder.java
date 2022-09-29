@@ -26,6 +26,8 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.BaseCommand;
@@ -58,6 +60,7 @@ import me.linusdev.lapi.api.objects.sticker.Sticker;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -88,6 +91,8 @@ public class ConfigBuilder implements Datable {
     public final static long DEFAULT_FLAGS = 0L;
 
     private String token = null;
+    private Long globalHttpRateLimitRetryLimit = null;
+    private Long httpRateLimitAssumedBucketLimit = null;
     private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
@@ -239,6 +244,42 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setToken(@NotNull String token){
         this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT}
+     * <p>
+     *     The retry limit after a global http rate limit happened.<br>
+     *     More specific: When a {@link LApiHttpResponse#isRateLimitResponse() rate limit response} is received, how many {@link QueueableFuture futures} to requeue
+     *     at once after waiting {@link RateLimitResponse#getRetryAfter() retry seconds}.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param globalHttpRateLimitRetryLimit retry limit after a global http rate limit happened
+     * @return this
+     */
+    public ConfigBuilder setGlobalHttpRateLimitRetryLimit(@Range(from = 1, to = Long.MAX_VALUE) Long globalHttpRateLimitRetryLimit) {
+        this.globalHttpRateLimitRetryLimit = globalHttpRateLimitRetryLimit;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT}
+     * <p>
+     *     How many requests can be send without knowing the rate limit provided by discord.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param httpRateLimitAssumedBucketLimit assumed bucket limit
+     * @return this
+     */
+    public ConfigBuilder setHttpRateLimitAssumedBucketLimit(@Range(from = 1, to = Long.MAX_VALUE) Long httpRateLimitAssumedBucketLimit) {
+        this.httpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
         return this;
     }
 
@@ -624,6 +665,8 @@ public class ConfigBuilder implements Datable {
 
         return new Config(
                 flags,
+                Objects.requireNonNullElse(globalHttpRateLimitRetryLimit, LApiImpl.DEFAULT_GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT),
+                Objects.requireNonNullElse(httpRateLimitAssumedBucketLimit, LApiImpl.DEFAULT_HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT),
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
                 applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),

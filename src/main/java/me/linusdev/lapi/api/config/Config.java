@@ -44,6 +44,8 @@ import java.util.function.Supplier;
 public class Config {
 
     private final long flags;
+    private final long globalHttpRateLimitRetryLimit;
+    private final long HttpRateLimitAssumedBucketLimit;
     private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
     private final @NotNull String token;
     private final @Nullable Snowflake applicationId;
@@ -62,12 +64,14 @@ public class Config {
     private final @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory;
     private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
-    public Config(long flags, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
+    public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
                   @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
+        this.globalHttpRateLimitRetryLimit = globalHttpRateLimitRetryLimit;
+        HttpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
         this.token = token;
 
         this.queueSupplier = queueSupplier;
@@ -95,6 +99,14 @@ public class Config {
      */
     public boolean isFlagSet(ConfigFlag flag){
         return flag.isSet(flags);
+    }
+
+    public long getGlobalHttpRateLimitRetryLimit() {
+        return globalHttpRateLimitRetryLimit;
+    }
+
+    public long getHttpRateLimitAssumedBucketLimit() {
+        return HttpRateLimitAssumedBucketLimit;
     }
 
     /**
