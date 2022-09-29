@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 @Inherited
 @Documented
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 public @interface Command {
 
 }
