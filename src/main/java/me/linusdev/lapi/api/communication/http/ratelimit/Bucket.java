@@ -17,7 +17,6 @@
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
-import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
