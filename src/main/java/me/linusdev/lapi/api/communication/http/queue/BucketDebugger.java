@@ -105,6 +105,8 @@ public class BucketDebugger extends JFrame {
 
             if(bucket.getQueueSize() > 0) {
                 setBorder(new ColorBorder(Color.red));
+            } else {
+                setBorder(new ColorBorder(Color.white));
             }
 
             if(bucket.isDeleted()) {

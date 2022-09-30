@@ -92,6 +92,7 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
         }
 
         try {
+            //TODO:  if(response.isRateLimitResponse()) ...
             if(response.isError()){
                 result = new ComputationResult<>(null, new QResponse(query, response), Error.of(response.getErrorMessage()));
             } else {
@@ -100,14 +101,14 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
 
         } catch (InvalidDataException invalidDataException){
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
-            log.error("InvalidDataException while trying to process result of " + query.toString());
+            log.error("InvalidDataException while trying to process result of " + query.asString());
             log.error(invalidDataException);
             log.errorAlign(invalidDataException.getData() == null ? null : invalidDataException.getData().toJsonString().toString(), "Data: ");
             return new ComputationResult<>(null, new QResponse(query, response), new ThrowableError(invalidDataException));
 
         }  catch (Throwable t) {
             LogInstance log = Logger.getLogger("Retriever", Logger.Type.ERROR);
-            log.error("Exception while trying to process result of " + query.toString());
+            log.error("Exception while trying to process result of " + query.asString());
             log.error(t);
             return new ComputationResult<>(null, new QResponse(query, response), new ThrowableError(t));
         }

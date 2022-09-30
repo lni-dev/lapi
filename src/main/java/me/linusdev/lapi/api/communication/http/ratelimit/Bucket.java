@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -37,6 +38,7 @@ public class Bucket {
 
     private final @NotNull Queue<QueueableFuture<?>> queue;
     private final @NotNull AtomicInteger queueSize = new AtomicInteger(0);
+    private final @NotNull AtomicBoolean resetScheduled = new AtomicBoolean(false);
 
     private final @NotNull Object limitLock = new Object();
     private volatile long limit;
@@ -100,17 +102,19 @@ public class Bucket {
      */
     public boolean canSendOrAddToQueue(@NotNull QueueableFuture<?> future) {
         synchronized (limitLock){
+            if (resetMillis >= 0L && resetMillis <= System.currentTimeMillis()) {
+                reset();
+                synchronized (queueSize) {
+                    if(queueSize.get() == 0) {
+                        return canSendOrAddToQueue(future);
+                    }
+                }
+            }
+
             if(remaining >= 1L) {
                 if(!limitless) remaining--;
                 return true;
 
-            } else if (resetMillis > 0L && resetMillis <= System.currentTimeMillis()) {
-                synchronized (queueSize) {
-                    if(queueSize.get() == 0) {
-                        reset(false);
-                        return canSendOrAddToQueue(future);
-                    }
-                }
             }
         }
 
@@ -118,6 +122,10 @@ public class Bucket {
         return false;
     }
 
+    /**
+     * This method should never be called from a synchronized context (of this Bucket).
+     * @param headers {@link RateLimitHeaders}
+     */
     public void onResponse(@NotNull RateLimitHeaders headers) {
         synchronized (limitLock) {
             if(this.limit != headers.getLimit())
@@ -126,6 +134,7 @@ public class Bucket {
             this.resetMillis = headers.getResetMillis();
             this.resetAfterMillis = this.resetMillis - System.currentTimeMillis();
         }
+        checkReset();
     }
 
     public void onRateLimit(@NotNull QueueableFuture<?> future, @NotNull RateLimitResponse rateLimitResponse) {
@@ -152,6 +161,7 @@ public class Bucket {
                 onRateLimit(future, rateLimitResponse);
             }
         }
+        checkReset();
     }
 
     /**
@@ -211,21 +221,15 @@ public class Bucket {
     private void add(@NotNull QueueableFuture<?> future) {
         synchronized (queueSize) {
             queue.add(future);
-            if(queueSize.incrementAndGet() == 1) {
-                asyncReset(System.currentTimeMillis() - resetMillis);
-            }
+            queueSize.incrementAndGet();
         }
+        checkReset();
     }
 
-    private void reset(boolean emptyQueue) {
-        //remaining will be reset in canSendOrAddToQueue
+    private void reset() {
         synchronized (limitLock){
-            if(resetMillis != -1) resetMillis += resetAfterMillis;
-            remaining = limitless ? 1L : limit-1L;
-        }
-
-        if(emptyQueue) {
-            emptyQueue();
+            resetMillis = -1L;
+            remaining = limitless ? 1L : limit;
         }
     }
 
@@ -243,22 +247,56 @@ public class Bucket {
     }
 
     private void emptyQueue() {
+        log.debug("Emptying the queue...");
         synchronized (queueSize) {
             for (int i = 0; limit < 0 || i < limit; i++) {
                 QueueableFuture<?> future = queue.poll();
+                if (future == null){
+                    synchronized (resetScheduled) {
+                        resetScheduled.set(false);
+                    }
+                    return;
+                }
                 queueSize.decrementAndGet();
-                if (future == null) return;
                 lApi.queue(future);
             }
 
-            if (queue.peek() != null) {
-                asyncReset(resetAfterMillis);
+            if (queue.peek() != null && !resetScheduled.get()) {
+                log.debug("Queue is still not completely empty. Emptying again in " + resetAfterMillis + " ms.");
+                synchronized (resetScheduled) {
+                    asyncReset(resetAfterMillis);
+                }
+            } else {
+                synchronized (resetScheduled) {
+                    resetScheduled.set(false);
+                }
+            }
+
+
+        }
+    }
+
+    private void checkReset() {
+        synchronized (queueSize) {
+            synchronized (resetScheduled) {
+                final long resetMillisCopy = resetMillis; //So we do not have to synchronize on limitLock
+                if (resetMillisCopy > -1 && !resetScheduled.get() && queueSize.get() > 0) {
+                    asyncReset(resetMillisCopy - System.currentTimeMillis());
+                }
             }
         }
     }
 
+    /**
+     * must always be called synchronized on {@link #resetScheduled}!
+     * @param delay in how many milliseconds to schedule the reset.
+     */
     private void asyncReset(long delay) {
-        lApi.runSupervised(() -> reset(true), Math.max(0, delay));
+        //This will actually not reset, but only empty the queue.
+        //The actual reset will happen in canSendOrAddToQueue.
+        log.debug("async reset in " + Math.max(0, delay));
+        resetScheduled.set(true);
+        lApi.runSupervised(this::emptyQueue, Math.max(0, delay));
     }
 
     private void adjustLimit(long newLimit) {
@@ -294,6 +332,6 @@ public class Bucket {
                 limitless || resetMillis < 0 ? "" : String.format(" resets in %.2fs", ((Long) (resetMillis - System.currentTimeMillis())).doubleValue() / 1000d),
                 limit,
                 remaining) +
-                (queueSize.get() > 0 ? "    queueSize=" + queueSize.get() : "");
+                ("    queueSize=" + queueSize.get() + " | " + queue.size());
     }
 }
