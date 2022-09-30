@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.async.queue;
 
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.response.RateLimitError;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,17 +31,37 @@ public class QResponse {
     private final @NotNull Query query;
     private final @Nullable LApiHttpResponse response;
     private final @Nullable Throwable exception;
+    private final @Nullable RateLimitError rateLimitError;
 
     public QResponse(@NotNull Query query, @NotNull LApiHttpResponse response) {
         this.query = query;
         this.response = response;
+        this.rateLimitError = null;
+        this.exception = null;
+    }
+
+    public QResponse(@NotNull Query query, @NotNull LApiHttpResponse response, @Nullable RateLimitError rateLimitError) {
+        this.query = query;
+        this.response = response;
+        this.rateLimitError = rateLimitError;
         this.exception = null;
     }
 
     public QResponse(@NotNull Query query, @NotNull Throwable exception) {
         this.query = query;
         this.response = null;
+        this.rateLimitError = null;
         this.exception = exception;
+    }
+
+    /**
+     * The {@link RateLimitError} contains information about the rate limit and if the {@link QueueableFuture} will
+     * automatically be sent again (see {@link RateLimitError#doesRetry()}).
+     *
+     * @return {@link RateLimitError} if this is a rate limit response. {@code null} otherwise
+     */
+    public @Nullable RateLimitError getRateLimitError() {
+        return rateLimitError;
     }
 
     /**

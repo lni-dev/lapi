@@ -17,11 +17,21 @@
 package me.linusdev.lapi.api.async.error;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.async.queue.QResponse;
+import me.linusdev.lapi.api.async.queue.QueueableFuture;
+import me.linusdev.lapi.api.communication.http.response.RateLimitError;
 import org.jetbrains.annotations.NotNull;
 
 public enum StandardErrorTypes implements ErrorType, SimpleDatable {
 
     THROWABLE,
+
+    /**
+     * {@link QueueableFuture} was rate limited. The error can be cast to {@link RateLimitError}.
+     * If {@link RateLimitError#doesRetry()} is {@code true}, the future will be automatically executed later.
+     * @see QResponse#getRateLimitError()
+     */
+    RATE_LIMIT,
 
     COMMAND_NOT_FOUND,
     COMMAND_ALREADY_ENABLED,

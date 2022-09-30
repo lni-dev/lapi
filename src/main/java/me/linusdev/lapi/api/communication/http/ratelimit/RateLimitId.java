@@ -48,7 +48,7 @@ public interface RateLimitId extends Unique {
         @NotNull PlaceHolder[] placeHolders = query.getPlaceHolders();
 
         int hash = query.getMethod().ordinal() +  query.getLink().uniqueId() * 10;
-        StringBuilder id = new StringBuilder(hash);
+        StringBuilder id = new StringBuilder(String.valueOf(hash));
 
         for (PlaceHolder placeHolder : placeHolders) {
             if (!placeHolder.getKey().isImportantForIdentifier()) {

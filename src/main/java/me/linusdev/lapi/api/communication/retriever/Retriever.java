@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.http.response.RateLimitError;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
@@ -92,11 +93,17 @@ public abstract class Retriever<T> extends QueueableImpl<T> implements HasLApi {
         }
 
         try {
-            //TODO:  if(response.isRateLimitResponse()) ...
-            if(response.isError()){
+            if(response.isRateLimitResponse()) {
+                //noinspection ConstantConditions: checked by above if
+                RateLimitError error =  new RateLimitError(response.getRateLimitResponse());
+                result = new ComputationResult<>(null, new QResponse(query, response, error), error);
+
+            } else if(response.isError()){
                 result = new ComputationResult<>(null, new QResponse(query, response), Error.of(response.getErrorMessage()));
+
             } else {
                 result = new ComputationResult<>(process(response), new QResponse(query, response), null);
+
             }
 
         } catch (InvalidDataException invalidDataException){
