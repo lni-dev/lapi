@@ -30,10 +30,12 @@ import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,8 +66,6 @@ public class QueueThread extends LApiThread implements HasLApi {
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
-    private final BucketDebugger d;
-
     public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?>> queue) {
         super(lApi, group, "queue-thread");
         this.lApi = lApi;
@@ -76,7 +76,11 @@ public class QueueThread extends LApiThread implements HasLApi {
         this.globalBucket = Bucket.newGlobalBucket(lApi);
         this.buckets = new ConcurrentHashMap<>();
         this.bucketsForId = new ConcurrentHashMap<>();
-        d = new BucketDebugger(bucketsForId, globalBucket);
+    }
+
+    @ApiStatus.Internal
+    public @NotNull BucketDebugger debug() {
+        return new BucketDebugger(bucketsForId, globalBucket);
     }
 
     @Override
@@ -185,7 +189,11 @@ public class QueueThread extends LApiThread implements HasLApi {
                 log.debug("Future was executed successfully.");
                 RateLimitHeaders headers = response.getRateLimitHeaders();
                 if(headers == null) {
-                    log.warning("Received response without rate limit headers");
+                    log.debug("Received response without rate limit headers");
+                    if(id.getType() == RateLimitId.Type.UNIQUE) {
+                        log.debug("Removing bucket, because it's id is unique.");
+                        deleteBucket(id, bucket);
+                    }
                     bucket.incrementRemaining();
                     continue;
                 }
@@ -212,6 +220,17 @@ public class QueueThread extends LApiThread implements HasLApi {
         }
     }
 
+    private void deleteBucket(@NotNull RateLimitId id, @NotNull Bucket bucket) {
+        synchronized (bucketsWriteLock) {
+            bucketsForId.remove(id);
+            if(bucket.getBucket() != null) {
+                buckets.remove(bucket.getBucket());
+            }
+
+            bucket.delete();
+        }
+    }
+
     private @NotNull Bucket getOrPutBucket(@NotNull RateLimitId id, @NotNull Supplier<Bucket> supplier) {
         synchronized (bucketsWriteLock) {
             return bucketsForId.computeIfAbsent(id, rateLimitId -> {
@@ -227,6 +246,9 @@ public class QueueThread extends LApiThread implements HasLApi {
             Bucket got = buckets.get(bucket);
             if(got == null) {
                 buckets.put(bucket, other);
+                if(other.getBucket() != null && !Objects.equals(other.getBucket(), bucket)) {
+                    log.error("bucket names do not match: " + other.getBucket() + "!=" + bucket);
+                }
                 return other;
             } else if(got != other) {
                 bucketsForId.put(id, got);

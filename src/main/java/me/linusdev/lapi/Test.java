@@ -183,23 +183,6 @@ public class Test implements EventListener{
     @Override
     public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
         System.out.println("onReady");
-
-        String applicationId = event.getApplication().getId();
-
-        /*lApi.getRequestFactory().createGlobalApplicationCommand(applicationId,
-                new ApplicationCommandTemplate("hi", null, "says hi to you",
-                        null,
-                        null, null, null, null))
-                .queue(((applicationCommand, error) -> {
-                    if(error != null){
-                        System.out.println(error);
-                        return;
-                    }
-
-                    System.out.println("application command id: " + applicationCommand.getId());
-                    System.out.println("application command name: " + applicationCommand.getName());
-                }));*/
-
     }
 
     @Override
@@ -450,6 +433,8 @@ public class Test implements EventListener{
         String content = msg.getContent();
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();
+
+        lApi.getRequestFactory().getChannel(event.getChannelId()).queue();
 
         if(!author.isBot()){
             if(content.toLowerCase().startsWith("hi")) {

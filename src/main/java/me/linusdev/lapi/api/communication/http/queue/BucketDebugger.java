@@ -56,7 +56,7 @@ public class BucketDebugger extends JFrame {
     }
 
     private void init() {
-        setLayout(new FlowLayout(FlowLayout.CENTER, 1000, 10));
+        setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
         getContentPane().add(top);
         getContentPane().add(globalView);
         for(Map.Entry<RateLimitId, Bucket> entry : buckets.entrySet()) {

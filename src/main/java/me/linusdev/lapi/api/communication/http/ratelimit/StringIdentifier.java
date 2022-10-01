@@ -16,10 +16,6 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
-import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.other.placeholder.Concatable;
-import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
-import me.linusdev.lapi.api.communication.http.request.Method;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -30,10 +26,12 @@ public class StringIdentifier implements RateLimitId {
 
     private final String id;
     private final int hash;
+    private final @NotNull Type type;
 
-    public StringIdentifier(String id, int hash) {
+    public StringIdentifier(String id, int hash, @NotNull Type type) {
         this.id = id;
         this.hash = hash;
+        this.type = type;
     }
 
     @Override
@@ -48,5 +46,10 @@ public class StringIdentifier implements RateLimitId {
     @Override
     public int hashCode() {
         return hash;
+    }
+
+    @Override
+    public @NotNull Type getType() {
+        return type;
     }
 }

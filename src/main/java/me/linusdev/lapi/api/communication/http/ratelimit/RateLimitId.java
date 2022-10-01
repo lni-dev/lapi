@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
 import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.interfaces.Unique;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
@@ -29,6 +30,23 @@ import org.jetbrains.annotations.NotNull;
 public interface RateLimitId extends Unique {
 
     static final LogInstance log = Logger.getLogger("StringIdentifier");
+
+    public static enum Type {
+        /**
+         * This id is exactly for one request
+         */
+        UNIQUE,
+
+        /**
+         * This id is for all requests of given link. These can also be {@link #UNIQUE}, if {@link AbstractLink#containsPlaceholders()} is {@code false}.
+         */
+        LINK_LEVEL_UNIQUE,
+
+        /**
+         * This id is for the top level resource id
+         */
+        TOP_LEVEL_UNIQUE,
+    }
 
     /**
      * Identifier for links without any {@link PlaceHolder}.
@@ -58,9 +76,9 @@ public interface RateLimitId extends Unique {
             id.append("_").append(placeHolder.getValue());
         }
 
-        log.debugAlign("Created complete link id for query " + query.asString() + ":\nid=" + id + "\nhash=" + hash);
+        log.debug("Created complete link id for query " + query.asString() + ": id=" + id + ", hash=" + hash);
 
-        return new StringIdentifier(id.toString(), hash);
+        return new StringIdentifier(id.toString(), hash, Type.UNIQUE);
     }
 
     /**
@@ -73,7 +91,7 @@ public interface RateLimitId extends Unique {
 
         for(PlaceHolder p : query.getPlaceHolders()) {
             if(p.getKey().isTopLevelResource()) {
-                log.debugAlign("Created top level id for query " + query.asString() + ":\nname=" + p.getKey() + "\nresource-id=" + p.getValue());
+                log.debug("Created top level id for query " + query.asString() + ": name=" + p.getKey() + ", resource-id=" + p.getValue());
                 return new TopLevelIdentifier(p.getValue(), p.getKey());
             }
         }
@@ -104,5 +122,7 @@ public interface RateLimitId extends Unique {
 
         return newCompleteLinkIdentifier(query);
     }
+
+    @NotNull Type getType();
 
 }

@@ -162,6 +162,9 @@ public class LApiImpl implements LApi {
         this.queueThread = new QueueThread(this, lApiThreadGroup, queue);
         this.queueThread.start();
 
+        //TODO: remove
+        this.queueThread.debug();
+
         requestFactory = new RequestFactory(this);
         eventTransmitter = new EventTransmitter(this);
         readyEventAwaiter = new ReadyEventAwaiter(this);

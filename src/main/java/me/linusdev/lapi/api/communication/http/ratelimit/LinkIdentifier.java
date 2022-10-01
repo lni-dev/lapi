@@ -41,4 +41,9 @@ public class LinkIdentifier implements RateLimitId {
     public int hashCode() {
         return link.uniqueId();
     }
+
+    @Override
+    public @NotNull Type getType() {
+        return Type.LINK_LEVEL_UNIQUE;
+    }
 }

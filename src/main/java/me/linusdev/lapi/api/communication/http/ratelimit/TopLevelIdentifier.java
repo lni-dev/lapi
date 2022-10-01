@@ -42,4 +42,9 @@ public class TopLevelIdentifier implements RateLimitId {
     public int hashCode() {
         return topLevelId.hashCode() + topLevelResource.code();
     }
+
+    @Override
+    public @NotNull Type getType() {
+        return Type.TOP_LEVEL_UNIQUE;
+    }
 }

@@ -49,7 +49,7 @@ public class Bucket {
     private final @NotNull Object assumedLock = new Object();
     /**
      * Over the lifetime of a {@link Bucket} this variable may only change from {@code true} to {@code false}, but
-     * never wise-versa!
+     * never vise-versa!
      */
     private volatile boolean assumed;
 
@@ -322,13 +322,16 @@ public class Bucket {
 
     @Override
     public String toString() {
+
+        String resetS = resetMillis < System.currentTimeMillis() ? " can reset" : String.format(" resets in %.2fs", ((Long) (resetMillis - System.currentTimeMillis())).doubleValue() / 1000d);
+
         return String.format(
                 "%sBucket '%s'%s:\n" +
                 "   limit=%d" +
                 "   remaining=%d",
                 (assumed ? "Assumed " : "") + (limitless ? "Limitless " : ""),
                 bucket,
-                limitless || resetMillis < 0 ? "" : String.format(" resets in %.2fs", ((Long) (resetMillis - System.currentTimeMillis())).doubleValue() / 1000d),
+                limitless || resetMillis < 0 ? "" : resetS,
                 limit,
                 remaining) +
                 ("    queueSize=" + queueSize.get() + " | " + queue.size());
