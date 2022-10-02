@@ -170,9 +170,10 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                     } else if(response.getRateLimitScope() == RateLimitScope.SHARED) {
                         if(sharedResourceId == null) sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
+                        final @Nullable RateLimitId finalSharedResourceId = sharedResourceId;
                         final @NotNull Bucket sRBucket = getOrPutBucket(sharedResourceId, () -> {
                             Bucket b = Bucket.newSharedResourceBucket(lApi, future);
-                            b.addId(sharedResourceId);
+                            b.addId(finalSharedResourceId);
                             return b;
                         });
                         sRBucket.onRateLimit(future, rateLimitResponse);
