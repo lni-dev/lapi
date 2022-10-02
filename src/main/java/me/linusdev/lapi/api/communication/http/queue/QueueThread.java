@@ -88,7 +88,6 @@ public class QueueThread extends LApiThread implements HasLApi {
         log.log("Started queue thread.");
         try {
             boolean hasSRRL;
-            @NotNull RateLimitId id;
 
             while (!stopImmediately.get()) {
                 if(queue.peek() == null && stopIfEmpty.get()) break;
@@ -118,8 +117,12 @@ public class QueueThread extends LApiThread implements HasLApi {
                     }
                 }
 
-                id = RateLimitId.newIdentifier(query);
-                Bucket bucket = getOrPutBucket(id, () -> Bucket.newAssumedBucket(lApi));
+                final @NotNull RateLimitId id = RateLimitId.newIdentifier(query);
+                Bucket bucket = getOrPutBucket(id, () -> {
+                    Bucket b = Bucket.newAssumedBucket(lApi);
+                    b.addId(id);
+                    return b;
+                });
                 if (!bucket.canSendOrAddToQueue(future)) continue;
 
 
@@ -167,7 +170,11 @@ public class QueueThread extends LApiThread implements HasLApi {
 
                     } else if(response.getRateLimitScope() == RateLimitScope.SHARED) {
                         if(sharedResourceId == null) sharedResourceId = RateLimitId.newSharedResourceIdentifier(query);
-                        final @NotNull Bucket sRBucket = getOrPutBucket(sharedResourceId, () -> Bucket.newSharedResourceBucket(lApi, future));
+                        final @NotNull Bucket sRBucket = getOrPutBucket(sharedResourceId, () -> {
+                            Bucket b = Bucket.newSharedResourceBucket(lApi, future);
+                            b.addId(sharedResourceId);
+                            return b;
+                        });
                         sRBucket.onRateLimit(future, rateLimitResponse);
 
                     } else if(response.getRateLimitScope() == RateLimitScope.USER) {
@@ -223,11 +230,11 @@ public class QueueThread extends LApiThread implements HasLApi {
     private void deleteBucket(@NotNull RateLimitId id, @NotNull Bucket bucket) {
         synchronized (bucketsWriteLock) {
             bucketsForId.remove(id);
-            if(bucket.getBucket() != null) {
-                buckets.remove(bucket.getBucket());
-            }
-
-            bucket.delete();
+            bucket.delete(id, () -> {
+                if(bucket.getBucket() != null) {
+                    buckets.remove(bucket.getBucket());
+                }
+            });
         }
     }
 
@@ -252,7 +259,11 @@ public class QueueThread extends LApiThread implements HasLApi {
                 return other;
             } else if(got != other) {
                 bucketsForId.put(id, got);
-                other.delete();
+                other.delete(id, () -> {
+                    if(other.getBucket() != null) {
+                        buckets.remove(other.getBucket());
+                    }
+                });
                 return got;
             }
 

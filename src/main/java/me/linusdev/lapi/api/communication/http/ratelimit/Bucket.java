@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.http.ratelimit;
 
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.lapi.LApiImpl;
+import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +47,8 @@ public class Bucket {
     private volatile long resetAfterMillis;
     private volatile @Nullable String bucket;
 
+    private final @NotNull LinusLinkedList<RateLimitId> ids;
+
     private final @NotNull Object assumedLock = new Object();
     /**
      * Over the lifetime of a {@link Bucket} this variable may only change from {@code true} to {@code false}, but
@@ -66,7 +69,8 @@ public class Bucket {
         this.bucket = bucket;
         this.assumed = assumed;
         this.limitless = limitless;
-        queue = new ConcurrentLinkedQueue<>();
+        this.queue = new ConcurrentLinkedQueue<>();
+        this.ids = new LinusLinkedList<>();
     }
 
     public static @NotNull Bucket newAssumedBucket(@NotNull LApiImpl lApi) {
@@ -92,6 +96,17 @@ public class Bucket {
 
     public static @NotNull Bucket newSharedResourceBucket(@NotNull LApiImpl lApi, @NotNull QueueableFuture<?> future) {
         return newLimitlessBucket(lApi, -1L, "sharedResourceBucket_" + future.getTask().getName());
+    }
+
+    /**
+     *
+     * @param id the {@link RateLimitId} to add
+     * @return {@code false} if this bucket is already deleted.
+     */
+    public boolean addId(@NotNull RateLimitId id) {
+        if(deleted) return false;
+        ids.add(id);
+        return true;
     }
 
     /**
@@ -185,13 +200,26 @@ public class Bucket {
         return true;
     }
 
-    public void delete() {
-        synchronized (queueSize) {
-            for(QueueableFuture<?> future : queue) {
-                lApi.queue(future);
+    /**
+     *
+     * @param id the {@link RateLimitId} to remove from this bucket
+     * @param ifDeleted {@link Runnable} executed if this bucket is deleted due to this method call. Will
+     *                                  be executed synchronized on this bucket.
+     * @return {@code true} if the bucket got deleted, due to removing of this id.
+     */
+    public synchronized boolean delete(@NotNull RateLimitId id, @Nullable Runnable ifDeleted) {
+        ids.remove(id);
+        if(ids.isEmpty()) {
+            synchronized (queueSize) {
+                for(QueueableFuture<?> future : queue) {
+                    lApi.queue(future);
+                }
             }
+            this.deleted = true;
+            if(ifDeleted != null) ifDeleted.run();
         }
-        this.deleted = true;
+
+        return this.deleted;
     }
 
     /**

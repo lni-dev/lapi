@@ -115,7 +115,7 @@ public class Test implements EventListener{
 
         while(System.currentTimeMillis() - cMillis < 1){}
 
-        LApi lApi = new ConfigBuilder(Helper.getConfigPath())
+        ConfigBuilder cb = new ConfigBuilder(Helper.getConfigPath())
                 .enable(ConfigFlag.ENABLE_GATEWAY)
                 .enable(ConfigFlag.CACHE_ROLES)
                 .enable(ConfigFlag.CACHE_GUILDS)
@@ -158,7 +158,11 @@ public class Test implements EventListener{
                                     System.out.println("Fatal");
                                 }
                             });
-                }).buildLApi();
+                });
+
+        cb.writeToFile(Helper.getConfigPath(), true);
+
+        LApi lApi = cb.buildLApi();
 
         lApi.getEventTransmitter().addListener(new Test());
 
@@ -434,8 +438,6 @@ public class Test implements EventListener{
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();
 
-        lApi.getRequestFactory().getChannel(event.getChannelId()).queue();
-
         if(!author.isBot()){
             if(content.toLowerCase().startsWith("hi")) {
 
@@ -443,7 +445,7 @@ public class Test implements EventListener{
                         .setReplyTo(msg, true)
                         .getQueueable(channelId)
                         .queue();
-            }else if(content.toLowerCase().startsWith("hey")) {
+            } else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
                 try {
                     lApi.getRequestFactory().createMessage(event.getChannelId(), new MessageTemplate("look below", false,
