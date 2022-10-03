@@ -95,9 +95,9 @@ public class QueueThread extends LApiThread implements HasLApi {
 
         final @NotNull QRunnable checks = new QRunnable() {
 
-            final int bucketCheckSize = 0;
-            final long assumedBucketMaxLifeTime = 10_000L;
-            final long bucketMaxLastUsedTime = 30_000L;
+            final int bucketCheckSize = lApi.getConfig().getBucketsCheckAmount();
+            final long assumedBucketMaxLifeTime = lApi.getConfig().getAssumedBucketMaxLifeTime();
+            final long bucketMaxLastUsedTime = lApi.getConfig().getBucketMaxLastUsedTime();
 
             @Override
             public boolean allowInterrupts() {
@@ -107,7 +107,7 @@ public class QueueThread extends LApiThread implements HasLApi {
             @Override
             public void run() {
 
-                //size() is by no means thread safe, but it is enough for this check, even if there is more or less in
+                //size() is by no means thread safe, but it is enough for this check, even if there is a little more or less in
                 //the map, it does not matter.
                 if(bucketsForId.size() > bucketCheckSize) {
 
