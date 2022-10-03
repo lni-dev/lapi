@@ -36,6 +36,9 @@ public class Bucket {
 
     private final @NotNull LApiImpl lApi;
 
+    private final long created;
+    private volatile long lastUsed;
+
     private final @NotNull Queue<QueueableFuture<?>> queue;
     private final @NotNull AtomicInteger queueSize = new AtomicInteger(0);
     private final @NotNull AtomicBoolean resetScheduled = new AtomicBoolean(false);
@@ -71,6 +74,8 @@ public class Bucket {
         this.limitless = limitless;
         this.queue = new ConcurrentLinkedQueue<>();
         this.ids = new LinusLinkedList<>();
+        this.created = System.currentTimeMillis();
+        this.lastUsed = created;
     }
 
     public static @NotNull Bucket newAssumedBucket(@NotNull LApiImpl lApi) {
@@ -115,6 +120,7 @@ public class Bucket {
      * @return {@code true} if given future can be sent. {@code false} it will be added to a queue.
      */
     public boolean canSendOrAddToQueue(@NotNull QueueableFuture<?> future) {
+        this.lastUsed = System.currentTimeMillis();
         synchronized (limitLock){
             if (resetMillis >= 0L && resetMillis <= System.currentTimeMillis()) {
                 reset();
@@ -141,6 +147,7 @@ public class Bucket {
      * @param headers {@link RateLimitHeaders}
      */
     public void onResponse(@NotNull RateLimitHeaders headers) {
+        this.lastUsed = System.currentTimeMillis();
         synchronized (limitLock) {
             if(this.limit != headers.getLimit())
                 adjustLimit(headers.getLimit());
@@ -152,6 +159,7 @@ public class Bucket {
     }
 
     public void onRateLimit(@NotNull QueueableFuture<?> future, @NotNull RateLimitResponse rateLimitResponse) {
+        this.lastUsed = System.currentTimeMillis();
         synchronized (limitLock) {
             this.remaining = 0L;
             this.resetMillis = rateLimitResponse.getRetryAtMillis();
@@ -185,6 +193,7 @@ public class Bucket {
      * @return {@code false} if the bucket was not an assumed bucket. {@code true} if this bucket was assumed before this call.
      */
     public boolean makeConcrete(@NotNull String bucket, @NotNull RateLimitHeaders headers) {
+        this.lastUsed = System.currentTimeMillis();
         synchronized (assumedLock) {
             if(!assumed) return false;
             synchronized (limitLock) {
@@ -346,6 +355,14 @@ public class Bucket {
 
     public @Nullable String getBucket() {
         return bucket;
+    }
+
+    public long getCreated() {
+        return created;
+    }
+
+    public long getLastUsed() {
+        return lastUsed;
     }
 
     @Override

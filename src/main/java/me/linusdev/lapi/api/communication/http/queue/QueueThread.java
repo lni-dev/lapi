@@ -34,6 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
@@ -62,6 +63,10 @@ public class QueueThread extends LApiThread implements HasLApi {
     private final @NotNull AtomicBoolean stopImmediately = new AtomicBoolean(false);
 
     private final @NotNull AtomicBoolean isWaiting;
+    /**
+     * If interrupts are allowed. Interrupts to stop the queue immediately are always allowed.
+     */
+    private final @NotNull AtomicBoolean allowInterrupts;
     private final @NotNull Object waitingLock = new Object();
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
@@ -72,6 +77,7 @@ public class QueueThread extends LApiThread implements HasLApi {
         this.queue = queue;
 
         this.isWaiting = new AtomicBoolean(false);
+        this.allowInterrupts = new AtomicBoolean(false);
 
         this.globalBucket = Bucket.newGlobalBucket(lApi);
         this.buckets = new ConcurrentHashMap<>();
@@ -86,12 +92,60 @@ public class QueueThread extends LApiThread implements HasLApi {
     @Override
     public void run() {
         log.log("Started queue thread.");
+
+        final @NotNull QRunnable checks = new QRunnable() {
+
+            final int bucketCheckSize = 0;
+            final long assumedBucketMaxLifeTime = 20_000L;
+            final long bucketMaxLastUsedTime = 50_000L;
+
+            @Override
+            public boolean allowInterrupts() {
+                return true;
+            }
+
+            @Override
+            public void run() {
+
+                //size() is by no means thread safe, but it is enough for this check, even if there is more or less in
+                //the map, it does not matter.
+                if(bucketsForId.size() > bucketCheckSize) {
+
+                    log.debug("Running deletion checks...");
+
+                    Iterator<Map.Entry<RateLimitId, Bucket>> it = bucketsForId.entrySet().iterator();
+                    Map.Entry<RateLimitId, Bucket> entry;
+
+                    while (it.hasNext()) {
+
+                        //check if interrupted, but do not clear the status.
+                        if(isInterrupted()) {
+                            break;
+                        }
+
+                        entry = it.next();
+                        final Bucket bucket = entry.getValue();
+                        final RateLimitId id = entry.getKey();
+
+                        if(bucket.isAssumed() ) {
+                            if(System.currentTimeMillis() - bucket.getCreated() > assumedBucketMaxLifeTime)
+                                bucket.delete(id, () -> deleteBucket(id, bucket));
+
+                        } else if(System.currentTimeMillis() - bucket.getLastUsed() > bucketMaxLastUsedTime) {
+                            bucket.delete(id, () -> deleteBucket(id, bucket));
+
+                        }
+                    }
+                }
+            }
+        };
+
         try {
             boolean hasSRRL;
 
             while (!stopImmediately.get()) {
                 if(queue.peek() == null && stopIfEmpty.get()) break;
-                awaitNotifyIf(10000L, () -> queue.peek() == null);
+                awaitNotifyIf(10000L, () -> queue.peek() == null, checks);
 
                 //noinspection ConstantConditions: checked by below if
                 final @NotNull QueueableFuture<?> future = queue.poll();
@@ -287,21 +341,42 @@ public class QueueThread extends LApiThread implements HasLApi {
      * @param timeoutMillis how long to wait
      * @param check {@link BooleanSupplier}. Only if {@code true} is returned the queue will wait.
      */
-    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check) throws InterruptedException {
+    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check, @Nullable QRunnable doMeanwhile) throws InterruptedException {
         synchronized (waitingLock) {
-            if(!check.getAsBoolean()) return;
-            try {
-                isWaiting.set(true);
-                waitingLock.wait(timeoutMillis);
-                isWaiting.set(false);
-            }finally {
-                isWaiting.set(false);
+            if (!check.getAsBoolean()) return;
+            isWaiting.set(true);
+        }
+        if (doMeanwhile != null) {
+            synchronized (allowInterrupts) {
+                allowInterrupts.set(doMeanwhile.allowInterrupts());
             }
+            doMeanwhile.run();
         }
 
+        synchronized (allowInterrupts) {
+            allowInterrupts.set(false);
+        }
+
+        synchronized (waitingLock) {
+            //clear interrupted state
+            if (!interrupted()) {
+                //check again in the case something was added to the queue while doMeanwhile was running
+                if (!check.getAsBoolean()) {
+                    //set waiting to false and return
+                    isWaiting.set(false);
+                    return;
+                }
+                //we can safely wait if we reach this statement.
+                waitingLock.wait(timeoutMillis);
+            }
+            isWaiting.set(false);
+        }
     }
 
     public void notifyAllAwaiting() {
+        synchronized (allowInterrupts) {
+            if(allowInterrupts.get()) interrupt();
+        }
         synchronized (waitingLock) {
             waitingLock.notifyAll();
         }
