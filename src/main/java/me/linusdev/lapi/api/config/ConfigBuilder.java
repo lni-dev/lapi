@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.communication.http.ratelimit.Bucket;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
@@ -88,15 +89,29 @@ public class ConfigBuilder implements Datable {
     public final static String FLAGS_KEY = "flags";
     public final static String GATEWAY_CONFIG_KEY = "gateway_config";
 
+    public final static String GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT_KEY = "global_http_rate_limit_retry_limit";
+    public final static String HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT_KEY = "http_rate_limit_assumed_bucket_limit";
+    public final static String BUCKETS_CHECK_AMOUNT_KEY = "buckets_check_amount";
+    public final static String ASSUMED_BUCKET_MAX_LIFE_TIME_KEY = "assumed_bucket_max_life_time";
+    public final static String BUCKET_MAX_LAST_USED_TIME_KEY = "bucket_max_last_used_time";
+
     public final static long DEFAULT_FLAGS = 0L;
 
     private String token = null;
-    private Long globalHttpRateLimitRetryLimit = null;
-    private Long httpRateLimitAssumedBucketLimit = null;
     private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
+
+    //Queue
+    private Long globalHttpRateLimitRetryLimit = null;
+    private Long httpRateLimitAssumedBucketLimit = null;
+    private Integer bucketsCheckAmount;
+    private Long assumedBucketMaxLifeTime;
+    private Long bucketMaxLastUsedTime;
+
     private Supplier<Queue<QueueableFuture<?>>> queueSupplier = null;
+
+
     private @NotNull GatewayConfigBuilder gatewayConfigBuilder;
     private @Nullable CommandProvider commandProvider;
     private ManagerFactory<GuildManager> guildManagerFactory = null;
@@ -280,6 +295,64 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setHttpRateLimitAssumedBucketLimit(@Range(from = 1, to = Long.MAX_VALUE) Long httpRateLimitAssumedBucketLimit) {
         this.httpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_BUCKETS_CHECK_AMOUNT}
+     * <p>
+     *      Amount of {@link Bucket ratelimit buckets} at which the queue will start checking and deleting unused buckets.
+     *      This process will only start, when the queue is not busy with any {@link QueueableFuture tasks}.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param bucketsCheckAmount int amount
+     * @return this
+     * @see #setAssumedBucketMaxLifeTime(Long)
+     * @see #setBucketMaxLastUsedTime(Long)
+     */
+    public ConfigBuilder setBucketsCheckAmount(Integer bucketsCheckAmount) {
+        this.bucketsCheckAmount = bucketsCheckAmount;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME}
+     * <p>
+     *      When the queue runs a {@link #setBucketsCheckAmount(Integer) check}, assumed {@link Bucket ratelimit buckets}, that exceed given lifetime will
+     *      be deleted.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param assumedBucketMaxLifeTime int amount
+     * @return this
+     * @see #setBucketsCheckAmount(Integer)
+     */
+    public ConfigBuilder setAssumedBucketMaxLifeTime(Long assumedBucketMaxLifeTime) {
+        this.assumedBucketMaxLifeTime = assumedBucketMaxLifeTime;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_BUCKET_MAX_LAST_USED_TIME}
+     * <p>
+     *      When the queue runs a {@link #setBucketsCheckAmount(Integer) check}, {@link Bucket ratelimit buckets}, that exceed given time since they
+     *      were last used will be deleted.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param bucketMaxLastUsedTime int amount
+     * @return this
+     * @see #setBucketsCheckAmount(Integer)
+     */
+    public ConfigBuilder setBucketMaxLastUsedTime(Long bucketMaxLastUsedTime) {
+        this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
         return this;
     }
 
@@ -607,6 +680,22 @@ public class ConfigBuilder implements Datable {
             this.apiVersion = ApiVersion.fromInt(((Number) o).intValue());
         } );
 
+
+        data.processIfNotNull(GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT_KEY,
+                (Number o) -> globalHttpRateLimitRetryLimit = o.longValue());
+
+        data.processIfNotNull(HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT_KEY,
+                (Number o) -> httpRateLimitAssumedBucketLimit = o.longValue());
+
+        data.processIfNotNull(BUCKETS_CHECK_AMOUNT_KEY,
+                (Number o) -> bucketsCheckAmount = o.intValue());
+
+        data.processIfNotNull(ASSUMED_BUCKET_MAX_LIFE_TIME_KEY,
+                (Number o) -> assumedBucketMaxLifeTime = o.longValue());
+
+        data.processIfNotNull(BUCKET_MAX_LAST_USED_TIME_KEY,
+                (Number o) -> bucketMaxLastUsedTime = o.longValue());
+
         return this;
     }
 
@@ -671,6 +760,9 @@ public class ConfigBuilder implements Datable {
                 token,
                 applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
+                Objects.requireNonNullElse(bucketsCheckAmount, LApiImpl.DEFAULT_BUCKETS_CHECK_AMOUNT),
+                Objects.requireNonNullElse(assumedBucketMaxLifeTime, LApiImpl.DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME),
+                Objects.requireNonNullElse(bucketMaxLastUsedTime, LApiImpl.DEFAULT_BUCKET_MAX_LAST_USED_TIME),
                 Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
@@ -711,6 +803,12 @@ public class ConfigBuilder implements Datable {
         data.addIfNotNull(API_VERSION_KEY, apiVersion);
         data.add(FLAGS_KEY, ConfigFlag.toData(flags));
         data.add(GATEWAY_CONFIG_KEY, gatewayConfigBuilder);
+
+        data.addIfNotNull(GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT_KEY, globalHttpRateLimitRetryLimit);
+        data.addIfNotNull(HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT_KEY, httpRateLimitAssumedBucketLimit);
+        data.addIfNotNull(BUCKETS_CHECK_AMOUNT_KEY, bucketsCheckAmount);
+        data.addIfNotNull(ASSUMED_BUCKET_MAX_LIFE_TIME_KEY, assumedBucketMaxLifeTime);
+        data.addIfNotNull(BUCKET_MAX_LAST_USED_TIME_KEY, bucketMaxLastUsedTime);
 
         return data;
     }

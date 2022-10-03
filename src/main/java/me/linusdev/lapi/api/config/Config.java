@@ -44,13 +44,22 @@ import java.util.function.Supplier;
 public class Config {
 
     private final long flags;
-    private final long globalHttpRateLimitRetryLimit;
-    private final long HttpRateLimitAssumedBucketLimit;
-    private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
+
     private final @NotNull String token;
     private final @Nullable Snowflake applicationId;
     private final @NotNull ApiVersion apiVersion;
     private final @NotNull GatewayConfig gatewayConfig;
+
+    //Queue
+    private final long globalHttpRateLimitRetryLimit;
+    private final long HttpRateLimitAssumedBucketLimit;
+    private final int bucketsCheckAmount;
+    private final long assumedBucketMaxLifeTime;
+    private final long bucketMaxLastUsedTime;
+
+    private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
+
+    //Other
     private final @NotNull CommandProvider commandProvider;
     private final @NotNull ManagerFactory<GuildManager> guildManagerFactory;
     private final @NotNull ManagerFactory<RoleManager> roleManagerFactory;
@@ -66,7 +75,7 @@ public class Config {
 
     public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
-                  @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
+                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
@@ -78,6 +87,9 @@ public class Config {
         this.applicationId = applicationId;
         this.apiVersion = apiVersion;
         this.gatewayConfig = gatewayConfig;
+        this.bucketsCheckAmount = bucketsCheckAmount;
+        this.assumedBucketMaxLifeTime = assumedBucketMaxLifeTime;
+        this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
         this.commandProvider = commandProvider;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
@@ -114,6 +126,18 @@ public class Config {
      */
     public Queue<QueueableFuture<?>> getNewQueue() {
         return queueSupplier.get();
+    }
+
+    public int getBucketsCheckAmount() {
+        return bucketsCheckAmount;
+    }
+
+    public long getAssumedBucketMaxLifeTime() {
+        return assumedBucketMaxLifeTime;
+    }
+
+    public long getBucketMaxLastUsedTime() {
+        return bucketMaxLastUsedTime;
     }
 
     public @NotNull String getToken() {

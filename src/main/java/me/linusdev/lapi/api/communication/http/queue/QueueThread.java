@@ -96,8 +96,8 @@ public class QueueThread extends LApiThread implements HasLApi {
         final @NotNull QRunnable checks = new QRunnable() {
 
             final int bucketCheckSize = 0;
-            final long assumedBucketMaxLifeTime = 20_000L;
-            final long bucketMaxLastUsedTime = 50_000L;
+            final long assumedBucketMaxLifeTime = 10_000L;
+            final long bucketMaxLastUsedTime = 30_000L;
 
             @Override
             public boolean allowInterrupts() {
