@@ -94,6 +94,7 @@ public class ConfigBuilder implements Datable {
     public final static String BUCKETS_CHECK_AMOUNT_KEY = "buckets_check_amount";
     public final static String ASSUMED_BUCKET_MAX_LIFE_TIME_KEY = "assumed_bucket_max_life_time";
     public final static String BUCKET_MAX_LAST_USED_TIME_KEY = "bucket_max_last_used_time";
+    public final static String MIN_TIME_BETWEEN_CHECKS_KEY = "min_time_between_checks";
 
     public final static long DEFAULT_FLAGS = 0L;
 
@@ -108,6 +109,7 @@ public class ConfigBuilder implements Datable {
     private Integer bucketsCheckAmount;
     private Long assumedBucketMaxLifeTime;
     private Long bucketMaxLastUsedTime;
+    private Long minTimeBetweenChecks;
 
     private Supplier<Queue<QueueableFuture<?>>> queueSupplier = null;
 
@@ -353,6 +355,24 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setBucketMaxLastUsedTime(Long bucketMaxLastUsedTime) {
         this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_MIN_TIME_BETWEEN_CHECKS}
+     * <p>
+     *      Minimum time between {@link #setBucketsCheckAmount(Integer) checks} of the http request queue.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param minTimeBetweenChecks millis between checks
+     * @return this
+     * @see #setBucketsCheckAmount(Integer)
+     */
+    public ConfigBuilder setMinTimeBetweenChecks(Long minTimeBetweenChecks) {
+        this.minTimeBetweenChecks = minTimeBetweenChecks;
         return this;
     }
 
@@ -696,6 +716,9 @@ public class ConfigBuilder implements Datable {
         data.processIfNotNull(BUCKET_MAX_LAST_USED_TIME_KEY,
                 (Number o) -> bucketMaxLastUsedTime = o.longValue());
 
+        data.processIfNotNull(MIN_TIME_BETWEEN_CHECKS_KEY,
+                (Number o) -> minTimeBetweenChecks = o.longValue());
+
         return this;
     }
 
@@ -763,6 +786,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(bucketsCheckAmount, LApiImpl.DEFAULT_BUCKETS_CHECK_AMOUNT),
                 Objects.requireNonNullElse(assumedBucketMaxLifeTime, LApiImpl.DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME),
                 Objects.requireNonNullElse(bucketMaxLastUsedTime, LApiImpl.DEFAULT_BUCKET_MAX_LAST_USED_TIME),
+                Objects.requireNonNullElse(minTimeBetweenChecks, LApiImpl.DEFAULT_MIN_TIME_BETWEEN_CHECKS),
                 Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
@@ -809,6 +833,7 @@ public class ConfigBuilder implements Datable {
         data.addIfNotNull(BUCKETS_CHECK_AMOUNT_KEY, bucketsCheckAmount);
         data.addIfNotNull(ASSUMED_BUCKET_MAX_LIFE_TIME_KEY, assumedBucketMaxLifeTime);
         data.addIfNotNull(BUCKET_MAX_LAST_USED_TIME_KEY, bucketMaxLastUsedTime);
+        data.addIfNotNull(MIN_TIME_BETWEEN_CHECKS_KEY, minTimeBetweenChecks);
 
         return data;
     }

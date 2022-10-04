@@ -56,6 +56,7 @@ public class Config {
     private final int bucketsCheckAmount;
     private final long assumedBucketMaxLifeTime;
     private final long bucketMaxLastUsedTime;
+    private final long minTimeBetweenChecks;
 
     private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
 
@@ -75,7 +76,7 @@ public class Config {
 
     public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
-                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
+                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
@@ -90,6 +91,7 @@ public class Config {
         this.bucketsCheckAmount = bucketsCheckAmount;
         this.assumedBucketMaxLifeTime = assumedBucketMaxLifeTime;
         this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
+        this.minTimeBetweenChecks = minTimeBetweenChecks;
         this.commandProvider = commandProvider;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
@@ -138,6 +140,10 @@ public class Config {
 
     public long getBucketMaxLastUsedTime() {
         return bucketMaxLastUsedTime;
+    }
+
+    public long getMinTimeBetweenChecks() {
+        return minTimeBetweenChecks;
     }
 
     public @NotNull String getToken() {
