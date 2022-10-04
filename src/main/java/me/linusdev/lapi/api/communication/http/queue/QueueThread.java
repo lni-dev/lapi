@@ -67,6 +67,7 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
      * If interrupts are allowed. Interrupts to stop the queue immediately are always allowed.
      */
     private final @NotNull AtomicBoolean allowInterrupts;
+    private volatile long lastCheckTime;
     private final @NotNull Object waitingLock = new Object();
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
@@ -82,6 +83,7 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
         this.globalBucket = Bucket.newGlobalBucket(lApi);
         this.buckets = new ConcurrentHashMap<>();
         this.bucketsForId = new ConcurrentHashMap<>();
+        this.lastCheckTime = System.currentTimeMillis();
     }
 
     @ApiStatus.Internal
@@ -364,6 +366,9 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
     @Override
     public void execute() {
 
+        if(System.currentTimeMillis() - this.lastCheckTime < lApi.getConfig().getMinTimeBetweenChecks()) return;
+        this.lastCheckTime = System.currentTimeMillis();
+
         final int bucketCheckSize = lApi.getConfig().getBucketsCheckAmount();
         final long assumedBucketMaxLifeTime = lApi.getConfig().getAssumedBucketMaxLifeTime();
         final long bucketMaxLastUsedTime = lApi.getConfig().getBucketMaxLastUsedTime();
@@ -372,7 +377,7 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
         //the map, it does not matter.
         if(bucketsForId.size() > bucketCheckSize) {
 
-            log.debug("Running deletion checks...");
+            log.debug("Running checks...");
 
             Iterator<Map.Entry<RateLimitId, Bucket>> it = bucketsForId.entrySet().iterator();
             Map.Entry<RateLimitId, Bucket> entry;
