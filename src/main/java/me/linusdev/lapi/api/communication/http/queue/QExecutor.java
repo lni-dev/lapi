@@ -18,11 +18,13 @@ package me.linusdev.lapi.api.communication.http.queue;
 
 
 /**
- * Even if {@link #allowInterrupts()} is {@code true}, the {@link #run()} method should not clear the interrupt status!
+ * Even if {@link #allowInterrupts()} is {@code true}, the {@link #execute()} method should not clear the interrupt status!
  * It should use {@link Thread#isInterrupted()}.
  */
-public interface QRunnable extends Runnable {
+public interface QExecutor {
 
     boolean allowInterrupts();
+
+    void execute();
 
 }

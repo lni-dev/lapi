@@ -48,7 +48,7 @@ import java.util.function.Supplier;
  * This is a special thread for the {@link LApi#queue}.
  * Only one instance of this Thread should be alive at the same time.
  */
-public class QueueThread extends LApiThread implements HasLApi {
+public class QueueThread extends LApiThread implements QExecutor, HasLApi {
 
     private final @NotNull LApiImpl lApi;
     private final @NotNull Queue<QueueableFuture<?>> queue;
@@ -93,59 +93,12 @@ public class QueueThread extends LApiThread implements HasLApi {
     public void run() {
         log.log("Started queue thread.");
 
-        final @NotNull QRunnable checks = new QRunnable() {
-
-            final int bucketCheckSize = lApi.getConfig().getBucketsCheckAmount();
-            final long assumedBucketMaxLifeTime = lApi.getConfig().getAssumedBucketMaxLifeTime();
-            final long bucketMaxLastUsedTime = lApi.getConfig().getBucketMaxLastUsedTime();
-
-            @Override
-            public boolean allowInterrupts() {
-                return true;
-            }
-
-            @Override
-            public void run() {
-
-                //size() is by no means thread safe, but it is enough for this check, even if there is a little more or less in
-                //the map, it does not matter.
-                if(bucketsForId.size() > bucketCheckSize) {
-
-                    log.debug("Running deletion checks...");
-
-                    Iterator<Map.Entry<RateLimitId, Bucket>> it = bucketsForId.entrySet().iterator();
-                    Map.Entry<RateLimitId, Bucket> entry;
-
-                    while (it.hasNext()) {
-
-                        //check if interrupted, but do not clear the status.
-                        if(isInterrupted()) {
-                            break;
-                        }
-
-                        entry = it.next();
-                        final Bucket bucket = entry.getValue();
-                        final RateLimitId id = entry.getKey();
-
-                        if(bucket.isAssumed() ) {
-                            if(System.currentTimeMillis() - bucket.getCreated() > assumedBucketMaxLifeTime)
-                                bucket.delete(id, () -> deleteBucket(id, bucket));
-
-                        } else if(System.currentTimeMillis() - bucket.getLastUsed() > bucketMaxLastUsedTime) {
-                            bucket.delete(id, () -> deleteBucket(id, bucket));
-
-                        }
-                    }
-                }
-            }
-        };
-
         try {
             boolean hasSRRL;
 
             while (!stopImmediately.get()) {
                 if(queue.peek() == null && stopIfEmpty.get()) break;
-                awaitNotifyIf(10000L, () -> queue.peek() == null, checks);
+                awaitNotifyIf(10000L, () -> queue.peek() == null, this);
 
                 //noinspection ConstantConditions: checked by below if
                 final @NotNull QueueableFuture<?> future = queue.poll();
@@ -340,8 +293,9 @@ public class QueueThread extends LApiThread implements HasLApi {
      * always work on any new incoming {@link QueueableFuture futures} immediately.
      * @param timeoutMillis how long to wait
      * @param check {@link BooleanSupplier}. Only if {@code true} is returned the queue will wait.
+     * @param doMeanwhile {@link QExecutor#execute()} will be called if the thread would wait
      */
-    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check, @Nullable QRunnable doMeanwhile) throws InterruptedException {
+    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check, @Nullable QExecutor doMeanwhile) throws InterruptedException {
         synchronized (waitingLock) {
             if (!check.getAsBoolean()) return;
             isWaiting.set(true);
@@ -350,7 +304,7 @@ public class QueueThread extends LApiThread implements HasLApi {
             synchronized (allowInterrupts) {
                 allowInterrupts.set(doMeanwhile.allowInterrupts());
             }
-            doMeanwhile.run();
+            doMeanwhile.execute();
         }
 
         synchronized (allowInterrupts) {
@@ -390,5 +344,59 @@ public class QueueThread extends LApiThread implements HasLApi {
     @Override
     public boolean allowBlockingOperations() {
         return false;
+    }
+
+
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                            QExecutor                          *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    @Override
+    public boolean allowInterrupts() {
+        return true;
+    }
+
+    @Override
+    public void execute() {
+
+        final int bucketCheckSize = lApi.getConfig().getBucketsCheckAmount();
+        final long assumedBucketMaxLifeTime = lApi.getConfig().getAssumedBucketMaxLifeTime();
+        final long bucketMaxLastUsedTime = lApi.getConfig().getBucketMaxLastUsedTime();
+
+        //size() is by no means thread safe, but it is enough for this check, even if there is a little more or less in
+        //the map, it does not matter.
+        if(bucketsForId.size() > bucketCheckSize) {
+
+            log.debug("Running deletion checks...");
+
+            Iterator<Map.Entry<RateLimitId, Bucket>> it = bucketsForId.entrySet().iterator();
+            Map.Entry<RateLimitId, Bucket> entry;
+
+            while (it.hasNext()) {
+
+                //check if interrupted, but do not clear the status.
+                if(isInterrupted()) {
+                    break;
+                }
+
+                entry = it.next();
+                final Bucket bucket = entry.getValue();
+                final RateLimitId id = entry.getKey();
+
+                if(bucket.isAssumed() ) {
+                    if(System.currentTimeMillis() - bucket.getCreated() > assumedBucketMaxLifeTime)
+                        bucket.delete(id, () -> deleteBucket(id, bucket));
+
+                } else if(System.currentTimeMillis() - bucket.getLastUsed() > bucketMaxLastUsedTime) {
+                    bucket.delete(id, () -> deleteBucket(id, bucket));
+
+                }
+            }
+        }
     }
 }
