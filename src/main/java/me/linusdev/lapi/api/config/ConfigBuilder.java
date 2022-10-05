@@ -95,6 +95,7 @@ public class ConfigBuilder implements Datable {
     public final static String ASSUMED_BUCKET_MAX_LIFE_TIME_KEY = "assumed_bucket_max_life_time";
     public final static String BUCKET_MAX_LAST_USED_TIME_KEY = "bucket_max_last_used_time";
     public final static String MIN_TIME_BETWEEN_CHECKS_KEY = "min_time_between_checks";
+    public final static String BUCKET_QUEUE_CHECK_SIZE_KEY = "bucket_queue_check_size";
 
     public final static long DEFAULT_FLAGS = 0L;
 
@@ -110,6 +111,7 @@ public class ConfigBuilder implements Datable {
     private Long assumedBucketMaxLifeTime;
     private Long bucketMaxLastUsedTime;
     private Long minTimeBetweenChecks;
+    private Integer bucketQueueCheckSize;
 
     private Supplier<Queue<QueueableFuture<?>>> queueSupplier = null;
 
@@ -278,7 +280,7 @@ public class ConfigBuilder implements Datable {
      * @param globalHttpRateLimitRetryLimit retry limit after a global http rate limit happened
      * @return this
      */
-    public ConfigBuilder setGlobalHttpRateLimitRetryLimit(@Range(from = 1, to = Long.MAX_VALUE) Long globalHttpRateLimitRetryLimit) {
+    public ConfigBuilder setGlobalHttpRateLimitRetryLimit(@Nullable @Range(from = 1, to = Long.MAX_VALUE) Long globalHttpRateLimitRetryLimit) {
         this.globalHttpRateLimitRetryLimit = globalHttpRateLimitRetryLimit;
         return this;
     }
@@ -295,7 +297,7 @@ public class ConfigBuilder implements Datable {
      * @param httpRateLimitAssumedBucketLimit assumed bucket limit
      * @return this
      */
-    public ConfigBuilder setHttpRateLimitAssumedBucketLimit(@Range(from = 1, to = Long.MAX_VALUE) Long httpRateLimitAssumedBucketLimit) {
+    public ConfigBuilder setHttpRateLimitAssumedBucketLimit(@Nullable @Range(from = 1, to = Long.MAX_VALUE) Long httpRateLimitAssumedBucketLimit) {
         this.httpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
         return this;
     }
@@ -315,7 +317,7 @@ public class ConfigBuilder implements Datable {
      * @see #setAssumedBucketMaxLifeTime(Long)
      * @see #setBucketMaxLastUsedTime(Long)
      */
-    public ConfigBuilder setBucketsCheckAmount(Integer bucketsCheckAmount) {
+    public ConfigBuilder setBucketsCheckAmount(@Nullable Integer bucketsCheckAmount) {
         this.bucketsCheckAmount = bucketsCheckAmount;
         return this;
     }
@@ -334,7 +336,7 @@ public class ConfigBuilder implements Datable {
      * @return this
      * @see #setBucketsCheckAmount(Integer)
      */
-    public ConfigBuilder setAssumedBucketMaxLifeTime(Long assumedBucketMaxLifeTime) {
+    public ConfigBuilder setAssumedBucketMaxLifeTime(@Nullable Long assumedBucketMaxLifeTime) {
         this.assumedBucketMaxLifeTime = assumedBucketMaxLifeTime;
         return this;
     }
@@ -353,7 +355,7 @@ public class ConfigBuilder implements Datable {
      * @return this
      * @see #setBucketsCheckAmount(Integer)
      */
-    public ConfigBuilder setBucketMaxLastUsedTime(Long bucketMaxLastUsedTime) {
+    public ConfigBuilder setBucketMaxLastUsedTime(@Nullable Long bucketMaxLastUsedTime) {
         this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
         return this;
     }
@@ -371,8 +373,26 @@ public class ConfigBuilder implements Datable {
      * @return this
      * @see #setBucketsCheckAmount(Integer)
      */
-    public ConfigBuilder setMinTimeBetweenChecks(Long minTimeBetweenChecks) {
+    public ConfigBuilder setMinTimeBetweenChecks(@Nullable Long minTimeBetweenChecks) {
         this.minTimeBetweenChecks = minTimeBetweenChecks;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@link LApiImpl#DEFAULT_BUCKET_QUEUE_CHECK_SIZE}
+     * <p>
+     *      Size at which the rate limited bucket queue should be checked and entries possibly deleted.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param bucketQueueCheckSize check size
+     * @return this
+     * @see #setBucketsCheckAmount(Integer)
+     */
+    public ConfigBuilder setBucketQueueCheckSize(@Nullable Integer bucketQueueCheckSize) {
+        this.bucketQueueCheckSize = bucketQueueCheckSize;
         return this;
     }
 
@@ -719,6 +739,9 @@ public class ConfigBuilder implements Datable {
         data.processIfNotNull(MIN_TIME_BETWEEN_CHECKS_KEY,
                 (Number o) -> minTimeBetweenChecks = o.longValue());
 
+        data.processIfNotNull(BUCKET_QUEUE_CHECK_SIZE_KEY,
+                (Number o) -> minTimeBetweenChecks = o.longValue());
+
         return this;
     }
 
@@ -787,6 +810,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(assumedBucketMaxLifeTime, LApiImpl.DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME),
                 Objects.requireNonNullElse(bucketMaxLastUsedTime, LApiImpl.DEFAULT_BUCKET_MAX_LAST_USED_TIME),
                 Objects.requireNonNullElse(minTimeBetweenChecks, LApiImpl.DEFAULT_MIN_TIME_BETWEEN_CHECKS),
+                Objects.requireNonNullElse(bucketQueueCheckSize, LApiImpl.DEFAULT_BUCKET_QUEUE_CHECK_SIZE),
                 Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),
@@ -834,6 +858,7 @@ public class ConfigBuilder implements Datable {
         data.addIfNotNull(ASSUMED_BUCKET_MAX_LIFE_TIME_KEY, assumedBucketMaxLifeTime);
         data.addIfNotNull(BUCKET_MAX_LAST_USED_TIME_KEY, bucketMaxLastUsedTime);
         data.addIfNotNull(MIN_TIME_BETWEEN_CHECKS_KEY, minTimeBetweenChecks);
+        data.addIfNotNull(BUCKET_QUEUE_CHECK_SIZE_KEY, bucketQueueCheckSize);
 
         return data;
     }

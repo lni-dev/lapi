@@ -257,7 +257,9 @@ public class Bucket {
     private void add(@NotNull QueueableFuture<?> future) {
         synchronized (queueSize) {
             queue.add(future);
-            queueSize.incrementAndGet();
+            if(queueSize.incrementAndGet() > lApi.getConfig().getBucketQueueCheckSize()) {
+                //TODO: impl check
+            };
         }
         checkReset();
     }

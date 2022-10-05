@@ -86,6 +86,7 @@ public class LApiImpl implements LApi {
     public static final long DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME = 60L * 1000L; // 1 minute
     public static final long DEFAULT_BUCKET_MAX_LAST_USED_TIME = 12L * 60L * 60L * 1000L; // 12 hours
     public static final long DEFAULT_MIN_TIME_BETWEEN_CHECKS = 60L * 1000L;
+    public static final int DEFAULT_BUCKET_QUEUE_CHECK_SIZE = 20;
 
     public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
     public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
