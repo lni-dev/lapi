@@ -23,8 +23,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class QueueableFuture<R> extends AbstractFuture<R, QResponse, QueueableImpl<R>> {
 
+    private final long createdMillis;
+
     public QueueableFuture(@NotNull QueueableImpl<R> task) {
         super(task);
+        createdMillis = System.currentTimeMillis();
     }
 
     @Override
@@ -36,5 +39,13 @@ public class QueueableFuture<R> extends AbstractFuture<R, QResponse, QueueableIm
     @Override
     public @NotNull QueueableImpl<R> getTask() {
         return super.getTask();
+    }
+
+    /**
+     *
+     * @return creation time of this future (in milliseconds since 01.01.1970)
+     */
+    public long getCreatedMillis() {
+        return createdMillis;
     }
 }

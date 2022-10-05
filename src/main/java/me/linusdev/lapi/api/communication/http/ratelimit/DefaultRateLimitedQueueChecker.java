@@ -25,6 +25,8 @@ public class DefaultRateLimitedQueueChecker implements RateLimitedQueueChecker {
     private final @NotNull LApi lApi;
     private final @NotNull Bucket bucket;
 
+    //TODO: possibly add a better implementation. Maybe check when the futures were created, etc
+
     public DefaultRateLimitedQueueChecker(@NotNull LApi lApi, @NotNull Bucket bucket) {
         this.lApi = lApi;
         this.bucket = bucket;
