@@ -24,6 +24,7 @@ import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -257,8 +258,21 @@ public class Bucket {
     private void add(@NotNull QueueableFuture<?> future) {
         synchronized (queueSize) {
             queue.add(future);
+
             if(queueSize.incrementAndGet() > lApi.getConfig().getBucketQueueCheckSize()) {
-                //TODO: impl check
+                final @NotNull RateLimitedQueueChecker checker = lApi.getConfig().getBucketQueueCheckerFactory().newInstance(lApi, this);
+                final @NotNull RateLimitedQueueChecker.CheckType checkType = checker.startCheck(queueSize.get());
+
+                if(checkType == RateLimitedQueueChecker.CheckType.REMOVE_ALL) {
+                    queue.clear();
+                    queueSize.set(0);
+                    //Queue is now empty, we can just return here
+                    return;
+
+                } else if(checkType == RateLimitedQueueChecker.CheckType.ITERATE_ALL){
+                    queue.removeIf(checker::check);
+                    if(checker.checkAgain()) queue.removeIf(checker::check);
+                }
             };
         }
         checkReset();

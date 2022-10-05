@@ -26,8 +26,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
-import me.linusdev.lapi.api.communication.http.ratelimit.Bucket;
-import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
+import me.linusdev.lapi.api.communication.http.ratelimit.*;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
@@ -113,6 +112,7 @@ public class ConfigBuilder implements Datable {
     private Long minTimeBetweenChecks;
     private Integer bucketQueueCheckSize;
 
+    private RateLimitedQueueCheckerFactory bucketQueueCheckerFactory;
     private Supplier<Queue<QueueableFuture<?>>> queueSupplier = null;
 
 
@@ -382,17 +382,33 @@ public class ConfigBuilder implements Datable {
      * <em>Optional</em><br>
      * Default: {@link LApiImpl#DEFAULT_BUCKET_QUEUE_CHECK_SIZE}
      * <p>
-     *      Size at which the rate limited bucket queue should be checked and entries possibly deleted.
+     *      Size at which the rate limited bucket queue should be {@link #setBucketQueueCheckerFactory(RateLimitedQueueCheckerFactory) checked} and entries possibly deleted.
      * </p>
      * <p>
      *      Set to {@code null} to reset to default.
      * </p>
      * @param bucketQueueCheckSize check size
      * @return this
-     * @see #setBucketsCheckAmount(Integer)
+     * @see #setBucketQueueCheckerFactory(RateLimitedQueueCheckerFactory) 
      */
     public ConfigBuilder setBucketQueueCheckSize(@Nullable Integer bucketQueueCheckSize) {
         this.bucketQueueCheckSize = bucketQueueCheckSize;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@code efaultRateLimitedQueueChecker::new}
+     * <p>
+     *     {@link RateLimitedQueueCheckerFactory factory} to supply with {@link RateLimitedQueueChecker}
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default
+     * </p>
+     * @param bucketQueueCheckerFactory factory
+     */
+    public ConfigBuilder setBucketQueueCheckerFactory(RateLimitedQueueCheckerFactory bucketQueueCheckerFactory) {
+        this.bucketQueueCheckerFactory = bucketQueueCheckerFactory;
         return this;
     }
 
@@ -811,6 +827,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(bucketMaxLastUsedTime, LApiImpl.DEFAULT_BUCKET_MAX_LAST_USED_TIME),
                 Objects.requireNonNullElse(minTimeBetweenChecks, LApiImpl.DEFAULT_MIN_TIME_BETWEEN_CHECKS),
                 Objects.requireNonNullElse(bucketQueueCheckSize, LApiImpl.DEFAULT_BUCKET_QUEUE_CHECK_SIZE),
+                Objects.requireNonNullElse(bucketQueueCheckerFactory, DefaultRateLimitedQueueChecker::new),
                 Objects.requireNonNullElse(commandProvider, new ServiceLoadingCommandProvider()),
                 Objects.requireNonNullElse(guildManagerFactory, lApi -> new LApiGuildManagerImpl(lApi)),
                 Objects.requireNonNullElse(roleManagerFactory, lApi -> new RoleManagerImpl(lApi)),

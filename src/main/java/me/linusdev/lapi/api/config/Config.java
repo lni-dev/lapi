@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.config;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.async.queue.Queueable;
+import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitedQueueCheckerFactory;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.command.provider.CommandProvider;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
@@ -59,6 +60,7 @@ public class Config {
     private final long minTimeBetweenChecks;
     private final int bucketQueueCheckSize;
 
+    private final @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory;
     private final @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier;
 
     //Other
@@ -77,7 +79,7 @@ public class Config {
 
     public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
-                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
+                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
@@ -94,6 +96,7 @@ public class Config {
         this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
         this.minTimeBetweenChecks = minTimeBetweenChecks;
         this.bucketQueueCheckSize = bucketQueueCheckSize;
+        this.bucketQueueCheckerFactory = bucketQueueCheckerFactory;
         this.commandProvider = commandProvider;
         this.guildManagerFactory = guildManagerFactory;
         this.roleManagerFactory = roleManagerFactory;
@@ -150,6 +153,10 @@ public class Config {
 
     public int getBucketQueueCheckSize() {
         return bucketQueueCheckSize;
+    }
+
+    public @NotNull RateLimitedQueueCheckerFactory getBucketQueueCheckerFactory() {
+        return bucketQueueCheckerFactory;
     }
 
     public @NotNull String getToken() {
