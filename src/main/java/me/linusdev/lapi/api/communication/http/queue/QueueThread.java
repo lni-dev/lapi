@@ -297,7 +297,7 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
      * @param check {@link BooleanSupplier}. Only if {@code true} is returned the queue will wait.
      * @param doMeanwhile {@link QExecutor#execute()} will be called if the thread would wait
      */
-    public <T> void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check, @Nullable QExecutor doMeanwhile) throws InterruptedException {
+    public void awaitNotifyIf(long timeoutMillis, @NotNull BooleanSupplier check, @Nullable QExecutor doMeanwhile) throws InterruptedException {
         synchronized (waitingLock) {
             if (!check.getAsBoolean()) return;
             isWaiting.set(true);
