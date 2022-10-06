@@ -220,23 +220,67 @@ public enum Link implements AbstractLink{
      */
     CREATE_INTERACTION_RESPONSE(Method.POST, false, INTERACTIONS, INTERACTION_ID, INTERACTION_TOKEN, CALLBACK),
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                           Audit Log                           *
-     *                                                               *
-     *  Done: 02.09.2022                                             *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                   Audit Log                                               *
+     *                                                                                                           *
+     *  Done:       02.09.2022                                                                                   *
+     *  Updated:    06.10.2022                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    /**
+     *
+     * <p>
+     *     Returns an audit log object for the guild. Requires the {@link Permission#VIEW_AUDIT_LOG VIEW_AUDIT_LOG} permission.
+     * </p>
+     *
+     * @see Name#GUILD_ID
+     */
     GET_GUILD_AUDIT_LOG(Method.GET, GUILDS, GUILD_ID, AUDIT_LOGS),
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                        Auto Moderation                        *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                Auto Moderation                                            *
+     *                                                                                                           *
+     *  Done:       06.10.2022                                                                                   *
+     *  Updated:    06.10.2022                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/auto-moderation#list-auto-moderation-rules-for-guild">Discord Documentation</a>
+     */
+    LIST_AUTO_MODERATION_RULES_FOR_GUILD(Method.GET, GUILDS, GUILD_ID, AUTO_MODERATION, RULES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#AUTO_MODERATION_RULE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/auto-moderation#get-auto-moderation-rule">Discord Documentation</a>
+     */
+    GET_AUTO_MODERATION_RULE(Method.GET, GUILDS, GUILD_ID, AUTO_MODERATION, RULES, AUTO_MODERATION_RULE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/auto-moderation#create-auto-moderation-rule">Discord Documentation</a>
+     */
+    CREATE_AUTO_MODERATION_RULE(Method.POST, GUILDS, GUILD_ID, AUTO_MODERATION, RULES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#AUTO_MODERATION_RULE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/auto-moderation#modify-auto-moderation-rule">Discord Documentation</a>
+     */
+    MODIFY_AUTO_MODERATION_RULE(Method.PATCH, GUILDS, GUILD_ID, AUTO_MODERATION, RULES, AUTO_MODERATION_RULE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#AUTO_MODERATION_RULE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/auto-moderation#delete-auto-moderation-rule">Discord Documentation</a>
+     */
+    DELETE_AUTO_MODERATION_RULE(Method.DELETE, GUILDS, GUILD_ID, AUTO_MODERATION, RULES, AUTO_MODERATION_RULE_ID),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

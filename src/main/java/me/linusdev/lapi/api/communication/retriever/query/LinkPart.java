@@ -52,7 +52,8 @@ public enum LinkPart implements Concatable {
     REGIONS("regions"),
     GUILD_EVENTS("guild-events"),
     CHANNELS("channels"),
-
+    AUTO_MODERATION("auto-moderation"),
+    RULES("rules"),
 
 
     ME("@me"),

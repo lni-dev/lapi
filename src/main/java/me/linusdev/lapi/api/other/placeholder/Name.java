@@ -38,6 +38,7 @@ public enum Name implements Concatable{
     OVERWRITE_ID("{overwrite.id}"),
     COMMAND_ID("{command.id}"),
     SCHEDULED_EVENT_ID("{guild_scheduled_event.id}"),
+    AUTO_MODERATION_RULE_ID("{auto_moderation_rule.id}"),
 
     INTERACTION_ID("{interaction.id}"),
     INTERACTION_TOKEN("{interaction.token}"),
