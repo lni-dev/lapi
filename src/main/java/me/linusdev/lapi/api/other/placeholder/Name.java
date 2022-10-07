@@ -40,6 +40,7 @@ public enum Name implements Concatable{
     SCHEDULED_EVENT_ID("{guild_scheduled_event.id}"),
     AUTO_MODERATION_RULE_ID("{auto_moderation_rule.id}"),
     INTEGRATION_ID("{integration.id}"),
+    TEMPLATE_CODE("{template.code}"),
 
     INTERACTION_ID("{interaction.id}"),
     INTERACTION_TOKEN("{interaction.token}"),

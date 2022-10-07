@@ -59,6 +59,8 @@ public enum LinkPart implements Concatable {
     BANS("bans"),
     INTEGRATIONS("integrations"),
     VOICE_STATES("voice-states"),
+    SCHEDULED_EVENTS("scheduled-events"),
+    TEMPLATES("templates"),
 
     ME("@me"),
     BOT("bot"),

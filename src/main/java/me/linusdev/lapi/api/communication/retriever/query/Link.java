@@ -897,18 +897,103 @@ public enum Link implements AbstractLink{
      *                                                                                                           *
      *                                              Guild Scheduled Event                                        *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       07.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#list-scheduled-events-for-guild">Discord Documentation</a>
+     */
+    LIST_SCHEDULED_EVENTS_FOR_GUILD(Method.GET, GUILDS, GUILD_ID, SCHEDULED_EVENTS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#create-guild-scheduled-event">Discord Documentation</a>
+     */
+    CREATE_GUILD_SCHEDULED_EVENT(Method.POST, true, true, GUILDS, GUILD_ID, SCHEDULED_EVENTS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#SCHEDULED_EVENT_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event">Discord Documentation</a>
+     */
+    GET_GUILD_SCHEDULED_EVENT(Method.GET, GUILDS, GUILD_ID, SCHEDULED_EVENTS, SCHEDULED_EVENT_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#SCHEDULED_EVENT_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#modify-guild-scheduled-event">Discord Documentation</a>
+     */
+    MODIFY_GUILD_SCHEDULED_EVENT(Method.PATCH, true, true, GUILDS, GUILD_ID, SCHEDULED_EVENTS, SCHEDULED_EVENT_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#SCHEDULED_EVENT_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#delete-guild-scheduled-event">Discord Documentation</a>
+     */
+    DELETE_GUILD_SCHEDULED_EVENT(Method.DELETE, GUILDS, GUILD_ID, SCHEDULED_EVENTS, SCHEDULED_EVENT_ID, SCHEDULED_EVENT_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#SCHEDULED_EVENT_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-scheduled-event#get-guild-scheduled-event-users">Discord Documentation</a>
+     */
+    GET_GUILD_SCHEDULED_EVENT_USERS(Method.GET, GUILDS, GUILD_ID, SCHEDULED_EVENTS, SCHEDULED_EVENT_ID, USERS),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
      *                                                                                                           *
      *                                                   Guild Template                                          *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       07.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#TEMPLATE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#get-guild-template">Discord Documentation</a>
+     */
+    GET_GUILD_TEMPLATE(Method.GET, GUILDS, TEMPLATES, TEMPLATE_CODE),
+
+    /**
+     * @see Name#TEMPLATE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#create-guild-from-guild-template">Discord Documentation</a>
+     */
+    CREATE_GUILD_FROM_GUILD_TEMPLATE(Method.POST, GUILDS, TEMPLATES, TEMPLATE_CODE),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#get-guild-templates">Discord Documentation</a>
+     */
+    GET_GUILD_TEMPLATES(Method.GET, GUILDS, GUILD_ID, TEMPLATES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#create-guild-template">Discord Documentation</a>
+     */
+    CREATE_GUILD_TEMPLATE(Method.POST, GUILD_ID, TEMPLATES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#TEMPLATE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#sync-guild-template">Discord Documentation</a>
+     */
+    SYNC_GUILD_TEMPLATE(Method.PUT, GUILDS, GUILD_ID, TEMPLATES, TEMPLATE_CODE),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#TEMPLATE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#modify-guild-template">Discord Documentation</a>
+     */
+    MODIFY_GUILD_TEMPLATE(Method.PATCH, GUILDS, GUILD_ID, TEMPLATES, TEMPLATE_CODE),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#TEMPLATE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/guild-template#delete-guild-template">Discord Documentation</a>
+     */
+    DELETE_GUILD_TEMPLATE(Method.PATCH, GUILDS, GUILD_ID, TEMPLATES, TEMPLATE_CODE),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *

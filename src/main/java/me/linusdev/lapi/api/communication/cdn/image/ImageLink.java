@@ -131,6 +131,11 @@ public enum ImageLink implements AbstractLink {
     }
 
     @Override
+    public boolean supportsAuditLogReasonHeader() {
+        return false;
+    }
+
+    @Override
     public int uniqueId() {
         return Link.amount + ordinal();
     }
