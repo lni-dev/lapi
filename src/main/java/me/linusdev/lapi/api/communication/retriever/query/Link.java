@@ -282,13 +282,14 @@ public enum Link implements AbstractLink{
      */
     DELETE_AUTO_MODERATION_RULE(Method.DELETE, GUILDS, GUILD_ID, AUTO_MODERATION, RULES, AUTO_MODERATION_RULE_ID),
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                            Channel                            *
-     *                                                               *
-     *  Done: 02.09.2022                                             *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Channel                                                *
+     *                                                                                                           *
+     *  Done:       02.09.2022                                                                                   *
+     *  Updated:                                                                                                 *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Get a {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} by ID.
@@ -560,36 +561,425 @@ public enum Link implements AbstractLink{
      */
     LIST_JOINED_PRIVATE_ARCHIVED_THREADS(Method.GET, CHANNELS,  CHANNEL_ID, USERS, ME, THREADS, ARCHIVED, PRIVATE),
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                             Emoji                             *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                     Emoji                                                 *
+     *                                                                                                           *
+     *  Done:       07.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                             Other                             *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/emoji#list-guild-emojis">Discord Documentation</a>
+     */
+    LIST_GUILD_EMOJIS(Method.GET, GUILDS, GUILD_ID, EMOJIS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#EMOJI_ID
+     * @see <a href="https://discord.com/developers/docs/resources/emoji#get-guild-emoji">Discord Documentation</a>
+     */
+    GET_GUILD_EMOJI(Method.GET, GUILDS, GUILD_ID, EMOJIS, EMOJI_ID),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/emoji#create-guild-emoji">Discord Documentation</a>
+     */
+    CREATE_GUILD_EMOJI(Method.GET, GUILDS, GUILD_ID, EMOJIS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#EMOJI_ID
+     * @see <a href="https://discord.com/developers/docs/resources/emoji#modify-guild-emoji">Discord Documentation</a>
+     */
+    MODIFY_GUILD_EMOJI(Method.PATCH, GUILDS, GUILD_ID, EMOJIS, EMOJI_ID),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#EMOJI_ID
+     * @see <a href="https://discord.com/developers/docs/resources/emoji#delete-guild-emoji">Discord Documentation</a>
+     */
+    DELETE_GUILD_EMOJI(Method.DELETE, GUILDS, GUILD_ID, EMOJIS, EMOJI_ID),
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                     Guild                                                 *
+     *                                                                                                           *
+     *  Done:       07.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/guild#create-guild">Discord Documentation</a>
+     */
+    CREATE_GUILD(Method.POST, GUILDS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild">Discord Documentation</a>
+     */
+    GET_GUILD(Method.GET, GUILDS, GUILD_ID),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-preview">Discord Documentation</a>
+     */
+    GET_GUILD_PREVIEW(Method.GET, GUILDS, GUILD_ID, PREVIEW),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild">Discord Documentation</a>
+     */
+    MODIFY_GUILD(Method.PATCH, true, true, GUILDS, GUILD_ID),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#delete-guild">Discord Documentation</a>
+     */
+    DELETE_GUILD(Method.DELETE, GUILDS, GUILD_ID),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-channels">Discord Documentation</a>
+     */
+    GET_GUILD_CHANNELS(Method.GET, GUILDS, GUILD_ID, CHANNELS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#create-guild-channel">Discord Documentation</a>
+     */
+    CREATE_GUILD_CHANNEL(Method.POST, true, true, GUILDS, GUILD_ID, CHANNELS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-channel-positions">Discord Documentation</a>
+     */
+    MODIFY_GUILD_CHANNEL_POSITIONS(Method.PATCH, GUILDS, GUILD_ID, CHANNELS),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#list-active-guild-threads">Discord Documentation</a>
+     */
+    LIST_ACTIVE_GUILD_THREADS(Method.GET, GUILDS, GUILD_ID, THREADS, ACTIVE),
 
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-member">Discord Documentation</a>
+     */
+    GET_GUILD_MEMBER(Method.GET, GUILDS, GUILD_ID, MEMBERS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#list-guild-members">Discord Documentation</a>
+     */
+    LIST_GUILD_MEMBERS(Method.GET, GUILDS, GUILD_ID, MEMBERS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#search-guild-members">Discord Documentation</a>
+     */
+    SEARCH_GUILD_MEMBERS(Method.GET, GUILDS, GUILD_ID, MEMBERS, SEARCH),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#add-guild-member">Discord Documentation</a>
+     */
+    ADD_GUILD_MEMBER(Method.PUT, GUILDS, GUILD_ID, MEMBERS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-member">Discord Documentation</a>
+     */
+    MODIFY_GUILD_MEMBER(Method.PATCH, true, true, GUILDS, GUILD_ID, MEMBERS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-current-member">Discord Documentation</a>
+     */
+    MODIFY_CURRENT_MEMBER(Method.PATCH, true, true, GUILDS, GUILD_ID, MEMBERS, ME),
+
+    /**
+     * @deprecated in favor of {@link #MODIFY_CURRENT_MEMBER}
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-current-user-nick">Discord Documentation</a>
+     */
+    @Deprecated()
+    MODIFY_CURRENT_USER_NICK(Method.PATCH, true, true, GUILDS, GUILD_ID, MEMBERS, ME, NICK),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see Name#ROLE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#add-guild-member-role">Discord Documentation</a>
+     */
+    ADD_GUILD_MEMBER_ROLE(Method.PUT, true, true, GUILDS, GUILD_ID, MEMBERS, USER_ID, ROLES, ROLE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see Name#ROLE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#remove-guild-member-role">Discord Documentation</a>
+     */
+    REMOVE_GUILD_MEMBER_ROLE(Method.DELETE, true, true, GUILDS, GUILD_ID, MEMBERS, USER_ID, ROLES, ROLE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#remove-guild-member">Discord Documentation</a>
+     */
+    REMOVE_GUILD_MEMBER(Method.DELETE, true, true, GUILDS, GUILD_ID, MEMBERS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-bans">Discord Documentation</a>
+     */
+    GET_GUILD_BANS(Method.GET, GUILDS, GUILD_ID, BANS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-ban">Discord Documentation</a>
+     */
+    GET_GUILD_BAN(Method.GET, GUILDS, GUILD_ID, BANS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#create-guild-ban">Discord Documentation</a>
+     */
+    CREATE_GUILD_BAN(Method.PUT, true, true, GUILDS, GUILD_ID, BANS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#remove-guild-ban">Discord Documentation</a>
+     */
+    REMOVE_GUILD_BAN(Method.DELETE, true, true, GUILDS, GUILD_ID, BANS, USER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-roles">Discord Documentation</a>
+     */
+    GET_GUILD_ROLES(Method.GET, GUILDS, GUILD_ID, ROLES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#create-guild-role">Discord Documentation</a>
+     */
+    CREATE_GUILD_ROLES(Method.POST, true, true, GUILDS, GUILD_ID, ROLES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-role-positions">Discord Documentation</a>
+     */
+    MODIFY_GUILD_ROLE_POSITIONS(Method.PATCH, true, true, GUILDS, GUILD_ID, ROLES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#ROLE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-role-positions">Discord Documentation</a>
+     */
+    MODIFY_GUILD_ROLE(Method.PATCH, true, true, GUILDS, GUILD_ID, ROLES, ROLE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-mfa-level">Discord Documentation</a>
+     */
+    MODIFY_GUILD_MFA_LEVEL(Method.POST, true, true, GUILDS, GUILD_ID, MFA),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#ROLE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#delete-guild-role">Discord Documentation</a>
+     */
+    DELETE_GUILD_ROLE(Method.DELETE, true, true, GUILDS, GUILD_ID, ROLES, ROLE_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-prune-count">Discord Documentation</a>
+     */
+    GET_GUILD_PRUNE_COUNT(Method.GET, GUILDS, GUILD_ID, PRUNE),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#begin-guild-prune">Discord Documentation</a>
+     */
+    BEGIN_GUILD_PRUNE(Method.POST, true, true, GUILDS, GUILD_ID, PRUNE),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-voice-regions">Discord Documentation</a>
+     */
+    GET_GUILD_VOICE_REGIONS(Method.GET, GUILDS, GUILD_ID, REGIONS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-invites">Discord Documentation</a>
+     */
+    GET_GUILD_INVITES(Method.GET, GUILDS, GUILD_ID, INVITES),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-integrations">Discord Documentation</a>
+     */
+    GET_GUILD_INTEGRATIONS(Method.GET, GUILDS, GUILD_ID, INTEGRATIONS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#INTEGRATION_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#delete-guild-integration">Discord Documentation</a>
+     */
+    DELETE_GUILD_INTEGRATION(Method.DELETE, true, true, GUILDS, GUILD_ID, INTEGRATIONS, INTEGRATION_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-widget-settings">Discord Documentation</a>
+     */
+    GET_GUILD_WIDGET_SETTINGS(Method.GET, GUILDS, GUILD_ID, WIDGET),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-widget">Discord Documentation</a>
+     */
+    MODIFY_GUILD_WIDGET(Method.PATCH, true, true, GUILDS, GUILD_ID, WIDGET),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-widget">Discord Documentation</a>
+     */
+    GET_GUILD_WIDGET(Method.GET, GUILDS, GUILD_ID, WIDGET_JSON),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-vanity-url">Discord Documentation</a>
+     */
+    GET_GUILD_VANITY_URL(Method.GET, GUILDS, GUILD_ID, VANITY_URL),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-widget-image">Discord Documentation</a>
+     */
+    GET_GUILD_WIDGET_IMAGE(Method.GET, GUILDS, GUILD_ID, WIDGET_PNG),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen">Discord Documentation</a>
+     */
+    GET_GUILD_WELCOME_SCREEN(Method.GET, GUILDS, GUILD_ID, WELCOME_SCREEN),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen">Discord Documentation</a>
+     */
+    MODIFY_GUILD_WELCOME_SCREEN(Method.PATCH, true, true, GUILDS, GUILD_ID, WELCOME_SCREEN),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-current-user-voice-state">Discord Documentation</a>
+     */
+    MODIFY_CURRENT_USER_VOICE_STATE(Method.PATCH, GUILDS, GUILD_ID, VOICE_STATES, ME),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/guild#modify-user-voice-state">Discord Documentation</a>
+     */
+    MODIFY_USER_VOICE_STATE(Method.PATCH, GUILDS, GUILD_ID, VOICE_STATES, USER_ID),
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                              Guild Scheduled Event                                        *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                   Guild Template                                          *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                     Invite                                                *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                 Stage Instance                                            *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                     Sticker                                               *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                      User                                                 *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                      Voice                                                *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Webhook                                                *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Gateway                                                *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Unsorted                                               *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
     /*
@@ -687,11 +1077,13 @@ public enum Link implements AbstractLink{
     private final @NotNull Method method;
     private final @NotNull Concatable[] concatables;
 
+    private final boolean supportsAuditLogReasonHeader;
+
     private final boolean boundToGlobalRateLimits;
     private final boolean containsTopLevelResource;
     private final boolean containsPlaceholders;
 
-    Link(@NotNull Method method, boolean boundToGlobalRateLimits, @NotNull Concatable... parts) {
+    Link(@NotNull Method method, boolean boundToGlobalRateLimits, boolean supportsAuditLogReasonHeader, @NotNull Concatable... parts) {
         this.method = method;
         this.boundToGlobalRateLimits = boundToGlobalRateLimits;
         this.concatables = parts;
@@ -709,10 +1101,15 @@ public enum Link implements AbstractLink{
         }
         this.containsTopLevelResource = tlr;
         this.containsPlaceholders = placeholders;
+        this.supportsAuditLogReasonHeader = supportsAuditLogReasonHeader;
+    }
+
+    Link(@NotNull Method method, boolean boundToGlobalRateLimits, @NotNull Concatable... parts) {
+        this(method, true, boundToGlobalRateLimits, parts);
     }
 
     Link(@NotNull Method method, @NotNull Concatable... parts) {
-        this(method, true, parts);
+        this(method, true, false, parts);
     }
 
     @Override
@@ -749,6 +1146,11 @@ public enum Link implements AbstractLink{
     @Override
     public boolean containsPlaceholders() {
         return containsPlaceholders;
+    }
+
+    @Override
+    public boolean supportsAuditLogReasonHeader() {
+        return supportsAuditLogReasonHeader;
     }
 
     @Override

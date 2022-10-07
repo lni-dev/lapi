@@ -54,10 +54,24 @@ public enum LinkPart implements Concatable {
     CHANNELS("channels"),
     AUTO_MODERATION("auto-moderation"),
     RULES("rules"),
-
+    MEMBERS("members"),
+    ROLES("roles"),
+    BANS("bans"),
+    INTEGRATIONS("integrations"),
+    VOICE_STATES("voice-states"),
 
     ME("@me"),
     BOT("bot"),
+
+    PREVIEW("preview"),
+    NICK("nick"),
+    MFA("mfa"),
+    PRUNE("prune"),
+    WIDGET("widget"),
+    WIDGET_JSON("widget.json"),
+    VANITY_URL("vanity-url"),
+    WIDGET_PNG("widget.png"),
+    WELCOME_SCREEN("welcome-screen"),
 
     CALLBACK("callback"),
     BULK_DELETE("bulk-delete"),
@@ -67,6 +81,7 @@ public enum LinkPart implements Concatable {
     ARCHIVED("archived"),
     PUBLIC("public"),
     PRIVATE("private"),
+    SEARCH("search"),
 
     //CDN
 

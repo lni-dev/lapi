@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.cdn.image.ImageLink;
+import me.linusdev.lapi.api.communication.http.HeaderTypes;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
@@ -69,6 +70,12 @@ public interface AbstractLink {
      * @return {@code true} if this link contains placeholders, {@code false otherwise}.
      */
     boolean containsPlaceholders();
+
+    /**
+     *
+     * @return {@code true} if this endpoint supports the {@link HeaderTypes#X_AUDIT_LOG_REASON X_AUDIT_LOG_REASON} header. {@code false} otherwise
+     */
+    boolean supportsAuditLogReasonHeader();
 
     /**
      * <ul>
