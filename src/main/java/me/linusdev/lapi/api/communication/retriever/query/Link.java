@@ -492,10 +492,7 @@ public enum Link implements AbstractLink{
      * <p>
      *     Returns all active threads in the channel, including public and private threads. Threads are ordered by their id, in descending order.
      * </p>
-     * <p>
-     *     This route is deprecated and will be removed in v10. It is replaced by List Active Guild Threads.
-     * </p>
-     * TODO add LIST_ACTIVE_GUILD_THREADS @link
+     * @deprecated This route is deprecated and will be removed in v10. It is replaced by {@link #LIST_ACTIVE_GUILD_THREADS List Active Guild Threads}.
      * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-active-threads" target="_top">List Active Threads</a>
      * @see <a href="https://discord.com/developers/docs/resources/channel#list-active-threads-response-body" target="_top">Response Body</a>
