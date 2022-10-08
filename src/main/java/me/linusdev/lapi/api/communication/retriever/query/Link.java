@@ -1000,78 +1000,115 @@ public enum Link implements AbstractLink{
      *                                                                                                           *
      *                                                     Invite                                                *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       08.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#INVITE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/invite#get-invite">Discord Documentation</a>
+     */
+    GET_INVITE(Method.GET, INVITES, INVITE_CODE),
+
+    /**
+     * @see Name#INVITE_CODE
+     * @see <a href="https://discord.com/developers/docs/resources/invite#delete-invite">Discord Documentation</a>
+     */
+    DELETE_INVITE(Method.DELETE, true, true, INVITES, INVITE_CODE),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
      *                                                                                                           *
      *                                                 Stage Instance                                            *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       08.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/stage-instance#create-stage-instance">Discord Documentation</a>
+     */
+    CREATE_STAGE_INSTANCE(Method.POST, true, true, STAGE_INSTANCES),
+
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/stage-instance#get-stage-instance">Discord Documentation</a>
+     */
+    GET_STAGE_INSTANCE(Method.GET, STAGE_INSTANCES, CHANNEL_ID),
+
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/stage-instance#modify-stage-instance">Discord Documentation</a>
+     */
+    MODIFY_STAGE_INSTANCE(Method.PATCH, true, true, STAGE_INSTANCES, CHANNEL_ID),
+
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/stage-instance#delete-stage-instance">Discord Documentation</a>
+     */
+    DELETE_STAGE_INSTANCE(Method.DELETE, true, true, STAGE_INSTANCES, CHANNEL_ID),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
      *                                                                                                           *
      *                                                     Sticker                                               *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       08.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#STICKER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#get-sticker">Discord Documentation</a>
+     */
+    GET_STICKER(Method.GET, STICKERS, STICKER_ID),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs">Discord Documentation</a>
+     */
+    LIST_NITRO_STICKER_PACKS(Method.GET, STICKER_PACKS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#list-guild-stickers">Discord Documentation</a>
+     */
+    LIST_GUILD_STICKERS(Method.GET, GUILDS, GUILD_ID, STICKERS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#STICKER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#get-guild-sticker">Discord Documentation</a>
+     */
+    GET_GUILD_STICKER(Method.GET, GUILDS, GUILD_ID, STICKERS, STICKERS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#create-guild-sticker">Discord Documentation</a>
+     */
+    CREATE_GUILD_STICKER(Method.POST, true, true, GUILDS, GUILD_ID, STICKERS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#STICKER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#modify-guild-sticker">Discord Documentation</a>
+     */
+    MODIFY_GUILD_STICKER(Method.PATCH, true, true, GUILDS, GUILD_ID, STICKERS, STICKER_ID),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see Name#STICKER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/sticker#delete-guild-sticker">Discord Documentation</a>
+     */
+    DELETE_GUILD_STICKER(Method.DELETE, true, true, GUILDS, GUILD_ID, STICKERS, STICKER_ID),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
      *                                                                                                           *
      *                                                      User                                                 *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       08.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                                                                           *
-     *                                                                                                           *
-     *                                                      Voice                                                *
-     *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
-     *  Updated:    00.00.0000                                                                                   *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                                                                           *
-     *                                                                                                           *
-     *                                                    Webhook                                                *
-     *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
-     *  Updated:    00.00.0000                                                                                   *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                                                                           *
-     *                                                                                                           *
-     *                                                    Gateway                                                *
-     *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
-     *  Updated:    00.00.0000                                                                                   *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                                                                           *
-     *                                                                                                           *
-     *                                                    Unsorted                                               *
-     *                                                                                                           *
-     *                                                                                                           *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-    /*
-     *
-     * User https://discord.com/developers/docs/resources/user#users-resource
-     *
-     */
 
     /**
      * <p>
@@ -1080,7 +1117,7 @@ public enum Link implements AbstractLink{
      *     which returns the object with an email.
      * </p>
      *
-     * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user" target="_top">Get Current User</a>
+     * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user" target="_top">Discord Documentation</a>
      */
     GET_CURRENT_USER(Method.GET, USERS, ME),
 
@@ -1089,10 +1126,15 @@ public enum Link implements AbstractLink{
      *     Returns a {@link me.linusdev.lapi.api.objects.user.User user object} for a given user ID.
      * </p>
      *
-     * @see <a href="https://discord.com/developers/docs/resources/user#get-user" target="_top">Get User</a>
      * @see Name#USER_ID
+     * @see <a href="https://discord.com/developers/docs/resources/user#get-user" target="_top">Discord Documentation</a>
      */
     GET_USER(Method.GET, USERS, USER_ID),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/user#modify-current-user">Discord Documentation</a>
+     */
+    MODIFY_CURRENT_USER(Method.PATCH, USERS, ME),
 
     /**
      * Returns a list of partial {@link Guild guild} objects the current user is a member of. Requires the guilds OAuth2 scope.
@@ -1112,28 +1154,82 @@ public enum Link implements AbstractLink{
      *     </li>
      * </ul>
      *
-     * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds" target="_top">Get Current User Guilds</a>
+     * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds" target="_top">Discord Documentation</a>
      * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guilds-query-string-params" target="_top">Query String Params</a>
      */
     GET_CURRENT_USER_GUILDS(Method.GET, USERS, ME, GUILDS),
 
     /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/user#get-current-user-guild-member">Discord Documentation</a>
+     */
+    GET_CURRENT_USER_GUILD_MEMBER(Method.GET, USERS, ME, GUILDS, GUILD_ID, MEMBER),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/user#leave-guild">Discord Documentation</a>
+     */
+    LEAVE_GUILD(Method.DELETE, USERS, ME, GUILDS, GUILD_ID),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/user#create-dm">Discord Documentation</a>
+     */
+    CREATE_DM(Method.POST, USERS, ME, CHANNELS),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/resources/user#create-group-dm">Discord Documentation</a>
+     */
+    CREATE_GROUP_DM(Method.POST, USERS, ME, CHANNELS),
+
+    /**
      * Returns a list of {@link me.linusdev.lapi.api.objects.user.connection.Connection connection}
      * objects. Requires the connections OAuth2 scope.
      *
-     * @see <a href="https://discord.com/developers/docs/resources/user#get-user-connections" target="_top">Get User Connections</a>
+     * @see <a href="https://discord.com/developers/docs/resources/user#get-user-connections" target="_top">Discord Documentation</a>
      */
-    GET_CURRENT_USER_CONNECTIONS(Method.GET, USERS, ME, CONNECTIONS),
+    GET_USER_CONNECTIONS(Method.GET, USERS, ME, CONNECTIONS),
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                      Voice                                                *
+     *                                                                                                           *
+     *  Done:       08.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    /**
+     * Returns an array of {@link me.linusdev.lapi.api.objects.voice.region.VoiceRegion voice region objects}
+     * that can be used when setting a voice or stage channel's rtc_region.
+     *
+     * @see <a href="https://discord.com/developers/docs/resources/voice#list-voice-regions" target="_top">Discord Documentation</a>
+     */
+    LIST_VOICE_REGIONS(Method.GET, VOICE, REGIONS),
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Webhook                                                *
+     *                                                                                                           *
+     *  Done:       00.00.0000                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Gateway                                                *
+     *                                                                                                           *
+     *  Done:       08.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * Returns an object with a single valid WSS URL, which the client can use for Connecting.
      * Clients should cache this value and only call this endpoint to retrieve a new URL if
      * they are unable to properly establish a connection using the cached version of the URL.
      *
-     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway" target="_top">Get Gateway</a>
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway" target="_top">Discord Documentation</a>
      */
     GET_GATEWAY(Method.GET, GATEWAY),
 
@@ -1144,17 +1240,29 @@ public enum Link implements AbstractLink{
      * as the value is not guaranteed to be the same per-call, and changes as the bot joins/leaves
      * guilds.
      *
-     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway-bot" target="_top">Get Gateway Bot</a>
+     * @see <a href="https://discord.com/developers/docs/topics/gateway#get-gateway-bot" target="_top">Discord Documentation</a>
      */
     GET_GATEWAY_BOT(Method.GET, GATEWAY, BOT),
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    OAuth2                                                 *
+     *                                                                                                           *
+     *  Done:       08.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     /**
-     * Returns an array of {@link me.linusdev.lapi.api.objects.voice.region.VoiceRegion voice region objects}
-     * that can be used when setting a voice or stage channel's rtc_region.
-     *
-     * @see <a href="https://discord.com/developers/docs/resources/voice#list-voice-regions" target="_top">List Voice Regions</a>
+     * @see <a href="https://discord.com/developers/docs/topics/oauth2#get-current-bot-application-information">Discord Documentation</a>
      */
-    GET_VOICE_REGIONS(Method.GET, VOICE, REGIONS),
+    GET_CURRENT_BOT_APPLICATION_INFORMATION(Method.GET, OAUTH2, APPLICATIONS, ME),
+
+    /**
+     * @see <a href="https://discord.com/developers/docs/topics/oauth2#get-current-authorization-information">Discord Documentation</a>
+     */
+    GET_CURRENT_AUTHORIZATION_INFORMATION(Method.GET, OAUTH2, ME),
+
     ;
 
     public static final int amount = values().length;

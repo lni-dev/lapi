@@ -61,6 +61,10 @@ public enum LinkPart implements Concatable {
     VOICE_STATES("voice-states"),
     SCHEDULED_EVENTS("scheduled-events"),
     TEMPLATES("templates"),
+    STAGE_INSTANCES("stage-instances"),
+    STICKER_PACKS("sticker-packs"),
+
+    OAUTH2("oauth2"),
 
     ME("@me"),
     BOT("bot"),
@@ -74,6 +78,7 @@ public enum LinkPart implements Concatable {
     VANITY_URL("vanity-url"),
     WIDGET_PNG("widget.png"),
     WELCOME_SCREEN("welcome-screen"),
+    MEMBER("member"),
 
     CALLBACK("callback"),
     BULK_DELETE("bulk-delete"),

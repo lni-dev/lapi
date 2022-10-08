@@ -49,7 +49,7 @@ public class VoiceRegionManager implements Manager, HasLApi {
      */
     public void update() throws LApiException, IOException, ParseException, InterruptedException {
         ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<SOData, VoiceRegion>(
-                new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
+                new LinkQuery(lApi, Link.LIST_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
         ArrayList<VoiceRegion> list = retriever.queueAndWait();
 
         if(list == null) return;
@@ -79,7 +79,7 @@ public class VoiceRegionManager implements Manager, HasLApi {
     @Override
     public void init(int initialCapacity) {
         ArrayRetriever<SOData, VoiceRegion> retriever = new ArrayRetriever<>(
-                new LinkQuery(lApi, Link.GET_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
+                new LinkQuery(lApi, Link.LIST_VOICE_REGIONS), (lApi1, data) -> VoiceRegion.fromData(data));
 
         retriever.queue((voiceRegions, s, error) -> {
 
