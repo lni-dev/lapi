@@ -63,6 +63,7 @@ public enum LinkPart implements Concatable {
     TEMPLATES("templates"),
     STAGE_INSTANCES("stage-instances"),
     STICKER_PACKS("sticker-packs"),
+    WEBHOOKS("webhooks"),
 
     OAUTH2("oauth2"),
 
@@ -79,6 +80,9 @@ public enum LinkPart implements Concatable {
     WIDGET_PNG("widget.png"),
     WELCOME_SCREEN("welcome-screen"),
     MEMBER("member"),
+    ORIGINAL("@original"),
+    SLACK("slack"),
+    GITHUB("github"),
 
     CALLBACK("callback"),
     BULK_DELETE("bulk-delete"),

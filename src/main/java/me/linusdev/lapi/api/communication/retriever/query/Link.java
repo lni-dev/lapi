@@ -49,7 +49,8 @@ public enum Link implements AbstractLink{
      *                                                                                                           *
      *                                             Application Commands                                          *
      *                                                                                                           *
-     *  Done: 02.09.2022                                                                                         *
+     *  Done:       02.09.2022                                                                                         *
+     *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -207,6 +208,8 @@ public enum Link implements AbstractLink{
      *  The Interaction endpoints below are not bound to the application's Global Rate Limit.                    *
      *  see https://discord.com/developers/docs/interactions/receiving-and-responding#endpoints                  *
      *                                                                                                           *
+     *  Done:       08.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -219,6 +222,65 @@ public enum Link implements AbstractLink{
      * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response" target="_top">Create Interaction Response</a>
      */
     CREATE_INTERACTION_RESPONSE(Method.POST, false, INTERACTIONS, INTERACTION_ID, INTERACTION_TOKEN, CALLBACK),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response" target="_top">Create Interaction Response</a>
+     */
+    GET_ORIGINAL_INTERACTION_RESPONSE(Method.GET, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, ORIGINAL),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#edit-original-interaction-response" target="_top">Create Interaction Response</a>
+     */
+    EDIT_ORIGINAL_INTERACTION_RESPONSE(Method.PATCH, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, ORIGINAL),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response" target="_top">Create Interaction Response</a>
+     */
+    DELETE_ORIGINAL_INTERACTION_RESPONSE(Method.DELETE, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, ORIGINAL),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#create-followup-message" target="_top">Create Interaction Response</a>
+     */
+    CREATE_FOLLOWUP_MESSAGE(Method.POST, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message" target="_top">Create Interaction Response</a>
+     */
+    GET_FOLLOWUP_MESSAGE(Method.GET, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, MESSAGE_ID),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message" target="_top">Create Interaction Response</a>
+     */
+    EDIT_FOLLOWUP_MESSAGE(Method.PATCH, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, MESSAGE_ID),
+
+    /**
+     *
+     * @see Name#APPLICATION_ID
+     * @see Name#INTERACTION_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#delete-followup-message" target="_top">Create Interaction Response</a>
+     */
+    DELETE_FOLLOWUP_MESSAGE(Method.DELETE, false, WEBHOOKS, APPLICATION_ID, INTERACTION_TOKEN, MESSAGES, MESSAGE_ID),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
@@ -288,7 +350,7 @@ public enum Link implements AbstractLink{
      *                                                    Channel                                                *
      *                                                                                                           *
      *  Done:       02.09.2022                                                                                   *
-     *  Updated:                                                                                                 *
+     *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -1208,9 +1270,111 @@ public enum Link implements AbstractLink{
      *                                                                                                           *
      *                                                    Webhook                                                *
      *                                                                                                           *
-     *  Done:       00.00.0000                                                                                   *
+     *  Done:       08.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#create-webhook">Discord Documentation</a>
+     */
+    CREATE_WEBHOOK(Method.POST, true, true, CHANNELS, CHANNEL_ID, WEBHOOKS),
+
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#get-channel-webhooks">Discord Documentation</a>
+     */
+    GET_CHANNEL_WEBHOOKS(Method.GET, CHANNELS, CHANNEL_ID, WEBHOOKS),
+
+    /**
+     * @see Name#GUILD_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#get-guild-webhooks">Discord Documentation</a>
+     */
+    GET_GUILD_WEBHOOKS(Method.GET, GUILD_ID, WEBHOOKS),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#get-webhook">Discord Documentation</a>
+     */
+    GET_WEBHOOK(Method.GET, WEBHOOKS, WEBHOOK_ID),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#get-webhook-with-token">Discord Documentation</a>
+     */
+    GET_WEBHOOK_WITH_TOKEN(Method.GET, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#modify-webhook">Discord Documentation</a>
+     */
+    MODIFY_WEBHOOK(Method.PATCH, true, true, WEBHOOKS, WEBHOOK_ID),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#modify-webhook-with-token">Discord Documentation</a>
+     */
+    MODIFY_WEBHOOK_WITH_TOKEN(Method.PATCH, true, true, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#delete-webhook">Discord Documentation</a>
+     */
+    DELETE_WEBHOOK(Method.DELETE, true, true, WEBHOOKS, WEBHOOK_ID),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#delete-webhook-with-token">Discord Documentation</a>
+     */
+    DELETE_WEBHOOK_WITH_TOKEN(Method.DELETE, true, true, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#execute-webhook">Discord Documentation</a>
+     */
+    EXECUTE_WEBHOOK(Method.POST, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#execute-slackcompatible-webhook">Discord Documentation</a>
+     */
+    EXECUTE_SLACK_COMPATIBLE_WEBHOOK(Method.POST, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN, SLACK),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#execute-githubcompatible-webhook">Discord Documentation</a>
+     */
+    EXECUTE_GITHUB_COMPATIBLE_WEBHOOK(Method.POST, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN, GITHUB),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#get-webhook-message">Discord Documentation</a>
+     */
+    GET_WEBHOOK_MESSAGE(Method.GET, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN, MESSAGES, MESSAGE_ID),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#edit-webhook-message">Discord Documentation</a>
+     */
+    EDIT_WEBHOOK_MESSAGE(Method.PATCH, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN, MESSAGES, MESSAGE_ID),
+
+    /**
+     * @see Name#WEBHOOK_ID
+     * @see Name#WEBHOOK_TOKEN
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/webhook#delete-webhook-message">Discord Documentation</a>
+     */
+    DELETE_WEBHOOK_MESSAGE(Method.PATCH, WEBHOOKS, WEBHOOK_ID, WEBHOOK_TOKEN, MESSAGES, MESSAGE_ID),
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
