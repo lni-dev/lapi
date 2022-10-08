@@ -16,6 +16,9 @@
 
 package me.linusdev.lapi.api.cache;
 
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
@@ -23,7 +26,9 @@ import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -50,29 +55,7 @@ public class Cache implements EventListener, HasLApi {
             lApi.getEventTransmitter().addListener(this);
 
         } else {
-            lApi.getRequestFactory().getCurrentUser().queue((user, response,  error) -> {
-                if(error != null) {
-                    error.log(Logger.getLogger(this));
-                    return;
-                }
-
-                currentUserId = user.getIdAsSnowflake();
-                if(currentApplicationId == null)
-                    currentApplicationId = currentUserId;
-
-                synchronized (lock) {
-                    if(!constructorFinished.get()) {
-                        try {
-                            lock.wait();
-                        } catch (InterruptedException e) {
-                            LogInstance log = Logger.getLogger(this);
-                            log.error("Interrupted while waiting for the constructor to finish! (Cache:66)");
-                            log.error(e);
-                        }
-                    }
-                }
-                lApi.transmitEvent().onCacheReady(lApi, new CacheReadyEvent(lApi, this));
-            });
+            lApi.runSupervised(this::retrieveCurrentUserAndApplicationId);
 
         }
 
@@ -149,4 +132,60 @@ public class Cache implements EventListener, HasLApi {
     public @NotNull LApi getLApi() {
         return lApi;
     }
+
+
+    /**
+     * This method must run in a new Thread!
+     */
+    private void retrieveCurrentUserAndApplicationId() {
+        if(currentApplicationId == null && !lApi.getConfig().isFlagSet(ConfigFlag.ENABLE_GATEWAY)) {
+            Future<Application, QResponse> futureApplication = lApi.getRequestFactory().getCurrentBotApplicationInformation().queue();
+            Future<User, QResponse> futureCurrentUser = lApi.getRequestFactory().getCurrentUser().queue();
+
+            try {
+                {
+                    //Get Application
+                    ComputationResult<Application, QResponse> result = futureApplication.get();
+
+                    if(result.hasError()) {
+                        result.getError().log(Logger.getLogger(this));
+                    } else {
+                        currentApplicationId = result.getResult().getIdAsSnowflake();
+                    }
+                }
+
+                {
+                    //Get User
+                    ComputationResult<User, QResponse> result = futureCurrentUser.get();
+
+                    if(result.hasError()) {
+                        result.getError().log(Logger.getLogger(this));
+                    } else {
+                        currentUserId = result.getResult().getIdAsSnowflake();
+                    }
+                }
+
+                synchronized (lock) {
+                    if(!constructorFinished.get()) {
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            LogInstance log = Logger.getLogger(this);
+                            log.error("Interrupted while waiting for the constructor to finish! (Cache:66)");
+                            log.error(e);
+                        }
+                    }
+                }
+                lApi.transmitEvent().onCacheReady(lApi, new CacheReadyEvent(lApi, this));
+
+
+            } catch (InterruptedException e) {
+                LogInstance log = Logger.getLogger(this);
+                log.interrupted(e);
+                return;
+            }
+
+        }
+    }
+
 }

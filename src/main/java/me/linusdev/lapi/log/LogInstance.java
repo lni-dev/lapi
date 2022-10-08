@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class LogInstance {
 
+    private final static StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+
     private @NotNull final String source;
     private @NotNull final Logger.Type defaultType;
 
@@ -33,12 +35,20 @@ public class LogInstance {
         Logger.log(defaultType, source, null, toLog, false);
     }
 
+    public void logf(String toLog, Object... objects) {
+        Logger.log(defaultType, source, null, String.format(toLog, objects), false);
+    }
+
     public void info(String infoLog){
         Logger.log(Logger.Type.INFO, source, null, infoLog, false);
     }
 
     public void warning(String warningLog){
         Logger.log(Logger.Type.INFO, source, null, warningLog, false);
+    }
+
+    public void warningf(String warningLog, Object... objects){
+        Logger.log(Logger.Type.INFO, source, null, String.format(warningLog, objects), false);
     }
 
     public void warningAlign(String warningLog){
@@ -90,5 +100,10 @@ public class LogInstance {
             err.append(e.toString()).append("\n");
 
         errorAlign(err.toString(), throwable.getClass().getSimpleName());
+    }
+
+    public void interrupted(@Nullable InterruptedException exception) {
+        @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
+        Logger.log(Logger.Type.INFO, "Interrupts", null, String.format("Class '%s' interrupted. (%s:%s)", frame.getClassName(), frame.getClassName(), frame.getLineNumber()), false);
     }
 }
