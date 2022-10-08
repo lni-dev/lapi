@@ -57,8 +57,8 @@ import java.util.function.Consumer;
  * </span><br>
  * <ul style="margin-top:0;padding-top:0;margin-bottom:0;padding-bottom:0">
  *     <li>
- *         All Threads waiting on {@link #get()} will be resumed and {@code null} will
- *         be returned.
+ *         All Threads waiting on {@link #get()} will be resumed and a {@link CancellationException} will
+ *         be thrown.
  *     </li>
  *     <li>
  *         The {@link Task} will not be executed.
