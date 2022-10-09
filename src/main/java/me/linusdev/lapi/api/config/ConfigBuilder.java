@@ -88,6 +88,7 @@ public class ConfigBuilder implements Datable {
     public final static String FLAGS_KEY = "flags";
     public final static String GATEWAY_CONFIG_KEY = "gateway_config";
 
+    public final static String DEBUG_RATE_LIMIT_BUCKETS_KEY = "debug_rate_limit_buckets";
     public final static String GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT_KEY = "global_http_rate_limit_retry_limit";
     public final static String HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT_KEY = "http_rate_limit_assumed_bucket_limit";
     public final static String BUCKETS_CHECK_AMOUNT_KEY = "buckets_check_amount";
@@ -104,6 +105,7 @@ public class ConfigBuilder implements Datable {
     private long flags = 0;
 
     //Queue
+    private Boolean debugRateLimitBuckets = null;
     private Long globalHttpRateLimitRetryLimit = null;
     private Long httpRateLimitAssumedBucketLimit = null;
     private Integer bucketsCheckAmount;
@@ -263,6 +265,23 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setToken(@NotNull String token){
         this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional / Not Recommended</em><br>
+     * Default: {@code false}
+     * <p>
+     *     If set to {@code true} will open a small java swing  window, showing all rate limit buckets and there values.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param debugRateLimitBuckets whether to open the debug window
+     * @return this
+     */
+    public ConfigBuilder setDebugRateLimitBuckets(Boolean debugRateLimitBuckets) {
+        this.debugRateLimitBuckets = debugRateLimitBuckets;
         return this;
     }
 
@@ -822,6 +841,7 @@ public class ConfigBuilder implements Datable {
                 token,
                 applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
+                Objects.requireNonNullElse(debugRateLimitBuckets, false),
                 Objects.requireNonNullElse(bucketsCheckAmount, LApiImpl.DEFAULT_BUCKETS_CHECK_AMOUNT),
                 Objects.requireNonNullElse(assumedBucketMaxLifeTime, LApiImpl.DEFAULT_ASSUMED_BUCKET_MAX_LIFE_TIME),
                 Objects.requireNonNullElse(bucketMaxLastUsedTime, LApiImpl.DEFAULT_BUCKET_MAX_LAST_USED_TIME),

@@ -166,9 +166,8 @@ public class LApiImpl implements LApi {
         this.queue = config.getNewQueue();
         this.queueThread = new QueueThread(this, lApiThreadGroup, queue);
         this.queueThread.start();
+        if(config.isDebugRateLimitBucketsEnabled()) this.queueThread.debug();
 
-        //TODO: remove
-        this.queueThread.debug();
 
         requestFactory = new RequestFactory(this);
         eventTransmitter = new EventTransmitter(this);

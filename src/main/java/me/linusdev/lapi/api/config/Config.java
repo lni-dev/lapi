@@ -52,6 +52,7 @@ public class Config {
     private final @NotNull GatewayConfig gatewayConfig;
 
     //Queue
+    private final boolean debugRateLimitBuckets;
     private final long globalHttpRateLimitRetryLimit;
     private final long HttpRateLimitAssumedBucketLimit;
     private final int bucketsCheckAmount;
@@ -79,7 +80,7 @@ public class Config {
 
     public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
-                  int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
+                  boolean debugRateLimitBuckets, int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
@@ -91,6 +92,7 @@ public class Config {
         this.applicationId = applicationId;
         this.apiVersion = apiVersion;
         this.gatewayConfig = gatewayConfig;
+        this.debugRateLimitBuckets = debugRateLimitBuckets;
         this.bucketsCheckAmount = bucketsCheckAmount;
         this.assumedBucketMaxLifeTime = assumedBucketMaxLifeTime;
         this.bucketMaxLastUsedTime = bucketMaxLastUsedTime;
@@ -118,6 +120,10 @@ public class Config {
      */
     public boolean isFlagSet(ConfigFlag flag){
         return flag.isSet(flags);
+    }
+
+    public boolean isDebugRateLimitBucketsEnabled() {
+        return debugRateLimitBuckets;
     }
 
     public long getGlobalHttpRateLimitRetryLimit() {
