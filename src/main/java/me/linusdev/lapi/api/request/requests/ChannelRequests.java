@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
@@ -187,7 +188,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
+     *     This will create a new {@link Message message}
      *     in the channel with given id
      * </p>
      *
@@ -210,7 +211,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
+     *     This will create a new {@link Message message}
      *     in the channel with given id.
      * </p>
      *
@@ -236,7 +237,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
+     *     This will create a new {@link Message message}
      *     in the channel with given id.
      * </p>
      *
@@ -255,7 +256,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
+     *     This will create a new {@link Message message}
      *     in the channel with given id.
      * </p>
      *
@@ -275,7 +276,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link me.linusdev.lapi.api.objects.message.abstracts.Message message}
+     *     This will create a new {@link Message message}
      *     in the channel with given id.
      * </p>
      *

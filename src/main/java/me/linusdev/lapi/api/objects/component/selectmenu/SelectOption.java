@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.component.selectmenu;
+package me.linusdev.lapi.api.objects.component.selectmenu;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
-import me.linusdev.lapi.api.objects.message.component.ComponentLimits;
+import me.linusdev.lapi.api.objects.component.ComponentLimits;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

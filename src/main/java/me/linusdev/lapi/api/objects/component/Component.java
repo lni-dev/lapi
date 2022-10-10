@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.component;
+package me.linusdev.lapi.api.objects.component;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
+import me.linusdev.lapi.api.objects.component.button.Button;
+import me.linusdev.lapi.api.objects.component.selectmenu.SelectMenu;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
-import me.linusdev.lapi.api.objects.message.component.actionrow.ActionRow;
-import me.linusdev.lapi.api.objects.message.component.button.Button;
-import me.linusdev.lapi.api.objects.message.component.selectmenu.SelectMenu;
+import me.linusdev.lapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
  *     </a>
  * </h2>
  * <p>
- *     Components are a new field on the {@link me.linusdev.lapi.api.objects.message.abstracts.Message message object}, so you can use them whether you're sending messages or responding to a slash command or other interaction
+ *     Components are a new field on the {@link Message message object}, so you can use them whether you're sending messages or responding to a slash command or other interaction
  *     The top-level components field is an array of {@link ActionRow Action Row} components.
  * </p>
  * <br>

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.component.actionrow;
+package me.linusdev.lapi.api.objects.component.actionrow;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.objects.message.component.Component;
-import me.linusdev.lapi.api.objects.message.component.ComponentLimits;
-import me.linusdev.lapi.api.objects.message.component.ComponentType;
+import me.linusdev.lapi.api.objects.component.ComponentType;
+import me.linusdev.lapi.api.objects.component.Component;
+import me.linusdev.lapi.api.objects.component.ComponentLimits;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

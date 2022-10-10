@@ -28,10 +28,10 @@ import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.MessageReference;
-import me.linusdev.lapi.api.objects.message.abstracts.Message;
-import me.linusdev.lapi.api.objects.message.component.Component;
-import me.linusdev.lapi.api.objects.message.component.ComponentType;
-import me.linusdev.lapi.api.objects.message.component.actionrow.ActionRow;
+import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.component.Component;
+import me.linusdev.lapi.api.objects.component.ComponentType;
+import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -75,7 +75,7 @@ import java.util.function.Function;
 public class MessageBuilder implements HasLApi {
 
     /**
-     * This class holds a bunch of limits of a {@link me.linusdev.lapi.api.objects.message.abstracts.Message Message}
+     * This class holds a bunch of limits of a {@link Message Message}
      */
     public static final class Limits{
         public static final int MAX_EMBEDS = 10;

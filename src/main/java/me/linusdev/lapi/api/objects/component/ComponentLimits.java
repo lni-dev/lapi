@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.component;
+package me.linusdev.lapi.api.objects.component;
 
 /**
  * Component Limits

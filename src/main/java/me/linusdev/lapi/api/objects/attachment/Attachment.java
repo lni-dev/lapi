@@ -19,12 +19,13 @@ package me.linusdev.lapi.api.objects.attachment;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
+import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Attachment used for example in retrieved {@link me.linusdev.lapi.api.objects.message.abstracts.Message messages}
+ * Attachment used for example in retrieved {@link Message messages}
  */
 public class Attachment extends PartialAttachment {
 

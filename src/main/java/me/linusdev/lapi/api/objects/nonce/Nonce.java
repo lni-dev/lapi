@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.nonce;
+package me.linusdev.lapi.api.objects.nonce;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.objects.message.Message;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
- * used in {@link me.linusdev.lapi.api.objects.message.abstracts.Message}
+ * used in {@link Message}
  * "used for validating a message was sent"
  * TODO what is this?
  */

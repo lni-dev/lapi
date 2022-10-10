@@ -25,11 +25,10 @@ import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.member.Member;
-import me.linusdev.lapi.api.objects.message.abstracts.AbstractMessage;
-import me.linusdev.lapi.api.objects.message.component.Component;
+import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
-import me.linusdev.lapi.api.objects.message.nonce.Nonce;
+import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.sticker.StickerItem;
@@ -40,9 +39,9 @@ import java.util.List;
 
 /**
  *
- * {@link me.linusdev.lapi.api.objects.message.abstracts.Message Message} Implementation
+ * {@link Message Message} Implementation
  *
- * @see me.linusdev.lapi.api.objects.message.abstracts.Message Message for more information
+ * @see Message Message for more information
  */
 public class MessageImplementation extends AbstractMessage {
 

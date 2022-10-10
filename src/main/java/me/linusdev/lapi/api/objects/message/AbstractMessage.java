@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.abstracts;
+package me.linusdev.lapi.api.objects.message;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;

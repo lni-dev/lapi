@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.component.button;
+package me.linusdev.lapi.api.objects.component.button;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;

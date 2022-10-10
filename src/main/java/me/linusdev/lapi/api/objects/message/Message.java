@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.abstracts;
+package me.linusdev.lapi.api.objects.message;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
@@ -26,14 +26,11 @@ import me.linusdev.lapi.api.objects.channel.ChannelMention;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.enums.MessageType;
 import me.linusdev.lapi.api.objects.guild.member.Member;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.MessageReference;
-import me.linusdev.lapi.api.objects.message.Reaction;
-import me.linusdev.lapi.api.objects.message.component.Component;
+import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
-import me.linusdev.lapi.api.objects.message.nonce.Nonce;
+import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.sticker.StickerItem;

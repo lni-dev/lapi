@@ -20,11 +20,12 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * This might be used in a {@link me.linusdev.lapi.api.objects.message.abstracts.Message} to store information about
+ * This might be used in a {@link Message} to store information about
  * a mentioned Channel.
  * <br><br>
  * Note that this Object will not be changed after creation, even if the channel name changes or the channel is deleted

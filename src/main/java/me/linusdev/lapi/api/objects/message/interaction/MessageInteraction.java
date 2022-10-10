@@ -21,14 +21,16 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.objects.interaction.InteractionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- *     This is sent on the {@link me.linusdev.lapi.api.objects.message.abstracts.Message message object}
+ *     This is sent on the {@link Message message object}
  *     when the message is a response to an Interaction without an existing message.
  * </p>
  * <p>

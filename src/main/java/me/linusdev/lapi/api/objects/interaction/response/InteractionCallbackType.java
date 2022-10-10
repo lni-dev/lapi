@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.interaction.response;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.objects.component.Component;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,7 +53,7 @@ public enum InteractionCallbackType implements SimpleDatable {
 
     /**
      * for components, edit the message the component was attached to.<br>
-     * Only valid for {@link me.linusdev.lapi.api.objects.message.component.Component component-based} interactions
+     * Only valid for {@link Component component-based} interactions
      */
     UPDATE_MESSAGE(7),
 

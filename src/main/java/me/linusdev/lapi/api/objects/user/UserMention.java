@@ -22,12 +22,13 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.guild.member.Member;
+import me.linusdev.lapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  *
- * used in {@link me.linusdev.lapi.api.objects.message.abstracts.Message}
+ * used in {@link Message}
  */
 public class UserMention implements Datable, HasLApi {
 

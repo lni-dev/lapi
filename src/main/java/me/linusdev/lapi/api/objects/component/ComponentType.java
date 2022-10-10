@@ -14,34 +14,50 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.message.interaction;
+package me.linusdev.lapi.api.objects.component;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type" target="_top">Interaction Type</a>
+ * @see <a href="https://discord.com/developers/docs/interactions/message-components#component-object-component-types" target="_top">ComponentType</a>
  */
-public enum InteractionType implements SimpleDatable {
+public enum ComponentType implements SimpleDatable {
+
+    /**
+     * LApi specific, not in Discord!
+     */
     UNKNOWN(0),
-    PING(1),
-    APPLICATION_COMMAND(2),
-    MESSAGE_COMPONENT(3),
-    APPLICATION_COMMAND_AUTOCOMPLETE(4),
+
+    /**
+     * A container for other components
+     */
+    ACTION_ROW(1),
+
+    /**
+     * A button object
+     */
+    BUTTON(2),
+
+    /**
+     * A select menu for picking from choices
+     */
+    SELECT_MENU(3),
     ;
 
     private final int value;
 
-    InteractionType(int value){
+    ComponentType(int value){
         this.value = value;
     }
 
     /**
      *
-     * @return {@link InteractionType} corresponding to given value or {@link InteractionType#UNKNOWN} if none matches
+     * @param value to get corresponding {@link ComponentType}
+     * @return {@link ComponentType} matching given value or {@link #UNKNOWN} if none matches
      */
-    public static @NotNull InteractionType fromValue(int value){
-        for(InteractionType type : InteractionType.values()){
+    public static @NotNull ComponentType fromValue(int value){
+        for(ComponentType type : ComponentType.values()){
             if(type.value == value) return type;
         }
 

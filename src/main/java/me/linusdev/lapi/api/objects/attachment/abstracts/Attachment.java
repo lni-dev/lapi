@@ -18,11 +18,12 @@ package me.linusdev.lapi.api.objects.attachment.abstracts;
 
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
+import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Attachment used in {@link me.linusdev.lapi.api.objects.message.abstracts.Message}
+ * Attachment used in {@link Message}
  * <br><br>
  * For the attachments array in Message Create/Edit requests, only the id is required. see {@link me.linusdev.lapi.api.objects.attachment.PartialAttachment}
  *

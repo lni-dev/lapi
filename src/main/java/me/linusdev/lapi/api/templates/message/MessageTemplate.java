@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.communication.http.request.body.FilePart;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.message.MessageReference;
-import me.linusdev.lapi.api.objects.message.component.Component;
+import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.Nullable;
