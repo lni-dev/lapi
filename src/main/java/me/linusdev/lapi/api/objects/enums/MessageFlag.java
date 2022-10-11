@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.objects.enums;
 
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,6 +100,7 @@ public enum MessageFlag {
      * @return Empty array if, bits == null or 0L.
      * Array with {@link MessageFlag} corresponding to bits otherwise
      */
+    @Contract("_ -> new")
     public static @NotNull List<MessageFlag> getFlagsFromBits(@Nullable Long bits){
         ArrayList<MessageFlag> flags = new ArrayList<>();
 
