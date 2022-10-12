@@ -17,7 +17,8 @@
 package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
@@ -34,7 +35,6 @@ import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.invite.Invite;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
@@ -69,7 +69,7 @@ public interface ChannelRequests extends HasLApi {
     default @NotNull Queueable<Channel<?>> getChannel(@NotNull String channelId){
         return new ConvertingRetriever<>(
                 new LinkQuery(getLApi(), Link.GET_CHANNEL,
-                        new PlaceHolder(Name.CHANNEL_ID, channelId)),
+                        Name.CHANNEL_ID.withValue(channelId)),
                 Channel::fromData);
     }
 
@@ -88,13 +88,14 @@ public interface ChannelRequests extends HasLApi {
     /**
      *
      * @param channelId the id of the {@link Channel}, in which the message was sent
-     * @param messageId the id of the {@link MessageImplementation}
-     * @return {@link Queueable} which can retrieve the {@link MessageImplementation}
+     * @param messageId the id of the {@link ChannelMessage message}
+     * @return {@link Queueable} which can retrieve the {@link ChannelMessage message}
      */
-    default @NotNull Queueable<MessageImplementation> getChannelMessage(@NotNull String channelId, @NotNull String messageId){
+    default @NotNull Queueable<ChannelMessage> getChannelMessage(@NotNull String channelId, @NotNull String messageId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGE,
-                new PlaceHolder(Name.CHANNEL_ID, channelId), new PlaceHolder(Name.MESSAGE_ID, messageId));
-        return new ConvertingRetriever<>(query, MessageImplementation::new);
+                Name.CHANNEL_ID.withValue(channelId),
+                Name.MESSAGE_ID.withValue(messageId));
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
 
@@ -108,13 +109,13 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This is used to retrieve a bunch of {@link MessageImplementation messages} in a {@link Channel channel}.
+     *     This is used to retrieve a bunch of {@link ChannelMessage messages} in a {@link Channel channel}.
      * </p>
      * <p>
      *     If anchorType is {@code null}, it should use {@link AnchorType#AROUND}, but it may result in unexpected behavior.
      * </p>
      * <p>
-     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link MessageImplementation messages} in the {@link Channel channel}.
+     *     If anchorMessageId and anchorType is {@code null} it should retrieve the latest {@link ChannelMessage messages} in the {@link Channel channel}.
      * </p>
      * <p>
      *     If limit is {@code null}, the limit will be 50
@@ -122,14 +123,14 @@ public interface ChannelRequests extends HasLApi {
      *
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
      * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
+     *                       The {@link ChannelMessage message} with this id will most likely be included in the result.
      *                        If this is {@code null}, it will retrieve the latest messages in the channel
      * @param limit the limit of how many messages you want to retrieve (between 1-100). Default is 50
      * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link ChannelMessage messages}
      * @see Link#GET_CHANNEL_MESSAGES
      */
-    default @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessages(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
+    default @NotNull Queueable<ArrayList<ChannelMessage>> getChannelMessages(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable Integer limit, @Nullable AnchorType anchorType){
 
         SOData queryStringsData = null;
 
@@ -145,35 +146,35 @@ public interface ChannelRequests extends HasLApi {
 
 
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_MESSAGES, queryStringsData,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
-        return new ArrayRetriever<SOData, MessageImplementation>(query, MessageImplementation::new);
+                Name.CHANNEL_ID.withValue(channelId));
+        return new ArrayRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /**
-     * This will retrieve 50 or less {@link MessageImplementation messages}.<br><br> For more information see
+     * This will retrieve 50 or less {@link ChannelMessage messages}.<br><br> For more information see
      * {@link #getChannelMessages(String, String, Integer, AnchorType)}<br><br>
      *
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are<br><br>
      * @param anchorMessageId the message around, before or after which you want to retrieve messages.
-     *                       The {@link MessageImplementation} with this id will most likely be included in the result.
+     *                       The {@link ChannelMessage message} with this id will most likely be included in the result.
      *                       If this is {@code null}, it will retrieve the latest messages in the channel.<br><br>
      * @param anchorType {@link AnchorType#AROUND}, {@link AnchorType#BEFORE} and {@link AnchorType#AFTER}<br><br>
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link ChannelMessage messages}
      * @see #getChannelMessages(String, String, Integer, AnchorType)
      */
-    default @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessages(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
+    default @NotNull Queueable<ArrayList<ChannelMessage>> getChannelMessages(@NotNull String channelId, @Nullable String anchorMessageId, @Nullable AnchorType anchorType){
         return getChannelMessages(channelId, anchorMessageId, null, anchorType);
     }
 
     /**
-     * This should retrieve the latest 50 or less {@link MessageImplementation messages} in given {@link Channel channel}. The newest {@link MessageImplementation message} will have index 0
+     * This should retrieve the latest 50 or less {@link ChannelMessage messages} in given {@link Channel channel}. The newest {@link ChannelMessage message} will have index 0
      * <br><br>
      * See {@link #getChannelMessages(String, String, Integer, AnchorType)} for more information<br><br>
      * @param channelId the id of the {@link Channel}, in which the messages you want to retrieve are
-     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link MessageImplementation Messages}
+     * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link ChannelMessage messages}
      * @see #getChannelMessages(String, String, Integer, AnchorType)
      */
-    default @NotNull Queueable<ArrayList<MessageImplementation>> getChannelMessages(@NotNull String channelId) {
+    default @NotNull Queueable<ArrayList<ChannelMessage>> getChannelMessages(@NotNull String channelId) {
         return getChannelMessages(channelId, null, null, null);
     }
 
@@ -188,7 +189,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link Message message}
+     *     This will create a new {@link ChannelMessage message}
      *     in the channel with given id
      * </p>
      *
@@ -202,16 +203,16 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
+    default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, @NotNull MessageTemplate message){
         Query query = new LinkQuery(getLApi(), Link.CREATE_MESSAGE, message.getBody(),
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
 
-        return new ConvertingRetriever<>(query, MessageImplementation::new);
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /**
      * <p>
-     *     This will create a new {@link Message message}
+     *     This will create a new {@link ChannelMessage message}
      *     in the channel with given id.
      * </p>
      *
@@ -226,7 +227,7 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
+    default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
         return createMessage(channelId, new MessageTemplate(
                 content,
                 false, null,
@@ -237,7 +238,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link Message message}
+     *     This will create a new {@link ChannelMessage message}
      *     in the channel with given id.
      * </p>
      *
@@ -250,13 +251,13 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull String content){
+    default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, @NotNull String content){
         return createMessage(channelId, content,true);
     }
 
     /**
      * <p>
-     *     This will create a new {@link Message message}
+     *     This will create a new {@link ChannelMessage message}
      *     in the channel with given id.
      * </p>
      *
@@ -266,7 +267,7 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
+    default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
         return createMessage(channelId,
                 new MessageTemplate(null, false, embeds,
                         allowMentions ? null : AllowedMentions.noneAllowed(),
@@ -276,7 +277,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     This will create a new {@link Message message}
+     *     This will create a new {@link ChannelMessage message}
      *     in the channel with given id.
      * </p>
      *
@@ -286,7 +287,7 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} to create the message
      * @see Link#CREATE_MESSAGE
      */
-    default @NotNull Queueable<MessageImplementation> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
+    default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, @NotNull Embed... embeds){
         return createMessage(channelId, true, embeds);
     }
 
@@ -315,7 +316,7 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}
-     * @param messageId the id of the {@link MessageImplementation}
+     * @param messageId the id of the {@link ChannelMessage message}
      * @param emoji the {@link Emoji}
      * @param afterUserId the {@link User} after which you want to retrieve. This should be {@code null}, if this is your first retrieve
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
@@ -330,17 +331,20 @@ public interface ChannelRequests extends HasLApi {
             if (limit != null) queryStringsData.add(RequestFactory.LIMIT_KEY, limit);
         }
 
-        String emojiString;
+        @NotNull String emojiString;
         if(emoji.isStandardEmoji()){
+            //noinspection ConstantConditions: checked by above if
             emojiString = emoji.getName();
+            assert emojiString != null;
         }else{
             emojiString = emoji.getName() + ":" + emoji.getId();
         }
 
+
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_REACTIONS, queryStringsData,
-                new PlaceHolder(Name.CHANNEL_ID, channelId),
-                new PlaceHolder(Name.MESSAGE_ID, messageId),
-                new PlaceHolder(Name.EMOJI, emojiString));
+                Name.CHANNEL_ID.withValue(channelId),
+                Name.MESSAGE_ID.withValue(messageId),
+                Name.EMOJI.withValue(emojiString));
         return new ArrayRetriever<>(query, User::fromData);
     }
 
@@ -353,7 +357,7 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}
-     * @param messageId the id of the {@link MessageImplementation}
+     * @param messageId the id of the {@link ChannelMessage message}
      * @param emoji the {@link Emoji}
      * @param limit max number of users to return (1-100). Will be 25 if {@code null}
      * @return {@link Queueable} which can retrieve a {@link ArrayList} of {@link User users} that have reacted with given emoji
@@ -403,7 +407,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ArrayList<Invite>> getChannelInvites(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_CHANNEL_INVITES,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
         return new ArrayRetriever<>(query, Invite::fromData);
     }
 
@@ -453,13 +457,13 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * @param channelId the id of the {@link Channel}, you want the pinned messages from
-     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link MessageImplementation pinned messages} for given channel
+     * @return {@link Queueable} which can retrieve an {@link ArrayList} of {@link ChannelMessage pinned messages} for given channel
      * @see Link#GET_PINNED_MESSAGES
      */
-    default @NotNull Queueable<ArrayList<MessageImplementation>> getPinnedMessages(@NotNull String channelId){
+    default @NotNull Queueable<ArrayList<ChannelMessage>> getPinnedMessages(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_PINNED_MESSAGES,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
-        return new ArrayRetriever<>(query, MessageImplementation::new);
+                Name.CHANNEL_ID.withValue(channelId));
+        return new ArrayRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -499,8 +503,8 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ThreadMember> getThreadMember(@NotNull String channelId, @NotNull String userId){
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_THREAD_MEMBER,
-                new PlaceHolder(Name.CHANNEL_ID, channelId),
-                new PlaceHolder(Name.USER_ID, userId));
+                Name.CHANNEL_ID.withValue(channelId),
+                Name.USER_ID.withValue(userId));
         return new ConvertingRetriever<>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
@@ -518,7 +522,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ArrayList<ThreadMember>> getThreadMembers(@NotNull String channelId){
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_THREAD_MEMBERS,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
         return new ArrayRetriever<SOData, ThreadMember>(query, (lApi, data) -> ThreadMember.fromData(data));
     }
 
@@ -565,7 +569,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_PUBLIC_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
@@ -624,7 +628,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 
@@ -682,7 +686,7 @@ public interface ChannelRequests extends HasLApi {
         }
 
         LinkQuery query = new LinkQuery(getLApi(), Link.LIST_JOINED_PRIVATE_ARCHIVED_THREADS, queryStringsData,
-                new PlaceHolder(Name.CHANNEL_ID, channelId));
+                Name.CHANNEL_ID.withValue(channelId));
         return new ConvertingRetriever<>(query, ListThreadsResponseBody::new);
     }
 

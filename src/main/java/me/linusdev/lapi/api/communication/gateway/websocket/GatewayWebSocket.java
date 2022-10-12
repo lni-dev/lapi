@@ -109,9 +109,9 @@ import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
 import me.linusdev.lapi.api.objects.integration.Integration;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.AbstractMessage;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
+import me.linusdev.lapi.api.objects.message.concrete.UpdateEventMessage;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -1550,31 +1550,28 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case MESSAGE_CREATE:
                     {
-                        MessageImplementation msg = Message.fromData(lApi, data);
+                        CreateEventMessage msg = AnyMessage.createEventMessageFromData(lApi, data);
                         transmitter.onMessageCreate(lApi, new MessageCreateEvent(lApi, payload, msg));
                     }
                     break;
 
                 case MESSAGE_UPDATE:
                     {
-                        MessageImplementation msg = Message.fromData(lApi, data);
+                        UpdateEventMessage msg = AnyMessage.updateEventMessageFromData(lApi, data);
                         transmitter.onMessageUpdate(lApi, new MessageUpdateEvent(lApi, payload, msg));
-                        //TODO: This may has to be changed. The Message in the MESSAGE_UPDATE event, can have all fields null
-                        //see https://discord.com/developers/docs/topics/gateway#message-update
-                        //missing, except id and channel_id
                     }
                     break;
 
                 case MESSAGE_DELETE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        String channelId = (String) data.get(AbstractMessage.CHANNEL_ID_KEY);
-                        String messageId = (String) data.get(AbstractMessage.ID_KEY);
+                        String channelId = (String) data.get(AnyMessage.CHANNEL_ID_KEY);
+                        String messageId = (String) data.get(AnyMessage.ID_KEY);
 
                         if(messageId == null || channelId == null) {
                             InvalidDataException.throwException(data, null, MessageDeleteEvent.class,
                                     new Object[]{guildId, channelId, messageId},
-                                    new String[]{GUILD_ID_KEY, AbstractMessage.CHANNEL_ID_KEY, AbstractMessage.ID_KEY});
+                                    new String[]{GUILD_ID_KEY, AnyMessage.CHANNEL_ID_KEY, AnyMessage.ID_KEY});
                             break; //unreachable statement
                         }
 

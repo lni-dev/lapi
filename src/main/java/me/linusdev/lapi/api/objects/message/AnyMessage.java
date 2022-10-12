@@ -18,8 +18,12 @@ package me.linusdev.lapi.api.objects.message;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.OptionalValue;
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.application.PartialApplication;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
@@ -29,7 +33,12 @@ import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.enums.MessageType;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
+import me.linusdev.lapi.api.objects.message.concrete.UpdateEventMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
+import me.linusdev.lapi.api.objects.message.impl.CreateEventMessageImpl;
+import me.linusdev.lapi.api.objects.message.impl.MessageImpl;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
@@ -40,6 +49,7 @@ import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.sticker.StickerItem;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +64,7 @@ import java.util.List;
  *     see <a href="https://discord.com/developers/docs/topics/gateway-events#message-update">discord documentation</a>.
  * </p>
  * <p>
- *     A {@code null} fields may correspond to unknown values.
+ *     A {@code null} field may correspond to a unknown value.
  * </p>
  * <p>
  *     An app will receive empty values in the {@link #getContent() content}, {@link #getEmbeds() embeds},
@@ -62,9 +72,110 @@ import java.util.List;
  *     (or been approved for) the {@link GatewayIntent#MESSAGE_CONTENT MESSAGE_CONTENT} privileged intent.
  * </p>
  *
+ * <h2>Limits</h2>
+ * <ul>
+ *     <li>
+ *         A Message can have up to {@value MessageBuilder.Limits#MAX_EMBEDS} {@link Embed Embeds}.
+ *         And up to {@value MessageBuilder.Limits#MAX_EMBED_CHARACTERS} characters inside these
+ *     </li>
+ *     <li>
+ *         A Message can have up to {@value MessageBuilder.Limits#MAX_STICKERS} {@link Sticker Stickers}
+ *     </li>
+ *     <li>
+ *         Message {@link #getContent() content} can contain uo to {@value MessageBuilder.Limits#MAX_CONTENT_CHARACTERS} characters
+ *     </li>
+ * </ul>
+ *
+ *
+ * @see <a href="https://discord.com/developers/docs/resources/channel#message-object" target="_top">Message Object</a>
+ *
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object-message-structure">Message Structure</a>
  */
-public interface AnyMessage extends Datable, SnowflakeAble {
+@SuppressWarnings("UnnecessaryModifier")
+public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
+
+    /*
+    All Message Keys
+     */
+
+    public static final String ID_KEY = "id";
+    public static final String CHANNEL_ID_KEY = "channel_id";
+    public static final String GUILD_ID_KEY = "guild_id";
+    public static final String AUTHOR_KEY = "author";
+    public static final String MEMBER_KEY = "member";
+    public static final String CONTENT_KEY = "content";
+    public static final String TIMESTAMP_KEY = "timestamp";
+    public static final String EDITED_TIMESTAMP_KEY = "edited_timestamp";
+    public static final String TTS_KEY = "tts";
+    public static final String MENTION_EVERYONE_KEY = "mention_everyone";
+    public static final String MENTIONS_KEY = "mentions";
+    public static final String MENTION_ROLES_KEY = "mention_roles";
+    public static final String MENTION_CHANNELS_KEY = "mention_channels";
+    public static final String ATTACHMENTS_KEY = "attachments";
+    public static final String EMBEDS_KEY = "embeds";
+    public static final String REACTIONS_KEY = "reactions";
+    public static final String NONCE_KEY = "nonce";
+    public static final String PINNED_KEY = "pinned";
+    public static final String WEBHOOK_ID_KEY = "webhook_id";
+    public static final String TYPE_KEY = "type";
+    public static final String ACTIVITY_KEY = "activity";
+    public static final String APPLICATION_KEY = "application";
+    public static final String APPLICATION_ID_KEY = "application_id";
+    public static final String MESSAGE_REFERENCE_KEY = "message_reference";
+    public static final String FLAGS_KEY = "flags";
+    public static final String REFERENCED_MESSAGE_KEY = "referenced_message";
+    public static final String INTERACTION_KEY = "interaction";
+    public static final String THREAD_KEY = "thread";
+    public static final String COMPONENTS_KEY = "components";
+    public static final String STICKER_ITEMS_KEY = "sticker_items";
+    public static final String STICKERS_KEY = "stickers";
+    public static final String POSITION_KEY = "position";
+
+    /**
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link ChannelMessage Message}
+     */
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable ChannelMessage channelMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        return new MessageImpl(lApi, data);
+    }
+
+    /**
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link CreateEventMessage Message}
+     */
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable CreateEventMessage createEventMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        return new CreateEventMessageImpl(lApi, data);
+    }
+
+    /**
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link UpdateEventMessage Message}
+     */
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable UpdateEventMessage updateEventMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        //TODO: implement
+        return null;
+    }
+
+    /**
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link AnyMessage Message}
+     */
+    @Contract("_, null -> null; _, !null -> !null")
+    static @Nullable AnyMessage fromData(@NotNull LApi lApi, @Nullable SOData data) {
+        if(data == null) return null;
+        //TODO: implement
+        return null;
+    }
 
     /**
      * @return the message-id as {@link Snowflake}.
@@ -130,13 +241,13 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      *
      * @return Array of {@link User users} specifically mentioned in the message.
      */
-    @Nullable User[] getMentions();
+    @Nullable List<User> getMentions();
 
     /**
      *
      * @return Array of ids (as {@link String}) of {@link Role roles} specifically mentioned in this message.
      */
-    @Nullable String[] getMentionRoles();
+    @Nullable List<String> getMentionRoles();
 
     /**
      * <p>
@@ -147,19 +258,19 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * </p>
      * @return channels specifically mentioned in this message.
      */
-    @Nullable ChannelMention[] getMentionChannels();
+    @Nullable List<ChannelMention> getMentionChannels();
 
     /**
      *
      * @return any attached files.
      */
-    @Nullable Attachment[] getAttachments();
+    @Nullable List<Attachment> getAttachments();
 
     /**
      *
      * @return any embedded content.
      */
-    @Nullable Embed[] getEmbeds();
+    @Nullable List<Embed> getEmbeds();
 
     /**
      * <p>
@@ -167,7 +278,7 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * </p>
      * @return Array of {@link Reaction reactions} or {@code null}.
      */
-    @Nullable Reaction[] getReactions();
+    @Nullable List<Reaction> getReactions();
 
     /**
      * <p>
@@ -226,7 +337,10 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * if the message is an {@link Interaction interaction} or application-owned webhook, this is the id of the application.
      * @return id as {@link String} of the {@link Application} or {@code null}.
      */
-    @Nullable String getApplicationId();
+    default @Nullable String getApplicationId() {
+        if(getApplicationIdAsSnowflake() == null) return null;
+        return getApplicationIdAsSnowflake().asString();
+    }
 
     /**
      * data showing the source of a {@link MessageFlag#IS_CROSSPOST crosspost}, {@link MessageType#CHANNEL_FOLLOW_ADD channel follow add},
@@ -263,7 +377,7 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * </p>
      * @return the message associated with the {@link #getMessageReference() message_reference}.
      */
-    @Nullable OptionalValue<Message> getReferencedMessage();
+    @Nullable OptionalValue<ChannelMessage> getReferencedMessage();
 
     /**
      * sent if the message is a response to an {@link Interaction Interaction}.
@@ -283,13 +397,13 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * </p>
      * @return Array of {@link Component components} or {@code null}.
      */
-    @Nullable Component[] getComponents();
+    @Nullable List<Component> getComponents();
 
     /**
      * sent if the message contains stickers.
      * @return Array of {@link StickerItem stickers} or {@code null}.
      */
-    @Nullable StickerItem[] getStickerItems();
+    @Nullable List<StickerItem> getStickerItems();
 
     /**
      * <p>
@@ -298,7 +412,8 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * @deprecated replaced by {@link #getStickerItems()}.
      * @return Array of {@link Sticker stickers} or {@code null}.
      */
-    @Deprecated @Nullable Sticker[] getStickers();
+    @Deprecated
+    @Nullable List<Sticker> getStickers();
 
     /**
      * <p>
@@ -310,5 +425,12 @@ public interface AnyMessage extends Datable, SnowflakeAble {
      * @return message position in a thread or {@code null}.
      */
     @Nullable Integer getPosition();
+
+    /**
+     * The {@link ImplementationType} of this message. Useful to safely {@link ImplementationType#cast(AnyMessage) cast} this message to
+     * its actual class.
+     * @return {@link ImplementationType}
+     */
+    @NotNull ImplementationType getImplementationType();
 
 }

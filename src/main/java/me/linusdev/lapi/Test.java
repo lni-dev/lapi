@@ -81,12 +81,12 @@ import me.linusdev.lapi.api.objects.emoji.StandardEmoji;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponseBuilder;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.component.ComponentType;
 import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
 import me.linusdev.lapi.api.objects.component.button.Button;
 import me.linusdev.lapi.api.objects.component.button.ButtonStyle;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.embed.EmbedBuilder;
 import me.linusdev.lapi.api.objects.message.embed.InvalidEmbedException;
@@ -433,7 +433,7 @@ public class Test implements EventListener{
     public void onMessageCreate(@NotNull LApi lApi, @NotNull MessageCreateEvent event) {
         System.out.println("onMessageCreate");
 
-        Message msg = event.getMessage();
+        CreateEventMessage msg = event.getMessage();
         String content = msg.getContent();
         String channelId = msg.getChannelId();
         User author = msg.getAuthor();

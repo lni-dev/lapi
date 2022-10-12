@@ -26,7 +26,8 @@ import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
+import me.linusdev.lapi.api.objects.message.impl.MessageImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class Examples {
         });
 
 
-        Queueable<MessageImplementation> msgRetriever = lApi.getRequestFactory().getChannelMessage("channelId", "messageId");
+        Queueable<ChannelMessage> msgRetriever = lApi.getRequestFactory().getChannelMessage("channelId", "messageId");
 
         msgRetriever.queue((result, response, error) -> {
             if(error != null) {

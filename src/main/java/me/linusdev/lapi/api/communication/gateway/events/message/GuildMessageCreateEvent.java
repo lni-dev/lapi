@@ -19,13 +19,13 @@ package me.linusdev.lapi.api.communication.gateway.events.message;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.GuildEvent;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 
 public class GuildMessageCreateEvent extends MessageCreateEvent implements GuildEvent {
 
-    public GuildMessageCreateEvent(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @NotNull MessageImplementation message) {
+    public GuildMessageCreateEvent(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @NotNull CreateEventMessage message) {
         super(lApi, payload, message);
     }
 

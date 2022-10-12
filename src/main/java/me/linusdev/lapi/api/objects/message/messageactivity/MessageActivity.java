@@ -19,6 +19,7 @@ package me.linusdev.lapi.api.objects.message.messageactivity;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +57,9 @@ public class MessageActivity implements Datable {
      * @return {@link MessageActivity}
      * @throws InvalidDataException if {@link #TYPE_KEY} field is missing
      */
-    public static @NotNull MessageActivity fromData(@NotNull SOData data) throws InvalidDataException {
+    @Contract("null -> null; !null -> new")
+    public static @Nullable MessageActivity fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
         Number typeNumber = (Number) data.get(TYPE_KEY);
         String partyId = (String) data.get(PARTY_ID_KEY);
 

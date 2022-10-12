@@ -16,6 +16,11 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.ImplementationType;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
+import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.exceptions.LimitException;
@@ -26,9 +31,7 @@ import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.message.MessageReference;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.component.ComponentType;
 import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
@@ -194,7 +197,7 @@ public class MessageBuilder implements HasLApi {
      * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
-    public Queueable<MessageImplementation> getQueueable(@NotNull String channelId) throws LimitException {
+    public Queueable<ChannelMessage> getQueueable(@NotNull String channelId) throws LimitException {
         return lApi.getRequestFactory().createMessage(channelId, build());
     }
 
@@ -485,23 +488,27 @@ public class MessageBuilder implements HasLApi {
     /**
      * @param message the message to reference (reply) to
      * @param fallIfNotExists if {@code true}, you will get an error after sending the message, if the referenced message does not exist
-     * @see #setReplyTo(Message, boolean, boolean)
+     * @see #setReplyTo(AnyMessage, boolean, boolean)
      */
-    public MessageBuilder setMessageReference(@NotNull Message message, boolean fallIfNotExists) {
+    public MessageBuilder setMessageReference(@NotNull AnyMessage message, boolean fallIfNotExists) {
+        Snowflake guildId = null;
+        if(message.getImplementationType() == ImplementationType.MESSAGE_CREATE_EVENT_MESSAGE) {
+            guildId = ((CreateEventMessage) message).getGuildIdAsSnowflake();
+        }
         this.messageReference = new MessageReference(
                 message.getIdAsSnowflake(),
                 message.getChannelIdAsSnowflake(),
-                message.getGuildIdAsSnowflake(),
+                guildId,
                 fallIfNotExists);
         return this;
     }
 
     /**
      * @param message the message to reference (reply) to
-     * @see #setMessageReference(Message, boolean)
-     * @see #setReplyTo(Message, boolean, boolean)
+     * @see #setMessageReference(AnyMessage, boolean)
+     * @see #setReplyTo(AnyMessage, boolean, boolean)
      */
-    public void setMessageReference(@NotNull Message message) {
+    public void setMessageReference(@NotNull AnyMessage message) {
         setMessageReference(message, true);
     }
     
@@ -512,7 +519,7 @@ public class MessageBuilder implements HasLApi {
      * @param fallIfNotExists if {@code true}, you will get an error after sending the message, if the referenced message does not exist
      * @param mentionUser whether to user the author of the referenced message
      */
-    public MessageBuilder setReplyTo(@NotNull Message message, boolean fallIfNotExists, boolean mentionUser){
+    public MessageBuilder setReplyTo(@NotNull AnyMessage message, boolean fallIfNotExists, boolean mentionUser){
         setMessageReference(message, fallIfNotExists);
         repliedUser = mentionUser;
         return this;
@@ -523,9 +530,9 @@ public class MessageBuilder implements HasLApi {
      * you will need to add this.
      * @param message the msg to reply to
      * @param mentionUser whether to user the author of the referenced message
-     * @see #setReplyTo(Message, boolean, boolean)
+     * @see #setReplyTo(AnyMessage, boolean, boolean)
      */
-    public MessageBuilder setReplyTo(@NotNull Message message, boolean mentionUser){
+    public MessageBuilder setReplyTo(@NotNull AnyMessage message, boolean mentionUser){
         return setReplyTo(message, true, mentionUser);
     }
 

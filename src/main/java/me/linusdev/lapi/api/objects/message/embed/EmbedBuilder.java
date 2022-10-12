@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,10 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class can {@link #build()} an {@link Embed}
+ * This class can {@link #build()} an {@link Embed}.<br>
  *
- * before building, it may be checked ({@link #checkEmbed()}) first
- *
+ * Before building, it may be checked ({@link #checkEmbed()}) first.
  *
  * <p>
  *     In the {@link Embed} object ({@link EmbedBuilder}), you can then set an {@link Image} to use an
@@ -511,7 +510,7 @@ public class EmbedBuilder {
 
     /**
      *
-     * This will check ({@link #checkEmbed()}) and build you an {@link Embed}, which you can attach to a {@link MessageImplementation}
+     * This will check ({@link #checkEmbed()}) and build you an {@link Embed}, which you can attach to a {@link AnyMessage}
      *
      * @return a build {@link Embed}
      * @throws InvalidEmbedException see {@link #checkEmbed()}
@@ -523,7 +522,7 @@ public class EmbedBuilder {
 
     /**
      *
-     * This will build you an {@link Embed}, which you can attach to a {@link MessageImplementation}
+     * This will build you an {@link Embed}, which you can attach to a {@link AnyMessage}
      *
      * @param check whether to check if this would build a valid {@link Embed}.
      * @return a build {@link Embed}

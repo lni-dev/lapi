@@ -19,16 +19,15 @@ package me.linusdev.lapi.api.communication.gateway.events.message;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
 import org.jetbrains.annotations.NotNull;
 
 
 public class MessageCreateEvent extends Event {
 
-    protected final @NotNull MessageImplementation message;
+    protected final @NotNull CreateEventMessage message;
 
-    public MessageCreateEvent(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @NotNull MessageImplementation message) {
+    public MessageCreateEvent(@NotNull LApi lApi, @NotNull GatewayPayloadAbstract payload, @NotNull CreateEventMessage message) {
         super(lApi, payload, message.getGuildIdAsSnowflake());
         this.message = message;
     }
@@ -36,9 +35,9 @@ public class MessageCreateEvent extends Event {
     /**
      * The message that was created.
      *
-     * @return {@link Message}
+     * @return {@link CreateEventMessage}
      */
-    public @NotNull Message getMessage() {
+    public @NotNull CreateEventMessage getMessage() {
         return message;
     }
 

@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
@@ -29,7 +30,6 @@ import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.invite.InviteMetadata;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.request.RequestFactory;
@@ -374,7 +374,7 @@ public enum Link implements AbstractLink{
      * permission to be present on the current user. If the current user is missing the
      * '{@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY}' permission in the channel
      * then this will return no messages (since they cannot read the message history).
-     * Returns an array of {@link MessageImplementation message objects} on success.
+     * Returns an array of {@link ChannelMessage message objects} on success.
      * </p>
      * <br>
      * <p style="margin-bottom:0;padding-bottom:0;">
@@ -407,7 +407,7 @@ public enum Link implements AbstractLink{
      * <p>
      *     Returns a specific message in the channel. If operating on a guild channel,
      *     this endpoint requires the '{@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY}'
-     *     permission to be present on the current user. Returns a {@link MessageImplementation message object} on success.
+     *     permission to be present on the current user. Returns a {@link ChannelMessage message object} on success.
      * </p>
      *
      * @see Name#CHANNEL_ID
@@ -417,7 +417,7 @@ public enum Link implements AbstractLink{
     GET_CHANNEL_MESSAGE(Method.GET,  CHANNELS, CHANNEL_ID, MESSAGES, MESSAGE_ID),
 
     /**
-     * Post a message to a guild text or DM channel. Returns a {@link MessageImplementation message} object.
+     * Post a message to a guild text or DM channel. Returns a {@link ChannelMessage message} object.
      *
      * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#create-message" target="_top">Create Message</a>
@@ -497,7 +497,7 @@ public enum Link implements AbstractLink{
 
     /**
      * <p>
-     *     Returns all pinned messages in the channel as an array of {@link MessageImplementation message} objects.
+     *     Returns all pinned messages in the channel as an array of {@link ChannelMessage message} objects.
      * </p>
      * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-pinned-messages" target="_top">Get Pinned Messages</a>

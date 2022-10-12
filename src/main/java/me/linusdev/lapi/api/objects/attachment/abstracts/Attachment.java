@@ -18,7 +18,6 @@ package me.linusdev.lapi.api.objects.attachment.abstracts;
 
 import me.linusdev.data.Datable;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Nullable;
 

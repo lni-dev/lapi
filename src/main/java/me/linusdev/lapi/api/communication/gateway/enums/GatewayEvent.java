@@ -262,6 +262,7 @@ public enum GatewayEvent implements SimpleDatable {
 
     /**
      * message was edited
+     * @see <a href="https://discord.com/developers/docs/topics/gateway-events#message-update">Discord Documentation</a>
      */
     MESSAGE_UPDATE("MESSAGE_UPDATE"),
 

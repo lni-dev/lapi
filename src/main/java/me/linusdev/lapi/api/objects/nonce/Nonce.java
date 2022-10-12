@@ -17,7 +17,6 @@
 package me.linusdev.lapi.api.objects.nonce;
 
 import me.linusdev.data.SimpleDatable;
-import me.linusdev.lapi.api.objects.message.Message;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 

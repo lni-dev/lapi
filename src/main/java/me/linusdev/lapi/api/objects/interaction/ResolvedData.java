@@ -24,8 +24,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.guild.member.Member;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -50,8 +49,8 @@ public class ResolvedData implements Datable, HasLApi {
     private final @Nullable ArrayList<User> users;
     private final @Nullable ArrayList<Member> members;
     private final @Nullable ArrayList<Role> roles;
-    private final @Nullable ArrayList<Channel> channels;
-    private final @Nullable ArrayList<Message> messages;
+    private final @Nullable ArrayList<Channel<?>> channels;
+    private final @Nullable ArrayList<AnyMessage> messages;
 
     /**
      *
@@ -62,7 +61,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @param channels the ids and partial Channel objects
      * @param messages the ids and partial Message objects
      */
-    public ResolvedData(@NotNull LApi lApi, @Nullable ArrayList<User> users, @Nullable ArrayList<Member> members, @Nullable ArrayList<Role> roles, @Nullable ArrayList<Channel> channels, @Nullable ArrayList<Message> messages) {
+    public ResolvedData(@NotNull LApi lApi, @Nullable ArrayList<User> users, @Nullable ArrayList<Member> members, @Nullable ArrayList<Role> roles, @Nullable ArrayList<Channel<?>> channels, @Nullable ArrayList<AnyMessage> messages) {
         this.lApi = lApi;
         this.users = users;
         this.members = members;
@@ -76,7 +75,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @param lApi {@link LApi}
      * @param data {@link SOData}
      * @return {@link ResolvedData}
-     * @throws InvalidDataException see {@link User#fromData(LApi, SOData)}, {@link Member#fromData(LApi, SOData)}, {@link Role#fromData(LApi, SOData)}, {@link Channel#fromData(LApi, SOData)}, {@link MessageImplementation#MessageImplementation(LApi, SOData)}
+     * @throws InvalidDataException see {@link User#fromData(LApi, SOData)}, {@link Member#fromData(LApi, SOData)}, {@link Role#fromData(LApi, SOData)}, {@link Channel#fromData(LApi, SOData)}, {@link MessageImpl#MessageImpl(LApi, SOData)}
      */
     public static @Nullable ResolvedData fromData(@NotNull LApi lApi, SOData data) throws InvalidDataException {
         if(data == null) return null;
@@ -89,11 +88,11 @@ public class ResolvedData implements Datable, HasLApi {
         ArrayList<Role> roles = data.getListAndConvertWithException(ROLES_KEY,
                 (ExceptionConverter<SOData, Role, InvalidDataException>) convertible -> Role.fromData(lApi, convertible));
 
-        ArrayList<Channel> channels = data.getListAndConvertWithException(CHANNELS_KEY,
-                (ExceptionConverter<SOData, Channel, InvalidDataException>) convertible -> Channel.fromData(lApi, convertible));
+        ArrayList<Channel<?>> channels = data.getListAndConvertWithException(CHANNELS_KEY,
+                (ExceptionConverter<SOData, Channel<?>, InvalidDataException>) convertible -> Channel.fromData(lApi, convertible));
 
-        ArrayList<Message> messages = data.getListAndConvertWithException(MESSAGES_KEY,
-                (ExceptionConverter<SOData, Message, InvalidDataException>) convertible -> new MessageImplementation(lApi, convertible));
+        ArrayList<AnyMessage> messages = data.getListAndConvertWithException(MESSAGES_KEY,
+                (ExceptionConverter<SOData, AnyMessage, InvalidDataException>) convertible -> AnyMessage.fromData(lApi, convertible));
 
 
         return new ResolvedData(lApi, users, members, roles, channels, messages);
@@ -123,14 +122,14 @@ public class ResolvedData implements Datable, HasLApi {
     /**
      * 	the ids and partial Channel objects
      */
-    public @Nullable ArrayList<Channel> getChannels() {
+    public @Nullable ArrayList<Channel<?>> getChannels() {
         return channels;
     }
 
     /**
      * the ids and partial Message objects
      */
-    public @Nullable ArrayList<Message> getMessages() {
+    public @Nullable ArrayList<AnyMessage> getMessages() {
         return messages;
     }
 

@@ -19,8 +19,8 @@ package me.linusdev.lapi.api.objects.attachment;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +56,12 @@ public class Attachment extends PartialAttachment {
             throw exception;
         }
 
+    }
+
+    @Contract("null -> null; !null -> new")
+    public static @Nullable Attachment fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        return new Attachment(data);
     }
 
 

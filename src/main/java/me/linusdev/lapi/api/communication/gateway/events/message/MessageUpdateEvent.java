@@ -19,8 +19,7 @@ package me.linusdev.lapi.api.communication.gateway.events.message;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.concrete.UpdateEventMessage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,9 +28,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MessageUpdateEvent extends Event {
 
-    protected final @NotNull MessageImplementation message;
+    protected final @NotNull UpdateEventMessage message;
 
-    public MessageUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull MessageImplementation message) {
+    public MessageUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @NotNull UpdateEventMessage message) {
         super(lApi, payload, message.getGuildIdAsSnowflake());
         this.message = message;
     }
@@ -39,9 +38,9 @@ public class MessageUpdateEvent extends Event {
     /**
      * The message that was created.
      *
-     * @return {@link Message}
+     * @return {@link UpdateEventMessage}
      */
-    public @NotNull Message getMessage() {
+    public @NotNull UpdateEventMessage getMessage() {
         return message;
     }
 

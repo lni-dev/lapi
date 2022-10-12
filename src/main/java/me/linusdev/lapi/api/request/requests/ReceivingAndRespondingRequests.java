@@ -20,7 +20,6 @@ import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
@@ -29,6 +28,8 @@ import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.interaction.response.InteractionResponse;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,12 +83,12 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @param interactionToken token of the {@link Interaction}
      * @return {@link Queueable} which can get the original interaction response
      */
-    default @NotNull Queueable<Message> getOriginalInteractionResponse(@NotNull String applicationId, @NotNull String interactionToken) {
+    default @NotNull Queueable<ChannelMessage> getOriginalInteractionResponse(@NotNull String applicationId, @NotNull String interactionToken) {
         Query query = new LinkQuery(getLApi(), Link.GET_ORIGINAL_INTERACTION_RESPONSE,
                 APPLICATION_ID.withValue(applicationId),
                 INTERACTION_ID.withValue(interactionToken));
 
-        return new ConvertingRetriever<>(query, Message::fromData);
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /**
@@ -98,7 +99,7 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @return {@link Queueable} which can get the original interaction response
      * @throws LApiIllegalStateException if the application id is not cached.
      */
-    default @NotNull Queueable<Message> getOriginalInteractionResponse(@NotNull String interactionToken) {
+    default @NotNull Queueable<ChannelMessage> getOriginalInteractionResponse(@NotNull String interactionToken) {
         return getOriginalInteractionResponse(RequestUtils.getApplicationIdFromCache(this), interactionToken);
     }
 
@@ -111,12 +112,12 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @param template {@link MessageTemplate} to edit your message
      * @return {@link Queueable} which can edit the original interaction response
      */
-    default @NotNull Queueable<Message> editOriginalInteractionResponse(@NotNull String applicationId, @NotNull String interactionToken, @NotNull MessageTemplate template) {
+    default @NotNull Queueable<ChannelMessage> editOriginalInteractionResponse(@NotNull String applicationId, @NotNull String interactionToken, @NotNull MessageTemplate template) {
         Query query = new LinkQuery(getLApi(), Link.EDIT_ORIGINAL_INTERACTION_RESPONSE, template.getBody(),
                 APPLICATION_ID.withValue(applicationId),
                 INTERACTION_ID.withValue(interactionToken));
 
-        return new ConvertingRetriever<>(query, Message::fromData);
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /**
@@ -128,7 +129,7 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @return {@link Queueable} which can edit the original interaction response
      * @throws LApiIllegalStateException if the application id is not cached.
      */
-    default @NotNull Queueable<Message> editOriginalInteractionResponse(@NotNull String interactionToken, @NotNull MessageTemplate template) {
+    default @NotNull Queueable<ChannelMessage> editOriginalInteractionResponse(@NotNull String interactionToken, @NotNull MessageTemplate template) {
         return editOriginalInteractionResponse(RequestUtils.getApplicationIdFromCache(this), interactionToken, template);
     }
 
@@ -176,12 +177,12 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @param template {@link MessageTemplate} to create the message
      * @return {@link Queueable} that can create the followup message.
      */
-    default @NotNull Queueable<Message> createFollowupMessage(@NotNull String applicationId, @NotNull String interactionToken, @NotNull MessageTemplate template) {
+    default @NotNull Queueable<ChannelMessage> createFollowupMessage(@NotNull String applicationId, @NotNull String interactionToken, @NotNull MessageTemplate template) {
         Query query = new LinkQuery(getLApi(), Link.CREATE_FOLLOWUP_MESSAGE, template.getBody(),
                 APPLICATION_ID.withValue(applicationId),
                 INTERACTION_ID.withValue(interactionToken));
 
-        return new ConvertingRetriever<>(query, Message::fromData);
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
     }
 
     /**
@@ -191,7 +192,7 @@ public interface ReceivingAndRespondingRequests extends HasLApi {
      * @return {@link Queueable} that can create the followup message.
      * @throws LApiIllegalStateException if the application id is not cached.
      */
-    default @NotNull Queueable<Message> createFollowupMessage(@NotNull String interactionToken, @NotNull MessageTemplate template) {
+    default @NotNull Queueable<ChannelMessage> createFollowupMessage(@NotNull String interactionToken, @NotNull MessageTemplate template) {
         return createFollowupMessage(RequestUtils.getApplicationIdFromCache(this), interactionToken, template);
     }
 

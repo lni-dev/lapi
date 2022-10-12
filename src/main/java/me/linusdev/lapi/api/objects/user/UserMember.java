@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,19 @@ package me.linusdev.lapi.api.objects.user;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.guild.member.Member;
-import me.linusdev.lapi.api.objects.message.Message;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-/**
- *
- * used in {@link Message}
- */
-public class UserMention implements Datable, HasLApi {
-
+public class UserMember implements Datable, HasLApi {
     public static final String MEMBER_KEY = "member";
 
     private final @NotNull LApi lApi;
 
     private final @NotNull User user;
-    private final @Nullable Member member;
+    private final @NotNull Member member;
 
     /**
      *
@@ -45,7 +38,7 @@ public class UserMention implements Datable, HasLApi {
      * @param user the user mentioned
      * @param member additional partial member field
      */
-    public UserMention(@NotNull LApi lApi, @NotNull User user, @Nullable Member member) {
+    public UserMember(@NotNull LApi lApi, @NotNull User user, @NotNull Member member) {
         this.lApi = lApi;
         this.user = user;
         this.member = member;
@@ -55,14 +48,20 @@ public class UserMention implements Datable, HasLApi {
      *
      * @param lApi {@link LApi}
      * @param data {@link SOData} with required fields
-     * @return {@link UserMention}
+     * @return {@link UserMember}
      * @throws InvalidDataException see {@link User#fromData(LApi, SOData)}
      */
-    public static @NotNull UserMention fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+    public static @NotNull UserMember fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
 
         SOData memberData = (SOData) data.get(MEMBER_KEY);
 
-        return new UserMention(lApi, User.fromData(lApi, data), Member.fromData(lApi, memberData));
+        if(memberData == null) {
+            InvalidDataException.throwException(data, null, UserMember.class,
+                    new Object[]{null}, new String[]{MEMBER_KEY});
+            return null; //unreachable
+        }
+
+        return new UserMember(lApi, User.fromData(lApi, data), Member.fromData(lApi, memberData));
     }
 
     /**
@@ -75,19 +74,18 @@ public class UserMention implements Datable, HasLApi {
     /**
      * additional partial member
      */
-    public @Nullable Member getMember() {
+    public @NotNull Member getMember() {
         return member;
     }
 
     /**
      *
-     * @return {@link SOData} for this {@link UserMention}
+     * @return {@link SOData} for this {@link UserMember}
      */
     @Override
     public SOData getData() {
         SOData data = user.getData();
-
-        if(member != null) data.add(MEMBER_KEY, member);
+        data.add(MEMBER_KEY, member);
 
         return data;
     }

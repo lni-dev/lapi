@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
 import me.linusdev.lapi.api.objects.component.button.Button;
 import me.linusdev.lapi.api.objects.component.selectmenu.SelectMenu;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
  *     </a>
  * </h2>
  * <p>
- *     Components are a new field on the {@link Message message object}, so you can use them whether you're sending messages or responding to a slash command or other interaction
+ *     Components are a new field on the {@link ChannelMessage message object}, so you can use them whether you're sending messages or responding to a slash command or other interaction
  *     The top-level components field is an array of {@link ActionRow Action Row} components.
  * </p>
  * <br>
@@ -68,6 +68,7 @@ import org.jetbrains.annotations.NotNull;
  * @see Button
  * @see SelectMenu
  */
+@SuppressWarnings("UnnecessaryModifier")
 public interface Component extends Datable {
 
     public static final String TYPE_KEY = "type";
@@ -93,7 +94,8 @@ public interface Component extends Datable {
         Number type = (Number) data.get(TYPE_KEY);
 
         if(type == null){
-            InvalidDataException.throwException(data, null, Component.class, new Object[]{type}, new String[]{TYPE_KEY});
+            InvalidDataException.throwException(data, null, Component.class, new Object[]{null}, new String[]{TYPE_KEY});
+            //noinspection ConstantConditions
             return null; //this will never happen, because above method will throw an Exception
         }
 

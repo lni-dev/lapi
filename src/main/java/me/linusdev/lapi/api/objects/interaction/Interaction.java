@@ -22,7 +22,8 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.guild.member.Member;
-import me.linusdev.lapi.api.objects.message.Message;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.user.User;
@@ -59,7 +60,7 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
     private final @Nullable User user;
     private final @NotNull String token;
     private final int version;
-    private final @Nullable Message message;
+    private final @Nullable ChannelMessage message;
 
     /**
      *
@@ -76,7 +77,10 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
      * @param version read-only property, always 1
      * @param message for components, the message they were attached to
      */
-    public Interaction(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull Snowflake applicationId, @NotNull InteractionType type, @Nullable InteractionData data, @Nullable Snowflake guildId, @Nullable Snowflake channelId, @Nullable Member member, @Nullable User user, @NotNull String token, int version, @Nullable Message message) {
+    public Interaction(@NotNull LApi lApi, @NotNull Snowflake id, @NotNull Snowflake applicationId,
+                       @NotNull InteractionType type, @Nullable InteractionData data, @Nullable Snowflake guildId,
+                       @Nullable Snowflake channelId, @Nullable Member member, @Nullable User user, @NotNull String token,
+                       int version, @Nullable ChannelMessage message) {
         this.lApi = lApi;
         this.id = id;
         this.applicationId = applicationId;
@@ -123,7 +127,7 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
         return new Interaction(lApi, Snowflake.fromString(id), Snowflake.fromString(applicationId),
                 InteractionType.fromValue(type.intValue()), InteractionData.fromData(lApi, interactionData),
                 Snowflake.fromString(guildId), Snowflake.fromString(channelId), Member.fromData(lApi, member),
-                User.fromData(lApi, user), token, version.intValue(), Message.fromData(lApi, message));
+                User.fromData(lApi, user), token, version.intValue(), AnyMessage.channelMessageFromData(lApi, message));
     }
 
     /**
@@ -223,7 +227,7 @@ public class Interaction implements Datable, HasLApi, SnowflakeAble {
     /**
      * for components, the message they were attached to
      */
-    public @Nullable Message getMessage() {
+    public @Nullable ChannelMessage getMessage() {
         return message;
     }
 

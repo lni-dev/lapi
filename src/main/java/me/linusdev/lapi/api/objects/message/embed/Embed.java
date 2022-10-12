@@ -19,15 +19,13 @@ package me.linusdev.lapi.api.objects.message.embed;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.objects.message.MessageImplementation;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Embed sent in {@link MessageImplementation}.
+ * Embed sent in {@link me.linusdev.lapi.api.objects.message.AnyMessage messages}.
  * <br> Objects of this class are static and do not change its content. Even if the embed is changed on discords end
  * <br><br>
  *
@@ -79,7 +77,6 @@ public class Embed implements Datable {
     /**
      * I advise you to use {@link EmbedBuilder} instead :)
      */
-    @Deprecated()
     public Embed(@Nullable String title, @Nullable EmbedType type, @Nullable String description,
                  @Nullable String url, @Nullable String timestamp, @Nullable Integer color,
                  @Nullable Footer footer, @Nullable Image image, @Nullable Thumbnail thumbnail,
@@ -109,7 +106,9 @@ public class Embed implements Datable {
      * @throws InvalidDataException if given data was invalid. for more information see {@link Footer},
      * {@link Image}, {@link Thumbnail}, {@link Video}, {@link Provider}, {@link Author}, {@link Field}
      */
-    public static @NotNull Embed fromData(@NotNull SOData data) throws InvalidDataException {
+    @Contract("null -> null; !null -> new")
+    public static @Nullable Embed fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
         @Nullable final Number color = (Number) data.get(COLOR_KEY);
         @Nullable final SOData footerData = (SOData) data.get(FOOTER_KEY);
         @Nullable final SOData imageData = (SOData) data.get(IMAGE_KEY);

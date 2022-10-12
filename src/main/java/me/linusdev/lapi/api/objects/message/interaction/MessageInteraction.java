@@ -21,7 +21,6 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.objects.message.Message;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.objects.interaction.InteractionType;
@@ -30,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <p>
- *     This is sent on the {@link Message message object}
+ *     This is sent on the {@link me.linusdev.lapi.api.objects.message.concrete.ChannelMessage message object}
  *     when the message is a response to an Interaction without an existing message.
  * </p>
  * <p>
@@ -87,7 +86,7 @@ public class MessageInteraction implements Datable, HasLApi {
                     new Object[]{id, type, name, user},
                     new String[]{ID_KEY, TYPE_KEY, NAME_KEY, USER_KEY});
             //we will never reach this, because above method will throw an exception,
-            //but I have it here anyways, so IntelliJ doesn't annoy me with things that could be null
+            //but I have it here anyway, so IntelliJ doesn't annoy me with things that could be null
             return null;
         }
 
