@@ -54,7 +54,7 @@ public class Config {
     //Queue
     private final boolean debugRateLimitBuckets;
     private final long globalHttpRateLimitRetryLimit;
-    private final long HttpRateLimitAssumedBucketLimit;
+    private final long httpRateLimitAssumedBucketLimit;
     private final int bucketsCheckAmount;
     private final long assumedBucketMaxLifeTime;
     private final long bucketMaxLastUsedTime;
@@ -85,7 +85,7 @@ public class Config {
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
         this.globalHttpRateLimitRetryLimit = globalHttpRateLimitRetryLimit;
-        HttpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
+        this.httpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
         this.token = token;
 
         this.queueSupplier = queueSupplier;
@@ -131,7 +131,7 @@ public class Config {
     }
 
     public long getHttpRateLimitAssumedBucketLimit() {
-        return HttpRateLimitAssumedBucketLimit;
+        return httpRateLimitAssumedBucketLimit;
     }
 
     /**
