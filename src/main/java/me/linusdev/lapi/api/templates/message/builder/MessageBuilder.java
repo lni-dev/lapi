@@ -401,7 +401,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      * This will append {@link MentionType#EVERYONE mention @everyone} at the end of the current content
-     * and add this @everyone to the {@link AllowedMentions allowed mentions}
+     * and add @everyone and @here to the {@link AllowedMentions allowed mentions}
      * @return this
      */
     public MessageBuilder appendEveryoneMention(){
@@ -410,7 +410,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      * This will append {@link MentionType#HERE mention @here} at the end of the current content
-     * and add this @everyone to the {@link AllowedMentions allowed mentions}
+     * and add this @everyone and @here to the {@link AllowedMentions allowed mentions}
      * @return this
      */
     public MessageBuilder appendHereMention(){
