@@ -54,8 +54,8 @@ public class MessageImpl implements ChannelMessage {
     protected final @NotNull String content;
     protected final @NotNull ISO8601Timestamp timestamp;
     protected final @Nullable ISO8601Timestamp editedTimestamp;
-    protected final boolean tts;
-    protected final boolean mentionEveryone;
+    protected final @NotNull Boolean tts;
+    protected final @NotNull Boolean mentionEveryone;
     protected final @NotNull List<User> mentions;
     protected final @NotNull List<String> mentionRoles;
     protected final @Nullable List<ChannelMention> mentionChannels;
@@ -63,7 +63,7 @@ public class MessageImpl implements ChannelMessage {
     protected final @NotNull List<Embed> embeds;
     protected final @Nullable List<Reaction> reactions;
     protected final @Nullable Nonce nonce;
-    protected final boolean pinned;
+    protected final @NotNull Boolean pinned;
     protected final @Nullable Snowflake webhookId;
     protected final @NotNull MessageType type;
     protected final @Nullable MessageActivity activity;
@@ -81,7 +81,7 @@ public class MessageImpl implements ChannelMessage {
 
 
     @SuppressWarnings({"ConstantConditions", "ConditionCoveredByFurtherCondition"})
-    public MessageImpl(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+    public MessageImpl(@NotNull LApi lApi, @NotNull SOData data, boolean doNullChecks) throws InvalidDataException {
         this.lApi = lApi;
 
         id = data.getAndConvert(ID_KEY, Snowflake::fromString);
@@ -90,8 +90,8 @@ public class MessageImpl implements ChannelMessage {
         content = data.getAs(CONTENT_KEY);
         timestamp = data.getAndConvert(TIMESTAMP_KEY, ISO8601Timestamp::fromString);
         editedTimestamp = data.getAndConvert(EDITED_TIMESTAMP_KEY, ISO8601Timestamp::fromString);
-        Boolean tts = data.getAs(TTS_KEY);
-        Boolean mentionEveryone = data.getAs(MENTION_EVERYONE_KEY);
+        tts = data.getAs(TTS_KEY);
+        mentionEveryone = data.getAs(MENTION_EVERYONE_KEY);
         mentions = data.getListAndConvertWithException(MENTIONS_KEY, (SOData c) -> User.fromData(lApi, c));
         mentionRoles = data.getListAndConvert(MENTION_ROLES_KEY, (String c) -> c);
         mentionChannels = data.getListAndConvertWithException(MENTION_CHANNELS_KEY, ChannelMention::fromData);
@@ -99,9 +99,9 @@ public class MessageImpl implements ChannelMessage {
         embeds = data.getListAndConvertWithException(EMBEDS_KEY, Embed::fromData);
         reactions = data.getListAndConvertWithException(REACTIONS_KEY, (SOData c) -> Reaction.fromData(lApi, c));
         nonce = data.getAndConvert(NONCE_KEY, Nonce::fromStringOrInteger);
-        Boolean pinned = data.getAs(PINNED_KEY);
+        pinned = data.getAs(PINNED_KEY);
         webhookId = data.getAndConvert(WEBHOOK_ID_KEY, Snowflake::fromString);
-        MessageType type = data.getAndConvertWithException(TYPE_KEY, (Number v) -> {
+        type = data.getAndConvertWithException(TYPE_KEY, (Number v) -> {
             if(v == null) return null;
             return MessageType.fromValue(v.intValue());
         });
@@ -118,26 +118,15 @@ public class MessageImpl implements ChannelMessage {
         stickers = data.getListAndConvertWithException(STICKERS_KEY, (SOData c) -> Sticker.fromData(lApi, c));
         position = data.getAs(POSITION_KEY);
 
-        if(id == null || channelId == null || author == null || content == null || timestamp == null ||
-                tts == null || mentionEveryone == null || mentions == null || mentionRoles == null || attachments == null ||
-                embeds == null || pinned == null || type == null) {
-            InvalidDataException.throwException(data, null, this.getClass(),
-                    new Object[]{id, channelId, author, content, timestamp, tts, mentionEveryone, mentions, mentionRoles, attachments, embeds, pinned, type},
-                    new String[]{ID_KEY, CHANNEL_ID_KEY, AUTHOR_KEY, CONTENT_KEY, TIMESTAMP_KEY, TTS_KEY, MENTION_EVERYONE_KEY, MENTIONS_KEY, MENTION_ROLES_KEY, ATTACHMENTS_KEY, EMBEDS_KEY, PINNED_KEY, TYPE_KEY});
-
-            //Below code is unreachable, because above method call will throw an exception.
-            //The code is still required, so that the compiler is happy
-            this.tts = true;
-            this.mentionEveryone = true;
-            this.pinned = true;
-            this.type = MessageType.DEFAULT;
-            return;
+        if(doNullChecks) {
+            if(id == null || channelId == null || author == null || content == null || timestamp == null ||
+                    tts == null || mentionEveryone == null || mentions == null || mentionRoles == null || attachments == null ||
+                    embeds == null || pinned == null || type == null) {
+                InvalidDataException.throwException(data, null, this.getClass(),
+                        new Object[]{id, channelId, author, content, timestamp, tts, mentionEveryone, mentions, mentionRoles, attachments, embeds, pinned, type},
+                        new String[]{ID_KEY, CHANNEL_ID_KEY, AUTHOR_KEY, CONTENT_KEY, TIMESTAMP_KEY, TTS_KEY, MENTION_EVERYONE_KEY, MENTIONS_KEY, MENTION_ROLES_KEY, ATTACHMENTS_KEY, EMBEDS_KEY, PINNED_KEY, TYPE_KEY});
+            }
         }
-
-        this.tts = tts;
-        this.mentionEveryone = mentionEveryone;
-        this.pinned = pinned;
-        this.type = type;
     }
 
     @Override

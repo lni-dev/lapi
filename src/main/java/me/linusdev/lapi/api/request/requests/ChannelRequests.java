@@ -230,7 +230,7 @@ public interface ChannelRequests extends HasLApi {
     default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, @NotNull String content, boolean allowMentions){
         return createMessage(channelId, new MessageTemplate(
                 content,
-                false, null,
+                null, false, null,
                 allowMentions ? null : AllowedMentions.noneAllowed(),
                 null, null, null, null,
                 null));
@@ -269,7 +269,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<ChannelMessage> createMessage(@NotNull String channelId, boolean allowMentions, @NotNull Embed... embeds){
         return createMessage(channelId,
-                new MessageTemplate(null, false, embeds,
+                new MessageTemplate(null, null, false, embeds,
                         allowMentions ? null : AllowedMentions.noneAllowed(),
                         null, null, null, null,
                         null));

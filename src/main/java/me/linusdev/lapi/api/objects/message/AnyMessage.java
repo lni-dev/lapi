@@ -39,6 +39,7 @@ import me.linusdev.lapi.api.objects.message.concrete.UpdateEventMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.impl.CreateEventMessageImpl;
 import me.linusdev.lapi.api.objects.message.impl.MessageImpl;
+import me.linusdev.lapi.api.objects.message.impl.UpdateEventMessageImpl;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
@@ -71,8 +72,8 @@ import java.util.List;
  *     {@link #getAttachments() attachments}, and {@link #getComponents() components} fields if they have not configured
  *     (or been approved for) the {@link GatewayIntent#MESSAGE_CONTENT MESSAGE_CONTENT} privileged intent.
  * </p>
- *
- * <h2>Limits</h2>
+ * <br>
+ * <h2 style="margin-bottom:0;padding-bottom:0">Limits</h2>
  * <ul>
  *     <li>
  *         A Message can have up to {@value MessageBuilder.Limits#MAX_EMBEDS} {@link Embed Embeds}.
@@ -139,7 +140,7 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
     @Contract("_, null -> null; _, !null -> !null")
     static @Nullable ChannelMessage channelMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        return new MessageImpl(lApi, data);
+        return new MessageImpl(lApi, data, true);
     }
 
     /**
@@ -150,7 +151,7 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
     @Contract("_, null -> null; _, !null -> !null")
     static @Nullable CreateEventMessage createEventMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        return new CreateEventMessageImpl(lApi, data);
+        return new CreateEventMessageImpl(lApi, data, true);
     }
 
     /**
@@ -161,8 +162,7 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
     @Contract("_, null -> null; _, !null -> !null")
     static @Nullable UpdateEventMessage updateEventMessageFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        //TODO: implement
-        return null;
+        return UpdateEventMessageImpl.newInstance(lApi, data);
     }
 
     /**
@@ -171,10 +171,13 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
      * @return {@link AnyMessage Message}
      */
     @Contract("_, null -> null; _, !null -> !null")
-    static @Nullable AnyMessage fromData(@NotNull LApi lApi, @Nullable SOData data) {
+    static @Nullable AnyMessage fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        //TODO: implement
-        return null;
+        try {
+            return new MessageImpl(lApi, data, true);
+        } catch (InvalidDataException e) {
+            return UpdateEventMessageImpl.newInstance(lApi, data);
+        }
     }
 
     /**
@@ -377,6 +380,7 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
      * </p>
      * @return the message associated with the {@link #getMessageReference() message_reference}.
      */
+    @SuppressWarnings("JavadocDeclaration")
     @Nullable OptionalValue<ChannelMessage> getReferencedMessage();
 
     /**

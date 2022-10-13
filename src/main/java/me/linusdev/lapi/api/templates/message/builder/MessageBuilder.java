@@ -16,10 +16,14 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.objects.attachment.PartialAttachment;
+import me.linusdev.lapi.api.objects.enums.MessageType;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.ImplementationType;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
+import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
@@ -39,6 +43,7 @@ import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.templates.EditMessageTemplate;
 import me.linusdev.lapi.api.templates.attachment.AttachmentTemplate;
 import me.linusdev.lapi.api.templates.message.AllowedMentionType;
 import me.linusdev.lapi.api.templates.message.AllowedMentions;
@@ -47,6 +52,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -75,10 +81,11 @@ import java.util.function.Function;
  * {@link #appendEveryoneMention()} and {@link #appendHereMention()} must be called after {@link #setNoMentionsAllowed()},
  * if you want your message to mention @everyone or @here.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class MessageBuilder implements HasLApi {
 
     /**
-     * This class holds a bunch of limits of a {@link Message Message}
+     * This class holds a bunch of limits of a {@link AnyMessage Message}
      */
     public static final class Limits{
         public static final int MAX_EMBEDS = 10;
@@ -93,17 +100,19 @@ public class MessageBuilder implements HasLApi {
 
     private final @NotNull LApi lApi;
 
-    private final StringBuilder content;
+    private @NotNull StringBuilder content;
 
-    private ArrayList<Embed> embeds = null;
+    private @Nullable ArrayList<Embed> embeds = null;
 
-    private boolean tts;
+    private @Nullable Nonce nonce;
+
+    private @Nullable Boolean tts;
 
     //Allowed mentions
     private @Nullable ArrayList<AllowedMentionType> parse;
     private @Nullable ArrayList<String> roles;
     private @Nullable ArrayList<String> users;
-    private boolean repliedUser;
+    private boolean repliedUser = false;
 
     private @Nullable MessageReference messageReference;
 
@@ -132,7 +141,62 @@ public class MessageBuilder implements HasLApi {
     public MessageBuilder(@NotNull LApi lApi, @Nullable String content){
         this.lApi = lApi;
         this.content = content == null ? new StringBuilder() : new StringBuilder(content);
+    }
 
+    /**
+     * <p>
+     *     Creates a new {@link MessageBuilder} with the same content, embeds, flags, allowed mentions, components and attachments as
+     *     the given message.
+     *     <br><br>
+     *     The only field that cannot be reconstructed is whether the user, which the message replied to should be mentioned. ({@link MessageType#REPLY} only).
+     *     This field will default to {@code false}.
+     * </p>
+     * @param message {@link AnyMessage} to copy
+     * @return {@link MessageBuilder}
+     */
+    public static @NotNull MessageBuilder editMessage(@NotNull AnyMessage message) {
+        MessageBuilder msgBuilder = new MessageBuilder(message.getLApi());
+
+        msgBuilder.content = new StringBuilder(Objects.requireNonNullElse(message.getContent(), ""));
+
+        if(message.getEmbeds() != null) {
+            msgBuilder.embeds = new ArrayList<>(message.getEmbeds());
+        }
+
+        if(message.getFlags() != null) {
+            msgBuilder.flags = new ArrayList<>(message.getFlagsAsList());
+        }
+
+        if(message.getComponents() != null) {
+            msgBuilder.components = new ArrayList<>(message.getComponents());
+        }
+
+        if(message.getAttachments() != null) {
+            msgBuilder.attachments = new ArrayList<>(message.getAttachments().size());
+
+            for(PartialAttachment attachment : message.getAttachments()) {
+                msgBuilder.attachments.add(PartialAttachment.of(attachment));
+            }
+        }
+
+        if(Boolean.TRUE.equals(message.isMentionEveryone())) {
+            msgBuilder.allowAllEveryoneMentions();
+        }
+
+        if(message.getMentions() != null) {
+            msgBuilder.users = new ArrayList<>(message.getMentions().size());
+
+            for(User user : message.getMentions()) {
+                msgBuilder.users.add(user.getId());
+            }
+        }
+
+        if(message.getMentionRoles() != null) {
+            msgBuilder.roles = new ArrayList<>(message.getMentionRoles().size());
+            msgBuilder.roles.addAll(message.getMentionRoles());
+        }
+
+        return msgBuilder;
     }
 
     /**
@@ -156,6 +220,29 @@ public class MessageBuilder implements HasLApi {
         if(content.length() == 0 && embeds == null && stickerIds == null && attachments == null){
             throw new LimitException("Cannot create a completely empty message!");
         }
+
+        if(nonce != null && nonce.length() > MessageTemplate.NONCE_MAX_CHARS) {
+            throw new LimitException("Message nonce cannot be longer than " + MessageTemplate.NONCE_MAX_CHARS + " characters.");
+        }
+
+        return this;
+    }
+
+    /**
+     * checks if this would build a valid {@link EditMessageTemplate}.<br>
+     *
+     * Does not check if the Embeds have less than {@value Limits#MAX_EMBED_CHARACTERS} or
+     * if the message is within the 8 MB (including all attachments and the http request) limit.
+     *
+     * @return this
+     */
+    public MessageBuilder checkEditTemplate() throws LimitException {
+        check();
+
+        if(nonce != null || tts != null || messageReference != null || stickerIds != null) {
+            throw new LimitException("A template for editing a message cannot have nonce, tts, message reference or stickers");
+        }
+
         return this;
     }
 
@@ -178,6 +265,7 @@ public class MessageBuilder implements HasLApi {
 
         return new MessageTemplate(
                 content.length() == 0 ? null : content.toString(),
+                nonce,
                 tts,
                 embeds == null ? null : embeds.toArray(new Embed[0]),
                 new AllowedMentions(
@@ -188,6 +276,35 @@ public class MessageBuilder implements HasLApi {
                 messageReference,
                 components == null ? null : components.toArray(new Component[0]),
                 stickerIds == null ? null : stickerIds.toArray(new String[0]),
+                attachments == null ? null : attachments.toArray(new Attachment[0]),
+                flags == null ? null : MessageFlag.getBitsFromFlags(flags));
+    }
+
+    /**
+     * Will {@link #check()} and then build a {@link EditMessageTemplate}
+     * @return {@link EditMessageTemplate} built with this builder
+     */
+    public EditMessageTemplate buildEditMessageTemplate() throws LimitException {
+        return buildEditMessageTemplate(true);
+    }
+
+    /**
+     *
+     * @param check whether to {@link #check()} before building
+     * @return {@link EditMessageTemplate} built with this builder
+     */
+    public EditMessageTemplate buildEditMessageTemplate(boolean check) throws LimitException {
+        if(check) checkEditTemplate();
+
+        return new EditMessageTemplate(
+                content.length() == 0 ? null : content.toString(),
+                embeds == null ? null : embeds.toArray(new Embed[0]),
+                new AllowedMentions(
+                        parse == null ? null : parse.toArray(new AllowedMentionType[0]),
+                        roles == null ? null : roles.toArray(new String[0]),
+                        users == null ? null : users.toArray(new String[0]),
+                        repliedUser),
+                components == null ? null : components.toArray(new Component[0]),
                 attachments == null ? null : attachments.toArray(new Attachment[0]),
                 flags == null ? null : MessageFlag.getBitsFromFlags(flags));
     }
@@ -209,7 +326,7 @@ public class MessageBuilder implements HasLApi {
      */
     public MessageBuilder appendUserMention(@NotNull String userId){
         return appendMention(MentionType.USER,
-                new PlaceHolder(Name.USER_ID, userId));
+                Name.USER_ID.withValue(userId));
     }
 
     /**
@@ -229,7 +346,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendUserNickNameMention(@NotNull String userId){
-        return appendMention(MentionType.USER_NICKNAME, new PlaceHolder(Name.USER_ID, userId));
+        return appendMention(MentionType.USER_NICKNAME, Name.USER_ID.withValue(userId));
     }
 
     /**
@@ -249,7 +366,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendRoleMention(@NotNull String roleId){
-        return appendMention(MentionType.ROLE, new PlaceHolder(Name.ROLE_ID, roleId));
+        return appendMention(MentionType.ROLE, Name.ROLE_ID.withValue(roleId));
     }
 
     /**
@@ -269,7 +386,7 @@ public class MessageBuilder implements HasLApi {
      * @return this
      */
     public MessageBuilder appendChannelMention(@NotNull String channelId){
-        return appendMention(MentionType.CHANNEL, new PlaceHolder(Name.CHANNEL_ID, channelId));
+        return appendMention(MentionType.CHANNEL, Name.CHANNEL_ID.withValue(channelId));
     }
 
     /**
@@ -278,7 +395,7 @@ public class MessageBuilder implements HasLApi {
      * @param channel the {@link Channel channel} you want to mention
      * @return this
      */
-    public MessageBuilder appendChannelMention(@NotNull Channel channel){
+    public MessageBuilder appendChannelMention(@NotNull Channel<?> channel){
         return appendChannelMention(channel.getId());
     }
 
@@ -384,14 +501,16 @@ public class MessageBuilder implements HasLApi {
             content.append(emoji.getName());
         }else{
             if(emoji.isAnimated()){
+                //noinspection ConstantConditions: checked by above if: {@code if(emoji.isStandardEmoji())...}
                 content.append(MentionType.CUSTOM_EMOJI_ANIMATED.get(
-                        new PlaceHolder(Name.EMOJI_NAME, emoji.getName()),
-                        new PlaceHolder(Name.EMOJI_ID, emoji.getId()))
+                        Name.EMOJI_NAME.withValue(emoji.getName()),
+                        Name.EMOJI_ID.withValue(emoji.getId()))
                 );
             }else{
+                //noinspection ConstantConditions: checked by above if: {@code if(emoji.isStandardEmoji())...}
                 content.append(MentionType.CUSTOM_EMOJI.get(
-                        new PlaceHolder(Name.EMOJI_NAME, emoji.getName()),
-                        new PlaceHolder(Name.EMOJI_ID, emoji.getId()))
+                        Name.EMOJI_NAME.withValue(emoji.getName()),
+                        Name.EMOJI_ID.withValue(emoji.getId()))
                 );
             }
         }
@@ -419,13 +538,13 @@ public class MessageBuilder implements HasLApi {
     public MessageBuilder appendTimestamp(long time, @NotNull TimeUnit timeUnit, @Nullable TimestampStyle timestampStyle){
         if(timestampStyle == null){
             content.append(MentionType.TIMESTAMP.get(
-                    new PlaceHolder(Name.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time)))
+                    Name.TIMESTAMP.withValue(String.valueOf(timeUnit.toSeconds(time)))
             ));
 
         }else {
             content.append(MentionType.TIMESTAMP_STYLED.get(
-                    new PlaceHolder(Name.TIMESTAMP, String.valueOf(timeUnit.toSeconds(time))),
-                    new PlaceHolder(Name.TIMESTAMP_STYLE, timestampStyle.getValue())
+                    Name.TIMESTAMP.withValue(String.valueOf(timeUnit.toSeconds(time))),
+                    Name.TIMESTAMP_STYLE.withValue(timestampStyle.getValue())
             ));
 
         }
@@ -587,6 +706,24 @@ public class MessageBuilder implements HasLApi {
     }
 
     /**
+     *
+     * Will allow all everyone and here mentions inside the message
+     *
+     * @return this
+     * @see AllowedMentionType#EVERYONE_MENTIONS
+     */
+    public MessageBuilder allowAllEveryoneMentions(){
+        if(parse == null){
+            parse = new ArrayList<>(1);
+            parse.add(AllowedMentionType.EVERYONE_MENTIONS);
+        }else if(!parse.contains(AllowedMentionType.EVERYONE_MENTIONS)){
+            parse.add(AllowedMentionType.EVERYONE_MENTIONS);
+        }
+
+        return this;
+    }
+
+    /**
      * This will add an attachment to the message. Currently, only {@link AttachmentTemplate} is supported,
      * because Discord does not allow to reuse an already uploaded attachment. If you want to do the latter, your
      * only option is to include the attachment link inside the message content. <br>
@@ -680,6 +817,14 @@ public class MessageBuilder implements HasLApi {
         if(this.flags == null) return this;
         this.flags.remove(flag);
         return this;
+    }
+
+    /**
+     * 	Can be used to verify a message was sent (up to 25 characters). Value will appear in the {@link GatewayEvent#MESSAGE_CREATE Message Create event}.
+     * @param nonce nonce for this message
+     */
+    public void setNonce(@Nullable Nonce nonce) {
+        this.nonce = nonce;
     }
 
     @Override

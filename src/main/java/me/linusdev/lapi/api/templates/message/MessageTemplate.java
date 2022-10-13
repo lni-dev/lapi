@@ -17,12 +17,14 @@
 package me.linusdev.lapi.api.templates.message;
 
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.http.request.body.FilePart;
-import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.message.MessageReference;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
+import me.linusdev.lapi.api.objects.nonce.Nonce;
+import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.templates.abstracts.Template;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,11 +32,14 @@ import java.util.ArrayList;
 
 /**
  * <p>
- *     used to {@link Link#CREATE_MESSAGE create a message}
+ *     {@link Template} used to {@link RequestFactory#createMessage(String, MessageTemplate) create a message}.
  * </p>
  * @see <a href="https://discord.com/developers/docs/resources/channel#create-message-jsonform-params" target="_top">JSON/Form Params</a>
+ * @see RequestFactory#createMessage(String, MessageTemplate)
  */
 public class MessageTemplate implements Template {
+
+    public static final int NONCE_MAX_CHARS = 25;
 
     public static final String CONTENT_KEY = "content";
     public static final String TTS_KEY = "tts";
@@ -46,30 +51,33 @@ public class MessageTemplate implements Template {
     public static final String ATTACHMENTS_KEY = "attachments";
     public static final String FLAGS_KEY = "flags";
 
-    private @Nullable final String content;
-    private final boolean tts;
-    private final @Nullable Embed[] embeds;
-    private final @Nullable AllowedMentions allowedMentions;
-    private final @Nullable MessageReference messageReference;
-    private final @Nullable Component[] components;
-    private final @Nullable String[] stickerIds;
-    private final @Nullable Attachment[] attachments;
-    private final @Nullable Long flags;
+    protected final @Nullable String content;
+    protected final @Nullable Nonce nonce;
+    protected final @Nullable Boolean tts;
+    protected final @Nullable Embed[] embeds;
+    protected final @Nullable AllowedMentions allowedMentions;
+    protected final @Nullable MessageReference messageReference;
+    protected final @Nullable Component[] components;
+    protected final @Nullable String[] stickerIds;
+    protected final @Nullable Attachment[] attachments;
+    protected final @Nullable Long flags;
 
     /**
-     *  @param content pure text content of the message
-     * @param tts whether this message is text to speech
-     * @param embeds {@link Embed embeds} for this message
-     * @param allowedMentions {@link AllowedMentions}. if {@code null}, Discord will generate the mentions of the content
+     * @param content          pure text content of the message
+     * @param nonce            Can be used to verify a message was sent (up to 25 characters). Value will appear in the {@link GatewayEvent#MESSAGE_CREATE Message Create event}.
+     * @param tts              whether this message is text to speech
+     * @param embeds           {@link Embed embeds} for this message
+     * @param allowedMentions  {@link AllowedMentions}. if {@code null}, Discord will generate the mentions of the content
      * @param messageReference {@link MessageReference}, include to make your message a reply
-     * @param components the {@link Component components} to include with the message
-     * @param stickerIds IDs of up to 3 stickers in the server to send in the message
-     * @param attachments attachment objects with filename and description
-     * @param flags  {@link me.linusdev.lapi.api.objects.enums.MessageFlag message flags} combined as a bitfield (only {@link me.linusdev.lapi.api.objects.enums.MessageFlag#SUPPRESS_EMBEDS} can be set)
+     * @param components       the {@link Component components} to include with the message
+     * @param stickerIds       IDs of up to 3 stickers in the server to send in the message
+     * @param attachments      attachment objects with filename and description
+     * @param flags            {@link me.linusdev.lapi.api.objects.enums.MessageFlag message flags} combined as a bitfield (only {@link me.linusdev.lapi.api.objects.enums.MessageFlag#SUPPRESS_EMBEDS} can be set)
      */
-    public MessageTemplate(@Nullable String content, boolean tts, @Nullable Embed[] embeds,
+    public MessageTemplate(@Nullable String content, @Nullable Nonce nonce, @Nullable Boolean tts, @Nullable Embed[] embeds,
                            @Nullable AllowedMentions allowedMentions, @Nullable MessageReference messageReference, @Nullable Component[] components, @Nullable String[] stickerIds, @Nullable Attachment[] attachments, @Nullable Long flags){
         this.content = content;
+        this.nonce = nonce;
         this.tts = tts;
         this.embeds = embeds;
         this.allowedMentions = allowedMentions;
@@ -98,7 +106,7 @@ public class MessageTemplate implements Template {
         SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(CONTENT_KEY, content);
-        if(tts) data.add(TTS_KEY, true);
+        data.addIfNotNull(TTS_KEY, tts);
         data.addIfNotNull(EMBEDS_KEY, embeds);
         data.addIfNotNull(ALLOWED_MENTIONS_KEY, allowedMentions);
         data.addIfNotNull(MESSAGE_REFERENCE_KEY, messageReference);

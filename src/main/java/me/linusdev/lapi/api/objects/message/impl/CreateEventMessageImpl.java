@@ -34,14 +34,15 @@ public class CreateEventMessageImpl extends MessageImpl implements CreateEventMe
     protected final @Nullable Member member;
     protected final @NotNull List<UserMember> mentionsWithMember;
 
-    public CreateEventMessageImpl(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
-        super(lApi, data);
+    @SuppressWarnings("ConstantConditions")
+    public CreateEventMessageImpl(@NotNull LApi lApi, @NotNull SOData data, boolean doNullChecks) throws InvalidDataException {
+        super(lApi, data, doNullChecks);
 
         guildId = data.getAndConvert(GUILD_ID_KEY, Snowflake::fromString);
         member = data.getAndConvertWithException(MEMBER_KEY, (SOData c) -> Member.fromData(lApi, c));
         mentionsWithMember = data.getListAndConvertWithException(MENTIONS_KEY, (SOData c) -> UserMember.fromData(lApi, c));
 
-        if(mentionsWithMember == null) {
+        if(doNullChecks && mentionsWithMember == null) {
             InvalidDataException.throwException(data, null, CreateEventMessageImpl.class,
                     new Object[]{null}, new String[]{MENTIONS_KEY});
             return; // unreachable

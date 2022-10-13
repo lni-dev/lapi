@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Attachment used for example in retrieved {@link Message messages}
+ * Attachment used for example in retrieved {@link me.linusdev.lapi.api.objects.message.AnyMessage messages}
  */
 public class Attachment extends PartialAttachment {
 

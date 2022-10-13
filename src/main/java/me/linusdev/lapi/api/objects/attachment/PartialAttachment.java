@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @see Attachment
  */
+@SuppressWarnings("ConstantConditions")
 public class PartialAttachment implements Attachment {
 
     public static final String ID_KEY = "id";
@@ -106,9 +107,24 @@ public class PartialAttachment implements Attachment {
         this(Snowflake.fromString(id));
     }
 
+    /**
+     *
+     * @param attachment {@link PartialAttachment}
+     * @return new {@link PartialAttachment} with the same id.
+     */
+    public static @NotNull PartialAttachment of(@NotNull PartialAttachment attachment) {
+        return new PartialAttachment(attachment.getId());
+    }
+
     @Override
     public @NotNull Snowflake getIdAsSnowflake() {
         return id;
+    }
+
+    @NotNull
+    @Override
+    public String getId() {
+        return Attachment.super.getId();
     }
 
     @Override

@@ -17,15 +17,16 @@
 package me.linusdev.lapi.api.objects.nonce;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 /**
- * used in {@link Message}
- * "used for validating a message was sent"
- * TODO what is this?
+ * Can be used for validating that a message was sent.
+ * @see MessageBuilder#setNonce(Nonce)
  */
 public class Nonce implements SimpleDatable {
 
@@ -61,6 +62,18 @@ public class Nonce implements SimpleDatable {
 
     public @Nullable Integer getInteger() {
         return integer;
+    }
+
+    public int length() {
+        return toString().length();
+    }
+
+    /**
+     *
+     * @return {@link #getString()} if it is not {@code null}, {@link #getInteger()} (as string) otherwise.
+     */
+    public @NotNull String getAsString() {
+        return toString();
     }
 
     @Override

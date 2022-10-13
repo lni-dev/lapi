@@ -448,7 +448,7 @@ public class Test implements EventListener{
             } else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
                 try {
-                    lApi.getRequestFactory().createMessage(event.getChannelId(), new MessageTemplate("look below", false,
+                    lApi.getRequestFactory().createMessage(event.getChannelId(), new MessageTemplate("look below", null, false,
                             new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
                             null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
                             new Component[]{new Button(lApi, ComponentType.BUTTON,
