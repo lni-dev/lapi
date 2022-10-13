@@ -64,7 +64,7 @@ import java.util.function.Function;
  * "Hello, @everyone how are you?" <br>
  * in the channel with id = 912377387868639282
  * <pre>
- *     {@code new MessageBuilder(api)
+ *     {@code new MessageBuilder(lApi)
  *                 .appendContent("Hello, ")
  *                 .appendEveryoneMention()
  *                 .appendContent(" how are you?")
