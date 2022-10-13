@@ -726,10 +726,13 @@ public class MessageBuilder implements HasLApi {
     /**
      * This will add an attachment to the message. Currently, only {@link AttachmentTemplate} is supported,
      * because Discord does not allow to reuse an already uploaded attachment. If you want to do the latter, your
-     * only option is to include the attachment link inside the message content. <br>
-     * <br>
-     * TODO this may be different when editing messages
-     * @param attachment {@link AttachmentTemplate}
+     * only option is to include the attachment link inside the message content.
+     * <br><br>
+     * When editing a message you can reuse an attachment, that is already attached to this message. 
+     * You can provide use {@link PartialAttachment#of(PartialAttachment) this method} to convert a {@link me.linusdev.lapi.api.objects.attachment.Attachment attachment}
+     * received from discord to an id-only attachment.
+     *
+     * @param attachment {@link AttachmentTemplate} or {@link PartialAttachment#of(PartialAttachment) a already attached to this message attachment (edit only)}
      * @return this
      */
     public MessageBuilder addAttachment(@NotNull Attachment attachment) {
