@@ -466,11 +466,25 @@ public enum Link implements AbstractLink{
 
     DELETE_ALL_REACTIONS_FOR_EMOJI(Method.DELETE, CHANNELS, CHANNEL_ID, MESSAGES, MESSAGE_ID, REACTIONS, EMOJI),
 
+    /**
+     * @see Name#CHANNEL_ID
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#edit-message" target="_top">Discord Documentation</a>
+     */
     EDIT_MESSAGE(Method.PATCH, CHANNELS, CHANNEL_ID, MESSAGES, MESSAGE_ID),
 
-    DELETE_MESSAGE(Method.DELETE, CHANNELS, CHANNEL_ID, MESSAGES, MESSAGE_ID),
+    /**
+     * @see Name#CHANNEL_ID
+     * @see Name#MESSAGE_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#delete-message" target="_top">Discord Documentation</a>
+     */
+    DELETE_MESSAGE(Method.DELETE, true, true, CHANNELS, CHANNEL_ID, MESSAGES, MESSAGE_ID),
 
-    BULK_DELETE_MESSAGES(Method.POST, CHANNELS, CHANNEL_ID, MESSAGES, BULK_DELETE),
+    /**
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#bulk-delete-messages" target="_top">Discord Documentation</a>
+     */
+    BULK_DELETE_MESSAGES(Method.POST, true, true, CHANNELS, CHANNEL_ID, MESSAGES, BULK_DELETE),
 
     EDIT_CHANNEL_PERMISSIONS(Method.PUT, CHANNELS, CHANNEL_ID, PERMISSIONS, OVERWRITE_ID),
 

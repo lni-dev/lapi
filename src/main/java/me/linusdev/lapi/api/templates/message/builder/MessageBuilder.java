@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
+import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.objects.attachment.PartialAttachment;
 import me.linusdev.lapi.api.objects.enums.MessageType;
@@ -100,6 +101,8 @@ public class MessageBuilder implements HasLApi {
 
     private final @NotNull LApi lApi;
 
+    private @Nullable AnyMessage original;
+
     private @NotNull StringBuilder content;
 
     private @Nullable ArrayList<Embed> embeds = null;
@@ -150,12 +153,15 @@ public class MessageBuilder implements HasLApi {
      *     <br><br>
      *     The only field that cannot be reconstructed is whether the user, which the message replied to should be mentioned. ({@link MessageType#REPLY} only).
      *     This field will default to {@code false}.
+     *     <br><br>
+     *     Note: Mentions you add using {@link #appendContent(Object)} will be ignored. You must use the {@link #appendMention(MentionType, PlaceHolder...) append mention methods}.
      * </p>
      * @param message {@link AnyMessage} to copy
      * @return {@link MessageBuilder}
      */
     public static @NotNull MessageBuilder editMessage(@NotNull AnyMessage message) {
         MessageBuilder msgBuilder = new MessageBuilder(message.getLApi());
+        msgBuilder.original = message;
 
         msgBuilder.content = new StringBuilder(Objects.requireNonNullElse(message.getContent(), ""));
 
@@ -178,6 +184,9 @@ public class MessageBuilder implements HasLApi {
                 msgBuilder.attachments.add(PartialAttachment.of(attachment));
             }
         }
+
+        //Mentions
+        msgBuilder.setNoMentionsAllowed();
 
         if(Boolean.TRUE.equals(message.isMentionEveryone())) {
             msgBuilder.allowAllEveryoneMentions();
@@ -314,8 +323,40 @@ public class MessageBuilder implements HasLApi {
      * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
-    public Queueable<ChannelMessage> getQueueable(@NotNull String channelId) throws LimitException {
+    public Queueable<ChannelMessage> getCreateMessageRequest(@NotNull String channelId) throws LimitException {
         return lApi.getRequestFactory().createMessage(channelId, build());
+    }
+
+    /**
+     * The message you want to edit. Only required if you want to use {@link #getEditMessageRequest(String)}.
+     * <br><br>
+     * Will be automatically set if you use {@link #editMessage(AnyMessage)}.
+     * @param original original {@link AnyMessage message}
+     */
+    public void setOriginalMessage(@NotNull AnyMessage original) {
+        this.original = original;
+    }
+
+    /**
+     *
+     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
+     * @return {@link Queueable} to create a message
+     * @throws LApiIllegalStateException if the original message is {@code null}. see {@link #setOriginalMessage(AnyMessage)}.
+     */
+    public Queueable<ChannelMessage> getEditMessageRequest(@NotNull String channelId) throws LimitException, LApiIllegalStateException {
+        if(original == null) {
+            throw new LApiIllegalStateException("Missing original message for the message id.");
+        }
+        return lApi.getRequestFactory().editMessage(channelId, original.getId(), buildEditMessageTemplate());
+    }
+
+    /**
+     *
+     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
+     * @return {@link Queueable} to create a message
+     */
+    public Queueable<ChannelMessage> getEditMessageRequest(@NotNull String channelId, @NotNull String messageId) throws LimitException {
+        return lApi.getRequestFactory().editMessage(channelId,messageId, buildEditMessageTemplate());
     }
 
     /**
@@ -419,8 +460,8 @@ public class MessageBuilder implements HasLApi {
 
     /**
      *
-     * This will add a mention to the content.<br><br>
-     *
+     * This will add a mention to the content.
+     * <br><br>
      * I recommend, you use:<br>
      * - {@link #appendUserMention(String)}<br>
      * - {@link #appendUserNickNameMention(String)}<br>
@@ -583,6 +624,15 @@ public class MessageBuilder implements HasLApi {
     }
 
     /**
+     * This will clear the current message content. The new message content will be "".
+     * @return this
+     */
+    public MessageBuilder clearContent() {
+        this.content = new StringBuilder();
+        return this;
+    }
+
+    /**
      *
      * You can build an {@link Embed} using the {@link me.linusdev.lapi.api.objects.message.embed.EmbedBuilder EmbedBuilder}.
      *
@@ -661,7 +711,7 @@ public class MessageBuilder implements HasLApi {
      * <br><br>
      * If {@link #appendHereMention()}, {@link #appendMention(MentionType, PlaceHolder...)}, {@link #appendUserMention(String)},
      * {@link #appendRoleMention(String)}, {@link #appendEveryoneMention()} or any other User, Role, Everyone or Here mentioning method is called
-     * afterwards (only important for @everyone and @here, others can also be before), the mention will still be present and will ping the mentioned users.
+     * <b>afterwards</b> (only important for @everyone and @here, others can also be called before), the mention will still be present and will ping the mentioned users.
      * @return this
      */
     public MessageBuilder setNoMentionsAllowed(){

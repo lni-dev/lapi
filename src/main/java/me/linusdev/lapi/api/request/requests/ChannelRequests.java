@@ -17,6 +17,12 @@
 package me.linusdev.lapi.api.request.requests;
 
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.ApiVersion;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
+import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
+import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
+import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.other.placeholder.Name;
@@ -41,12 +47,15 @@ import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.request.AnchorType;
 import me.linusdev.lapi.api.request.RequestFactory;
+import me.linusdev.lapi.api.templates.EditMessageTemplate;
 import me.linusdev.lapi.api.templates.message.AllowedMentions;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
+import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static me.linusdev.lapi.api.request.RequestFactory.*;
 
@@ -366,13 +375,98 @@ public interface ChannelRequests extends HasLApi {
         return getReactions(channelId, messageId, emoji, null, limit);
     }
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                      Edit/Delete Message                      *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                            Edit / Delete Message                                          *
+     *                                                                                                           *
+     *  Done:       14.10.2022                                                                                   *
+     *  Updated:    00.00.0000                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * <p>
+     *      Edit a previously sent message. The fields content, embeds, and flags can be edited by the original message author.
+     *      Other users can only {@link MessageBuilder#setFlag(MessageFlag) edit flags} and only if they have the
+     *      {@link Permission#MANAGE_MESSAGES MANAGE_MESSAGES} permission in the corresponding channel. When specifying
+     *      flags, ensure to include all previously set flags in addition to ones that you are modifying.
+     *      Only flags documented in the table below may be modified by users (unsupported flag changes are currently ignored without error).
+     *      <br><br>
+     *      When the {@link MessageBuilder#appendContent(Object) content field} is edited, the mentions array in the message
+     *      object will be reconstructed from scratch based on the new content.
+     *      The allowed_mentions field of the edit request controls how this happens.
+     *      If there is no explicit allowed_mentions in the edit request, the content will be parsed with default allowances,
+     *      that is, without regard to whether or not an allowed_mentions was present in the request that originally created the message.
+     * </p>
+     * <p>
+     *     Starting with {@link ApiVersion#V10 API v10}, the attachments array must contain all attachments that should be present after edit,
+     *     including retained and new attachments provided in the request body.
+     * </p>
+     * <p>
+     *     If you use {@link MessageBuilder#editMessage(AnyMessage)} the flags, allowed mentions and attachments will be set automatically.
+     * </p>
+     * @param channelId id of the {@link Channel channel} the message to edit is in.
+     * @param messageId id of the {@link AnyMessage message} to edit.
+     * @param template {@link EditMessageTemplate}
+     * @return {@link Queueable} which can edit the message.
+     * @see Link#EDIT_MESSAGE
+     * @see MessageBuilder#editMessage(AnyMessage)
+     */
+    default @NotNull Queueable<ChannelMessage> editMessage(@NotNull String channelId, @NotNull String messageId, @NotNull EditMessageTemplate template) {
+        LinkQuery query = new LinkQuery(getLApi(), Link.EDIT_MESSAGE, template.getBody(),
+                Name.CHANNEL_ID.withValue(channelId),
+                Name.MESSAGE_ID.withValue(messageId));
+
+        return new ConvertingRetriever<>(query, AnyMessage::channelMessageFromData);
+    }
+
+    /**
+     * <p>
+     *     Delete a message. If operating on a guild channel and trying to delete a message that was not sent by the
+     *     current user, this endpoint requires the {@link Permission#MANAGE_MESSAGES MANAGE_MESSAGES} permission.
+     *     Returns a 204 empty response on success. Fires a {@link GatewayEvent#MESSAGE_DELETE Message Delete Gateway event}.
+     * </p>
+     *
+     * @param channelId id of the {@link Channel channel} the message to delete is in.
+     * @param messageId id of the {@link AnyMessage message} to delete.
+     * @return {@link Queueable} that can delete the message.
+     * @see Link#DELETE_MESSAGE
+     */
+    default @NotNull Queueable<LApiHttpResponse> deleteMessage(@NotNull String channelId, @NotNull String messageId) {
+        LinkQuery query = new LinkQuery(getLApi(), Link.DELETE_MESSAGE,
+                Name.CHANNEL_ID.withValue(channelId),
+                Name.MESSAGE_ID.withValue(messageId));
+
+        return new NoContentRetriever(query);
+    }
+
+    /**
+     * <p>
+     *     Delete multiple messages in a single request. This endpoint can only be used on guild channels and requires
+     *     the {@link Permission#MANAGE_MESSAGES MANAGE_MESSAGES} permission. Returns a 204 empty response on success.
+     *     Fires a {@link GatewayEvent#MESSAGE_DELETE_BULK Message Delete Bulk Gateway event}.
+     * </p>
+     * <p>
+     *     Any message IDs given that do not exist or are invalid will count towards the minimum and maximum message count
+     *     (currently {@value RequestUtils#BULK_DELETE_MESSAGES_MIN_MESSAGE_COUNT} and {@value RequestUtils#BULK_DELETE_MESSAGES_MAX_MESSAGE_COUNT} respectively)
+     * </p>
+     * <p>
+     *     This endpoint will not delete messages older than 2 weeks, and will fail with a 400 BAD REQUEST if
+     *     any message provided is older than that or if any duplicate message IDs are provided.
+     * </p>
+     * @param channelId id of the {@link Channel channel} the messages to delete are in.
+     * @param messageIds ids of the {@link AnyMessage messages} to delete.
+     * @return {@link Queueable} that can delete the messages
+     */
+    default @NotNull Queueable<LApiHttpResponse> bulkDeleteMessages(@NotNull String channelId, @NotNull List<String> messageIds) {
+        SOData data = SOData.newOrderedDataWithKnownSize(1);
+        data.add(RequestUtils.MESSAGES, messageIds);
+
+        LinkQuery query = new LinkQuery(getLApi(), Link.BULK_DELETE_MESSAGES, new LApiHttpBody(data),
+                Name.CHANNEL_ID.withValue(channelId));
+
+        return new NoContentRetriever(query);
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

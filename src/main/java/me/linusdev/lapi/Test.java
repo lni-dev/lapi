@@ -136,6 +136,7 @@ public class Test implements EventListener{
                 .enable(ConfigFlag.CACHE_PRESENCES)
                 .enable(ConfigFlag.COPY_PRESENCE_ON_UPDATE_EVENT)
                 .enable(ConfigFlag.COMMAND_MANAGER)
+                .setDebugRateLimitBuckets(true)
                 .adjustGatewayConfig(gatewayConfigBuilder -> {
                     gatewayConfigBuilder
                             .setApiVersion(ApiVersion.V10)
@@ -443,7 +444,7 @@ public class Test implements EventListener{
 
                 new MessageBuilder(event.getLApi(), "Hi " + author.getUsername())
                         .setReplyTo(msg, true)
-                        .getQueueable(channelId)
+                        .getCreateMessageRequest(channelId)
                         .queue();
             } else if(content.toLowerCase().startsWith("hey")) {
                 System.out.println("hey");
@@ -482,10 +483,33 @@ public class Test implements EventListener{
 
                 try {
                     builder.addEmbed(embed.build(false));
-                    builder.getQueueable(event.getChannelId()).queue();
+                    builder.getCreateMessageRequest(event.getChannelId()).queue();
                 } catch (InvalidEmbedException e) {
                     e.printStackTrace();
                 }
+            } else if(content.equalsIgnoreCase("testEdit")) {
+                MessageBuilder builder = new MessageBuilder(lApi);
+
+                builder.appendContent("Hi ho this message will be edited...").getCreateMessageRequest(event.getChannelId()).queue((result, secondary, error) -> {
+                    if(error != null) {
+                        error.asThrowable().printStackTrace();
+                        return;
+                    }
+
+                    lApi.runSupervised( () -> {
+                        MessageBuilder edit = MessageBuilder.editMessage(result);
+                        edit.appendContent("\n... successfully edited!");
+                        edit.getEditMessageRequest(result.getChannelId()).queue((result1, secondary1, error1) -> {
+                            if(error1 != null) {
+                                error1.asThrowable().printStackTrace();
+                                return;
+                            }
+                        });
+                    }, 5000);
+
+
+                });
+
             }
         }
     }
@@ -564,7 +588,7 @@ public class Test implements EventListener{
         if(event.getGuildId() == null) {
             MessageBuilder msg = new MessageBuilder(lApi, "Hi ");
             msg.appendUserMention(event.getUserId());
-            msg.getQueueable(event.getChannelId()).queue();
+            msg.getCreateMessageRequest(event.getChannelId()).queue();
         }
     }
 
