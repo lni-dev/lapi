@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdenti
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
+import me.linusdev.lapi.api.manager.guild.GuildPool;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
@@ -247,5 +248,11 @@ public interface LApi extends HasLApi {
      * @return {@link CommandManagerImpl} or {@code null} if {@link ConfigFlag#COMMAND_MANAGER} is not enabled.
      */
     CommandManager getCommandManager();
+
+    /**
+     *
+     * @return {@link GuildPool} or {@code null} if {@link ConfigFlag#CACHE_GUILDS} is not enabled.
+     */
+    GuildPool getGuildPool();
 
 }

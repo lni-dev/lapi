@@ -16,11 +16,13 @@
 
 package me.linusdev.lapi.api.manager.guild;
 
+import me.linusdev.lapi.api.objects.guild.CachedGuild;
 import me.linusdev.lapi.api.objects.guild.Guild;
-import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import org.jetbrains.annotations.Nullable;
 
-public interface GuildPool extends Iterable<CachedGuildImpl> {
+public interface GuildPool extends Iterable<CachedGuild> {
 
     @Nullable Guild getGuildById(@Nullable String guildId);
+
+
 }

@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdenti
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
+import me.linusdev.lapi.api.manager.guild.GuildPool;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.other.placeholder.Name;
@@ -406,6 +407,11 @@ public class LApiImpl implements LApi {
     @Override
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    @Override
+    public GuildPool getGuildPool() {
+        return guildManager;
     }
 
     @Override

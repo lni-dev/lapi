@@ -24,10 +24,7 @@ import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
-import me.linusdev.lapi.api.objects.guild.GuildImpl;
-import me.linusdev.lapi.api.objects.guild.Guild;
-import me.linusdev.lapi.api.objects.guild.UnavailableGuild;
+import me.linusdev.lapi.api.objects.guild.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -131,7 +128,7 @@ public class LApiGuildManagerImpl implements GuildManager {
         UnavailableGuild uGuild = UnavailableGuild.fromData((SOData) payload.getPayloadData());
 
         CachedGuildImpl guild = guilds.get(uGuild.getId());
-        return new Update<CachedGuildImpl, Guild>(guild, (SOData) payload.getPayloadData());
+        return new Update<>(guild, (SOData) payload.getPayloadData());
     }
 
     @Override
@@ -165,8 +162,20 @@ public class LApiGuildManagerImpl implements GuildManager {
 
     @NotNull
     @Override
-    public Iterator<CachedGuildImpl> iterator() {
+    public Iterator<CachedGuild> iterator() {
         if(guilds == null) throw new UnsupportedOperationException("init() not yet called!");
-        return guilds.values().iterator();
+        return new Iterator<>() {
+            private final @NotNull Iterator<CachedGuildImpl> it = guilds.values().iterator();
+
+            @Override
+            public boolean hasNext() {
+                return it.hasNext();
+            }
+
+            @Override
+            public CachedGuild next() {
+                return it.next();
+            }
+        };
     }
 }
