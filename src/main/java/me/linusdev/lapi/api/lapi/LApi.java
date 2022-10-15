@@ -90,6 +90,7 @@ import java.io.*;
  *     for more information see {@link me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener EventListener}
  * </div>
  */
+@SuppressWarnings("UnnecessaryModifier")
 public interface LApi extends HasLApi {
 
     /**
@@ -134,6 +135,7 @@ public interface LApi extends HasLApi {
      * @param queueable {@link Queueable}
      * @param <T> Return Type of {@link Queueable}
      */
+    @SuppressWarnings("JavadocReference")
     @ApiStatus.Internal
     <T> void queue(@NotNull QueueableFuture<T> queueable);
 
