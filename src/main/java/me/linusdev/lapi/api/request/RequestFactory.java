@@ -31,6 +31,8 @@ public class RequestFactory implements HasLApi,
                                     ApplicationCommandRequests,
                                     ReceivingAndRespondingRequests,
 
+                                    GuildRequests,
+
                                     ChannelRequests,
 
                                     UserRequests,
