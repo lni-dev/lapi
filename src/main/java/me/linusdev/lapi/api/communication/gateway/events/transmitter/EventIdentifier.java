@@ -153,7 +153,7 @@ public enum EventIdentifier implements Requireable {
      * <br><br>
      * <p>
      *     This event will only happen once after all of the following events were triggered:
-     *     {@link #READY}, {@link #GUILDS_READY}, {@link #VOICE_REGION_MANAGER_READY}. If any of these events are disabled
+     *     {@link #READY}, {@link #GUILDS_READY}, {@link #VOICE_REGION_MANAGER_READY}, {@link #COMMAND_MANAGER_READY}, {@link #CACHE_READY}. If any of these events are disabled
      *     in the {@link ConfigBuilder#setFlags(long) config}, they will be ignored and the {@link #LAPI_READY} event will still fire.
      * </p>
      * <p>
