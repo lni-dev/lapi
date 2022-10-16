@@ -809,7 +809,7 @@ public class MessageBuilder implements HasLApi {
     public MessageBuilder addComponent(@NotNull Function<ArrayList<Component>, ArrayList<Component>> consumer){
         if(components == null) components = new ArrayList<>();
 
-        ActionRow actionRow = new ActionRow(lApi, ComponentType.ACTION_ROW, consumer.apply(new ArrayList<>()).toArray(new Component[0]));
+        ActionRow actionRow = new ActionRow(lApi, ComponentType.ACTION_ROW, consumer.apply(new ArrayList<>()));
         components.add(actionRow);
 
         return this;

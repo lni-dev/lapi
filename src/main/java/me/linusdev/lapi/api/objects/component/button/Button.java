@@ -28,6 +28,7 @@ import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.component.ComponentLimits;
 import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
 import me.linusdev.lapi.api.objects.component.selectmenu.SelectMenu;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -112,7 +113,9 @@ public class Button implements Component, HasLApi {
      * @return {@link Button}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #STYLE_KEY}
      */
-    public static @NotNull Button fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+    @Contract("_, null -> null; _, !null -> !null")
+    public static @Nullable Button fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
         Number type = (Number) data.get(TYPE_KEY);
         Number style = (Number)  data.get(STYLE_KEY);
         String label = (String) data.get(LABEL_KEY);

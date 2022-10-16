@@ -101,6 +101,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -452,10 +453,10 @@ public class Test implements EventListener{
                     lApi.getRequestFactory().createMessage(event.getChannelId(), new MessageTemplate("look below", null, false,
                             new Embed[]{new EmbedBuilder().setTitle("Ingore me ><").build()},
                             null, null, new Component[]{new ActionRow(lApi, ComponentType.ACTION_ROW,
-                            new Component[]{new Button(lApi, ComponentType.BUTTON,
+                            List.of(new Component[]{new Button(lApi, ComponentType.BUTTON,
                                     ButtonStyle.PRIMARY, "Klick mich UwU",
                                     null, "me.linusdev.btn_1", null,
-                                    null)}
+                                    null)})
                     )}, null,
                             /*new Attachment[]{
                                     new AttachmentTemplate("image.png",

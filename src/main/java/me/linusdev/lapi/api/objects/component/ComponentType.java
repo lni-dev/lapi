@@ -17,32 +17,121 @@
 package me.linusdev.lapi.api.objects.component;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
+import me.linusdev.lapi.api.objects.component.button.Button;
+import me.linusdev.lapi.api.objects.component.selectmenu.SelectMenu;
+import me.linusdev.lapi.api.objects.component.textinput.TextInput;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/interactions/message-components#component-object-component-types" target="_top">ComponentType</a>
+ * @updated 16.10.2022
  */
 public enum ComponentType implements SimpleDatable {
 
     /**
      * LApi specific, not in Discord!
      */
-    UNKNOWN(0),
+    UNKNOWN(0) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return UnknownComponent.fromData(data);
+        }
+    },
 
     /**
      * A container for other components
      */
-    ACTION_ROW(1),
+    ACTION_ROW(1) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return ActionRow.fromData(lApi, data);
+        }
+    },
 
     /**
      * A button object
      */
-    BUTTON(2),
+    BUTTON(2) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return Button.fromData(lApi, data);
+        }
+    },
 
     /**
      * A select menu for picking from choices
      */
-    SELECT_MENU(3),
+    SELECT_MENU(3) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return SelectMenu.fromData(lApi, data);
+        }
+    },
+
+    /**
+     * Text input object
+     */
+    TEXT_INPUT(4) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return TextInput.fromData(lApi, data);
+        }
+    },
+
+    /**
+     * Select menu for users
+     */
+    USER_SELECT(5) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return SelectMenu.fromData(lApi, data);
+        }
+    },
+
+    /**
+     * Select menu for roles
+     */
+    ROLE_SELECT(6) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return SelectMenu.fromData(lApi, data);
+        }
+    },
+
+    /**
+     * Select menu for mentionables (users and roles)
+     */
+    MENTIONABLE(7) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return SelectMenu.fromData(lApi, data);
+        }
+    },
+
+    /**
+     * Select menu for channels
+     */
+    CHANNEL_SELECT(8) {
+        @Override
+        @Nullable
+        Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+            return SelectMenu.fromData(lApi, data);
+        }
+    },
     ;
 
     private final int value;
@@ -67,6 +156,9 @@ public enum ComponentType implements SimpleDatable {
     public int getValue() {
         return value;
     }
+
+    @Contract("_, null -> null; _, !null -> !null")
+    abstract @Nullable Component fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException;
 
     @Override
     public Object simplify() {

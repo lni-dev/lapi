@@ -18,7 +18,9 @@ package me.linusdev.lapi.api.objects.component;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This does not actually exist in Discord! But will be created if Discord adds a new type, not yet supported by this api
@@ -47,7 +49,9 @@ public class UnknownComponent implements Component{
      * @return {@link UnknownComponent}
      * @throws InvalidDataException if {@link #TYPE_KEY} is null or missing
      */
-    public static @NotNull UnknownComponent fromData(@NotNull SOData data) throws InvalidDataException {
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable UnknownComponent fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
         Number type = (Number) data.get(TYPE_KEY);
 
         if(type == null){

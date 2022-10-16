@@ -79,10 +79,15 @@ public interface Component extends Datable {
     public static final String EMOJI_KEY = "emoji";
     public static final String URL_KEY = "url";
     public static final String OPTION_KEY = "option";
+    public static final String CHANNEL_TYPES = "channel_types";
     public static final String PLACEHOLDER_KEY = "placeholder";
     public static final String MIN_VALUES_KEY = "min_values";
     public static final String MAX_VALUES_KEY = "max_values";
     public static final String COMPONENTS_KEY = "components";
+    public static final String MIN_LENGTH_KEY = "min_length";
+    public static final String MAX_LENGTH_KEY = "max_length";
+    public static final String REQUIRED_KEY = "required";
+    public static final String VALUE_KEY = "value";
 
     /**
      *
@@ -91,27 +96,17 @@ public interface Component extends Datable {
      * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
      */
     public static @NotNull Component fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
-        Number type = (Number) data.get(TYPE_KEY);
+        Number typeNum = (Number) data.get(TYPE_KEY);
 
-        if(type == null){
+        if(typeNum == null){
             InvalidDataException.throwException(data, null, Component.class, new Object[]{null}, new String[]{TYPE_KEY});
             //noinspection ConstantConditions
             return null; //this will never happen, because above method will throw an Exception
         }
 
-        int typeInt = type.intValue();
+        ComponentType type = ComponentType.fromValue(typeNum.intValue());
 
-        if(typeInt == ComponentType.ACTION_ROW.getValue()){
-            return ActionRow.fromData(lApi, data);
-
-        }else if(typeInt == ComponentType.BUTTON.getValue()){
-            return Button.fromData(lApi, data);
-
-        }else if(typeInt == ComponentType.SELECT_MENU.getValue()){
-            return SelectMenu.fromData(lApi, data);
-        }
-
-        return UnknownComponent.fromData(data);
+        return type.fromData(lApi, data);
     }
 
     /**

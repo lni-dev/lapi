@@ -24,8 +24,11 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.component.ComponentType;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.component.ComponentLimits;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,7 +54,7 @@ import java.util.List;
 public class ActionRow implements Datable, Component, HasLApi {
 
     private final @NotNull ComponentType type;
-    private final @NotNull Component[] components; //TODO: check if this is really @NotNull
+    private final @NotNull List<Component> components;
 
     private final @NotNull LApi lApi;
 
@@ -60,7 +63,7 @@ public class ActionRow implements Datable, Component, HasLApi {
      * @param type {@link ComponentType component type}
      * @param components a list of child components
      */
-    public ActionRow(@NotNull LApi lApi, @NotNull ComponentType type, @NotNull Component[] components){
+    public ActionRow(@NotNull LApi lApi, @NotNull ComponentType type, @NotNull List<Component> components){
         this.lApi = lApi;
         this.type = type;
         this.components = components;
@@ -72,21 +75,21 @@ public class ActionRow implements Datable, Component, HasLApi {
      * @return {@link ActionRow}
      * @throws InvalidDataException if {@link #TYPE_KEY} or {@link #COMPONENTS_KEY} are missing
      */
-    public static @NotNull ActionRow fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+    @Contract("_, null -> null; _, !null -> !null")
+    public static @Nullable ActionRow fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
         Number type = (Number) data.get(TYPE_KEY);
-        List<Object> componentsData = data.getList(COMPONENTS_KEY);
+        List<Component> components = data.getListAndConvertWithException(COMPONENTS_KEY, (SOData c) -> Component.fromData(lApi, c));
 
-        if(type == null || componentsData == null){
+        //Nullability of components is not documented...
+        if(components == null)
+            components = new ArrayList<>(0);
+
+        if(type == null) {
             InvalidDataException.throwException(data, null, ActionRow.class,
-                    new Object[]{type, componentsData}, new String[]{TYPE_KEY, COMPONENTS_KEY});
-            return null; //this will never happen, because above method will throw an Exception
-        }
-
-        Component[] components = new Component[componentsData.size()];
-        int i = 0;
-        for(Object o : componentsData){
-            SOData d = (SOData) o;
-            components[i++] = Component.fromData(lApi, d);
+                    new Object[]{null}, new String[]{TYPE_KEY, COMPONENTS_KEY});
+            //unreachable statement
+            return null;
         }
 
         return new ActionRow(lApi, ComponentType.fromValue(type.intValue()), components);
@@ -100,7 +103,7 @@ public class ActionRow implements Datable, Component, HasLApi {
     /**
      * a list of child components
      */
-    public @NotNull Component[] getComponents() {
+    public @NotNull List<Component> getComponents() {
         return components;
     }
 
