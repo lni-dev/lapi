@@ -55,6 +55,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -802,14 +803,16 @@ public class MessageBuilder implements HasLApi {
      * The function gives you an empty {@link ArrayList} of {@link Component components}. You can add your components to
      * the list and then return the list.<br><br>
      *
-     * For more information about components and there limits, see: {@link Component}, {@link ActionRow}
+     * For more information about components and their limits, see: {@link Component}, {@link ActionRow}
      * @param consumer to add {@link Component components} to the {@link ActionRow action-row}
      * @return this
      */
-    public MessageBuilder addComponent(@NotNull Function<ArrayList<Component>, ArrayList<Component>> consumer){
+    public MessageBuilder addComponent(@NotNull Consumer<ArrayList<Component>> consumer){
         if(components == null) components = new ArrayList<>();
 
-        ActionRow actionRow = new ActionRow(lApi, ComponentType.ACTION_ROW, consumer.apply(new ArrayList<>()));
+        ArrayList<Component> compsInRow = new ArrayList<>();
+        consumer.accept(compsInRow);
+        ActionRow actionRow = new ActionRow(lApi, ComponentType.ACTION_ROW, compsInRow);
         components.add(actionRow);
 
         return this;
