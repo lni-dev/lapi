@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.async.error.MessageError;
 import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.Retriever;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
@@ -36,6 +37,13 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ *
+ * {@link Queueable}, which can retrieve images from discords cdn endpoints.
+ *
+ * @see #queue(ResultAndErrorConsumer)
+ * @see #queueAndWriteToFile(Path, boolean, ResultAndErrorConsumer)
+ */
 public class CDNImageRetriever extends Retriever<InputStream>  {
 
     /**

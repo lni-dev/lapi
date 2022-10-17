@@ -18,15 +18,11 @@ package me.linusdev.lapi.api.objects.guild.member;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.cdn.image.CDNImage;
-import me.linusdev.lapi.api.communication.cdn.image.CDNImageRetriever;
-import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
@@ -39,31 +35,11 @@ import java.util.List;
 /**
  * @see <a href="https://discord.com/developers/docs/resources/guild#guild-member-object" target="_top">GuildImpl Member Object</a>
  */
-public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
+public class Member extends PartialMember implements Datable, HasLApi, CopyAndUpdatable<Member> {
 
-    public static final String USER_KEY = "user";
-    public static final String NICK_KEY = "nick";
-    public static final String AVATAR_KEY = "avatar";
-    public static final String ROLES_KEY = "roles";
-    public static final String JOINED_AT_KEY = "joined_at";
-    public static final String PREMIUM_SINCE_KEY = "premium_since";
-    public static final String DEAF_KEY = "deaf";
-    public static final String MUTE_KEY = "mute";
-    public static final String PENDING_KEY = "pending";
-    public static final String PERMISSIONS_KEY = "permissions";
-
-    private @Nullable User user;
-    private @Nullable String nick;
-    private @Nullable String avatarHash;
-    private @NotNull Snowflake[] roles;
-    private @NotNull final ISO8601Timestamp joinedAt;
-    private @Nullable ISO8601Timestamp premiumSince;
-    private boolean deaf;
-    private boolean mute;
-    private @Nullable Boolean pending;
-    private @Nullable String permissionsString;
-
-    private @NotNull final LApi lApi;
+    protected @Nullable User user;
+    protected boolean deaf;
+    protected boolean mute;
 
     /**
      *
@@ -81,17 +57,11 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     public Member(@NotNull LApi lApi, @Nullable User user, @Nullable String nick, @Nullable String avatarHash, @NotNull Snowflake[] roles,
                   @NotNull ISO8601Timestamp joinedAt, @Nullable ISO8601Timestamp premiumSince, boolean deaf, boolean mute,
                   @Nullable Boolean pending, @Nullable String permissionsString){
-        this.lApi = lApi;
+        super(lApi, nick, avatarHash, roles, joinedAt, premiumSince, pending, permissionsString);
         this.user = user;
-        this.nick = nick;
-        this.avatarHash = avatarHash;
-        this.roles = roles;
-        this.joinedAt = joinedAt;
-        this.premiumSince = premiumSince;
         this.deaf = deaf;
         this.mute = mute;
-        this.pending = pending;
-        this.permissionsString = permissionsString;
+
     }
 
     /**
@@ -138,59 +108,9 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     /**
      * the user this guild member represents
      */
+    @Override
     public @Nullable User getUser() {
         return user;
-    }
-
-    /**
-     * this users guild nickname
-     */
-    public @Nullable String getNick() {
-        return nick;
-    }
-
-    /**
-     * the member's guild avatar hash
-     */
-    public @Nullable String getAvatarHash() {
-        return avatarHash;
-    }
-
-    /**
-     *
-     * TODO docs
-     *
-     * @see CDNImageRetriever
-     * @see CDNImage
-     * @see me.linusdev.lapi.api.communication.cdn.image.ImageQuery
-     */
-    public @NotNull CDNImageRetriever getAvatar(int desiredSize, @NotNull String guildId, @Nullable String userId, @NotNull AbstractFileType fileType){
-
-        if(userId == null && user == null) throw new IllegalArgumentException("No userId given");
-        if(getAvatarHash() == null) throw new IllegalArgumentException("This member object has no avatar hash");
-
-        return new CDNImageRetriever(CDNImage.ofGuildMemberAvatar(lApi, guildId, userId == null ? user.getId() : userId, getAvatarHash(), fileType));
-    }
-
-    /**
-     * array of role object ids as {@link Snowflake Snowflake[]}
-     */
-    public @NotNull Snowflake[] getRoleIds() {
-        return roles;
-    }
-
-    /**
-     * when the user joined the guild
-     */
-    public @NotNull ISO8601Timestamp getJoinedAt() {
-        return joinedAt;
-    }
-
-    /**
-     * when the user started boosting the guild
-     */
-    public @Nullable ISO8601Timestamp getPremiumSince() {
-        return premiumSince;
     }
 
     /**
@@ -207,27 +127,6 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
         return mute;
     }
 
-    /**
-     * whether the user has not yet passed the guild's Membership Screening requirements
-     */
-    public @Nullable Boolean getPending() {
-        return pending;
-    }
-
-    /**
-     * total permissions of the member in the channel, including overwrites, returned when in the interaction object
-     */
-    public @Nullable String getPermissionsString() {
-        return permissionsString;
-    }
-
-    /**
-     * total permissions of the member in the channel, including overwrites, returned when in the interaction object
-     * as {@link Permissions}
-     */
-    public @Nullable Permissions getPermissions() {
-        return Permissions.ofString(permissionsString);
-    }
 
     /**
      * Generate {@link SOData} of this {@link Member}
@@ -271,7 +170,7 @@ public class Member implements Datable, HasLApi, CopyAndUpdatable<Member> {
     }
 
     @Override
-    public void updateSelfByData(SOData data) throws InvalidDataException {
+    public void updateSelfByData(@NotNull SOData data) throws InvalidDataException {
 
         if(user == null) this.user = User.fromData(lApi, (SOData) data.get(USER_KEY));
         data.processIfContained(NICK_KEY, (String str) -> this.nick = str);
