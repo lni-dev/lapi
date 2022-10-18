@@ -29,7 +29,7 @@ import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;

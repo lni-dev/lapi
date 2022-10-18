@@ -20,7 +20,7 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.guild.member.Member;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

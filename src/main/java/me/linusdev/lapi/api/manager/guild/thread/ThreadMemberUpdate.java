@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.manager.guild.thread;
 
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

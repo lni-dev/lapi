@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.templates.commands;
 import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandOptionException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
-import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.objects.local.Locale;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import org.jetbrains.annotations.NotNull;

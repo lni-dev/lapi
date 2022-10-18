@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.channel.thread;
+package me.linusdev.lapi.api.objects.nchannel.thread;
 
 
 import me.linusdev.data.Datable;
@@ -41,6 +41,7 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
     public static final String AUTO_ARCHIVE_DURATION_KEY = "auto_archive_duration";
     public static final String LOCKED_KEY = "locked";
     public static final String INVITABLE_KEY = "invitable";
+    public static final String CREATE_TIMESTAMP_KEY = "create_timestamp";
 
 
     private final boolean archived;
@@ -48,6 +49,7 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
     private final int autoArchiveDuration;
     private final boolean locked;
     private @Nullable final Boolean invitable;
+    private final @Nullable ISO8601Timestamp createTimestamp;
 
 
     /**
@@ -76,6 +78,7 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
         this.autoArchiveDuration = autoArchiveDuration.intValue();
         this.locked = locked;
         this.invitable = invitable;
+        this.createTimestamp = data.getAndConvert(CREATE_TIMESTAMP_KEY, ISO8601Timestamp::fromString);
     }
 
     @Override
@@ -86,6 +89,8 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
         data.add(ARCHIVE_TIMESTAMP_KEY, this.archiveTimestamp);
         data.add(AUTO_ARCHIVE_DURATION_KEY, this.autoArchiveDuration);
         data.add(LOCKED_KEY, this.locked);
+        data.addIfNotNull(INVITABLE_KEY, invitable);
+        data.addIfNotNull(CREATE_TIMESTAMP_KEY, createTimestamp);
 
         return data;
     }
@@ -124,6 +129,13 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
      */
     public @Nullable Boolean getInvitable() {
         return invitable;
+    }
+
+    /**
+     * Timestamp when the thread was created; only populated for threads created after 2022-01-09.
+     */
+    public @Nullable ISO8601Timestamp getCreateTimestamp() {
+        return createTimestamp;
     }
 
     /**

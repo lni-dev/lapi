@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
@@ -37,8 +38,8 @@ import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
@@ -586,7 +587,7 @@ public interface ChannelRequests extends HasLApi {
 
     /**
      * <p>
-     *     Returns a {@link me.linusdev.lapi.api.objects.channel.thread.ThreadMember thread member} object
+     *     Returns a {@link ThreadMember thread member} object
      *     for the specified user if they are a member of the thread, returns a 404 response otherwise.
      * </p>
      *
@@ -633,10 +634,10 @@ public interface ChannelRequests extends HasLApi {
     /**
      * <p>
      *     Returns archived threads in the channel that are public.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_TEXT GUILD_TEXT} channel,
-     *     returns threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
-     *     threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
+     *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
@@ -670,10 +671,10 @@ public interface ChannelRequests extends HasLApi {
     /**
      * <p>
      *     Returns archived threads in the channel that are public.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_TEXT GUILD_TEXT} channel,
-     *     returns threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
-     *     threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
+     *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
@@ -695,7 +696,7 @@ public interface ChannelRequests extends HasLApi {
      *
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires both the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
      *     {@link Permission#MANAGE_THREADS MANAGE_THREADS} permissions.
@@ -730,7 +731,7 @@ public interface ChannelRequests extends HasLApi {
      *
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires both the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
      *     {@link Permission#MANAGE_THREADS MANAGE_THREADS} permissions.
@@ -754,7 +755,7 @@ public interface ChannelRequests extends HasLApi {
     /**
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD},
      *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
@@ -787,7 +788,7 @@ public interface ChannelRequests extends HasLApi {
     /**
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD},
      *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>

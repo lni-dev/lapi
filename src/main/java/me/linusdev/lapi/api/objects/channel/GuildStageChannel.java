@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.GuildStageChannelAbstract;
-import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.objects.enums.VideoQuality;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

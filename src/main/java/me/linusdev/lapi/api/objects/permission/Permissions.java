@@ -16,8 +16,6 @@
 
 package me.linusdev.lapi.api.objects.permission;
 
-import me.linusdev.data.AbstractData;
-import me.linusdev.data.Datable;
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -29,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * This class contains a set of permissions.
+ * This class represents a set of {@link Permission permissions}.
  * @see Permission
  */
 public class Permissions implements SimpleDatable {

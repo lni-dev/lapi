@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

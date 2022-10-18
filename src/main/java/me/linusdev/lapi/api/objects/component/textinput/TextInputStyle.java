@@ -16,9 +16,10 @@
 
 package me.linusdev.lapi.api.objects.component.textinput;
 
+import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;
 
-public enum TextInputStyle {
+public enum TextInputStyle implements SimpleDatable {
 
     UNKNOWN(0),
 
@@ -50,6 +51,11 @@ public enum TextInputStyle {
     }
 
     public int getValue() {
+        return value;
+    }
+
+    @Override
+    public Object simplify() {
         return value;
     }
 }

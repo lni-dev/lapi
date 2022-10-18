@@ -25,7 +25,7 @@ import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

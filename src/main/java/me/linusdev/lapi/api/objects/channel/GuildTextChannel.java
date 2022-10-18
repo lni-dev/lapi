@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrites;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.GuildTextChannelAbstract;
-import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

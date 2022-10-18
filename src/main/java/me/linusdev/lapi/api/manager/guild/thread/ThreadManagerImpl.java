@@ -28,7 +28,7 @@ import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

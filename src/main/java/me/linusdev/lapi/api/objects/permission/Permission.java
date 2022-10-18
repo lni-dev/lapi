@@ -28,7 +28,10 @@ import static me.linusdev.lapi.api.objects.enums.SimpleChannelType.*;
 
 
 /**
- * <a href="https://discord.com/developers/docs/topics/permissions#permissions">Permission</a>
+ * This enum contains all of discords permissions.
+ *
+ * @see <a href="https://discord.com/developers/docs/topics/permissions#permissions">Discord Documentation</a>
+ * @updated 17.10.2022
  */
 public enum Permission {
 
@@ -71,8 +74,15 @@ public enum Permission {
     CREATE_PRIVATE_THREADS      (36, "Allows for creating private threads", TEXT),
     USE_EXTERNAL_STICKERS       (37, "Allows the usage of custom stickers from other servers", TEXT),
     SEND_MESSAGES_IN_THREADS    (38, "Allows for sending messages in threads", TEXT),
-    START_EMBEDDED_ACTIVITIES   (39, "Allows for launching activities (applications with the EMBEDDED flag) in a voice channel", VOICE),
+    USE_EMBEDDED_ACTIVITIES     (39, "Allows for using activities (applications with the EMBEDDED flag) in a voice channel", VOICE),
+    MODERATE_MEMBERS            (40, "Allows for timing out users to prevent them from sending or reacting to messages in chat and threads, and from speaking in voice and stage channels"),
     ;
+
+    /**
+     * @deprecated - replaced by {@link #USE_EMBEDDED_ACTIVITIES}
+     */
+    @Deprecated()
+    public static final Permission START_EMBEDDED_ACTIVITIES = USE_EMBEDDED_ACTIVITIES;
 
     /**
      * The bit set for this permission. to get the actual value you would have to do: 1 << setBit

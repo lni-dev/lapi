@@ -26,7 +26,7 @@ import me.linusdev.lapi.api.objects.channel.thread.GuildPublicThread;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.channel.*;
-import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -90,15 +90,15 @@ public abstract class Channel<T extends Channel<T>> implements CopyAndUpdatable<
                 return new GroupDirectMessageChannel(lApi, id, type, data);
             case GUILD_CATEGORY:
                 return new ChannelCategory(lApi, id, type, data);
-            case GUILD_NEWS:
+            case GUILD_ANNOUNCEMENT:
                 return new GuildNewsChannel(lApi, id, type, data);
             case GUILD_STORE: //7
                 return new GuildStoreChannel(lApi, id, type, data);
-            case GUILD_NEWS_THREAD: //10
+            case ANNOUNCEMENT_THREAD: //10
                 return new GuildNewsThread(lApi, id, type, data);
-            case GUILD_PUBLIC_THREAD:
+            case PUBLIC_THREAD:
                 return new GuildPublicThread(lApi, id, type, data);
-            case GUILD_PRIVATE_THREAD:
+            case PRIVATE_THREAD:
                 return new GuildPrivateThread(lApi, id, type, data);
             case GUILD_STAGE_VOICE:
                 return new GuildStageChannel(lApi, id, type, data);

@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.enums.ChannelType;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

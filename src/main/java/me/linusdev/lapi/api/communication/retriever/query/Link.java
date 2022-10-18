@@ -18,14 +18,15 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
+import me.linusdev.lapi.api.objects.nchannel.ChannelType;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.invite.Invite;
@@ -579,10 +580,10 @@ public enum Link implements AbstractLink{
     /**
      * <p>
      *     Returns archived threads in the channel that are public.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_TEXT GUILD_TEXT} channel,
-     *     returns threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
-     *     threads of {@link Channel#getType() type} {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_NEWS_THREAD GUILD_NEWS_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
+     *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
+     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
@@ -600,7 +601,7 @@ public enum Link implements AbstractLink{
     /**
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires both the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} and
      *     {@link Permission#MANAGE_THREADS MANAGE_THREADS} permissions.
@@ -619,7 +620,7 @@ public enum Link implements AbstractLink{
     /**
      * <p>
      *     Returns archived threads in the channel that are of {@link Channel#getType() type}
-     *     {@link me.linusdev.lapi.api.objects.enums.ChannelType#GUILD_PRIVATE_THREAD GUILD_PRIVATE_THREAD},
+     *     {@link ChannelType#PRIVATE_THREAD GUILD_PRIVATE_THREAD},
      *     and the user has joined. Threads are ordered by their {@link Channel#getId() id}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
