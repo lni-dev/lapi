@@ -25,10 +25,11 @@ import me.linusdev.lapi.api.objects.interaction.ResolvedData;
 import me.linusdev.lapi.api.objects.nchannel.thread.AutoArchiveDuration;
 import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
-import me.linusdev.lapi.api.objects.enums.VideoQuality;
+import me.linusdev.lapi.api.objects.nchannel.thread.ThreadChannel;
 import me.linusdev.lapi.api.objects.nchannel.forum.DefaultReaction;
 import me.linusdev.lapi.api.objects.nchannel.forum.ForumTag;
 import me.linusdev.lapi.api.objects.nchannel.forum.SortOrderType;
+import me.linusdev.lapi.api.objects.enums.VideoQuality;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrite;
@@ -45,9 +46,19 @@ import java.util.List;
 /**
  * Represents a guild or DM channel within Discord.
  * @see <a href="https://discord.com/developers/docs/resources/channel">Discord Documentation</a>
+ * @see PartialChannel
+ * @see ThreadChannel
  */
 @SuppressWarnings({"UnnecessaryModifier", "unused"})
 public interface Channel extends SnowflakeAble, Datable, HasLApi {
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Limits                                                 *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     public static final int CHANNEL_NAME_MIN_CHARS = 1;
     public static final int CHANNEL_NAME_MAX_CHARS = 100;
@@ -59,6 +70,51 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
     public static final int FORUM_CHANNEL_TOPIC_MAX_CHARS = 4096;
 
     public static final int MAX_CHANNELS_IN_CATEGORY = 50;
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                    Keys                                                   *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    public static final String ID_KEY = "id";
+    public static final String TYPE_KEY = "type";
+    public static final String GUILD_ID_KEY = "guild_id";
+    public static final String POSITION_KEY = "position";
+    public static final String PERMISSION_OVERWRITES_KEY = "permission_overwrites";
+    public static final String NAME_KEY = "name";
+    public static final String TOPIC_KEY = "topic";
+    public static final String NSFW_KEY = "nsfw";
+    public static final String LAST_MESSAGE_ID_KEY = "last_message_id";
+    public static final String BITRATE_KEY = "bitrate";
+    public static final String USER_LIMIT_KEY = "user_limit";
+    public static final String RATE_LIMIT_PER_USER_KEY = "rate_limit_per_user";
+    public static final String RECIPIENTS_KEY = "recipients";
+    public static final String ICON_KEY = "icon";
+    public static final String OWNER_ID_KEY = "owner_id";
+    public static final String APPLICATION_ID_KEY = "application_id";
+    public static final String PARENT_ID_KEY = "parent_id";
+    public static final String LAST_PIN_TIMESTAMP_KEY = "last_pin_timestamp";
+    public static final String RTC_REGION_KEY = "rtc_region";
+    public static final String VIDEO_QUALITY_MODE_KEY = "video_quality_mode";
+    public static final String MESSAGE_COUNT_KEY = "message_count";
+    public static final String MEMBER_COUNT_KEY = "member_count";
+    public static final String THREAD_METADATA_KEY = "thread_metadata";
+    public static final String MEMBER_KEY = "member";
+    public static final String DEFAULT_AUTO_ARCHIVE_DURATION_KEY = "default_auto_archive_duration";
+    public static final String PERMISSIONS_KEY = "permissions";
+    public static final String FLAGS_KEY = "flags";
+    public static final String TOTAL_MESSAGE_SENT_KEY = "total_message_sent";
+    public static final String AVAILABLE_TAGS_KEY = "available_tags";
+    public static final String APPLIED_TAGS_KEY = "applied_tags";
+    public static final String DEFAULT_REACTION_EMOJI_KEY = "default_reaction_emoji";
+    public static final String DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY = "default_thread_rate_limit_per_user";
+    public static final String DEFAULT_SORT_ORDER_KEY = "default_sort_order";
+
+
+
 
     /**
      * The id of this channel.
@@ -264,7 +320,7 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
      * Computed permissions for the invoking user in the channel, including overwrites, only included when part of
      * the {@link ResolvedData resolved data} received on a slash command interaction.
      */
-    @Nullable Permissions permissions();
+    @Nullable Permissions getPermissions();
 
     /**
      * {@link ChannelFlag Channel flags} combined as a bitfield.
@@ -299,7 +355,7 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
      * The emoji to show in the add reaction button on a thread in a {@link ChannelType#GUILD_FORUM GUILD_FORUM} channel.
      * @return {@link OptionalValue}
      */
-    @NotNull OptionalValue<DefaultReaction> getDefaultReaction();
+    @NotNull OptionalValue<DefaultReaction> getDefaultReactionEmoji();
 
     /**
      * The initial {@link #getRateLimitPerUser() rate_limit_per_user} to set on newly created threads in a channel.
@@ -313,4 +369,16 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
      * @return {@link OptionalValue}
      */
     @NotNull OptionalValue<SortOrderType> getDefaultSortOrder();
+
+    /**
+     *
+     * @return {@code true} if this instance is a partial channel (not all fields have been retrieved). {@code false} otherwise.
+     */
+    boolean isPartial();
+
+    /**
+     *
+     * @return {@code true} if this channel is actually a {@link ThreadChannel thread}. {@code false} otherwise.
+     */
+    boolean isThread();
 }

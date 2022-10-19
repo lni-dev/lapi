@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -32,9 +33,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * <a href="https://discord.com/developers/docs/resources/channel#overwrite-object">Overwrite Object</a>
- *
- *
+ * @see <a href="https://discord.com/developers/docs/resources/channel#overwrite-object">Discord Documentation</a>
  */
 public class PermissionOverwrite implements Copyable<PermissionOverwrite>, SnowflakeAble, Datable {
 
@@ -90,15 +89,30 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
      * @param data to read from
      * @throws InvalidDataException if given {@link SOData} does not match a {@link PermissionOverwrite}
      */
+    @SuppressWarnings({"ConditionCoveredByFurtherCondition", "ConstantConditions"})
     public PermissionOverwrite(@NotNull SOData data) throws InvalidDataException {
         this.data = data;
         this.id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
-        this.type = ((Number)data.getOrDefault(TYPE_KEY, -1)).intValue();
-        this.allow = (String) data.getOrDefault(ALLOW_KEY, "0");
-        this.deny = (String) data.getOrDefault(DENY_KEY, "0");
+        Number typeNumber = data.getAs(TYPE_KEY);
+        this.allow = data.getAs(ALLOW_KEY);
+        this.deny = data.getAs(DENY_KEY);
 
-        if(this.id == null) throw new InvalidDataException(data, "id in permission override may not be null").addMissingFields(ID_KEY);
-        if(this.type == -1) throw new InvalidDataException(data, "type in permission override us unknown or unset").addMissingFields(TYPE_KEY);
+        if(id == null || typeNumber == null || allow == null || deny == null) {
+            InvalidDataException.throwException(data, null, PermissionOverwrite.class,
+                    new Object[]{id, typeNumber, allow, deny},
+                    new String[]{ID_KEY, TYPE_KEY, ALLOW_KEY, DENY_KEY});
+            //unreachable statements:
+            this.type = 0;
+            return;
+        }
+
+        this.type = typeNumber.intValue();
+    }
+
+    @Contract("null -> null; !null -> new")
+    public static @Nullable PermissionOverwrite fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        else return new PermissionOverwrite(data);
     }
 
     @Override

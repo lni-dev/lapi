@@ -19,7 +19,9 @@ package me.linusdev.lapi.api.objects.nchannel;
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.objects.enums.SimpleChannelType;
 import me.linusdev.lapi.api.objects.permission.Permission;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This contains the different types of channels.
@@ -108,12 +110,12 @@ public enum ChannelType implements SimpleDatable {
      * <a href="https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ">hub</a>
      * containing the listed servers.
      */
-    GUILD_DIRECTORY(14, "Guild Directory", SimpleChannelType.UNKNOWN),
+    GUILD_DIRECTORY(14, "Guild Directory", SimpleChannelType.TEXT),
 
     /**
      * Channel that can only contain threads.
      */
-    GUILD_FORUM(15, "Guild Forum", SimpleChannelType.UNKNOWN),
+    GUILD_FORUM(15, "Guild Forum", SimpleChannelType.TEXT),
     ;
 
     private final int id;
@@ -147,6 +149,12 @@ public enum ChannelType implements SimpleDatable {
         for (ChannelType type : ChannelType.values())
             if (type.getId() == id) return type;
         return UNKNOWN;
+    }
+
+    @Contract("null -> null; !null -> !null")
+    public static @Nullable ChannelType fromNumber(@Nullable Number number) {
+        if(number == null) return null;
+        return fromId(number.intValue());
     }
 
     /**
