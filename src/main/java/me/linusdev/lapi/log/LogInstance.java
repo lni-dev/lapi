@@ -104,6 +104,6 @@ public class LogInstance {
 
     public void interrupted(@Nullable InterruptedException exception) {
         @NotNull StackWalker.StackFrame frame = STACK_WALKER.walk(s -> s.skip(1).findFirst().orElse(null));
-        Logger.log(Logger.Type.INFO, "Interrupts", null, String.format("Class '%s' interrupted. (%s:%s)", frame.getClassName(), frame.getClassName(), frame.getLineNumber()), false);
+        Logger.log(Logger.Type.INFO, "Interrupts", null, String.format("Class '%s' interrupted. (%s:%s)", frame.getDeclaringClass().getSimpleName(), frame.getClassName(), frame.getLineNumber()), false);
     }
 }

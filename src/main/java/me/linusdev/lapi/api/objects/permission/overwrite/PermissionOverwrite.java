@@ -48,7 +48,7 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
     /**
      * role or user id
      */
-    private @NotNull final Snowflake id;
+    private @NotNull final String id;
 
     /**
      * either 0 ({@link #ROLE}) or 1 ({@link #MEMBER})
@@ -76,7 +76,7 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
      * @param allow {@link BigInteger} serialized into a string
      * @param deny {@link BigInteger} serialized into a string
      */
-    public PermissionOverwrite(@NotNull Snowflake id, @Range(from=ROLE, to=MEMBER) int type, @NotNull String allow, @NotNull String deny){
+    public PermissionOverwrite(@NotNull String id, @Range(from=ROLE, to=MEMBER) int type, @NotNull String allow, @NotNull String deny){
         this.data = null;
         this.id = id;
         this.type = type;
@@ -89,24 +89,13 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
      * @param data to read from
      * @throws InvalidDataException if given {@link SOData} does not match a {@link PermissionOverwrite}
      */
-    @SuppressWarnings({"ConditionCoveredByFurtherCondition", "ConstantConditions"})
+
     public PermissionOverwrite(@NotNull SOData data) throws InvalidDataException {
         this.data = data;
-        this.id = Snowflake.fromString((String) data.getOrDefault(ID_KEY, null));
-        Number typeNumber = data.getAs(TYPE_KEY);
-        this.allow = data.getAs(ALLOW_KEY);
-        this.deny = data.getAs(DENY_KEY);
-
-        if(id == null || typeNumber == null || allow == null || deny == null) {
-            InvalidDataException.throwException(data, null, PermissionOverwrite.class,
-                    new Object[]{id, typeNumber, allow, deny},
-                    new String[]{ID_KEY, TYPE_KEY, ALLOW_KEY, DENY_KEY});
-            //unreachable statements:
-            this.type = 0;
-            return;
-        }
-
-        this.type = typeNumber.intValue();
+        this.id = data.getAsAndRequireNotNull(ID_KEY, InvalidDataException.SUPPLIER);
+        this.type = data.getAndRequireNotNullAndConvert(TYPE_KEY, Number::intValue, InvalidDataException.SUPPLIER);
+        this.allow = data.getAsAndRequireNotNull(ALLOW_KEY, InvalidDataException.SUPPLIER);
+        this.deny = data.getAsAndRequireNotNull(DENY_KEY, InvalidDataException.SUPPLIER);
     }
 
     @Contract("null -> null; !null -> new")
@@ -118,6 +107,12 @@ public class PermissionOverwrite implements Copyable<PermissionOverwrite>, Snowf
     @Override
     @NotNull
     public Snowflake getIdAsSnowflake() {
+        return Snowflake.fromString(id);
+    }
+
+    @NotNull
+    @Override
+    public String getId() {
         return id;
     }
 
