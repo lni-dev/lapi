@@ -77,7 +77,7 @@ public abstract class AbstractChannel implements Channel {
     protected AbstractChannel(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.lApi = lApi;
 
-        this.id = data.getAs(ID_KEY);
+        this.id = data.getAsAndRequireNotNull(ID_KEY, InvalidDataException.SUPPLIER);
         this.type = data.getAndConvert(TYPE_KEY, ChannelType::fromNumber);
         this.guildId = data.getAs(GUILD_ID_KEY);
         this.position = data.getAs(POSITION_KEY);
