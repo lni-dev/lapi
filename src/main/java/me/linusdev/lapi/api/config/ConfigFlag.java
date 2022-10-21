@@ -27,9 +27,8 @@ import me.linusdev.lapi.api.manager.command.BaseCommand;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
@@ -186,7 +185,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
 
     /**
      * <p>
-     *     Caches all {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} retrieved by the
+     *     Caches all {@link {@link Channel#isThread() threads} retrieved by the
      *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
      * </p>
      */
@@ -194,7 +193,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
 
     /**
      * <p>
-     *     Does not remove {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread threads} where
+     *     Does not remove {@link Channel#isThread() threads} where
      *     {@link ThreadMetadata#isArchived()} is {@code true} from the {@link CachedGuildImpl}.
      * </p>
      */
@@ -202,7 +201,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
 
     /**
      * <p>
-     *     Copies {@link Thread} objects, when they receive an update, so
+     *     Copies {@link Channel#isThread() thread} objects, when they receive an update, so
      *     you can check the difference between the old object and the updated one.
      * </p>
      */

@@ -97,9 +97,8 @@ import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.CachedGuildImpl;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -458,13 +457,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             //This may be a non guild channel
                             //TODO: cache non guild channels
                             transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
-                                    null, Channel.fromData(lApi, data)));
+                                    null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), Channel.channelFromData(lApi, data)));
                             break;
                         }
 
@@ -473,20 +472,19 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), Channel.channelFromData(lApi, data)));
                             break;
                         }
 
-                        ListManager<Channel<?>> channelManager = guild.getChannelManager();
+                        ListManager<Channel> channelManager = guild.getChannelManager();
 
                         if(channelManager == null) {
                             transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), Channel.channelFromData(lApi, data)));
                             break;
                         }
 
-                        Channel<?> channel = Channel.fromData(lApi, data);
-                        channelManager.add(channel);
+                        Channel channel = channelManager.onAdd(data);
                         transmitter.onChannelCreate(lApi, new ChannelCreateEvent(lApi, payload,
                                 Snowflake.fromString(guildId), channel));
                     }
@@ -500,13 +498,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             //This may be a non guild channel
                             //TODO: cache non guild channels
                             transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
-                                    null, new Update<>(null, Channel.fromData(lApi, data))));
+                                    null, new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
@@ -515,27 +513,27 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
-                        ListManager<Channel<?>> channelManager = guild.getChannelManager();
+                        ListManager<Channel> channelManager = guild.getChannelManager();
 
                         if(channelManager == null) {
                             transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
 
-                        Update<Channel<?>, Channel<?>> update = channelManager.onUpdate(data);
+                        Update<Channel, Channel> update = channelManager.onUpdate(data);
 
                         if(update == null) {
                             //ChannelManager did not contain this channel -> error
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_CHANNEL, null)));
                             transmitter.onChannelUpdate(lApi, new ChannelUpdateEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), new Update<>(null, Channel.fromData(lApi, data))));
+                                    Snowflake.fromString(guildId), new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
@@ -552,13 +550,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             //This may be a non guild channel
                             //TODO: cache non guild channels
                             transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
-                                    null, null, Channel.fromData(lApi, data)));
+                                    null, null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
@@ -567,27 +565,27 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
-                        ListManager<Channel<?>> channelManager = guild.getChannelManager();
+                        ListManager<Channel> channelManager = guild.getChannelManager();
 
                         if(channelManager == null) {
                             transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
-                        Channel<?> received = Channel.fromData(lApi, data);
-                        Channel<?> deleted = channelManager.onDelete(received.getId());
+                        Channel received = Channel.channelFromData(lApi, data);
+                        Channel deleted = channelManager.onDelete(received.getId());
 
                         if(deleted == null) {
                             //ChannelManager did not contain this channel -> error
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_CHANNEL, null)));
                             transmitter.onChannelDelete(lApi, new ChannelDeleteEvent(lApi, payload,
-                                    Snowflake.fromString(guildId), null, Channel.fromData(lApi, data)));
+                                    Snowflake.fromString(guildId), null, Channel.channelFromData(lApi, data)));
                             break;
                         }
 
@@ -622,13 +620,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         if(guildId == null) {
                             //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, null,
-                                    new Update<>(null, Thread.fromData(lApi, data))));
+                                    new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new Update<>(null, Thread.fromData(lApi, data))));
+                                    new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
@@ -637,18 +635,18 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new Update<>(null, Thread.fromData(lApi, data))));
+                                    new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
                         ThreadManager threadManager = guild.getThreadManager();
                         if(threadManager == null) {
                             transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new Update<>(null, Thread.fromData(lApi, data))));
+                                    new Update<>(null, Channel.channelFromData(lApi, data))));
                             break;
                         }
 
-                        Update<Thread<?>, Thread<?>> update = threadManager.onCreate(data);
+                        Update<Channel, Channel> update = threadManager.onCreate(data);
                         transmitter.onThreadCreate(lApi, new ThreadCreateEvent(lApi, payload, Snowflake.fromString(guildId),
                                 update));
                     }
@@ -661,13 +659,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         if(guildId == null) {
                             //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, null,
-                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                                    new ThreadUpdate(null, Channel.channelFromData(lApi, data), false, false)));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                                    new ThreadUpdate(null, Channel.channelFromData(lApi, data), false, false)));
                             break;
                         }
 
@@ -676,14 +674,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                                    new ThreadUpdate(null, Channel.channelFromData(lApi, data), false, false)));
                             break;
                         }
 
                         ThreadManager threadManager = guild.getThreadManager();
                         if(threadManager == null) {
                             transmitter.onThreadUpdate(lApi, new ThreadUpdateEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    new ThreadUpdate(null, Thread.fromData(lApi, data), false, false)));
+                                    new ThreadUpdate(null, Channel.channelFromData(lApi, data), false, false)));
                             break;
                         }
 
@@ -700,13 +698,13 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         if(guildId == null) {
                             //This may be a non guild channel. This should never, but let's keep it here just in case
                             transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, null,
-                                   Thread.fromData(lApi, data)));
+                                    Channel.channelFromData(lApi, data)));
                             break;
                         }
 
                         if(guildManager == null) {
                             transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    Thread.fromData(lApi, data)));
+                                    Channel.channelFromData(lApi, data)));
                             break;
                         }
 
@@ -715,20 +713,20 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
                                     new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD, null)));
                             transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    Thread.fromData(lApi, data)));
+                                    Channel.channelFromData(lApi, data)));
                             break;
                         }
 
                         ThreadManager threadManager = guild.getThreadManager();
                         if(threadManager == null) {
                             transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
-                                    Thread.fromData(lApi, data)));
+                                    Channel.channelFromData(lApi, data)));
                             break;
                         }
 
-                        Thread<?> deleted = threadManager.onDelete(data);
+                        Channel deleted = threadManager.onDelete(data);
                         transmitter.onThreadDelete(lApi, new ThreadDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
-                                deleted == null ? Thread.fromData(lApi, data) : deleted));
+                                deleted == null ? Channel.channelFromData(lApi, data) : deleted));
                     }
                     break;
 
@@ -758,7 +756,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             break;
                         }
 
-                        ListUpdate<Thread<?>> update = threadManager.onThreadListSync(threadListSyncData);
+                        ListUpdate<Channel> update = threadManager.onThreadListSync(threadListSyncData);
                         transmitter.onThreadListSync(lApi, new ThreadListSyncEvent(lApi, payload, threadListSyncData.getGuildIdAsSnowflake(),
                                 threadListSyncData, update));
                     }

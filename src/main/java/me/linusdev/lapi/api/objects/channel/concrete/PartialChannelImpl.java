@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.gateway.events.thread;
+package me.linusdev.lapi.api.objects.channel.concrete;
 
-import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
-import me.linusdev.lapi.api.communication.gateway.events.Event;
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.objects.channel.AbstractChannel;
 import me.linusdev.lapi.api.objects.channel.Channel;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.PartialChannel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ThreadDeleteEvent extends Event {
+/**
+ * @see Channel
+ * @see PartialChannel
+ */
+public class PartialChannelImpl extends AbstractChannel implements PartialChannel {
 
-    private final @NotNull Channel deleted;
-
-    public ThreadDeleteEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull Channel deleted) {
-        super(lApi, payload, guildId);
-        this.deleted = deleted;
+    public PartialChannelImpl(@NotNull ChannelType type, @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+        super(type, lApi, data);
     }
 
-    public @NotNull Channel getDeletedThread() {
-        return deleted;
+    @Override
+    public boolean isCached() {
+        return false;
     }
 }

@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionChoice;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
-import me.linusdev.lapi.api.objects.nchannel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

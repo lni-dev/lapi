@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel.thread;
+package me.linusdev.lapi.api.objects.channel.thread;
 
 
 import me.linusdev.data.Datable;

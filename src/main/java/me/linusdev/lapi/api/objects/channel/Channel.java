@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel;
+package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.OptionalValue;
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.objects.interaction.ResolvedData;
-import me.linusdev.lapi.api.objects.nchannel.thread.AutoArchiveDuration;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadChannel;
-import me.linusdev.lapi.api.objects.nchannel.forum.DefaultReaction;
-import me.linusdev.lapi.api.objects.nchannel.forum.ForumTag;
-import me.linusdev.lapi.api.objects.nchannel.forum.SortOrderType;
+import me.linusdev.lapi.api.objects.channel.concrete.ChannelImpl;
+import me.linusdev.lapi.api.objects.channel.concrete.PartialChannelImpl;
+import me.linusdev.lapi.api.objects.channel.thread.AutoArchiveDuration;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.channel.forum.DefaultReaction;
+import me.linusdev.lapi.api.objects.channel.forum.ForumTag;
+import me.linusdev.lapi.api.objects.channel.forum.SortOrderType;
 import me.linusdev.lapi.api.objects.enums.VideoQuality;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.permission.Permissions;
@@ -38,6 +43,8 @@ import me.linusdev.lapi.api.objects.snowflake.SnowflakeAble;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.objects.voice.region.VoiceRegion;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,10 +54,9 @@ import java.util.List;
  * Represents a guild or DM channel within Discord.
  * @see <a href="https://discord.com/developers/docs/resources/channel">Discord Documentation</a>
  * @see PartialChannel
- * @see ThreadChannel
  */
 @SuppressWarnings({"UnnecessaryModifier", "unused"})
-public interface Channel extends SnowflakeAble, Datable, HasLApi {
+public interface Channel extends SnowflakeAble, Datable, HasLApi, CopyAndUpdatable<Channel> {
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                                                                           *
@@ -113,8 +119,53 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
     public static final String DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY = "default_thread_rate_limit_per_user";
     public static final String DEFAULT_SORT_ORDER_KEY = "default_sort_order";
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                               Instantiation                                               *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+    /**
+     * <p>
+     *     Creates a new {@link Channel} from given {@code data}.
+     * </p>
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link Channel} or {@code null} if given {@code data} is {@code null}.
+     * @throws InvalidDataException if given {@code data} is invalid.
+     */
+    @Contract("_, null -> null; _, !null -> new")
+    public static @Nullable Channel channelFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        ChannelType type = data.getAndRequireNotNullAndConvert(TYPE_KEY, ChannelType::fromNumber, InvalidDataException.SUPPLIER);
+        return new ChannelImpl(type, lApi, data);
+    }
 
+    /**
+     * <p>
+     *     Creates a new {@link PartialChannel} from given {@code data}.
+     * </p>
+     * @param lApi {@link LApi}
+     * @param data {@link SOData}
+     * @return {@link Channel} or {@code null} if given {@code data} is {@code null}.
+     * @throws InvalidDataException if given {@code data} is invalid.
+     */
+    @Contract("_, null -> null; _, !null -> new")
+    public static @Nullable PartialChannel partialChannelFromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        ChannelType type = data.getAndRequireNotNullAndConvert(TYPE_KEY, ChannelType::fromNumber, InvalidDataException.SUPPLIER);
+        return new PartialChannelImpl(type, lApi, data);
+    }
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                   Getter                                                  *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      * The id of this channel.
@@ -370,6 +421,14 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
      */
     @NotNull OptionalValue<SortOrderType> getDefaultSortOrder();
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                                  LApi Stuff                                               *
+     *                                                                                                           *
+     *                                                                                                           *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     /**
      *
      * @return {@code true} if this instance is a partial channel (not all fields have been retrieved). {@code false} otherwise.
@@ -378,7 +437,19 @@ public interface Channel extends SnowflakeAble, Datable, HasLApi {
 
     /**
      *
-     * @return {@code true} if this channel is actually a {@link ThreadChannel thread}. {@code false} otherwise.
+     * @return {@code true} if this channel is actually a {@link ChannelType.Type#THREAD thread}. {@code false} otherwise.
      */
-    boolean isThread();
+    default boolean isThread() {
+        return getType().getType() == ChannelType.Type.THREAD;
+    }
+
+    boolean isCached();
+
+    /**
+     *
+     * @param newMember the new {@link ThreadMember} or {@code null}
+     * @return the previous {@link ThreadMember}
+     */
+    @ApiStatus.Internal
+    @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember);
 }

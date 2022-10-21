@@ -17,9 +17,6 @@
 package me.linusdev.lapi.api.objects.message.concrete;
 
 import me.linusdev.data.OptionalValue;
-import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.application.PartialApplication;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
 import me.linusdev.lapi.api.objects.channel.ChannelMention;
@@ -29,14 +26,13 @@ import me.linusdev.lapi.api.objects.message.*;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
 import me.linusdev.lapi.api.objects.sticker.StickerItem;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -118,7 +114,7 @@ public interface ChannelMessage extends AnyMessage {
     @Nullable MessageInteraction getInteraction();
 
     @Override
-    @Nullable Thread<?> getThread();
+    @Nullable Channel getThread();
 
     @Override
     @Nullable List<Component> getComponents();

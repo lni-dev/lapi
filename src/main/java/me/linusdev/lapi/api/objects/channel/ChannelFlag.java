@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel;
+package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.SimpleDatable;
 import org.jetbrains.annotations.NotNull;

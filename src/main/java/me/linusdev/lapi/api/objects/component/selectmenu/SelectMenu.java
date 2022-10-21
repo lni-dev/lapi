@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.component.ComponentType;
 import me.linusdev.lapi.api.objects.component.button.Button;
-import me.linusdev.lapi.api.objects.nchannel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.objects.interaction.Interaction;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.component.ComponentLimits;

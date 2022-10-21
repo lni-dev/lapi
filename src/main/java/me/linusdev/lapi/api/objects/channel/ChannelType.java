@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel;
+package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.SimpleDatable;
 import me.linusdev.lapi.api.objects.enums.SimpleChannelType;
@@ -32,27 +32,27 @@ public enum ChannelType implements SimpleDatable {
     /**
      * This is LApi specific, in case discord adds another channel type.
      */
-    UNKNOWN(-1, "Unknown Channel", SimpleChannelType.UNKNOWN),
+    UNKNOWN(-1, "Unknown Channel", SimpleChannelType.UNKNOWN, Type.CHANNEL),
 
     /**
      * A text channel within a server.
      */
-    GUILD_TEXT(0, "Guild Text Channel", SimpleChannelType.TEXT),
+    GUILD_TEXT(0, "Guild Text Channel", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * A direct message between users.
      */
-    DM(1, "DM Channel", SimpleChannelType.TEXT),
+    DM(1, "DM Channel", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * A voice channel within a server.
      */
-    GUILD_VOICE(2, "Guild Voice Channel", SimpleChannelType.VOICE),
+    GUILD_VOICE(2, "Guild Voice Channel", SimpleChannelType.VOICE, Type.CHANNEL),
 
     /**
      * A direct message between multiple users.
      */
-    GROUP_DM(3, "Group DM Channel", SimpleChannelType.TEXT),
+    GROUP_DM(3, "Group DM Channel", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * An
@@ -61,7 +61,7 @@ public enum ChannelType implements SimpleDatable {
      * </a>
      * that contains up to 50 channels.
      */
-    GUILD_CATEGORY(4, "Category Channel", SimpleChannelType.CATEGORY),
+    GUILD_CATEGORY(4, "Category Channel", SimpleChannelType.CATEGORY, Type.CHANNEL),
 
     /**
      * A channel that
@@ -69,12 +69,12 @@ public enum ChannelType implements SimpleDatable {
      * users can follow and crosspost into their own server
      * </a> (formerly news channels).
      */
-    GUILD_ANNOUNCEMENT(5, "Guild Announcement Channel", SimpleChannelType.TEXT),
+    GUILD_ANNOUNCEMENT(5, "Guild Announcement Channel", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * A temporary sub-channel within a {@link #GUILD_ANNOUNCEMENT} channel
      */
-    ANNOUNCEMENT_THREAD(10, "Guild Announcement Thread", SimpleChannelType.THREAD),
+    ANNOUNCEMENT_THREAD(10, "Guild Announcement Thread", SimpleChannelType.THREAD, Type.THREAD),
 
     /**
      * A channel in which game developers can
@@ -82,20 +82,20 @@ public enum ChannelType implements SimpleDatable {
      * sell their game on Discord
      * </a>.
      */
-    @Deprecated
-    GUILD_STORE(6, "Guild Store Channel", SimpleChannelType.TEXT),
+    @SuppressWarnings("DeprecatedIsStillUsed") @Deprecated
+    GUILD_STORE(6, "Guild Store Channel", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * A temporary sub-channel within a {@link #GUILD_TEXT} channel.
      */
-    PUBLIC_THREAD(11, "Public Thread", SimpleChannelType.THREAD),
+    PUBLIC_THREAD(11, "Public Thread", SimpleChannelType.THREAD, Type.THREAD),
 
     /**
      * A temporary sub-channel within a {@link #GUILD_TEXT} channel
      * that is only viewable by those invited and those with the
      * {@link Permission#MANAGE_THREADS MANAGE_THREADS} permission.
      */
-    PRIVATE_THREAD(12, "Private Thread", SimpleChannelType.THREAD),
+    PRIVATE_THREAD(12, "Private Thread", SimpleChannelType.THREAD, Type.THREAD),
 
     /**
      * A voice channel for
@@ -103,29 +103,36 @@ public enum ChannelType implements SimpleDatable {
      * hosting events with an audience
      * </a>.
      */
-    GUILD_STAGE_VOICE(13, "Guild Stage Voice Channel", SimpleChannelType.STAGE),
+    GUILD_STAGE_VOICE(13, "Guild Stage Voice Channel", SimpleChannelType.STAGE, Type.CHANNEL),
 
     /**
      * The channel in a
      * <a href="https://support.discord.com/hc/en-us/articles/4406046651927-Discord-Student-Hubs-FAQ">hub</a>
      * containing the listed servers.
      */
-    GUILD_DIRECTORY(14, "Guild Directory", SimpleChannelType.TEXT),
+    GUILD_DIRECTORY(14, "Guild Directory", SimpleChannelType.TEXT, Type.CHANNEL),
 
     /**
      * Channel that can only contain threads.
      */
-    GUILD_FORUM(15, "Guild Forum", SimpleChannelType.TEXT),
+    GUILD_FORUM(15, "Guild Forum", SimpleChannelType.TEXT, Type.CHANNEL),
     ;
+
+    public enum Type {
+        THREAD,
+        CHANNEL,
+    }
 
     private final int id;
     private final @NotNull String string;
     private final @NotNull SimpleChannelType simpleChannelType;
+    private final @NotNull Type type;
 
-    ChannelType(int id, @NotNull String string, @NotNull SimpleChannelType simpleChannelType) {
+    ChannelType(int id, @NotNull String string, @NotNull SimpleChannelType simpleChannelType, @NotNull Type type) {
         this.id = id;
         this.string = string;
         this.simpleChannelType = simpleChannelType;
+        this.type = type;
     }
 
     public int getId() {
@@ -170,6 +177,14 @@ public enum ChannelType implements SimpleDatable {
     @Override
     public @NotNull String toString() {
         return super.toString();
+    }
+
+    /**
+     *
+     * @return the {@link Type} of this {@link ChannelType}.
+     */
+    public @NotNull Type getType() {
+        return type;
     }
 
     @Override

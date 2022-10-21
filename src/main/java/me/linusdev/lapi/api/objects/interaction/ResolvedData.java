@@ -25,9 +25,9 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.guild.member.PartialMember;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +53,7 @@ public class ResolvedData implements Datable, HasLApi {
     private final @Nullable SAOData<User> users;
     private final @Nullable SAOData<PartialMember> members;
     private final @Nullable SAOData<Role> roles;
-    private final @Nullable SAOData<Channel<?>> channels;
+    private final @Nullable SAOData<Channel> channels;
     private final @Nullable SAOData<AnyMessage> messages;
     private final @Nullable SAOData<Attachment> attachments;
 
@@ -67,7 +67,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @param attachments the ids and attachment objects
      */
     public ResolvedData(@NotNull LApi lApi, @Nullable SAOData<User> users, @Nullable SAOData<PartialMember> members,
-                        @Nullable SAOData<Role> roles, @Nullable SAOData<Channel<?>> channels,
+                        @Nullable SAOData<Role> roles, @Nullable SAOData<Channel> channels,
                         @Nullable SAOData<AnyMessage> messages, @Nullable SAOData<Attachment> attachments) {
         this.lApi = lApi;
         this.users = users;
@@ -124,13 +124,13 @@ public class ResolvedData implements Datable, HasLApi {
         //channels
         //TODO: Partial channel
         SOData channelsData = data.getAs(CHANNELS_KEY);
-        SAOData<Channel<?>> channels = null;
+        SAOData<Channel> channels = null;
 
         if(channelsData != null) {
             channels = new SAODataListImpl<>(new ArrayList<>(channelsData.size()));
 
             for(Entry<String, Object> entry : channelsData)
-                channels.add(entry.getKey(), Channel.fromData(lApi, (SOData) entry.getValue()));
+                channels.add(entry.getKey(), Channel.channelFromData(lApi, (SOData) entry.getValue()));
         }
 
         //messages
@@ -182,7 +182,7 @@ public class ResolvedData implements Datable, HasLApi {
     /**
      * 	the ids and partial Channel objects
      */
-    public @Nullable SAOData<Channel<?>> getChannels() {
+    public @Nullable SAOData<Channel> getChannels() {
         return channels;
     }
 

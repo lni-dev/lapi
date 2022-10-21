@@ -16,24 +16,24 @@
 
 package me.linusdev.lapi.api.manager.guild.thread;
 
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ThreadMemberUpdate {
 
-    private final @Nullable Thread<?> thread;
+    private final @Nullable Channel thread;
     private final @Nullable ThreadMember old;
     private final @NotNull ThreadMember updated;
 
-    public ThreadMemberUpdate(@Nullable Thread<?> thread, @Nullable ThreadMember old, @NotNull ThreadMember updated) {
+    public ThreadMemberUpdate(@Nullable Channel thread, @Nullable ThreadMember old, @NotNull ThreadMember updated) {
         this.thread = thread;
         this.old = old;
         this.updated = updated;
     }
 
-    public @Nullable Thread<?> getThread() {
+    public @Nullable Channel getThread() {
         return thread;
     }
 

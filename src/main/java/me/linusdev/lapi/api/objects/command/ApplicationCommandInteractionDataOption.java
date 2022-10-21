@@ -22,6 +22,7 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +49,7 @@ public class ApplicationCommandInteractionDataOption implements Datable {
 
     /**
      *
-     * @param lApi
+     * @param lApi {@link LApi}
      * @param name the name of the parameter
      * @param type value of {@link ApplicationCommandOptionType application command option type}
      * @param value the value of the pair
@@ -74,20 +75,13 @@ public class ApplicationCommandInteractionDataOption implements Datable {
     public static @Nullable ApplicationCommandInteractionDataOption fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
-        String name = (String) data.get(NAME_KEY);
-        Number type = (Number) data.get(TYPE_KEY);
+        String name = data.getAsAndRequireNotNull(NAME_KEY, InvalidDataException.SUPPLIER);
+        Number type = data.getAsAndRequireNotNull(TYPE_KEY, InvalidDataException.SUPPLIER);
         Object value = data.get(VALUE_KEY);
         ArrayList<ApplicationCommandInteractionDataOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (ExceptionConverter<SOData, ApplicationCommandInteractionDataOption, InvalidDataException>)
                 convertible -> ApplicationCommandInteractionDataOption.fromData(lApi, convertible));
         Boolean focused = (Boolean) data.get(FOCUSED_KEY);
 
-        if(name == null || type == null) {
-            InvalidDataException.throwException(data, null, ApplicationCommandInteractionDataOption.class,
-                    new Object[]{name, type},
-                    new String[]{NAME_KEY, TYPE_KEY});
-        }
-
-        //noinspection ConstantConditions
         return new ApplicationCommandInteractionDataOption(lApi, name, ApplicationCommandOptionType.fromValue(type.intValue()), value, options, focused);
     }
 
@@ -128,7 +122,7 @@ public class ApplicationCommandInteractionDataOption implements Datable {
      *         {@link ApplicationCommandOptionType#USER USER}: a {@link me.linusdev.lapi.api.objects.user.User User} will be returned
      *     </li>
      *     <li>
-     *         {@link ApplicationCommandOptionType#CHANNEL CHANNEL}: a {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel Channel} will be returned
+     *         {@link ApplicationCommandOptionType#CHANNEL CHANNEL}: a {@link Channel Channel} will be returned
      *     </li>
      *     <li>
      *         {@link ApplicationCommandOptionType#ROLE ROLE}: a {@link me.linusdev.lapi.api.objects.role.Role Role} will be returned
@@ -143,7 +137,7 @@ public class ApplicationCommandInteractionDataOption implements Datable {
      * </ul>
      *
      *
-     * @throws InvalidDataException if an exception while converting occured
+     * @throws InvalidDataException if an exception while converting occurred
      */
     public Object getValue() throws InvalidDataException {
         return type.convertValue(lApi, getValueRaw());

@@ -17,14 +17,12 @@
 package me.linusdev.lapi.api.communication.gateway.events.thread;
 
 import me.linusdev.data.Datable;
-import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +45,7 @@ public class ThreadListSyncData implements Datable, HasLApi {
 
     private final @NotNull Snowflake guildId;
     private final @Nullable ArrayList<Snowflake> channelIds;
-    private final @NotNull ArrayList<Thread<?>> threads;
+    private final @NotNull ArrayList<Channel> threads;
     private final @NotNull ArrayList<ThreadMember> members;
 
     /**
@@ -61,7 +59,7 @@ public class ThreadListSyncData implements Datable, HasLApi {
      *                   indicating which threads the current user has been added to
      */
     public ThreadListSyncData(@NotNull LApi lApi, @NotNull Snowflake guildId, @Nullable ArrayList<Snowflake> channelIds,
-                              @NotNull ArrayList<Thread<?>> threads, @NotNull ArrayList<ThreadMember> members) {
+                              @NotNull ArrayList<Channel> threads, @NotNull ArrayList<ThreadMember> members) {
         this.lApi = lApi;
         this.guildId = guildId;
         this.channelIds = channelIds;
@@ -73,25 +71,16 @@ public class ThreadListSyncData implements Datable, HasLApi {
     public static @Nullable ThreadListSyncData fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if (data == null) return null;
 
-        String guildId = (String) data.get(GUILD_ID_KEY);
+        String guildId = data.getAsAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
-        ArrayList<Snowflake> channelIds = data.getListAndConvertWithException(CHANNEL_IDS_KEY,
-                (ExceptionConverter<String, Snowflake, InvalidDataException>) Snowflake::fromString);
-
-        ArrayList<Thread<?>> threads = data.getListAndConvertWithException(THREADS_KEY,
-                (ExceptionConverter<SOData, Thread<?>, InvalidDataException>) convertible -> {
-                    Channel<?> channel = Channel.fromData(lApi, convertible);
-                    if(!(channel instanceof Thread))
-                        throw new InvalidDataException(convertible, "wrong type: " + channel.getType() + ". expected Thread!");
-                    return (Thread<?>) channel;
-                });
-
+        ArrayList<Snowflake> channelIds = data.getListAndConvertWithException(CHANNEL_IDS_KEY, Snowflake::fromString);
+        ArrayList<Channel> threads = data.getListAndConvertWithException(THREADS_KEY, (SOData c) -> Channel.channelFromData(lApi, c));
         ArrayList<ThreadMember> members = data.getListAndConvertWithException(MEMBERS_KEY, ThreadMember::fromData);
 
-        if(guildId == null || threads == null || members == null) {
+        if(threads == null || members == null) {
             InvalidDataException.throwException(data, null, ThreadListSyncData.class,
-                    new Object[]{guildId, threads, members},
-                    new String[]{GUILD_ID_KEY, THREADS_KEY, MEMBERS_KEY});
+                    new Object[]{threads, members},
+                    new String[]{THREADS_KEY, MEMBERS_KEY});
             return null; //appeasing null checks - This line will never be executed
         }
 
@@ -123,7 +112,7 @@ public class ThreadListSyncData implements Datable, HasLApi {
     /**
      * all active threads in the given channels that the current user can access
      */
-    public @NotNull ArrayList<Thread<?>> getThreads() {
+    public @NotNull ArrayList<Channel> getThreads() {
         return threads;
     }
 

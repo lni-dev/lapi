@@ -17,11 +17,11 @@
 package me.linusdev.lapi.api.manager.guild.thread;
 
 import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ThreadUpdate extends Update<Thread<?>, Thread<?>> {
+public class ThreadUpdate extends Update<Channel, Channel> {
 
     private final boolean gotArchived;
     private final boolean cached;
@@ -33,7 +33,7 @@ public class ThreadUpdate extends Update<Thread<?>, Thread<?>> {
      * @param gotArchived {@code true} if the thread just got archived. {@code false} otherwise, also if unknown.
      * @param cached whether this thread is cached in a {@link ThreadManager}
      */
-    public ThreadUpdate(@Nullable Thread<?> copy, @NotNull Thread<?> thread, boolean gotArchived, boolean cached) {
+    public ThreadUpdate(@Nullable Channel copy, @NotNull Channel thread, boolean gotArchived, boolean cached) {
         super(copy, thread);
         this.gotArchived = gotArchived;
         this.cached = cached;

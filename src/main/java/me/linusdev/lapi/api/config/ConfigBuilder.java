@@ -52,8 +52,8 @@ import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStatesManagerImpl;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManagerImpl;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -126,7 +126,7 @@ public class ConfigBuilder implements Datable {
     private ManagerFactory<ListManager<Sticker>> stickerManagerFactory = null;
     private ManagerFactory<VoiceStateManager> voiceStateManagerFactory = null;
     private ManagerFactory<MemberManager> memberManagerFactory = null;
-    private ManagerFactory<ListManager<Channel<?>>> channelManagerFactory = null;
+    private ManagerFactory<ListManager<Channel>> channelManagerFactory = null;
     private ManagerFactory<ThreadManager> threadManagerFactory = null;
     private ManagerFactory<PresenceManager> presenceManagerFactory = null;
     private ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory = null;
@@ -646,7 +646,7 @@ public class ConfigBuilder implements Datable {
      * @param channelManagerFactory the {@link ManagerFactory ManagerFactory&lt;ListManager&lt;Channel&lt;?&gt;&gt;&gt;}
      * @return this
      */
-    public ConfigBuilder setChannelManagerFactory(ManagerFactory<ListManager<Channel<?>>> channelManagerFactory) {
+    public ConfigBuilder setChannelManagerFactory(ManagerFactory<ListManager<Channel>> channelManagerFactory) {
         this.channelManagerFactory = channelManagerFactory;
         return this;
     }
@@ -855,7 +855,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(stickerManagerFactory, lApi -> new ListManager<>(lApi, Sticker.ID_KEY, Sticker::fromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_STICKER_ON_UPDATE_EVENT))),
                 Objects.requireNonNullElse(voiceStateManagerFactory, lApi -> new VoiceStatesManagerImpl(lApi)),
                 Objects.requireNonNullElse(memberManagerFactory, lApi -> new MemberManagerImpl(lApi)),
-                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::fromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT))),
+                Objects.requireNonNullElse(channelManagerFactory, lApi -> new ListManager<>(lApi, Channel.ID_KEY, Channel::channelFromData, () -> lApi.getConfig().isFlagSet(ConfigFlag.COPY_CHANNEL_ON_UPDATE_EVENT))),
                 Objects.requireNonNullElse(threadManagerFactory, lApi -> new ThreadManagerImpl(lApi)),
                 Objects.requireNonNullElse(presenceManagerFactory, lApi -> new PresenceManagerImpl(lApi)),
                 Objects.requireNonNullElse(stageInstanceManagerFactory,

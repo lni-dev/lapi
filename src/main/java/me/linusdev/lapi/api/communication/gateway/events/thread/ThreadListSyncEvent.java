@@ -22,7 +22,7 @@ import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,10 +32,10 @@ import java.util.List;
 public class ThreadListSyncEvent extends Event {
 
     private final @NotNull ThreadListSyncData threadListSyncData;
-    private final @Nullable ListUpdate<Thread<?>> update;
+    private final @Nullable ListUpdate<Channel> update;
 
     public ThreadListSyncEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId,
-                               @NotNull ThreadListSyncData threadListSyncData, @Nullable ListUpdate<Thread<?>> update) {
+                               @NotNull ThreadListSyncData threadListSyncData, @Nullable ListUpdate<Channel> update) {
         super(lApi, payload, guildId);
         this.threadListSyncData = threadListSyncData;
         this.update = update;
@@ -48,14 +48,14 @@ public class ThreadListSyncEvent extends Event {
      * @see #getAdded()
      * @return {@link ListUpdate} or {@code null} if {@link ConfigFlag#CACHE_THREADS CACHE_THREADS} is not enabled.
      */
-    public @Nullable ListUpdate<Thread<?>> getUpdate() {
+    public @Nullable ListUpdate<Channel> getUpdate() {
         return update;
     }
 
     /**
      * All threads that have been removed from the cache due to this list sync event
      */
-    public @Nullable List<Thread<?>> getRemoved() {
+    public @Nullable List<Channel> getRemoved() {
         if(update == null) return null;
         return update.getRemoved();
     }
@@ -63,7 +63,7 @@ public class ThreadListSyncEvent extends Event {
     /**
      * All threads that have been added to the cache due to this list sync event
      */
-    public @Nullable List<Thread<?>> getAdded() {
+    public @Nullable List<Channel> getAdded() {
         if(update == null) return null;
         return update.getAdded();
     }

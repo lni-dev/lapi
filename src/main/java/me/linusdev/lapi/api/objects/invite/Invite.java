@@ -22,9 +22,9 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.application.Application;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.guild.scheduledevent.GuildScheduledEvent;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +85,7 @@ public class Invite implements Datable, HasLApi {
      * @param expiresAt the expiration date of this invite, returned from the GET /invites/&lt;code&gt; endpoint when with_expiration is true TODO add @link
      * @param stageInstance stage instance data if there is a public Stage instance in the Stage channel this invite is for TODO add link public stage instance
      * @param guildScheduledEvent guild scheduled event data, only included if guild_scheduled_event_id contains a valid guild scheduled event id
-     * @param inviteMetadata Extra information about an invite, will extend the invite object.
+     * @param inviteMetadata Extra information about an {@link Invite}, will "extend" the invite object.
      */
     public Invite(@NotNull LApi lApi, @NotNull String code, @Nullable Guild guild, @NotNull Channel channel, @Nullable User inviter, @Nullable TargetType targetType, @Nullable User targetUser, @Nullable Application targetApplication, @Nullable Integer approximatePresenceCount, @Nullable Integer approximateMemberCount, @Nullable ISO8601Timestamp expiresAt, @Nullable InviteStageInstance stageInstance, @Nullable GuildScheduledEvent guildScheduledEvent, @Nullable InviteMetadata inviteMetadata) {
         this.lApi = lApi;
@@ -114,9 +114,9 @@ public class Invite implements Datable, HasLApi {
     public static @Nullable Invite fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
 
-        String code = (String) data.get(CODE_KEY);
+        String code = data.getAsAndRequireNotNull(CODE_KEY, InvalidDataException.SUPPLIER);
         SOData guildData = (SOData) data.get(GUILD_KEY);
-        SOData channelData = (SOData) data.get(CHANNEL_KEY);
+        SOData channelData = data.getAsAndRequireNotNull(CHANNEL_KEY, InvalidDataException.SUPPLIER);
         SOData inviterData = (SOData) data.get(INVITER_KEY);
         Number targetType = (Number) data.get(TARGET_TYPE_KEY);
         SOData targetUserData = (SOData) data.get(TARGET_USER_KEY);
@@ -130,15 +130,8 @@ public class Invite implements Datable, HasLApi {
         //This extends the Invite object
         InviteMetadata inviteMetadata = InviteMetadata.fromData(data);
 
-        if(code == null || channelData == null ){
-            InvalidDataException.throwException(data, null, Invite.class,
-                    new Object[]{code, channelData},
-                    new String[]{CODE_KEY, CHANNEL_KEY});
 
-        }
-
-        //noinspection ConstantConditions: assured by above if
-        return new Invite(lApi, code, Guild.fromData(lApi, guildData), Channel.fromData(lApi, channelData),
+        return new Invite(lApi, code, Guild.fromData(lApi, guildData), Channel.channelFromData(lApi, channelData),
                 inviterData == null ? null : User.fromData(lApi, inviterData),
                 targetType == null ? null : TargetType.fromValue(targetType.intValue()),
                 targetUserData == null ? null : User.fromData(lApi, targetUserData), Application.fromData(lApi, targetApplication),

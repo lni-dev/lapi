@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel.forum;
+package me.linusdev.lapi.api.objects.channel.forum;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;

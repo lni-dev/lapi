@@ -31,8 +31,8 @@ import me.linusdev.lapi.api.manager.guild.thread.ThreadManager;
 import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.stage.StageInstance;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -72,7 +72,7 @@ public class Config {
     private final @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory;
     private final @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory;
     private final @NotNull ManagerFactory<MemberManager> memberManagerFactory;
-    private final @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory;
+    private final @NotNull ManagerFactory<ListManager<Channel>> channelManagerFactory;
     private final @NotNull ManagerFactory<ThreadManager> threadsManagerFactory;
     private final @NotNull ManagerFactory<PresenceManager> presenceManagerFactory;
     private final @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory;
@@ -82,7 +82,7 @@ public class Config {
                   @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
                   boolean debugRateLimitBuckets, int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
-                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel<?>>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
+                  @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
         this.flags = flags;
         this.globalHttpRateLimitRetryLimit = globalHttpRateLimitRetryLimit;
         this.httpRateLimitAssumedBucketLimit = httpRateLimitAssumedBucketLimit;
@@ -209,7 +209,7 @@ public class Config {
         return memberManagerFactory;
     }
 
-    public @NotNull ManagerFactory<ListManager<Channel<?>>> getChannelManagerFactory() {
+    public @NotNull ManagerFactory<ListManager<Channel>> getChannelManagerFactory() {
         return channelManagerFactory;
     }
 

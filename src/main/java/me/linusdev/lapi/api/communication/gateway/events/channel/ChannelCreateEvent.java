@@ -19,21 +19,21 @@ package me.linusdev.lapi.api.communication.gateway.events.channel;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ChannelCreateEvent extends Event {
 
-    private final @NotNull Channel<?> channel;
+    private final @NotNull Channel channel;
 
-    public ChannelCreateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull Channel<?> channel) {
+    public ChannelCreateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId, @NotNull Channel channel) {
         super(lApi, payload, guildId);
         this.channel = channel;
     }
 
-    public @NotNull Channel<?> getChannel() {
+    public @NotNull Channel getChannel() {
         return channel;
     }
 }

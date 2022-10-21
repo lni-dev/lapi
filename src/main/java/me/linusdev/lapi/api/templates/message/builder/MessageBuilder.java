@@ -24,6 +24,7 @@ import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.ImplementationType;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.message.concrete.CreateEventMessage;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.placeholder.Name;
@@ -33,7 +34,6 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.MessageReference;
@@ -321,7 +321,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      *
-     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
+     * @param channelId the id of the {@link Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
     public Queueable<ChannelMessage> getCreateMessageRequest(@NotNull String channelId) throws LimitException {
@@ -340,7 +340,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      *
-     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
+     * @param channelId the id of the {@link Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      * @throws LApiIllegalStateException if the original message is {@code null}. see {@link #setOriginalMessage(AnyMessage)}.
      */
@@ -353,7 +353,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      *
-     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} the message should be sent in
+     * @param channelId the id of the {@link Channel channel} the message should be sent in
      * @return {@link Queueable} to create a message
      */
     public Queueable<ChannelMessage> getEditMessageRequest(@NotNull String channelId, @NotNull String messageId) throws LimitException {
@@ -437,7 +437,7 @@ public class MessageBuilder implements HasLApi {
      * @param channel the {@link Channel channel} you want to mention
      * @return this
      */
-    public MessageBuilder appendChannelMention(@NotNull Channel<?> channel){
+    public MessageBuilder appendChannelMention(@NotNull Channel channel){
         return appendChannelMention(channel.getId());
     }
 

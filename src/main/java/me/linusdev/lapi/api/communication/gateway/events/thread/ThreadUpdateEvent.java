@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadUpdate;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,14 +47,14 @@ public class ThreadUpdateEvent extends Event {
         return update;
     }
 
-    public @NotNull Thread<?> getThread() {
+    public @NotNull Channel getThread() {
         return update.getObj();
     }
 
     /**
      * This may be {@code null} even if {@link ConfigFlag#COPY_THREAD_ON_UPDATE_EVENT COPY_THREAD_ON_UPDATE_EVENT} is enabled!
      */
-    public @Nullable Thread<?> getOldThread() {
+    public @Nullable Channel getOldThread() {
         return update.getCopy();
     }
 }

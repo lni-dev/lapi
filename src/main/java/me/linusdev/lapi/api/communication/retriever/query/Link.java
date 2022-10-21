@@ -18,15 +18,14 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
-import me.linusdev.lapi.api.objects.nchannel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.other.placeholder.Concatable;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
 import me.linusdev.lapi.api.communication.http.request.Method;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.guild.Guild;
 import me.linusdev.lapi.api.objects.invite.Invite;
@@ -355,10 +354,10 @@ public enum Link implements AbstractLink{
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
-     * Get a {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel} by ID.
-     * Returns a {@link me.linusdev.lapi.api.objects.channel.abstracts.Channel channel object}.
-     * If the channel is a {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread},
-     * a {@link Thread#getMember() thread member} object is included in the returned result.
+     * Get a {@link Channel channel} by ID.
+     * Returns a {@link Channel channel object}.
+     * If the channel is a {@link Channel#isThread() thread},
+     * a {@link Channel#getMember() thread member} object is included in the returned result.
      *
      * @see Name#CHANNEL_ID
      * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel" target="_top">Get Channel</a>
@@ -582,7 +581,7 @@ public enum Link implements AbstractLink{
      *     Returns archived threads in the channel that are public.
      *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
      *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     When called on a {@link ChannelType#GUILD_ANNOUNCEMENT GUILD_ANNOUNCEMENT} channel returns
      *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.

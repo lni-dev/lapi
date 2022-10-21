@@ -21,7 +21,7 @@ import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.other.LApiConverter;
@@ -78,7 +78,7 @@ public final class ApplicationCommandOptionType<C, R, E extends InvalidDataExcep
      * Includes all channel types + categories
      */
     public static final ApplicationCommandOptionType<Object, Channel, InvalidDataException>
-            CHANNEL = new ApplicationCommandOptionType<>(7, (lApi, convertible) -> Channel.fromData(lApi, (SOData) convertible));
+            CHANNEL = new ApplicationCommandOptionType<>(7, (lApi, convertible) -> Channel.channelFromData(lApi, (SOData) convertible));
 
     public static final ApplicationCommandOptionType<Object, Role, InvalidDataException>
             ROLE = new ApplicationCommandOptionType<>(8, (lApi, convertible) -> Role.fromData(lApi, (SOData) convertible));

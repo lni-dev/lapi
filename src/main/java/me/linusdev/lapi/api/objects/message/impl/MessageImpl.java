@@ -23,7 +23,6 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.application.PartialApplication;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
 import me.linusdev.lapi.api.objects.channel.ChannelMention;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.enums.MessageType;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.message.MessageReference;
@@ -32,6 +31,7 @@ import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.objects.sticker.Sticker;
@@ -73,7 +73,7 @@ public class MessageImpl implements ChannelMessage {
     protected final @Nullable Long flags;
     protected final @NotNull OptionalValue<ChannelMessage> referencedMessage;
     protected final @Nullable MessageInteraction interaction;
-    protected final @Nullable Thread<?> thread;
+    protected final @Nullable Channel thread;
     protected final @Nullable List<Component> components;
     protected final @Nullable List<StickerItem> stickerItems;
     protected final @Nullable List<Sticker> stickers;
@@ -112,7 +112,7 @@ public class MessageImpl implements ChannelMessage {
         flags = data.getAndConvert(FLAGS_KEY, (Number v) -> v == null ? null : v.longValue());
         referencedMessage = data.getOptionalValue(REFERENCED_MESSAGE_KEY);
         interaction = data.getAndConvertWithException(INTERACTION_KEY, (SOData c) -> MessageInteraction.fromData(lApi, c));
-        thread = data.getAndConvertWithException(THREAD_KEY, (SOData c) -> Thread.fromData(lApi, c));
+        thread = data.getAndConvertWithException(THREAD_KEY, (SOData c) -> Channel.channelFromData(lApi, c));
         components = data.getListAndConvertWithException(COMPONENTS_KEY, (SOData c) -> Component.fromData(lApi, c));
         stickerItems = data.getListAndConvertWithException(STICKER_ITEMS_KEY, StickerItem::fromData);
         stickers = data.getListAndConvertWithException(STICKERS_KEY, (SOData c) -> Sticker.fromData(lApi, c));
@@ -255,7 +255,7 @@ public class MessageImpl implements ChannelMessage {
     }
 
     @Override
-    public @Nullable Thread<?> getThread() {
+    public @Nullable Channel getThread() {
         return thread;
     }
 

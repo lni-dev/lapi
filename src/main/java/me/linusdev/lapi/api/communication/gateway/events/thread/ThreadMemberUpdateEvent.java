@@ -20,8 +20,8 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.manager.guild.thread.ThreadMemberUpdate;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +52,7 @@ public class ThreadMemberUpdateEvent extends Event {
     /**
      * The cached thread containing this thread member or {@code null}
      */
-    public @Nullable Thread<?> getThread() {
+    public @Nullable Channel getThread() {
         return update.getThread();
     }
 }

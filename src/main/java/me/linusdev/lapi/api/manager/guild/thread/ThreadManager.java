@@ -24,13 +24,13 @@ import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.interfaces.updatable.Updatable;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public interface ThreadManager extends ThreadPool, Manager {
-    void add(Thread<?> thread);
+    void add(Channel thread);
 
     /**
      * Received when a new Thread is created (then newly_created field exists) or
@@ -39,7 +39,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link Thread} contained in this manager
      * @throws InvalidDataException if data parameter is invalid
      */
-    @NotNull Update<Thread<?>, Thread<?>> onCreate(@NotNull SOData data) throws InvalidDataException;
+    @NotNull Update<Channel, Channel> onCreate(@NotNull SOData data) throws InvalidDataException;
 
     /**
      * Received when a thread is updated. (not when last_message_id changes)
@@ -56,7 +56,7 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link Thread} which was removed from this manager or {@code null} if there was no thread with given id.
      * @throws InvalidDataException if id field is missing in given data
      */
-    @Nullable Thread<?> onDelete(@NotNull SOData data) throws InvalidDataException;
+    @Nullable Channel onDelete(@NotNull SOData data) throws InvalidDataException;
 
     /**
      *
@@ -67,14 +67,14 @@ public interface ThreadManager extends ThreadPool, Manager {
      * @return {@link ListUpdate}, but {@link ListUpdate#getOld() old} and {@link ListUpdate#getUpdated() updated} will always be {@code null}
      * @throws InvalidDataException specified by implementation
      */
-    @NotNull ListUpdate<Thread<?>> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) throws InvalidDataException;
+    @NotNull ListUpdate<Channel> onThreadListSync(@NotNull ThreadListSyncData threadListSyncData) throws InvalidDataException;
 
     /**
      *
      * @param data retrieved {@link SOData}
      * @return {@link ThreadMemberUpdate} containing the new and old {@link ThreadMember} object and the updated {@link Thread}.
      * Or {@code null} if no thread with given id (in data) is cached.
-     * @throws InvalidDataException see {@link ThreadMember#fromData(Data)}
+     * @throws InvalidDataException see {@link ThreadMember#fromData(SOData)}
      */
     @NotNull ThreadMemberUpdate onThreadMemberUpdate(@NotNull SOData data) throws InvalidDataException;
 

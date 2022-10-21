@@ -16,14 +16,12 @@
 
 package me.linusdev.lapi.api.request.requests;
 
-import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -37,11 +35,11 @@ public interface GuildRequests extends HasLApi {
      * @param guildId id of the guild
      * @return {@link Queueable} which can retrieve the list of {@link Channel channels}
      */
-    default @NotNull Queueable<ArrayList<Channel<?>>> getGuildChannels(@NotNull String guildId) {
+    default @NotNull Queueable<ArrayList<Channel>> getGuildChannels(@NotNull String guildId) {
         LinkQuery query = new LinkQuery(getLApi(), Link.GET_GUILD_CHANNELS,
                 GUILD_ID.withValue(guildId));
 
-        return new ArrayRetriever<>(query, (LApi lApi, SOData data) -> Channel.fromData(lApi, data));
+        return new ArrayRetriever<>(query, Channel::channelFromData);
     }
 
 }

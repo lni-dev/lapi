@@ -20,29 +20,29 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ChannelUpdateEvent extends Event {
 
-    private final @NotNull Update<Channel<?>, Channel<?>> update;
+    private final @NotNull Update<Channel, Channel> update;
 
     public ChannelUpdateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId,
-                              @NotNull Update<Channel<?>, Channel<?>> update) {
+                              @NotNull Update<Channel, Channel> update) {
         super(lApi, payload, guildId);
         this.update = update;
     }
 
-    public @NotNull Update<Channel<?>, Channel<?>> getUpdate() {
+    public @NotNull Update<Channel, Channel> getUpdate() {
         return update;
     }
 
     /**
      * @return the updated {@link Channel}
      */
-    public @NotNull Channel<?> getChannel() {
+    public @NotNull Channel getChannel() {
         return update.getObj();
     }
 
@@ -51,7 +51,7 @@ public class ChannelUpdateEvent extends Event {
      * @return copy of the {@link Channel} before it was updated or {@code null} if
      * {@link me.linusdev.lapi.api.config.ConfigFlag#COPY_CHANNEL_ON_UPDATE_EVENT COPY_CHANNEL_ON_UPDATE_EVENT} is not enabled.
      */
-    public @Nullable Channel<?> getOldChannel() {
+    public @Nullable Channel getOldChannel() {
         return update.getCopy();
     }
 }

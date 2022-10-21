@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
-import me.linusdev.lapi.api.objects.nchannel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

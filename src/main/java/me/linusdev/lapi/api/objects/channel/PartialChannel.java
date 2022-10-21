@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.channel.abstracts;
+package me.linusdev.lapi.api.objects.channel;
 
-public interface GuildVoiceChannelAbstract extends GuildChannel, VoiceChannel{
+/**
+ * A {@link Channel} received from Discord, which may be missing some fields.
+ * @see #isPartial()
+ */
+public interface PartialChannel extends Channel{
+
+    @Override
+    default boolean isPartial() {
+        return true;
+    }
 }

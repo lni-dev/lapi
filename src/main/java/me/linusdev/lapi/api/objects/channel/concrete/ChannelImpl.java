@@ -14,21 +14,32 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild.thread;
+package me.linusdev.lapi.api.objects.channel.concrete;
 
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.objects.channel.AbstractChannel;
 import me.linusdev.lapi.api.objects.channel.Channel;
-import me.linusdev.lapi.api.objects.snowflake.Snowflake;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public interface ThreadPool {
+/**
+ * @see Channel
+ */
+public class ChannelImpl extends AbstractChannel {
 
-    @Nullable Channel getThread(@NotNull String id);
-
-    @Nullable Channel getThread(@NotNull String channelId, @NotNull String id);
-
-    default @Nullable Channel getThread(@NotNull Snowflake id) {
-        return getThread(id.asString());
+    public ChannelImpl(@NotNull ChannelType type, @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+        super(type, lApi, data);
     }
 
+    @Override
+    public boolean isPartial() {
+        return false;
+    }
+
+    @Override
+    public boolean isCached() {
+        return false;
+    }
 }

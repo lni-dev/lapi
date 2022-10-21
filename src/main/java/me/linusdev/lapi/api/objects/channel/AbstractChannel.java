@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.nchannel;
+package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.OptionalValue;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.enums.VideoQuality;
-import me.linusdev.lapi.api.objects.nchannel.forum.DefaultReaction;
-import me.linusdev.lapi.api.objects.nchannel.forum.ForumTag;
-import me.linusdev.lapi.api.objects.nchannel.forum.SortOrderType;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.channel.forum.DefaultReaction;
+import me.linusdev.lapi.api.objects.channel.forum.ForumTag;
+import me.linusdev.lapi.api.objects.channel.forum.SortOrderType;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrite;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
@@ -62,7 +62,7 @@ public abstract class AbstractChannel implements Channel {
     protected final @Nullable Integer messageCount;
     protected final @Nullable Integer memberCount;
     protected final @Nullable ThreadMetadata threadMetadata;
-    protected final @Nullable ThreadMember member;
+    protected @Nullable ThreadMember member;
     protected final @Nullable Integer defaultAutoArchiveDuration;
     protected final @Nullable Permissions permissions;
     protected final @Nullable Integer flags;
@@ -74,11 +74,11 @@ public abstract class AbstractChannel implements Channel {
     protected final @NotNull OptionalValue<SortOrderType> defaultSortOrderOptional;
 
 
-    protected AbstractChannel(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
+    protected AbstractChannel(@NotNull ChannelType type, @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.lApi = lApi;
 
         this.id = data.getAsAndRequireNotNull(ID_KEY, InvalidDataException.SUPPLIER);
-        this.type = data.getAndConvert(TYPE_KEY, ChannelType::fromNumber);
+        this.type = type;
         this.guildId = data.getAs(GUILD_ID_KEY);
         this.position = data.getAs(POSITION_KEY);
         this.permissionOverwrites = data.getListAndConvertWithException(PERMISSION_OVERWRITES_KEY, PermissionOverwrite::fromData);
@@ -111,8 +111,6 @@ public abstract class AbstractChannel implements Channel {
         this.defaultThreadRateLimitPerUser = data.getAs(DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY);
         this.defaultSortOrderOptional = data.getOptionalValueAndConvert(DEFAULT_SORT_ORDER_KEY, SortOrderType::fromValue);
 
-
-        //TODO: fill variables
     }
 
     @Override
@@ -282,9 +280,41 @@ public abstract class AbstractChannel implements Channel {
 
     @Override
     public SOData getData() {
-        SOData data = SOData.newOrderedDataWithKnownSize(20);
+        SOData data = SOData.newOrderedDataWithKnownSize(25);
 
-        //TODO: add fields
+        data.add(ID_KEY, id);
+        data.add(TYPE_KEY, type);
+        data.addIfNotNull(GUILD_ID_KEY, guildId);
+        data.addIfNotNull(POSITION_KEY, position);
+        data.addIfNotNull(PERMISSION_OVERWRITES_KEY, permissionOverwrites);
+        data.addIfOptionalExists(NAME_KEY, nameOptional);
+        data.addIfOptionalExists(TOPIC_KEY, topicOptional);
+        data.addIfNotNull(NSFW_KEY, nsfw);
+        data.addIfOptionalExists(LAST_MESSAGE_ID_KEY, lastMessageIdOptional);
+        data.addIfNotNull(BITRATE_KEY, bitrate);
+        data.addIfNotNull(USER_LIMIT_KEY, userLimit);
+        data.addIfNotNull(RATE_LIMIT_PER_USER_KEY, rateLimitPerUser);
+        data.addIfNotNull(RECIPIENTS_KEY, recipients);
+        data.addIfOptionalExists(ICON_KEY, iconOptional);
+        data.addIfNotNull(OWNER_ID_KEY, ownerId);
+        data.addIfNotNull(APPLICATION_ID_KEY, applicationId);
+        data.addIfOptionalExists(PARENT_ID_KEY, parentIdOptional);
+        data.addIfOptionalExists(LAST_PIN_TIMESTAMP_KEY, lastPinTimestampOptional);
+        data.addIfOptionalExists(RTC_REGION_KEY, rtcRegionOptional);
+        data.addIfNotNull(VIDEO_QUALITY_MODE_KEY, videoQualityMode);
+        data.addIfNotNull(MESSAGE_COUNT_KEY, messageCount);
+        data.addIfNotNull(MEMBER_COUNT_KEY, memberCount);
+        data.addIfNotNull(THREAD_METADATA_KEY, threadMetadata);
+        data.addIfNotNull(MEMBER_KEY, member);
+        data.addIfNotNull(DEFAULT_AUTO_ARCHIVE_DURATION_KEY, defaultAutoArchiveDuration);
+        data.addIfNotNull(PERMISSIONS_KEY, permissions);
+        data.addIfNotNull(FLAGS_KEY, flags);
+        data.addIfNotNull(TOTAL_MESSAGE_SENT_KEY, totalMessageSent);
+        data.addIfNotNull(AVAILABLE_TAGS_KEY, availableTags);
+        data.addIfNotNull(APPLIED_TAGS_KEY, appliedTags);
+        data.addIfOptionalExists(DEFAULT_REACTION_EMOJI_KEY, defaultReactionEmojiOptional);
+        data.addIfNotNull(DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY, defaultThreadRateLimitPerUser);
+        data.addIfOptionalExists(DEFAULT_SORT_ORDER_KEY, defaultSortOrderOptional);
 
         return data;
     }
@@ -292,5 +322,88 @@ public abstract class AbstractChannel implements Channel {
     @Override
     public @NotNull LApi getLApi() {
         return lApi;
+    }
+
+    @Override
+    public @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember) {
+        ThreadMember old = member;
+        member = newMember;
+        return old;
+    }
+
+    @Override
+    public @NotNull Channel copy() {
+        return null;
+    }
+
+    @Override
+    public boolean checkIfChanged(@NotNull SOData data) {
+        return Channel.super.checkIfChanged(data);
+    }
+
+    @Override
+    public void updateSelfByData(@NotNull SOData data) throws InvalidDataException {
+        /*
+
+        List<Object> rs = data.getList(RECIPIENTS_KEY);
+        if(rs != null) {
+            this.recipients = new Recipient[rs.size()];
+            int i = 0;
+            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(SOData) d);
+        }
+
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
+        data.processIfContained(ICON_KEY, (String str) -> this.iconHash = str);
+        data.processIfContained(OWNER_ID_KEY, (String str) -> this.ownerId = Snowflake.fromString(str));
+        data.processIfContained(APPLICATION_ID_KEY, (String str) -> this.applicationId = Snowflake.fromString(str));
+
+
+        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
+
+
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(NSFW_KEY, (Boolean bool) -> {if (bool != null) this.nsfw = bool;});
+        //guildId may not change
+        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
+
+        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
+        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+
+
+
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
+        data.processIfContained(NSFW_KEY, (Boolean bool) -> this.nsfw = bool);
+        //guildId should never change
+        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
+
+        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
+        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+        data.processIfContained(RATE_LIMIT_PER_USER_KEY, (Number num) -> {if(num != null)this.rateLimitPerUser = num.intValue();});
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
+        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
+
+
+
+        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
+        data.processIfContained(NSFW_KEY, (Boolean bool) -> {if (bool != null) this.nsfw = bool;});
+        //guildId may not change
+        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
+
+        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
+        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
+
+        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
+        data.processIfContained(BITRATE_KEY, (Number num) -> {if(num != null) this.bitRate = num.intValue();});
+        data.processIfContained(USER_LIMIT_KEY, (Number num) -> {if(num != null) this.userLimit = num.intValue();});
+        data.processIfContained(RTC_REGION_KEY, (String str) -> this.rtcRegion = str);
+        data.processIfContained(VIDEO_QUALITY_MODE_KEY, (Number num) -> {if(num != null) this.videoQualityMode = VideoQuality.fromId(num);});
+
+        */
     }
 }

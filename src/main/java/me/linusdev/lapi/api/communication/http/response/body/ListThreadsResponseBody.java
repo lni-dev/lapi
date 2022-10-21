@@ -16,13 +16,11 @@
 
 package me.linusdev.lapi.api.communication.http.response.body;
 
-import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -39,7 +37,7 @@ public class ListThreadsResponseBody extends ResponseBody{
     public static final String MEMBERS_KEY = "members";
     public static final String HAS_MORE_KEY = "has_more";
 
-    private final @NotNull ArrayList<Thread<?>> threads;
+    private final @NotNull ArrayList<Channel> threads;
     private @NotNull ArrayList<ThreadMember> members;
     private final boolean hasMore;
 
@@ -52,28 +50,21 @@ public class ListThreadsResponseBody extends ResponseBody{
     @SuppressWarnings("ConstantConditions")
     public ListThreadsResponseBody(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         super(lApi, data);
-        threads = data.getListAndConvertWithException(THREADS_KEY,
-                (ExceptionConverter<SOData, Thread<?>, InvalidDataException>) convertible -> (Thread<?>) Channel.fromData(lApi, convertible));
-
+        threads = data.getListAndConvertWithException(THREADS_KEY, (SOData c) -> Channel.channelFromData(lApi, c));
         members = data.getListAndConvertWithException(MEMBERS_KEY, ThreadMember::fromData);
+        hasMore = data.getAsAndRequireNotNull(HAS_MORE_KEY, InvalidDataException.SUPPLIER);
 
-        hasMore = data.getAndConvertWithException(HAS_MORE_KEY,
-                (ExceptionConverter<Boolean, Boolean, InvalidDataException>) convertible -> {
-            if(convertible == null) throw new InvalidDataException(data, "has_more may not be missing or null!").addMissingFields(HAS_MORE_KEY);
-            return convertible;
-        }, null);
-
-        if(threads == null || members == null){
+        if(members == null){
             InvalidDataException.throwException(data, null, ListThreadsResponseBody.class,
-                    new Object[]{threads, members},
-                    new String[]{THREADS_KEY, MEMBERS_KEY});
+                    new Object[]{null},
+                    new String[]{ MEMBERS_KEY});
         }
     }
 
     /**
      * the active threads
      */
-    public @NotNull ArrayList<Thread<?>> getThreads() {
+    public @NotNull ArrayList<Channel> getThreads() {
         return threads;
     }
 

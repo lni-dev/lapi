@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.objects.permission;
 
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
 import me.linusdev.lapi.api.objects.enums.SimpleChannelType;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

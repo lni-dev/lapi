@@ -28,7 +28,6 @@ import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.application.PartialApplication;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
 import me.linusdev.lapi.api.objects.channel.ChannelMention;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.enums.MessageType;
@@ -42,6 +41,7 @@ import me.linusdev.lapi.api.objects.message.impl.MessageImpl;
 import me.linusdev.lapi.api.objects.message.impl.UpdateEventMessageImpl;
 import me.linusdev.lapi.api.objects.message.interaction.MessageInteraction;
 import me.linusdev.lapi.api.objects.message.messageactivity.MessageActivity;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
@@ -390,10 +390,10 @@ public interface AnyMessage extends Datable, SnowflakeAble, HasLApi {
     @Nullable MessageInteraction getInteraction();
 
     /**
-     * the thread that was started from this message, includes {@link Thread#getMember() thread member object}.
-     * @return {@link Thread} or {@code null}.
+     * the thread that was started from this message, includes {@link Channel#getMember() thread member object}.
+     * @return {@link Channel#isThread() thread} or {@code null}.
      */
-    @Nullable Thread<?> getThread();
+    @Nullable Channel getThread();
 
     /**
      * <p>

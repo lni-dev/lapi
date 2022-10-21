@@ -25,7 +25,8 @@ import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
-import me.linusdev.lapi.api.objects.nchannel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
@@ -36,10 +37,8 @@ import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.communication.http.response.body.ListThreadsResponseBody;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Channel;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMember;
-import me.linusdev.lapi.api.objects.nchannel.thread.ThreadMetadata;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
+import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
 import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
@@ -76,11 +75,11 @@ public interface ChannelRequests extends HasLApi {
      * @return {@link Queueable} which can retrieve the {@link Channel}
      * @see Queueable#queue()
      */
-    default @NotNull Queueable<Channel<?>> getChannel(@NotNull String channelId){
+    default @NotNull Queueable<Channel> getChannel(@NotNull String channelId){
         return new ConvertingRetriever<>(
                 new LinkQuery(getLApi(), Link.GET_CHANNEL,
                         Name.CHANNEL_ID.withValue(channelId)),
-                Channel::fromData);
+                Channel::channelFromData);
     }
 
     //TODO: modify Channel request
@@ -591,7 +590,7 @@ public interface ChannelRequests extends HasLApi {
      *     for the specified user if they are a member of the thread, returns a 404 response otherwise.
      * </p>
      *
-     * @param channelId the id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread}, the user is a member of
+     * @param channelId the id of the {@link Channel#isThread()}  thread}, the user is a member of
      * @param userId the {@link User#getId() user id}
      * @return {@link Queueable} to retrieve the {@link ThreadMember} matching given user in given thread
      * @see Link#GET_THREAD_MEMBER
@@ -611,7 +610,7 @@ public interface ChannelRequests extends HasLApi {
      *     This endpoint is restricted according to whether the {@link me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent#GUILD_MEMBERS GUILD_MEMBERS} Privileged GatewayIntent is enabled for your application.
      * </p>
      *
-     * @param channelId the channel id of the {@link me.linusdev.lapi.api.objects.channel.abstracts.Thread thread}
+     * @param channelId the channel id of the {@link Channel#isThread() thread}
      * @return {@link Queueable} to retrieve a {@link ArrayList list} of {@link ThreadMember thread members}
      * @see Link#LIST_THREAD_MEMBERS
      */
@@ -636,18 +635,18 @@ public interface ChannelRequests extends HasLApi {
      *     Returns archived threads in the channel that are public.
      *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
      *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     When called on a {@link ChannelType#GUILD_ANNOUNCEMENT GUILD_ANNOUNCEMENT} channel returns
      *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Channel#isThread() threads} by setting
      *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Channel#isThread() threads} for
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
@@ -673,7 +672,7 @@ public interface ChannelRequests extends HasLApi {
      *     Returns archived threads in the channel that are public.
      *     When called on a {@link ChannelType#GUILD_TEXT GUILD_TEXT} channel,
      *     returns threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_PUBLIC_THREAD}.
-     *     When called on a {@link ChannelType#GUILD_NEWS GUILD_NEWS} channel returns
+     *     When called on a {@link ChannelType#GUILD_ANNOUNCEMENT GUILD_ANNOUNCEMENT} channel returns
      *     threads of {@link Channel#getType() type} {@link ChannelType#ANNOUNCEMENT_THREAD GUILD_NEWS_THREAD}.
      *     Threads are ordered by {@link ThreadMetadata#getArchiveTimestamp() archive_timestamp}, in descending order.
      *     Requires the {@link Permission#READ_MESSAGE_HISTORY READ_MESSAGE_HISTORY} permission.
@@ -683,7 +682,7 @@ public interface ChannelRequests extends HasLApi {
      *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more with {@link #listPublicArchivedThreads(String, ISO8601Timestamp, Integer)}
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all public archived {@link Channel#isThread() threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see Link#LIST_PUBLIC_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
@@ -703,11 +702,11 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Channel#isThread() threads} by setting
      *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Channel#isThread() threads} for
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
@@ -738,11 +737,11 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} with
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Channel#isThread() threads} with
      *     {@link #listPrivateArchivedThreads(String, ISO8601Timestamp, Integer)}
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Channel#isThread() threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see Link#LIST_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
@@ -761,11 +760,11 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} by setting
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Channel#isThread() threads} by setting
      *     before to the {@link ThreadMetadata#getArchiveTimestamp()} of the last retrieved thread.
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Channel#isThread() threads} for
      * @param before optional returns threads before this timestamp. {@code null} to retrieve the latest threads
      * @param limit optional maximum number of threads to return. {@code null} if you want no limit
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
@@ -794,11 +793,11 @@ public interface ChannelRequests extends HasLApi {
      * </p>
      *
      * <p>
-     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Thread threads} with
+     *     If {@link ListThreadsResponseBody#hasMore()} is {@code true}, you can retrieve more {@link Channel#isThread() threads} with
      *     {@link #listJoinedPrivateArchivedThreads(String, ISO8601Timestamp, Integer)}
      * </p>
      *
-     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Thread threads} for
+     * @param channelId the id of the {@link Channel} you want to get all private archived {@link Channel#isThread() threads} for
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see Link#LIST_JOINED_PRIVATE_ARCHIVED_THREADS
      * @see ListThreadsResponseBody
@@ -824,7 +823,7 @@ public interface ChannelRequests extends HasLApi {
      *     This route is deprecated and will be removed in v10. It is replaced by List Active GuildImpl Threads.
      * </p>
      * TODO add LIST_ACTIVE_GUILD_THREADS @link
-     * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Thread threads} from
+     * @param channelId the id of the {@link Channel channel}, to retrieve all {@link Channel#isThread() threads} from
      * @return {@link Queueable} to retrieve a {@link ListThreadsResponseBody}
      * @see Link#LIST_ACTIVE_THREADS
      * @see ListThreadsResponseBody

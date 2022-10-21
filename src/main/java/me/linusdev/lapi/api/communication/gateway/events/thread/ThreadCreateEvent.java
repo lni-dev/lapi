@@ -20,7 +20,7 @@ import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstra
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.objects.channel.abstracts.Thread;
+import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,10 +32,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ThreadCreateEvent extends Event {
 
-    private final @NotNull Update<Thread<?>, Thread<?>> update;
+    private final @NotNull Update<Channel, Channel> update;
 
     public ThreadCreateEvent(@NotNull LApi lApi, @Nullable GatewayPayloadAbstract payload, @Nullable Snowflake guildId,
-                             @NotNull Update<Thread<?>, Thread<?>> update) {
+                             @NotNull Update<Channel, Channel> update) {
         super(lApi, payload, guildId);
         this.update = update;
     }
@@ -44,7 +44,7 @@ public class ThreadCreateEvent extends Event {
         return update.isNew();
     }
 
-    public Thread<?> getThread() {
+    public Channel getThread() {
         return update.getObj();
     }
 }
