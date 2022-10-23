@@ -71,7 +71,7 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
     protected @Nullable Boolean large;
     protected @Nullable Integer memberCount;
     protected @Nullable MemberManager memberManager;
-    protected @Nullable ListManager<me.linusdev.lapi.api.objects.channel.Channel> channelManager;
+    protected @Nullable ListManager<Channel> channelManager;
     protected @Nullable ThreadManager threadsManager;
     protected @Nullable PresenceManager presenceManager;
     protected @Nullable ListManager<StageInstance> stageInstanceManager;
@@ -311,7 +311,6 @@ public class CachedGuildImpl extends GuildImpl implements CachedGuild, Datable, 
         //Emojis
         if(emojiManager != null){
             if(!emojiManager.isInitialized()){
-                @SuppressWarnings("unchecked")
                 List<Object> emojisData = data.getList(EMOJIS_KEY);
                 if(emojisData != null){
                     emojiManager.init(emojisData.size());

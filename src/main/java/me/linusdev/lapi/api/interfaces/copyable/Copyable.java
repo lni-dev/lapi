@@ -21,7 +21,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * This interface indicates, that given class can be copied using the {@link #copy()} method.
@@ -58,8 +60,10 @@ public interface Copyable<T> {
      * @param <T> {@link Copyable}
      * @return A copy of given array. Every element of the array will be copied with {@link #copy(Copyable)}
      */
-    static <T extends Copyable<T>> T[] copyArrayDeep(@Nullable T[] array){
-        @SuppressWarnings("unchecked")
+    @Contract("null -> null; !null -> !null")
+    @SuppressWarnings("unchecked")
+    static <T extends Copyable<T>> @Nullable T[] copyArrayDeep(@Nullable T @Nullable[] array){
+        if(array == null) return null;
         T[] copy = (T[]) Array.newInstance(array.getClass().getComponentType(), array.length);
 
         for(int i = 0; i < copy.length; i++){
@@ -77,5 +81,35 @@ public interface Copyable<T> {
      */
     static <T> T[] copyArrayFlat(@Nullable T[] array){
         return Arrays.copyOf(array, array.length);
+    }
+
+    /**
+     *
+     * @param list the {@link List} to be copied
+     * @return An {@link ArrayList} with the elements copied with {@link Copyable#copy(Copyable)} from {@code list}.
+     * @param <T> {@link Copyable}
+     */
+    @Contract("null -> null; !null -> !null")
+    static <T extends Copyable<T>> @Nullable List<T> copyListDeep(@Nullable List<T> list) {
+        if(list == null) return null;
+        ArrayList<T> copy = new ArrayList<>(list.size());
+
+        for(T item : list) {
+            copy.add(Copyable.copy(item));
+        }
+
+        return copy;
+    }
+
+    /**
+     *
+     * @param list the {@link List} to be copied
+     * @return An {@link ArrayList} with the same elements as given {@code list}.
+     * @param <T> {@link Copyable}
+     */
+    @Contract("null -> null; !null -> !null")
+    static <T> @Nullable List<T> copyListFlat(@Nullable List<T> list) {
+        if(list == null) return null;
+        return new ArrayList<>(list);
     }
 }

@@ -31,12 +31,24 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PartialChannelImpl extends AbstractChannel implements PartialChannel {
 
+    private final @NotNull SOData data;
+
     public PartialChannelImpl(@NotNull ChannelType type, @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         super(type, lApi, data);
+        this.data = data;
     }
 
     @Override
     public boolean isCached() {
         return false;
+    }
+
+    @Override
+    public @NotNull Channel copy() {
+        try {
+            return Channel.partialChannelFromData(lApi, data);
+        } catch (InvalidDataException ignored) {
+            return this; //Will not happen, as this channel was created with the same data...
+        }
     }
 }

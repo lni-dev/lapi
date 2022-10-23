@@ -30,6 +30,7 @@ import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.permission.overwrite.PermissionOverwrite;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,39 +41,93 @@ public abstract class AbstractChannel implements Channel {
     protected final @NotNull LApi lApi;
 
     protected final @NotNull String id;
-    protected final @NotNull ChannelType type;
+    protected @NotNull ChannelType type;
     protected final @Nullable String guildId;
-    protected final @Nullable Integer position;
-    protected final @Nullable List<PermissionOverwrite> permissionOverwrites;
-    protected final @NotNull OptionalValue<String> nameOptional;
-    protected final @NotNull OptionalValue<String> topicOptional;
-    protected final @Nullable Boolean nsfw;
-    protected final @NotNull OptionalValue<String> lastMessageIdOptional;
-    protected final @Nullable Integer bitrate;
-    protected final @Nullable Integer userLimit;
-    protected final @Nullable Integer rateLimitPerUser;
-    protected final @Nullable List<User> recipients;
-    protected final @NotNull OptionalValue<String> iconOptional;
-    protected final @Nullable String ownerId;
-    protected final @Nullable String applicationId;
-    protected final @NotNull OptionalValue<String> parentIdOptional;
-    protected final @NotNull OptionalValue<ISO8601Timestamp> lastPinTimestampOptional;
-    protected final @NotNull OptionalValue<String> rtcRegionOptional;
-    protected final @Nullable VideoQuality videoQualityMode;
-    protected final @Nullable Integer messageCount;
-    protected final @Nullable Integer memberCount;
-    protected final @Nullable ThreadMetadata threadMetadata;
+    protected @Nullable Integer position;
+    protected @Nullable List<PermissionOverwrite> permissionOverwrites;
+    protected @NotNull OptionalValue<String> nameOptional;
+    protected @NotNull OptionalValue<String> topicOptional;
+    protected @Nullable Boolean nsfw;
+    protected @NotNull OptionalValue<String> lastMessageIdOptional;
+    protected @Nullable Integer bitrate;
+    protected @Nullable Integer userLimit;
+    protected @Nullable Integer rateLimitPerUser;
+    protected @Nullable List<User> recipients;
+    protected @NotNull OptionalValue<String> iconOptional;
+    protected @Nullable String ownerId;
+    protected @Nullable String applicationId;
+    protected @NotNull OptionalValue<String> parentIdOptional;
+    protected @NotNull OptionalValue<ISO8601Timestamp> lastPinTimestampOptional;
+    protected @NotNull OptionalValue<String> rtcRegionOptional;
+    protected @Nullable VideoQuality videoQualityMode;
+    protected @Nullable Integer messageCount;
+    protected @Nullable Integer memberCount;
+    protected @Nullable ThreadMetadata threadMetadata;
     protected @Nullable ThreadMember member;
-    protected final @Nullable Integer defaultAutoArchiveDuration;
-    protected final @Nullable Permissions permissions;
-    protected final @Nullable Integer flags;
-    protected final @Nullable Integer totalMessageSent;
-    protected final @Nullable List<ForumTag> availableTags;
-    protected final @Nullable List<String> appliedTags;
-    protected final @NotNull OptionalValue<DefaultReaction> defaultReactionEmojiOptional;
-    protected final @Nullable Integer defaultThreadRateLimitPerUser;
-    protected final @NotNull OptionalValue<SortOrderType> defaultSortOrderOptional;
+    protected @Nullable Integer defaultAutoArchiveDuration;
+    protected @Nullable Permissions permissions;
+    protected @Nullable Integer flags;
+    protected @Nullable Integer totalMessageSent;
+    protected @Nullable List<ForumTag> availableTags;
+    protected @Nullable List<String> appliedTags;
+    protected @NotNull OptionalValue<DefaultReaction> defaultReactionEmojiOptional;
+    protected @Nullable Integer defaultThreadRateLimitPerUser;
+    protected @NotNull OptionalValue<SortOrderType> defaultSortOrderOptional;
 
+    public AbstractChannel(
+            @NotNull LApi lApi, @NotNull String id, @NotNull ChannelType type, @Nullable String guildId,
+            @Nullable Integer position, @Nullable List<PermissionOverwrite> permissionOverwrites,
+            @NotNull OptionalValue<String> nameOptional, @NotNull OptionalValue<String> topicOptional,
+            @Nullable Boolean nsfw, @NotNull OptionalValue<String> lastMessageIdOptional,
+            @Nullable Integer bitrate, @Nullable Integer userLimit, @Nullable Integer rateLimitPerUser,
+            @Nullable List<User> recipients, @NotNull OptionalValue<String> iconOptional, @Nullable String ownerId,
+            @Nullable String applicationId, @NotNull OptionalValue<String> parentIdOptional,
+            @NotNull OptionalValue<ISO8601Timestamp> lastPinTimestampOptional,
+            @NotNull OptionalValue<String> rtcRegionOptional, @Nullable VideoQuality videoQualityMode,
+            @Nullable Integer messageCount, @Nullable Integer memberCount, @Nullable ThreadMetadata threadMetadata,
+            @Nullable ThreadMember member, @Nullable Integer defaultAutoArchiveDuration,
+            @Nullable Permissions permissions, @Nullable Integer flags, @Nullable Integer totalMessageSent,
+            @Nullable List<ForumTag> availableTags, @Nullable List<String> appliedTags,
+            @NotNull OptionalValue<DefaultReaction> defaultReactionEmojiOptional,
+            @Nullable Integer defaultThreadRateLimitPerUser,
+            @NotNull OptionalValue<SortOrderType> defaultSortOrderOptional
+    )
+    {
+        this.lApi = lApi;
+        this.id = id;
+        this.type = type;
+        this.guildId = guildId;
+        this.position = position;
+        this.permissionOverwrites = permissionOverwrites;
+        this.nameOptional = nameOptional;
+        this.topicOptional = topicOptional;
+        this.nsfw = nsfw;
+        this.lastMessageIdOptional = lastMessageIdOptional;
+        this.bitrate = bitrate;
+        this.userLimit = userLimit;
+        this.rateLimitPerUser = rateLimitPerUser;
+        this.recipients = recipients;
+        this.iconOptional = iconOptional;
+        this.ownerId = ownerId;
+        this.applicationId = applicationId;
+        this.parentIdOptional = parentIdOptional;
+        this.lastPinTimestampOptional = lastPinTimestampOptional;
+        this.rtcRegionOptional = rtcRegionOptional;
+        this.videoQualityMode = videoQualityMode;
+        this.messageCount = messageCount;
+        this.memberCount = memberCount;
+        this.threadMetadata = threadMetadata;
+        this.member = member;
+        this.defaultAutoArchiveDuration = defaultAutoArchiveDuration;
+        this.permissions = permissions;
+        this.flags = flags;
+        this.totalMessageSent = totalMessageSent;
+        this.availableTags = availableTags;
+        this.appliedTags = appliedTags;
+        this.defaultReactionEmojiOptional = defaultReactionEmojiOptional;
+        this.defaultThreadRateLimitPerUser = defaultThreadRateLimitPerUser;
+        this.defaultSortOrderOptional = defaultSortOrderOptional;
+    }
 
     protected AbstractChannel(@NotNull ChannelType type, @NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
         this.lApi = lApi;
@@ -324,16 +379,12 @@ public abstract class AbstractChannel implements Channel {
         return lApi;
     }
 
+    @ApiStatus.Internal
     @Override
     public @Nullable ThreadMember updateMember(@Nullable ThreadMember newMember) {
         ThreadMember old = member;
         member = newMember;
         return old;
-    }
-
-    @Override
-    public @NotNull Channel copy() {
-        return null;
     }
 
     @Override
@@ -343,67 +394,41 @@ public abstract class AbstractChannel implements Channel {
 
     @Override
     public void updateSelfByData(@NotNull SOData data) throws InvalidDataException {
-        /*
-
-        List<Object> rs = data.getList(RECIPIENTS_KEY);
-        if(rs != null) {
-            this.recipients = new Recipient[rs.size()];
-            int i = 0;
-            for(Object d : rs) this.recipients[i++] = new Recipient(lApi,(SOData) d);
-        }
-
-        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
-        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
-        data.processIfContained(ICON_KEY, (String str) -> this.iconHash = str);
-        data.processIfContained(OWNER_ID_KEY, (String str) -> this.ownerId = Snowflake.fromString(str));
-        data.processIfContained(APPLICATION_ID_KEY, (String str) -> this.applicationId = Snowflake.fromString(str));
-
-
-        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
-
-
-        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
-        data.processIfContained(NSFW_KEY, (Boolean bool) -> {if (bool != null) this.nsfw = bool;});
-        //guildId may not change
-        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
-
-        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
-        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
-
-        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
-
-
-
-        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
-        data.processIfContained(TOPIC_KEY, (String str) -> this.topic = str);
-        data.processIfContained(NSFW_KEY, (Boolean bool) -> this.nsfw = bool);
-        //guildId should never change
-        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
-
-        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
-        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
-
-        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
-        data.processIfContained(RATE_LIMIT_PER_USER_KEY, (Number num) -> {if(num != null)this.rateLimitPerUser = num.intValue();});
-        data.processIfContained(LAST_MESSAGE_ID_KEY, (String str) -> this.lastMessageId = Snowflake.fromString(str));
-        data.processIfContained(LAST_PIN_TIMESTAMP_KEY, (String str) -> this.lastPinTimestamp = ISO8601Timestamp.fromString(str));
-
-
-
-        data.processIfContained(NAME_KEY, (String str) -> this.name = str);
-        data.processIfContained(NSFW_KEY, (Boolean bool) -> {if (bool != null) this.nsfw = bool;});
-        //guildId may not change
-        data.processIfContained(POSITION_KEY, (Number num) -> {if(num != null) this.position = num.intValue();});
-
-        List<Object> array = data.getList(PERMISSION_OVERWRITES_KEY);
-        if(array != null) this.permissionOverwrites = new PermissionOverwrites(array);
-
-        data.processIfContained(PARENT_ID_KEY, (String str) -> this.parentId = Snowflake.fromString(str));
-        data.processIfContained(BITRATE_KEY, (Number num) -> {if(num != null) this.bitRate = num.intValue();});
-        data.processIfContained(USER_LIMIT_KEY, (Number num) -> {if(num != null) this.userLimit = num.intValue();});
-        data.processIfContained(RTC_REGION_KEY, (String str) -> this.rtcRegion = str);
-        data.processIfContained(VIDEO_QUALITY_MODE_KEY, (Number num) -> {if(num != null) this.videoQualityMode = VideoQuality.fromId(num);});
-
-        */
+        //id will never change
+        data.processIfContained(TYPE_KEY, (Number num) -> this.type = ChannelType.fromNumber(num));
+        //guild id will never change
+        data.processIfContainedAndRequireNotNull(POSITION_KEY, (Number num) -> this.position = num.intValue(), InvalidDataException.SUPPLIER);
+        data.getContainer(PERMISSION_OVERWRITES_KEY).ifExists().requireNotNull(InvalidDataException.SUPPLIER)
+                .asList().castAndConvertWithException(PermissionOverwrite::fromData).process(list -> this.permissionOverwrites = list);
+        data.processIfContained(NAME_KEY, (String s ) -> this.nameOptional = OptionalValue.of(s));
+        data.processIfContained(TOPIC_KEY, (String s) -> this.topicOptional = OptionalValue.of(s));
+        data.processIfContainedAndRequireNotNull(NSFW_KEY, (Boolean b) -> this.nsfw = b, InvalidDataException.SUPPLIER);
+        data.processIfContained(LAST_MESSAGE_ID_KEY, (String s) -> this.lastMessageIdOptional = OptionalValue.of(s));
+        data.processIfContainedAndRequireNotNull(BITRATE_KEY, (Number num) -> this.bitrate = num.intValue(), InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(USER_LIMIT_KEY, (Number num) -> this.userLimit = num.intValue(), InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(RATE_LIMIT_PER_USER_KEY, (Number num) -> this.rateLimitPerUser = num.intValue(), InvalidDataException.SUPPLIER);
+        data.getContainer(RECIPIENTS_KEY).ifExists().requireNotNull(InvalidDataException.SUPPLIER)
+                .asList().castAndConvertWithException((SOData c) -> User.fromData(lApi, c)).process(users -> this.recipients = users);
+        data.processIfContained(ICON_KEY, (String s) -> this.iconOptional = OptionalValue.of(s));
+        data.processIfContainedAndRequireNotNull(OWNER_ID_KEY, (String s) -> this.ownerId = s, InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(APPLICATION_ID_KEY, (String s) -> this.applicationId = s, InvalidDataException.SUPPLIER);
+        data.processIfContained(PARENT_ID_KEY, (String s) -> this.parentIdOptional = OptionalValue.of(s));
+        data.convertAndProcessIfContained(LAST_PIN_TIMESTAMP_KEY, ISO8601Timestamp::fromString, t -> this.lastPinTimestampOptional = OptionalValue.of(t));
+        data.processIfContained(RTC_REGION_KEY, (String s) -> this.rtcRegionOptional = OptionalValue.of(s));
+        data.convertAndProcessIfContainedAndRequireNotNull(VIDEO_QUALITY_MODE_KEY, VideoQuality::fromId, vq -> this.videoQualityMode = vq, InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(MESSAGE_COUNT_KEY, (Number num) -> this.messageCount = num.intValue(), InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(MEMBER_COUNT_KEY, (Number num) -> this.memberCount = num.intValue(), InvalidDataException.SUPPLIER);
+        data.convertWithExceptionAndProcessIfContainedAndRequireNotNull(THREAD_METADATA_KEY, ThreadMetadata::new, tM -> this.threadMetadata = tM, InvalidDataException.SUPPLIER);
+        data.convertWithExceptionAndProcessIfContainedAndRequireNotNull(MEMBER_KEY, ThreadMember::fromData, tM -> this.member = tM, InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(DEFAULT_AUTO_ARCHIVE_DURATION_KEY, (Number num) -> this.defaultAutoArchiveDuration = num.intValue(), InvalidDataException.SUPPLIER);
+        data.convertWithExceptionAndProcessIfContainedAndRequireNotNull(PERMISSIONS_KEY, Permissions::ofString, p -> this.permissions = p, InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(FLAGS_KEY, (Number num) -> this.flags = num.intValue(), InvalidDataException.SUPPLIER);
+        data.processIfContainedAndRequireNotNull(TOTAL_MESSAGE_SENT_KEY, (Number num) -> this.totalMessageSent = num.intValue(), InvalidDataException.SUPPLIER);
+        data.getContainer(AVAILABLE_TAGS_KEY).ifExists().requireNotNull(InvalidDataException.SUPPLIER)
+                .asList().castAndConvertWithException(ForumTag::fromData).process(list -> this.availableTags = list);
+        data.getContainer(APPLIED_TAGS_KEY).ifExists().requireNotNull(InvalidDataException.SUPPLIER).asList().<String>cast().process((List<String> list) -> this.appliedTags = list);
+        data.convertAndProcessIfContained(DEFAULT_REACTION_EMOJI_KEY, DefaultReaction::fromData, dr -> this.defaultReactionEmojiOptional = OptionalValue.of(dr));
+        data.processIfContainedAndRequireNotNull(DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY, (Number num) -> this.defaultThreadRateLimitPerUser = num.intValue(), InvalidDataException.SUPPLIER);
+        data.convertAndProcessIfContained(DEFAULT_SORT_ORDER_KEY, SortOrderType::fromValue, sot -> this.defaultSortOrderOptional = OptionalValue.of(sot));
     }
 }

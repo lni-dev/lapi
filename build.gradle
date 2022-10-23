@@ -14,7 +14,12 @@ targetCompatibility = JavaVersion.VERSION_11
 sourceCompatibility = JavaVersion.VERSION_11
 compileJava.options.encoding = 'UTF-8'
 
+def useMavenLocal = false;
+
 repositories {
+    if(useMavenLocal) {
+        mavenLocal()
+    }
     mavenCentral()
 }
 
@@ -31,7 +36,7 @@ tasks.named('jar') {
 }
 
 dependencies {
-    api 'io.github.lni-dev:data:2.0.13'
+    api 'io.github.lni-dev:data:2.0.17'
     api 'org.jetbrains:annotations:23.0.0'
 }
 
@@ -47,6 +52,15 @@ java {
 javadoc {
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:none', '-quiet')
+    title = "LApi"
+
+    configure(options) {
+        tags(
+                'implNote:a:Implementation Note:',
+                'implSpec:a:Implemenatation Requirements:',
+                'apiNote:a:API Note:'
+        )
+    }
 }
 
 publishing {

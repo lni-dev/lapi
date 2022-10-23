@@ -17,6 +17,7 @@
 package me.linusdev.lapi.api.objects.permission;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ import java.util.Objects;
  * This class represents a set of {@link Permission permissions}.
  * @see Permission
  */
-public class Permissions implements SimpleDatable {
+public class Permissions implements SimpleDatable, Copyable<Permissions> {
 
     private @NotNull BigInteger setBits;
 
@@ -126,5 +127,11 @@ public class Permissions implements SimpleDatable {
     @Override
     public Object simplify() {
         return getValueAsString();
+    }
+
+    @NotNull
+    @Override
+    public Permissions copy() {
+        return new Permissions(new BigInteger(setBits.toByteArray()));
     }
 }
