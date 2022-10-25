@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.objects.invite;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

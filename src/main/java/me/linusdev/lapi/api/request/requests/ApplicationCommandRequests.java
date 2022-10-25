@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.request.requests;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;

@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.manager.voiceregion;
 
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;

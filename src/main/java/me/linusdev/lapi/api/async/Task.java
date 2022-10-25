@@ -20,7 +20,7 @@ import me.linusdev.lapi.api.async.error.MessageError;
 import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.exception.ErrorException;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.log.Logger;

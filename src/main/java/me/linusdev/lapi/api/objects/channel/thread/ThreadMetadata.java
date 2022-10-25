@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.objects.channel.thread;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;

@@ -24,7 +24,7 @@ import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.Queueable;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.retriever.Retriever;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.log.Logger;

@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.communication.cdn.image.ImageQuery;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
@@ -105,7 +106,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable SOData data){
         if(data == null) return null;
         //TODO
-        return null;
+        return GuildImpl.fromData((LApiImpl) lApi, data);
     }
 
     /**

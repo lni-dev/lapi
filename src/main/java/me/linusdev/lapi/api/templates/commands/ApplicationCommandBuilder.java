@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.templates.commands;
 
-import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandException;
-import me.linusdev.lapi.api.communication.exceptions.InvalidApplicationCommandOptionException;
+import me.linusdev.lapi.api.exceptions.InvalidApplicationCommandException;
+import me.linusdev.lapi.api.exceptions.InvalidApplicationCommandOptionException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;

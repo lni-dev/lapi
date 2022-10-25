@@ -16,10 +16,8 @@
 
 package me.linusdev.lapi.api.exceptions;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.interfaces.Requireable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.query.AbstractLink;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.interfaces.Unique;

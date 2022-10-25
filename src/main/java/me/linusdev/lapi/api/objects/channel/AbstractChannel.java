@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.objects.channel;
 
 import me.linusdev.data.OptionalValue;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.objects.enums.VideoQuality;
 import me.linusdev.lapi.api.objects.channel.forum.DefaultReaction;

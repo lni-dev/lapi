@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.interaction.response;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;

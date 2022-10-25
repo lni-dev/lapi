@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.queue;
 
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
 import me.linusdev.lapi.api.communication.gateway.other.GatewayPayload;
 

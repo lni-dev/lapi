@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.templates.message.builder;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.objects.attachment.PartialAttachment;
 import me.linusdev.lapi.api.objects.enums.MessageType;
@@ -29,7 +29,7 @@ import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
-import me.linusdev.lapi.api.communication.exceptions.LimitException;
+import me.linusdev.lapi.api.exceptions.LimitException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.interfaces.HasLApi;

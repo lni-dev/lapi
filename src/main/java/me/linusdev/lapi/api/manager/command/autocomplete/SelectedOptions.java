@@ -16,8 +16,8 @@
 
 package me.linusdev.lapi.api.manager.command.autocomplete;
 
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandInteractionDataOption;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;

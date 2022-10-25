@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.gateway.presence;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.activity.ActivityType;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommand;

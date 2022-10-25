@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.communication.http.request;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 
 public class LApiHttpRequestException extends LApiException {
     public LApiHttpRequestException() {

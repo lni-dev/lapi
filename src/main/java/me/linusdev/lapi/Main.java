@@ -23,7 +23,7 @@ import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.helper.Helper;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;

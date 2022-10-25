@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.objects.channel.forum;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.objects.permission.Permission;

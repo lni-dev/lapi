@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.communication.gateway.queue;
 
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.queue.processor.DispatchEventProcessor;
 import org.jetbrains.annotations.*;

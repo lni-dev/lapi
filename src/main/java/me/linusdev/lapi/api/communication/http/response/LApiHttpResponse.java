@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.communication.http.response;
 import me.linusdev.data.so.SOData;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.ContentType;
 import me.linusdev.lapi.api.communication.http.HeaderType;
@@ -27,7 +27,6 @@ import me.linusdev.lapi.api.communication.http.HeaderTypes;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitHeaders;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitResponse;
 import me.linusdev.lapi.api.communication.http.ratelimit.RateLimitScope;
-import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.response.body.HttpErrorMessage;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.log.LogInstance;
@@ -40,7 +39,6 @@ import java.io.InputStream;
 import java.io.PushbackReader;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
-import java.util.Objects;
 import java.util.Optional;
 
 /**

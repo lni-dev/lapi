@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.templates.guild;
 
-/**
- * file type is not supported I guess...
- */
-public class UnsupportedFileTypeException extends LApiUncheckedException{
-    public UnsupportedFileTypeException(String message) {
-        super(message);
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.templates.abstracts.Template;
+
+public class ModifyGuildTemplate implements Template {
+
+
+
+    @Override
+    public SOData getData() {
+        return null;
     }
 }

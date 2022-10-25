@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
-public class LApiRuntimeException extends RuntimeException{
-
-    public LApiRuntimeException(){super();}
-
-    public LApiRuntimeException(String message){
-        super(message);
-    }
-
-    public LApiRuntimeException(Throwable cause) {
-        super(cause);
-    }
+public class NoInternetException extends LApiException{
 }

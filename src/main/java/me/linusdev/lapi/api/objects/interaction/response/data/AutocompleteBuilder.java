@@ -16,18 +16,14 @@
 
 package me.linusdev.lapi.api.objects.interaction.response.data;
 
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionChoice;
-import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOptionType;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
-import me.linusdev.lapi.api.templates.commands.ApplicationCommandOptionBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 

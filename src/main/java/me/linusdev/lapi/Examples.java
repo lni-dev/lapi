@@ -17,7 +17,7 @@
 package me.linusdev.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.message.MessageUpdateEvent;
@@ -27,7 +27,6 @@ import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
-import me.linusdev.lapi.api.objects.message.impl.MessageImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

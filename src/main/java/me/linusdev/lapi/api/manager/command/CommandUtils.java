@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.manager.command;
 import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.Task;
 import me.linusdev.lapi.api.async.queue.QResponse;
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.command.ApplicationCommand;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;

@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.request.requests;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import org.jetbrains.annotations.NotNull;

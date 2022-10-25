@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
-public class LApiException extends Exception{
+public class LimitException extends LApiRuntimeException{
 
-    public LApiException() {
-    }
-
-    public LApiException(String message) {
+    public LimitException(String message){
         super(message);
-    }
-
-    public LApiException(String message, Throwable cause) {
-        super(message, cause);
     }
 }

@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.manager.guild.voicestate;
+package me.linusdev.lapi.api.exceptions;
 
-import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.communication.gateway.update.Update;
-import me.linusdev.lapi.api.manager.Manager;
-import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
-import org.jetbrains.annotations.NotNull;
+public class LApiRuntimeException extends RuntimeException{
 
-public interface VoiceStateManager extends VoiceStatePool, Manager {
+    public LApiRuntimeException(){super();}
 
+    public LApiRuntimeException(String message){
+        super(message);
+    }
 
-
-    VoiceState add(VoiceState voiceState);
-
-    @NotNull Update<VoiceState, VoiceState> update(@NotNull SOData voiceStateData) throws InvalidDataException;
+    public LApiRuntimeException(Throwable cause) {
+        super(cause);
+    }
 }

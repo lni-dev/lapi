@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.objects.message.embed;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 
 /**
  * This

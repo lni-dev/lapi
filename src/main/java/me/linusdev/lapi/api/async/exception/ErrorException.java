@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.async.exception;
 
 import me.linusdev.lapi.api.async.error.Error;
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 
 public class ErrorException extends LApiRuntimeException {
 

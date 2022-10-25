@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.manager.guild.role;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.manager.Manager;
 import me.linusdev.lapi.api.objects.role.Role;

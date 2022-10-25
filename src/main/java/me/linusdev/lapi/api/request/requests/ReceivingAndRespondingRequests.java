@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.request.requests;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiIllegalStateException;
+import me.linusdev.lapi.api.exceptions.LApiIllegalStateException;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
 import me.linusdev.lapi.api.objects.application.Application;
 import me.linusdev.lapi.api.objects.interaction.Interaction;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
 /**
  * Exceptions like this are thrown, if an Exception is thrown in some corner cases, but

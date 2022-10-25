@@ -21,7 +21,7 @@ import me.linusdev.data.functions.Converter;
 import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.events.Event;
 import me.linusdev.lapi.api.lapi.LApi;

@@ -17,9 +17,8 @@
 package me.linusdev.lapi.api.objects.presence;
 
 import me.linusdev.data.Datable;
-import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.gateway.activity.Activity;
 import me.linusdev.lapi.api.communication.gateway.presence.StatusType;
 import me.linusdev.lapi.api.interfaces.CopyAndUpdatable;

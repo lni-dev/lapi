@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.templates.attachment;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.UnsupportedFileTypeException;
+import me.linusdev.lapi.api.exceptions.UnsupportedFileTypeException;
 import me.linusdev.lapi.api.communication.file.types.AbstractContentType;
 import me.linusdev.lapi.api.communication.file.types.AbstractFileType;
 import me.linusdev.lapi.api.communication.file.types.FileType;

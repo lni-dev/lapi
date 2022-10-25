@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
 public class InvalidApplicationCommandOptionException extends InvalidApplicationCommandException{
     public InvalidApplicationCommandOptionException(String message) {

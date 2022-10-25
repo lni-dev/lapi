@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.async;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.lapi.LApi;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;

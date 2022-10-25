@@ -21,7 +21,7 @@ import me.linusdev.data.entry.Entry;
 import me.linusdev.data.implemantations.SAODataListImpl;
 import me.linusdev.data.so.SAOData;
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.Attachment;

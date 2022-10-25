@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
-import me.linusdev.lapi.api.communication.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.request.Method;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;

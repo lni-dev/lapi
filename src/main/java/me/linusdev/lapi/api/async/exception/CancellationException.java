@@ -16,7 +16,7 @@
 
 package me.linusdev.lapi.api.async.exception;
 
-import me.linusdev.lapi.api.communication.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 
 public class CancellationException extends LApiRuntimeException {
 }

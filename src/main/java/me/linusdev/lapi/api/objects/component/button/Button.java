@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.objects.component.button;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.component.ComponentType;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;

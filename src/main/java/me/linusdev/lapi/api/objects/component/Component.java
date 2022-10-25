@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.objects.component;
 import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.lapi.LApi;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.objects.component.actionrow.ActionRow;
 import me.linusdev.lapi.api.objects.component.button.Button;
 import me.linusdev.lapi.api.objects.component.selectmenu.SelectMenu;

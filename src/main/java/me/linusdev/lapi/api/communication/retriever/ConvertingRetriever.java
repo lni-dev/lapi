@@ -17,7 +17,7 @@
 package me.linusdev.lapi.api.communication.retriever;
 
 import me.linusdev.data.so.SOData;
-import me.linusdev.lapi.api.communication.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.communication.retriever.converter.Converter;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
 import org.jetbrains.annotations.NotNull;

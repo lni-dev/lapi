@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Linus Andera
+ * Copyright (c) 2022 Linus Andera
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
-public class NoInternetException extends LApiException{
+public class LApiIllegalStateException extends LApiRuntimeException {
+
+    public LApiIllegalStateException(String message) {
+        super(message);
+    }
 }

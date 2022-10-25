@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.communication.exceptions;
+package me.linusdev.lapi.api.exceptions;
 
 import me.linusdev.data.AbstractData;
 import me.linusdev.data.functions.ExceptionSupplier;
