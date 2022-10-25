@@ -47,7 +47,7 @@ import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
 import me.linusdev.lapi.api.request.AnchorType;
 import me.linusdev.lapi.api.request.RequestFactory;
-import me.linusdev.lapi.api.templates.EditMessageTemplate;
+import me.linusdev.lapi.api.templates.message.EditMessageTemplate;
 import me.linusdev.lapi.api.templates.message.AllowedMentions;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;

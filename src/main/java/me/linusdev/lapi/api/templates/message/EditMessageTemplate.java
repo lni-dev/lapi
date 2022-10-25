@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.templates;
+package me.linusdev.lapi.api.templates.message;
 
 import me.linusdev.lapi.api.objects.attachment.abstracts.Attachment;
 import me.linusdev.lapi.api.objects.component.Component;
 import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.templates.abstracts.Template;
-import me.linusdev.lapi.api.templates.message.AllowedMentions;
-import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import org.jetbrains.annotations.Nullable;
 
 public class EditMessageTemplate extends MessageTemplate implements Template {
