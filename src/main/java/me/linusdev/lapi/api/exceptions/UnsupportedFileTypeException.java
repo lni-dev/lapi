@@ -19,7 +19,7 @@ package me.linusdev.lapi.api.exceptions;
 /**
  * file type is not supported I guess...
  */
-public class UnsupportedFileTypeException extends LApiUncheckedException{
+public class UnsupportedFileTypeException extends LApiRuntimeException {
     public UnsupportedFileTypeException(String message) {
         super(message);
     }
