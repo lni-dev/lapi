@@ -17,11 +17,14 @@
 package me.linusdev.lapi.api.objects.guild.enums;
 
 import me.linusdev.data.SimpleDatable;
+import me.linusdev.lapi.api.objects.permission.Permission;
 import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @see <a href="https://discord.com/developers/docs/resources/guild#guild-object-guild-features" target="_top">GuildImpl Features</a>
+ * @updated 25.10.2022
  */
 public enum GuildFeature implements SimpleDatable {
 
@@ -31,9 +34,19 @@ public enum GuildFeature implements SimpleDatable {
     UNKNOWN("-1"),
 
     /**
+     * guild has access to set an animated guild banner image
+     */
+    ANIMATED_BANNER("ANIMATED_BANNER"),
+
+    /**
      * guild has access to set an animated guild icon
      */
     ANIMATED_ICON("ANIMATED_ICON"),
+
+    /**
+     * guild has set up auto moderation rules
+     */
+    AUTO_MODERATION("AUTO_MODERATION"),
 
     /**
      * guild has access to set a guild banner image
@@ -43,22 +56,33 @@ public enum GuildFeature implements SimpleDatable {
     /**
      * guild has access to use commerce features (i.e. create store channels)
      */
+    @Deprecated
     COMMERCE("COMMERCE"),
 
     /**
      * guild can enable welcome screen, Membership Screening, stage channels and discovery, and receives community updates
      */
-    COMMUNITY("COMMUNITY"),
+    COMMUNITY("COMMUNITY", Permission.ADMINISTRATOR),
+
+    /**
+     * guild has been set as a support server on the App Directory
+     */
+    DEVELOPER_SUPPORT_SERVER("DEVELOPER_SUPPORT_SERVER"),
 
     /**
      * guild is able to be discovered in the directory
      */
-    DISCOVERABLE("DISCOVERABLE"),
+    DISCOVERABLE("DISCOVERABLE", Permission.ADMINISTRATOR),
 
     /**
      * guild is able to be featured in the directory
      */
     FEATURABLE("FEATURABLE"),
+
+    /**
+     * guild has paused invites, preventing new users from joining
+     */
+    INVITES_DISABLED("INVITES_DISABLED", Permission.MANAGE_GUILD),
 
     /**
      * guild has access to set an invite splash background
@@ -108,11 +132,13 @@ public enum GuildFeature implements SimpleDatable {
     /**
      * guild has access to the seven day archive time for threads
      */
+    @Deprecated
     SEVEN_DAY_THREAD_ARCHIVE("SEVEN_DAY_THREAD_ARCHIVE"),
 
     /**
      * guild has access to the three day archive time for threads
      */
+    @Deprecated
     THREE_DAY_THREAD_ARCHIVE("THREE_DAY_THREAD_ARCHIVE"),
 
     /**
@@ -141,10 +167,22 @@ public enum GuildFeature implements SimpleDatable {
     WELCOME_SCREEN_ENABLED("WELCOME_SCREEN_ENABLED"),
     ;
 
-    private final String value;
+    private final @NotNull String value;
+    private final boolean mutable;
+    private final @Nullable Permission requiredPermission;
+
+    GuildFeature(@NotNull String value, boolean mutable, @Nullable Permission requiredPermission) {
+        this.value = value;
+        this.mutable = mutable;
+        this.requiredPermission = requiredPermission;
+    }
+
+    GuildFeature(@NotNull String value, @NotNull Permission requiredPermission) {
+        this(value, true, requiredPermission);
+    }
 
     GuildFeature(String value) {
-        this.value = value;
+        this(value, false, null);
     }
 
     @Contract("null -> null; !null -> !null")
@@ -186,6 +224,14 @@ public enum GuildFeature implements SimpleDatable {
         }
 
         return array;
+    }
+
+    public boolean isMutable() {
+        return mutable;
+    }
+
+    public @Nullable Permission getRequiredPermission() {
+        return requiredPermission;
     }
 
     @Override
