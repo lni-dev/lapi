@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public interface Requireable {
 
-    @Nullable Requireable[] requires();
+    @NotNull Requireable @Nullable[] requires();
 
     boolean isPresent(@NotNull LApiImpl lApi);
 
@@ -35,18 +35,20 @@ public interface Requireable {
      * @param lApi {@link LApiImpl}
      * @throws MissingRequirementsException if a {@link Requireable requirement} for given {@link Requireable} is missing.
      */
+    @SuppressWarnings("UnnecessaryModifier")
     public static void isValid(@NotNull Requireable requireable, @NotNull LApiImpl lApi) {
         if(requireable.requires() == null) return;
+        //noinspection ConstantConditions: checked by above if
         MissingRequirementsException e = isValid(requireable, requireable.requires(), lApi, null, new ArrayList<>());
         if( e != null) throw e;
     }
 
-    private static @Nullable MissingRequirementsException isValid(@NotNull Requireable checkFor, @NotNull Requireable[] requires, @NotNull LApiImpl lApi,
+    private static @Nullable MissingRequirementsException isValid(@NotNull Requireable checkFor, @NotNull Requireable @NotNull[] requires, @NotNull LApiImpl lApi,
                                                         @Nullable MissingRequirementsException e, @NotNull ArrayList<Requireable> alreadyChecked) {
-        for(Requireable r : requires) {
+        loop: for(Requireable r : requires) {
             for(Requireable checked : alreadyChecked) {
                 //avoid endless recursion
-                if(r.equals(checked)) continue;
+                if(r.equals(checked)) continue loop;
             }
             alreadyChecked.add(r);
             if(!r.isPresent(lApi)) {
@@ -55,6 +57,7 @@ public interface Requireable {
             }
 
             if(r.requires() != null){
+                //noinspection ConstantConditions: checked by above if
                 e = isValid(checkFor, r.requires(), lApi, e, alreadyChecked);
             }
         }
