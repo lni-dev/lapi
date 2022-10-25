@@ -16,7 +16,6 @@
 
 package me.linusdev.lapi.api.other.localization;
 
-import me.linusdev.lapi.api.objects.local.Locale;
 import org.jetbrains.annotations.NotNull;
 
 public class Localization {

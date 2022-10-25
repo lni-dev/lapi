@@ -21,7 +21,7 @@ import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
-import me.linusdev.lapi.api.objects.local.Locale;
+import me.linusdev.lapi.api.objects.locale.Locale;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;

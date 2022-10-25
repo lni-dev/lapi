@@ -20,7 +20,7 @@ import me.linusdev.lapi.api.exceptions.InvalidApplicationCommandOptionException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.channel.ChannelType;
-import me.linusdev.lapi.api.objects.local.Locale;
+import me.linusdev.lapi.api.objects.locale.Locale;
 import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

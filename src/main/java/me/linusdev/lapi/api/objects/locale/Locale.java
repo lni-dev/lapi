@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.linusdev.lapi.api.objects.local;
+package me.linusdev.lapi.api.objects.locale;
 
 import me.linusdev.lapi.helper.Helper;
 import org.jetbrains.annotations.ApiStatus;

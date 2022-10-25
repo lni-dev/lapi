@@ -35,7 +35,7 @@ import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
 import me.linusdev.lapi.api.objects.guild.enums.*;
 import me.linusdev.lapi.api.objects.guild.voice.VoiceState;
-import me.linusdev.lapi.api.objects.local.Locale;
+import me.linusdev.lapi.api.objects.locale.Locale;
 import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.presence.PresenceUpdate;
