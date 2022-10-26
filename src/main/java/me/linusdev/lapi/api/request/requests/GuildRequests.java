@@ -25,8 +25,10 @@ import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.guild.Guild;
+import me.linusdev.lapi.api.objects.guild.enums.GuildFeature;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.templates.channel.ChannelTemplate;
+import me.linusdev.lapi.api.templates.guild.ModifyGuildTemplate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -58,12 +60,25 @@ public interface GuildRequests extends HasLApi {
      *                                                                                                           *
      *                                             Modify / Delete Guild                                         *
      *                                                                                                           *
-     *  Done:       00.00.2022                                                                                   *
+     *  Done:       26.10.2022                                                                                   *
      *  Updated:    00.00.0000                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-    default @NotNull Queueable<Guild> modifyGuild(@NotNull String guildId) {
-        LinkQuery query = new LinkQuery(getLApi(), Link.MODIFY_GUILD,
+    /**
+     * <p>
+     *     Modify a guild's settings. Requires the {@link Permission#MANAGE_GUILD MANAGE_GUILD} permission.
+     *     Returns the updated guild object on success. Fires a {@link GatewayEvent#GUILD_UPDATE Guild Update} Gateway event.
+     * </p>
+     * <p>
+     *     Only some {@link GuildFeature guild features} are mutable and these may require special permissions.
+     *     See the {@link GuildFeature} you want to add/remove for more information.
+     * </p>
+     * @param guildId id of the guild to modify
+     * @param template {@link ModifyGuildTemplate}
+     * @return {@link Queueable} than can modify and retrieve the guild.
+     */
+    default @NotNull Queueable<Guild> modifyGuild(@NotNull String guildId, @NotNull ModifyGuildTemplate template) {
+        LinkQuery query = new LinkQuery(getLApi(), Link.MODIFY_GUILD, template.getBody(),
                 GUILD_ID.withValue(guildId));
         return new ConvertingRetriever<>(query, Guild::fromData);
     }

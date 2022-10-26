@@ -71,7 +71,7 @@ public class Modal implements Datable, Template {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(3);
         data.add(CUSTOM_ID_KEY, customId);
         data.add(TITLE_KEY, title);

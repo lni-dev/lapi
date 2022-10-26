@@ -26,6 +26,7 @@ import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.nonce.Nonce;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.templates.abstracts.Template;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public class MessageTemplate implements Template {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(CONTENT_KEY, content);

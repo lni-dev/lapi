@@ -76,7 +76,7 @@ public class ChannelTemplate implements Template {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(1);
 
         data.add(NAME_KEY, name);

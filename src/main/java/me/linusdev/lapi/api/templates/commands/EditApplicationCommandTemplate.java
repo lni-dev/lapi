@@ -21,6 +21,7 @@ import me.linusdev.lapi.api.other.localization.LocalizationDictionary;
 import me.linusdev.lapi.api.objects.command.option.ApplicationCommandOption;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.templates.abstracts.Template;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static me.linusdev.lapi.api.objects.command.ApplicationCommand.*;
@@ -54,7 +55,7 @@ public class EditApplicationCommandTemplate implements Template {
 
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.addIfNotNull(NAME_KEY, name);

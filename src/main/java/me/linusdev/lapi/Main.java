@@ -17,17 +17,12 @@
 package me.linusdev.lapi;
 
 
+import me.linusdev.data.OptionalValue;
 import me.linusdev.data.parser.exceptions.ParseException;
-import me.linusdev.lapi.api.cache.CacheReadyEvent;
-import me.linusdev.lapi.api.communication.gateway.events.ready.ReadyEvent;
-import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener;
-import me.linusdev.lapi.api.config.ConfigBuilder;
-import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.exceptions.LApiException;
-import me.linusdev.lapi.helper.Helper;
+import me.linusdev.lapi.api.templates.guild.ModifyGuildTemplate;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -39,25 +34,6 @@ public class Main {
     public static void main(String... args) throws IOException, InterruptedException, ParseException, LApiException, ExecutionException, URISyntaxException {
         Logger.start(true, false);
         LogInstance log = Logger.getLogger("main");
-
-        ConfigBuilder configBuilder = new ConfigBuilder(Helper.getConfigPath());
-        final LApi lApi = configBuilder.buildLApi();
-
-        lApi.getEventTransmitter().addListener(new EventListener() {
-            @Override
-            public void onReady(@NotNull LApi lApi, @NotNull ReadyEvent event) {
-                System.out.println("onReady");
-            }
-
-            @Override
-            public void onCacheReady(@NotNull LApi lApi, @NotNull CacheReadyEvent event) {
-                System.out.println("cache ready");
-            }
-        });
-
-        lApi.waitUntilLApiReadyEvent();
-
-        System.out.println("yay");
 
     }
 }

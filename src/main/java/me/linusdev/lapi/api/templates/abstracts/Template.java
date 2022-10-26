@@ -16,15 +16,16 @@
 
 package me.linusdev.lapi.api.templates.abstracts;
 
-import me.linusdev.data.Datable;
 import me.linusdev.data.so.SOData;
+import me.linusdev.data.so.SODatable;
 import me.linusdev.lapi.api.communication.http.request.body.FilePart;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A {@link Template} is a template, which can be sent to Discord to create an object
  */
-public interface Template extends Datable {
+public interface Template extends SODatable {
 
     /**
      * The Files used in this Template
@@ -42,5 +43,5 @@ public interface Template extends Datable {
     }
 
     @Override
-    SOData getData();
+    @NotNull SOData getData();
 }

@@ -65,7 +65,7 @@ public class InteractionResponse implements Datable, Template {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(2);
 
         data.add(TYPE_KEY, type);

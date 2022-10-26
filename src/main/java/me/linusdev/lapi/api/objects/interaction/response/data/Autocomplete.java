@@ -44,7 +44,7 @@ public class Autocomplete implements Datable, Template {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(1);
         data.add(CHOICES_KEY, choices);
         return data;

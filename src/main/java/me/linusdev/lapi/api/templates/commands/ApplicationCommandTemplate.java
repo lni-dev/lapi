@@ -99,7 +99,7 @@ public class ApplicationCommandTemplate implements Template, Datable {
     }
 
     @Override
-    public SOData getData() {
+    public @NotNull SOData getData() {
         SOData data = SOData.newOrderedDataWithKnownSize(9);
 
         data.add(NAME_KEY, name);

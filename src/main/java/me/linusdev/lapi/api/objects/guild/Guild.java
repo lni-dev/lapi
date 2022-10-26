@@ -44,10 +44,9 @@ import java.util.Collection;
 /**
  *
  * A temporary guild object.
- *
- * <a href="https://discord.com/developers/docs/resources/guild#guild-resource" target="_top">GuildImpl Resource</a>
+ * @see <a href="https://discord.com/developers/docs/resources/guild#guild-resource" target="_top">GuildImpl Resource</a>
  */
-@SuppressWarnings("UnnecessaryInterfaceModifier")
+@SuppressWarnings({"UnnecessaryInterfaceModifier", "unused"})
 public interface Guild extends Datable, HasLApi, SnowflakeAble {
 
     public static final String ID_KEY = "id";
@@ -101,6 +100,7 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
     public static final String STAGE_INSTANCES_KEY = "stage_instances";
     public static final String STICKERS_KEY = "stickers";
     public static final String GUILD_SCHEDULED_EVENTS_KEY = "guild_scheduled_events";
+    public static final String PREMIUM_PROGRESS_BAR_ENABLED = "premium_progress_bar_enabled";
 
 
     static @Nullable Guild fromData(@NotNull LApi lApi, @Nullable SOData data){

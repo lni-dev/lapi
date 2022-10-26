@@ -35,4 +35,31 @@ public interface AbstractFileType {
     default @NotNull String getFirstFileEnding() {
         return getFileEndings()[0];
     }
+
+    /**
+     *
+     * @param fileEnding the file ending
+     * @return matching {@link FileType} or a new {@link AbstractFileType} with given file ending.
+     */
+    @SuppressWarnings("UnnecessaryModifier")
+    public static @NotNull AbstractFileType of(@NotNull String fileEnding) {
+        for(FileType f : FileType.values()) {
+            for(String ending : f.getFileEndings()) {
+                if(ending.equalsIgnoreCase(fileEnding))
+                    return f;
+            }
+        }
+
+        return new AbstractFileType() {
+            @Override
+            public @Nullable AbstractContentType getContentType() {
+                return null;
+            }
+
+            @Override
+            public @NotNull String[] getFileEndings() {
+                return new String[]{fileEnding};
+            }
+        };
+    }
 }

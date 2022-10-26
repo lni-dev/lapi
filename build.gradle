@@ -36,7 +36,7 @@ tasks.named('jar') {
 }
 
 dependencies {
-    api 'io.github.lni-dev:data:2.0.17'
+    api 'io.github.lni-dev:data:2.0.18'
     api 'org.jetbrains:annotations:23.0.0'
 }
 
