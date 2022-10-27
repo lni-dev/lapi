@@ -135,15 +135,15 @@ public abstract class AbstractChannel implements Channel {
         this.id = data.getAsAndRequireNotNull(ID_KEY, InvalidDataException.SUPPLIER);
         this.type = type;
         this.guildId = data.getAs(GUILD_ID_KEY);
-        this.position = data.getAs(POSITION_KEY);
+        this.position = data.getAndConvert(POSITION_KEY, (Number num) -> num == null ? null : num.intValue());
         this.permissionOverwrites = data.getListAndConvertWithException(PERMISSION_OVERWRITES_KEY, PermissionOverwrite::fromData);
         this.nameOptional = data.getOptionalValue(NAME_KEY);
         this.topicOptional = data.getOptionalValue(TOPIC_KEY);
         this.nsfw = data.getAs(NSFW_KEY);
         this.lastMessageIdOptional = data.getOptionalValue(LAST_MESSAGE_ID_KEY);
-        this.bitrate = data.getAs(BITRATE_KEY);
-        this.userLimit = data.getAs(USER_LIMIT_KEY);
-        this.rateLimitPerUser = data.getAs(RATE_LIMIT_PER_USER_KEY);
+        this.bitrate = data.getAndConvert(BITRATE_KEY, (Number num) -> num == null ? null : num.intValue());
+        this.userLimit = data.getAndConvert(USER_LIMIT_KEY, (Number num) -> num == null ? null : num.intValue());
+        this.rateLimitPerUser = data.getAndConvert(RATE_LIMIT_PER_USER_KEY, (Number num) -> num == null ? null : num.intValue());
         this.recipients = data.getListAndConvertWithException(RECIPIENTS_KEY, (SOData c) -> User.fromData(lApi, c));
         this.iconOptional = data.getOptionalValue(ICON_KEY);
         this.ownerId = data.getAs(OWNER_ID_KEY);
@@ -152,18 +152,18 @@ public abstract class AbstractChannel implements Channel {
         this.lastPinTimestampOptional = data.getOptionalValueAndConvert(LAST_PIN_TIMESTAMP_KEY, ISO8601Timestamp::fromString);
         this.rtcRegionOptional = data.getOptionalValue(RTC_REGION_KEY);
         this.videoQualityMode = data.getAndConvert(VIDEO_QUALITY_MODE_KEY, VideoQuality::fromId);
-        this.messageCount = data.getAs(MESSAGE_COUNT_KEY);
-        this.memberCount = data.getAs(MEMBER_COUNT_KEY);
-        this.threadMetadata = data.getAndConvertWithException(THREAD_METADATA_KEY, ThreadMetadata::new);
+        this.messageCount =data.getAndConvert(MESSAGE_COUNT_KEY, (Number num) -> num == null ? null : num.intValue());
+        this.memberCount = data.getAndConvert(MEMBER_COUNT_KEY, (Number num) -> num == null ? null : num.intValue());
+        this.threadMetadata = data.getAndConvertWithException(THREAD_METADATA_KEY, ThreadMetadata::fromData);
         this.member = data.getAndConvertWithException(MEMBER_KEY, ThreadMember::fromData);
-        this.defaultAutoArchiveDuration = data.getAs(DEFAULT_AUTO_ARCHIVE_DURATION_KEY);
+        this.defaultAutoArchiveDuration = data.getAndConvert(DEFAULT_AUTO_ARCHIVE_DURATION_KEY, (Number num) -> num == null ? null : num.intValue());
         this.permissions = data.getAndConvert(PERMISSIONS_KEY, Permissions::ofString);
-        this.flags = data.getAs(FLAGS_KEY);
-        this.totalMessageSent = data.getAs(TOTAL_MESSAGE_SENT_KEY);
+        this.flags = data.getAndConvert(FLAGS_KEY, (Number num) -> num == null ? null : num.intValue());
+        this.totalMessageSent = data.getAndConvert(TOTAL_MESSAGE_SENT_KEY, (Number num) -> num == null ? null : num.intValue());
         this.availableTags = data.getListAndConvertWithException(AVAILABLE_TAGS_KEY, ForumTag::fromData);
         this.appliedTags = data.getListAndConvert(APPLIED_TAGS_KEY, (String c) -> c);
         this.defaultReactionEmojiOptional = data.getOptionalValueAndConvert(DEFAULT_REACTION_EMOJI_KEY, DefaultReaction::fromData);
-        this.defaultThreadRateLimitPerUser = data.getAs(DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY);
+        this.defaultThreadRateLimitPerUser = data.getAndConvert(DEFAULT_THREAD_RATE_LIMIT_PER_USER_KEY, (Number num) -> num == null ? null : num.intValue());
         this.defaultSortOrderOptional = data.getOptionalValueAndConvert(DEFAULT_SORT_ORDER_KEY, SortOrderType::fromValue);
 
     }

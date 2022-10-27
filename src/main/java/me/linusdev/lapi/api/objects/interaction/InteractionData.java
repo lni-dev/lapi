@@ -25,7 +25,6 @@ import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandInteractionDataOption;
 import me.linusdev.lapi.api.objects.command.ApplicationCommandType;
 import me.linusdev.lapi.api.objects.component.ComponentType;
-import me.linusdev.lapi.api.objects.component.selectmenu.SelectOption;
 import me.linusdev.lapi.api.objects.snowflake.Snowflake;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +56,7 @@ public class InteractionData implements Datable, HasLApi {
     private final @Nullable ArrayList<ApplicationCommandInteractionDataOption> options;
     private final @Nullable String customId;
     private final @Nullable ComponentType componentType;
-    private final @Nullable ArrayList<SelectOption> values;
+    private final @Nullable ArrayList<String> values;
     private final @Nullable Snowflake targetId;
 
     /**
@@ -73,7 +72,11 @@ public class InteractionData implements Datable, HasLApi {
      * @param values the values the user selected
      * @param targetId id the of user or message targeted by a user or message command
      */
-    public InteractionData(@NotNull LApi lApi, @Nullable String id, @Nullable String name, @Nullable ApplicationCommandType type, @Nullable ResolvedData resolved, @Nullable ArrayList<ApplicationCommandInteractionDataOption> options, @Nullable String customId, @Nullable ComponentType componentType, @Nullable ArrayList<SelectOption> values, @Nullable Snowflake targetId) {
+    public InteractionData(@NotNull LApi lApi, @Nullable String id, @Nullable String name,
+                           @Nullable ApplicationCommandType type, @Nullable ResolvedData resolved,
+                           @Nullable ArrayList<ApplicationCommandInteractionDataOption> options,
+                           @Nullable String customId, @Nullable ComponentType componentType,
+                           @Nullable ArrayList<String> values, @Nullable Snowflake targetId) {
         this.lApi = lApi;
         this.id = id;
         this.name = name;
@@ -105,7 +108,7 @@ public class InteractionData implements Datable, HasLApi {
                 convertible -> ApplicationCommandInteractionDataOption.fromData(lApi, convertible));
         String customId = (String) data.get(CUSTOM_ID_KEY);
         Number componentType = (Number) data.get(COMPONENT_TYPE_KEY);
-        ArrayList<SelectOption> values = data.getListAndConvertWithException(VALUES_KEY, (ExceptionConverter<SOData, SelectOption, InvalidDataException>) convertible -> SelectOption.fromData(lApi, convertible));
+        ArrayList<String> values = data.getListAndConvertWithException(VALUES_KEY, (String c) -> c);
         String targetId = (String) data.get(TARGET_ID_KEY);
 
 
@@ -177,7 +180,7 @@ public class InteractionData implements Datable, HasLApi {
      * the values the user selected<br>
      * 	Component (Select) only
      */
-    public @Nullable ArrayList<SelectOption> getValues() {
+    public @Nullable ArrayList<String> getValues() {
         return values;
     }
 

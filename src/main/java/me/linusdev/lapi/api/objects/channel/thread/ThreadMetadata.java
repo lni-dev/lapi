@@ -23,6 +23,7 @@ import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.copyable.Copyable;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,6 +80,12 @@ public class ThreadMetadata implements Copyable<ThreadMetadata>, Datable {
         this.locked = locked;
         this.invitable = invitable;
         this.createTimestamp = data.getAndConvert(CREATE_TIMESTAMP_KEY, ISO8601Timestamp::fromString);
+    }
+
+    @Contract("null -> null; !null -> new")
+    public static @Nullable ThreadMetadata fromData(@Nullable SOData data) throws InvalidDataException {
+        if(data == null) return null;
+        return new ThreadMetadata(data);
     }
 
     @Override

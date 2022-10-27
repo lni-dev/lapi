@@ -18,7 +18,7 @@ package me.linusdev.lapi.api.templates.guild;
 
 import me.linusdev.data.OptionalValue;
 import me.linusdev.data.refl.OptValue;
-import me.linusdev.data.refl.ReflectionSODatable;
+import me.linusdev.data.refl.AutoSODatable;
 import me.linusdev.data.refl.Value;
 import me.linusdev.data.so.SOData;
 import me.linusdev.lapi.api.objects.guild.Guild;
@@ -35,7 +35,7 @@ import java.util.List;
  * @see <a href="https://discord.com/developers/docs/resources/guild#modify-guild">Discord Documentation</a>
  */
 @SuppressWarnings({"FieldCanBeLocal", "unused"})
-public class ModifyGuildTemplate implements Template, ReflectionSODatable {
+public class ModifyGuildTemplate implements Template, AutoSODatable {
 
     @Value(value = Guild.NAME_KEY, addIfNull = false)
     private final @Nullable String name;
@@ -141,6 +141,6 @@ public class ModifyGuildTemplate implements Template, ReflectionSODatable {
 
     @Override
     public @NotNull SOData getData() {
-        return ReflectionSODatable.super.getData();
+        return AutoSODatable.super.getData();
     }
 }
