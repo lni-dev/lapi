@@ -41,6 +41,7 @@ import java.util.List;
 /**
  * Interface for messages received from discord with all normal fields present.
  * @see <a href="https://discord.com/developers/docs/resources/channel#message-object-message-structure">Message Structure</a>
+ * @see AnyMessage
  */
 public interface ChannelMessage extends AnyMessage {
 

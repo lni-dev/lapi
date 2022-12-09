@@ -16,39 +16,44 @@
 
 package me.linusdev.lapi.api.request.requests;
 
+import me.linusdev.data.OptionalValue;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.queue.Queueable;
 import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpBody;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
-import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
-import me.linusdev.lapi.api.objects.enums.MessageFlag;
-import me.linusdev.lapi.api.objects.message.AnyMessage;
-import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
-import me.linusdev.lapi.api.objects.channel.Channel;
-import me.linusdev.lapi.api.objects.channel.ChannelType;
-import me.linusdev.lapi.api.other.placeholder.Name;
-import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
+import me.linusdev.lapi.api.communication.http.response.body.ListThreadsResponseBody;
 import me.linusdev.lapi.api.communication.retriever.ArrayRetriever;
 import me.linusdev.lapi.api.communication.retriever.ConvertingRetriever;
+import me.linusdev.lapi.api.communication.retriever.NoContentRetriever;
 import me.linusdev.lapi.api.communication.retriever.query.Link;
 import me.linusdev.lapi.api.communication.retriever.query.LinkQuery;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
-import me.linusdev.lapi.api.communication.http.response.body.ListThreadsResponseBody;
-import me.linusdev.lapi.api.async.queue.Queueable;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.ChannelType;
+import me.linusdev.lapi.api.objects.channel.thread.AutoArchiveDuration;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMetadata;
 import me.linusdev.lapi.api.objects.emoji.abstracts.Emoji;
+import me.linusdev.lapi.api.objects.enums.MessageFlag;
 import me.linusdev.lapi.api.objects.invite.Invite;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
+import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
+import me.linusdev.lapi.api.other.placeholder.Name;
+import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.request.AnchorType;
+import me.linusdev.lapi.api.request.BiContainer;
 import me.linusdev.lapi.api.request.RequestFactory;
-import me.linusdev.lapi.api.templates.message.EditMessageTemplate;
 import me.linusdev.lapi.api.templates.message.AllowedMentions;
+import me.linusdev.lapi.api.templates.message.EditMessageTemplate;
+import me.linusdev.lapi.api.templates.message.ForumThreadMessageTemplate;
 import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import me.linusdev.lapi.api.templates.message.builder.MessageBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +62,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.linusdev.lapi.api.request.RequestFactory.*;
+import static me.linusdev.lapi.api.request.RequestFactory.LIMIT_KEY;
+import static me.linusdev.lapi.api.request.requests.RequestUtils.*;
 
 public interface ChannelRequests extends HasLApi {
 
@@ -451,7 +457,7 @@ public interface ChannelRequests extends HasLApi {
      *     (currently {@value RequestUtils#BULK_DELETE_MESSAGES_MIN_MESSAGE_COUNT} and {@value RequestUtils#BULK_DELETE_MESSAGES_MAX_MESSAGE_COUNT} respectively)
      * </p>
      * <p>
-     *     This endpoint will not delete messages older than 2 weeks, and will fail with a 400 BAD REQUEST if
+     *     This endpoint will not delete messages older than {@link RequestUtils#BULK_DELETE_MESSAGES_MAX_OLDNESS_MILLIS 2 weeks}, and will fail with a 400 BAD REQUEST if
      *     any message provided is older than that or if any duplicate message IDs are provided.
      * </p>
      * @param channelId id of the {@link Channel channel} the messages to delete are in.
@@ -460,7 +466,7 @@ public interface ChannelRequests extends HasLApi {
      */
     default @NotNull Queueable<LApiHttpResponse> bulkDeleteMessages(@NotNull String channelId, @NotNull List<String> messageIds) {
         SOData data = SOData.newOrderedDataWithKnownSize(1);
-        data.add(RequestUtils.MESSAGES, messageIds);
+        data.add(RequestUtils.MESSAGES_KEY, messageIds);
 
         LinkQuery query = new LinkQuery(getLApi(), Link.BULK_DELETE_MESSAGES, new LApiHttpBody(data),
                 Name.CHANNEL_ID.withValue(channelId));
@@ -575,6 +581,52 @@ public interface ChannelRequests extends HasLApi {
      *                                                               *
      *                                                               *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    /**
+     * <p>
+     *     Creates a thread and a message in a {@link ChannelType#GUILD_FORUM forum} channel.
+     *     <br><br>
+     *     See {@link Link#START_THREAD_IN_FORUM_CHANNEL START_THREAD_IN_FORUM_CHANNEL} for a more detailed description.
+     * </p>
+     *
+     *
+     * @param channelId id of the forum channel
+     * @param name {@value Channel#CHANNEL_NAME_MIN_CHARS}-{@value Channel#CHANNEL_NAME_MAX_CHARS} character channel name
+     * @param autoArchiveDuration duration in minutes to automatically archive the thread after recent activity,
+     *                           can be set to: {@link AutoArchiveDuration}.
+     * @param rateLimitPerUser amount of seconds a user has to wait before sending another message (0-21600)
+     * @param message contents of the first message in the forum thread
+     * @param appliedTags the IDs of the set of tags that have been applied to a thread in a GUILD_FORUM channel
+     * @return {@link Queueable} that can create a thread in given forum channel and retrieve the created thread and message.
+     * @see Link#START_THREAD_IN_FORUM_CHANNEL
+     */
+    default @NotNull Queueable<BiContainer<Channel, ChannelMessage>> startThreadInForumChannel(@NotNull String channelId,
+                                                                      @NotNull String name,
+                                                                      @Nullable AutoArchiveDuration autoArchiveDuration,
+                                                                      @Nullable OptionalValue<Integer> rateLimitPerUser,
+                                                                      @NotNull ForumThreadMessageTemplate message,
+                                                                      @NotNull String @Nullable [] appliedTags) {
+        SOData jsonParams = SOData.newOrderedDataWithKnownSize(5);
+
+        jsonParams.add(NAME_KEY, name);
+        jsonParams.addIfNotNull(AUTO_ARCHIVE_DURATION_KEY, autoArchiveDuration);
+        if(rateLimitPerUser != null) jsonParams.addIfOptionalExists(RATE_LIMIT_PER_USER_KEY, rateLimitPerUser);
+        jsonParams.add(MESSAGE_KEY, message);
+        jsonParams.add(APPLIED_TAGS_KEY, appliedTags);
+
+        LinkQuery query = new LinkQuery(getLApi(), Link.START_THREAD_IN_FORUM_CHANNEL, new LApiHttpBody(jsonParams),
+                Name.CHANNEL_ID.withValue(channelId));
+        return new ConvertingRetriever<>(query, (lApi, data) -> {
+
+            Channel channel = Channel.channelFromData(lApi, data);
+            ChannelMessage msg = data.getContainer(MESSAGE_KEY)
+                    .requireNotNull(InvalidDataException.SUPPLIER)
+                    .castAndConvertWithException((SOData c) -> AnyMessage.channelMessageFromData(lApi, c))
+                    .get();
+
+            return new BiContainer<>(channel, msg);
+        });
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

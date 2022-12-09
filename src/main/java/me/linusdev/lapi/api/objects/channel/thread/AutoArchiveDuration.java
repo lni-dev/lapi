@@ -57,5 +57,4 @@ public enum AutoArchiveDuration implements SimpleDatable {
     public Object simplify() {
         return minutes;
     }
-
 }

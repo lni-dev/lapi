@@ -283,6 +283,11 @@ public class GuildImpl implements Guild {
     }
 
     @Override
+    public @NotNull List<GuildFeature> getFeatures() {
+        return features;
+    }
+
+    @Override
     public @NotNull LApi getLApi() {
         return lApi;
     }

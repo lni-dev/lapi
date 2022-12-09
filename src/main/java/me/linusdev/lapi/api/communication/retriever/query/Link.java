@@ -17,6 +17,10 @@
 package me.linusdev.lapi.api.communication.retriever.query;
 
 import me.linusdev.lapi.api.communication.ApiVersion;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.http.request.body.LApiHttpMultiPartBodyPublisher;
+import me.linusdev.lapi.api.communication.http.response.HttpResponseCode;
+import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.channel.ChannelType;
@@ -530,7 +534,54 @@ public enum Link implements AbstractLink{
 
     START_THREAD_WITHOUT_MESSAGE(Method.POST, CHANNELS, CHANNEL_ID, THREADS),
 
-    START_THREAD_IN_FORUM_CHANNEL(Method.POST, CHANNELS, CHANNEL_ID, THREADS),
+    /**
+     * <p>
+     *    Creates a new {@link Channel#isThread() thread} in a {@link ChannelType#GUILD_FORUM forum channel},
+     *    and sends a message within the created thread. Returns a {@link Channel channel},
+     *    with a nested {@link AnyMessage message object}, on success,
+     *    and a {@link HttpResponseCode#BAD_REQUEST 400 BAD REQUEST} on invalid parameters.
+     *    Fires a {@link GatewayEvent#THREAD_CREATE Thread Create}
+     *    and {@link GatewayEvent#MESSAGE_CREATE Message Create} Gateway event.
+     *
+     *    <ul>
+     *        <li>
+     *            The type of the created thread is {@link ChannelType#PUBLIC_THREAD PUBLIC_THREAD}.
+     *        </li>
+     *        <li>
+     *            See <a href="https://discord.com/developers/docs/reference#message-formatting" target="_TOP">message formatting</a>
+     *            for more information on how to properly format messages.
+     *        </li>
+     *        <li>
+     *            The current user must have the {@link Permission#SEND_MESSAGES SEND_MESSAGES} permission
+     *            ({@link Permission#CREATE_PUBLIC_THREADS CREATE_PUBLIC_THREADS} is ignored).
+     *        </li>
+     *        <li>
+     *            The maximum request size when sending a message is 8MiB.<br>
+     *            TODO: This should probably be added to some static variable.
+     *        </li>
+     *        <li>
+     *            For the embed object, you can set every field except type (it will be rich regardless of if you try
+     *            to set it), provider, video, and any height, width, or proxy_url values for images.
+     *        </li>
+     *        <li>
+     *            Examples for file uploads are available in
+     *            <a href="https://discord.com/developers/docs/reference#uploading-files">Uploading Files</a>.
+     *        </li>
+     *        <li>
+     *            Files must be attached using a multipart/form-data body as described in
+     *            <a href="https://discord.com/developers/docs/reference#uploading-files">Uploading Files</a>.<br>
+     *            see {@link LApiHttpMultiPartBodyPublisher}.
+     *        </li>
+     *        <li>
+     *            Note that when sending a message, you must provide a value for at least one of content, embeds,
+     *            sticker_ids, components, or files[n].
+     *        </li>
+     *    </ul>
+     * </p>
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel" target="_top">Discord Documentation</a>
+     */
+    START_THREAD_IN_FORUM_CHANNEL(Method.POST, true, true, CHANNELS, CHANNEL_ID, THREADS),
 
     JOIN_THREAD(Method.PUT, CHANNELS, CHANNEL_ID, THREAD_MEMBERS, ME),
 

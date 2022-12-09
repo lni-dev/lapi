@@ -44,11 +44,8 @@ import me.linusdev.lapi.api.objects.message.embed.Embed;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.role.Role;
 import me.linusdev.lapi.api.objects.user.User;
-import me.linusdev.lapi.api.templates.message.EditMessageTemplate;
+import me.linusdev.lapi.api.templates.message.*;
 import me.linusdev.lapi.api.templates.attachment.AttachmentTemplate;
-import me.linusdev.lapi.api.templates.message.AllowedMentionType;
-import me.linusdev.lapi.api.templates.message.AllowedMentions;
-import me.linusdev.lapi.api.templates.message.MessageTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -256,6 +253,16 @@ public class MessageBuilder implements HasLApi {
         return this;
     }
 
+    public MessageBuilder checkForumThreadMessageTemplate() throws LimitException {
+        check();
+
+        if(nonce != null || tts != null || messageReference != null) {
+            throw new LimitException("A template for editing a message cannot have nonce, tts or message reference ");
+        }
+
+        return this;
+    }
+
     /**
      * Will {@link #check()} and then build a {@link MessageTemplate}
      * @return {@link MessageTemplate} built with this builder
@@ -291,7 +298,7 @@ public class MessageBuilder implements HasLApi {
     }
 
     /**
-     * Will {@link #check()} and then build a {@link EditMessageTemplate}
+     * Will {@link #checkEditTemplate()} and then build a {@link EditMessageTemplate}
      * @return {@link EditMessageTemplate} built with this builder
      */
     public EditMessageTemplate buildEditMessageTemplate() throws LimitException {
@@ -300,7 +307,7 @@ public class MessageBuilder implements HasLApi {
 
     /**
      *
-     * @param check whether to {@link #check()} before building
+     * @param check whether to {@link #checkEditTemplate()} before building
      * @return {@link EditMessageTemplate} built with this builder
      */
     public EditMessageTemplate buildEditMessageTemplate(boolean check) throws LimitException {
@@ -318,6 +325,38 @@ public class MessageBuilder implements HasLApi {
                 attachments == null ? null : attachments.toArray(new Attachment[0]),
                 flags == null ? null : MessageFlag.getBitsFromFlags(flags));
     }
+
+    /**
+     * Will {@link #checkForumThreadMessageTemplate()} and then build a {@link ForumThreadMessageTemplate}
+     * @return {@link ForumThreadMessageTemplate} built with this builder
+     */
+    public ForumThreadMessageTemplate buildForumThreadMessageTemplate() throws LimitException {
+        return buildForumThreadMessageTemplate(true);
+    }
+
+    /**
+     *
+     * @param check whether to {@link #checkForumThreadMessageTemplate()} before building
+     * @return {@link ForumThreadMessageTemplate} built with this builder
+     */
+    public ForumThreadMessageTemplate buildForumThreadMessageTemplate(boolean check) throws LimitException {
+        if(check) checkForumThreadMessageTemplate();
+
+        return new ForumThreadMessageTemplate(
+                content.length() == 0 ? null : content.toString(),
+                embeds == null ? null : embeds.toArray(new Embed[0]),
+                new AllowedMentions(
+                        parse == null ? null : parse.toArray(new AllowedMentionType[0]),
+                        roles == null ? null : roles.toArray(new String[0]),
+                        users == null ? null : users.toArray(new String[0]),
+                        repliedUser),
+                components == null ? null : components.toArray(new Component[0]),
+                stickerIds == null ? null : stickerIds.toArray(new String[0]),
+                attachments == null ? null : attachments.toArray(new Attachment[0]),
+                flags == null ? null : MessageFlag.getBitsFromFlags(flags));
+    }
+
+
 
     /**
      *

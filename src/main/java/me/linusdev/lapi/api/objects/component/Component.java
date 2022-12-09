@@ -78,7 +78,7 @@ public interface Component extends Datable {
     public static final String LABEL_KEY = "label";
     public static final String EMOJI_KEY = "emoji";
     public static final String URL_KEY = "url";
-    public static final String OPTION_KEY = "option";
+    public static final String OPTIONS_KEY = "options";
     public static final String CHANNEL_TYPES = "channel_types";
     public static final String PLACEHOLDER_KEY = "placeholder";
     public static final String MIN_VALUES_KEY = "min_values";
@@ -96,16 +96,8 @@ public interface Component extends Datable {
      * @throws InvalidDataException if {@link #TYPE_KEY} is missing or null
      */
     public static @NotNull Component fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
-        Number typeNum = (Number) data.get(TYPE_KEY);
-
-        if(typeNum == null){
-            InvalidDataException.throwException(data, null, Component.class, new Object[]{null}, new String[]{TYPE_KEY});
-            //noinspection ConstantConditions
-            return null; //this will never happen, because above method will throw an Exception
-        }
-
+        Number typeNum = (Number) data.getAndRequireNotNull(TYPE_KEY, InvalidDataException.SUPPLIER);
         ComponentType type = ComponentType.fromValue(typeNum.intValue());
-
         return type.fromData(lApi, data);
     }
 

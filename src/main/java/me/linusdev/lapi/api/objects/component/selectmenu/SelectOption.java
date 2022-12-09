@@ -71,19 +71,14 @@ public class SelectOption implements Datable, HasLApi {
      * @throws InvalidDataException if {@link #LABEL_KEY} or {@link #VALUE_KEY} are missing
      */
     public static @NotNull SelectOption fromData(@NotNull LApi lApi, @NotNull SOData data) throws InvalidDataException {
-        String label = (String) data.get(LABEL_KEY);
-        String value = (String) data.get(VALUE_KEY);
+        String label = (String) data.getAndRequireNotNull(LABEL_KEY, InvalidDataException.SUPPLIER);
+        String value = (String) data.getAndRequireNotNull(VALUE_KEY, InvalidDataException.SUPPLIER);
         String description = (String) data.get(DESCRIPTION_KEY);
         SOData emoji = (SOData) data.get(EMOJI_KEY);
         Boolean default_ = (Boolean) data.get(DEFAULT_KEY);
 
-        if(label == null || value == null){
-            InvalidDataException.throwException(data, null, SelectOption.class, new Object[]{label, value}, new String[]{LABEL_KEY, VALUE_KEY});
-            return null; // this will never happen, because above method will throw an Exception
-        }
-
         return new SelectOption(lApi, label, value, description,
-                emoji == null ? null : EmojiObject.fromData(lApi, data), default_);
+                emoji == null ? null : EmojiObject.fromData(lApi, emoji), default_);
     }
 
     /**

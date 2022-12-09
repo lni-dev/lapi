@@ -30,6 +30,7 @@ import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.guild.enums.DefaultMessageNotificationLevel;
 import me.linusdev.lapi.api.objects.guild.enums.ExplicitContentFilterLevel;
+import me.linusdev.lapi.api.objects.guild.enums.GuildFeature;
 import me.linusdev.lapi.api.objects.guild.enums.VerificationLevel;
 import me.linusdev.lapi.api.objects.permission.Permissions;
 import me.linusdev.lapi.api.objects.role.Role;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -311,6 +313,8 @@ public interface Guild extends Datable, HasLApi, SnowflakeAble {
      * roles in the guild
      */
     @NotNull Collection<Role> getRoles();
+
+    @NotNull List<GuildFeature> getFeatures();
 
     //TODO: emojis, features, ...
 

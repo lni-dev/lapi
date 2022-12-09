@@ -27,7 +27,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RequestUtils {
 
-    public static final String MESSAGES = "messages";
+    public static final String MESSAGES_KEY = "messages";
+
+    public static final String NAME_KEY = "name";
+    public static final String AUTO_ARCHIVE_DURATION_KEY = "auto_archive_duration";
+    public static final String RATE_LIMIT_PER_USER_KEY = "rate_limit_per_user";
+    public static final String MESSAGE_KEY = "message";
+    public static final String APPLIED_TAGS_KEY = "applied_tags";
 
     /**
      * @see Link#BULK_DELETE_MESSAGES

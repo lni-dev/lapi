@@ -106,27 +106,19 @@ public class SelectMenu implements Component, HasLApi {
      *
      * @param data {@link SOData} with required fields
      * @return {@link SelectMenu}
-     * @throws InvalidDataException if {@link #TYPE_KEY}, {@link #CUSTOM_ID_KEY} or {@link #OPTION_KEY} are missing or null
+     * @throws InvalidDataException if {@link #TYPE_KEY}, {@link #CUSTOM_ID_KEY} or {@link #OPTIONS_KEY} are missing or null
      */
     @Contract("_, null -> null; _, !null -> !null")
     public static @Nullable SelectMenu fromData(@NotNull LApi lApi, @Nullable SOData data) throws InvalidDataException {
         if(data == null) return null;
-        Number type = (Number) data.get(TYPE_KEY);
-        String customId = (String) data.get(CUSTOM_ID_KEY);
-        List<SelectOption> options = data.getListAndConvertWithException(OPTION_KEY, (SOData c) -> SelectOption.fromData(lApi, c));
+        Number type = (Number) data.getAndRequireNotNull(TYPE_KEY, InvalidDataException.SUPPLIER);
+        String customId = (String) data.getAndRequireNotNull(CUSTOM_ID_KEY, InvalidDataException.SUPPLIER);
+        List<SelectOption> options = data.getListAndConvertWithException(OPTIONS_KEY, (SOData c) -> SelectOption.fromData(lApi, c));
         List<ChannelType> channelTypes = data.getListAndConvert(CHANNEL_TYPES, (Number v) -> ChannelType.fromId(v.intValue()));
         String placeholder = (String) data.get(PLACEHOLDER_KEY);
         Number min_values = (Number) data.get(MIN_VALUES_KEY);
         Number max_values = (Number) data.get(MAX_VALUES_KEY);
         Boolean disabled = (Boolean) data.get(DISABLED_KEY);
-
-        if(type == null || customId == null){
-            InvalidDataException.throwException(data, null, SelectMenu.class,
-                    new Object[]{type, customId},
-                    new String[]{TYPE_KEY, CUSTOM_ID_KEY});
-            //unreachable statement
-            return null;
-        }
 
         return new SelectMenu(lApi, ComponentType.fromValue(type.intValue()), customId, options, channelTypes, placeholder,
                 min_values == null ? null : min_values.intValue(), max_values == null ? null : max_values.intValue(), disabled);
@@ -202,7 +194,7 @@ public class SelectMenu implements Component, HasLApi {
 
         data.add(TYPE_KEY, type);
         data.add(CUSTOM_ID_KEY, customId);
-        data.addIfNotNull(OPTION_KEY, options);
+        data.addIfNotNull(OPTIONS_KEY, options);
         data.addIfNotNull(CHANNEL_TYPES, channelTypes);
         data.addIfNotNull(PLACEHOLDER_KEY, placeholder);
         data.addIfNotNull(MIN_VALUES_KEY, minValues);
