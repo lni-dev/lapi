@@ -116,7 +116,7 @@ public class MessageImpl implements ChannelMessage {
         components = data.getListAndConvertWithException(COMPONENTS_KEY, (SOData c) -> Component.fromData(lApi, c));
         stickerItems = data.getListAndConvertWithException(STICKER_ITEMS_KEY, StickerItem::fromData);
         stickers = data.getListAndConvertWithException(STICKERS_KEY, (SOData c) -> Sticker.fromData(lApi, c));
-        position = data.getAs(POSITION_KEY);
+        position = data.getAndConvert(POSITION_KEY, (Number c) -> c == null ? null : c.intValue());
 
         if(doNullChecks) {
             if(id == null || channelId == null || author == null || content == null || timestamp == null ||
