@@ -122,7 +122,8 @@ public class MessageImpl implements ChannelMessage {
             if(id == null || channelId == null || author == null || content == null || timestamp == null ||
                     tts == null || mentionEveryone == null || mentions == null || mentionRoles == null || attachments == null ||
                     embeds == null || pinned == null || type == null) {
-                InvalidDataException.throwException(data, null, this.getClass(),
+
+                InvalidDataException. throwException(data, null, this.getClass(),
                         new Object[]{id, channelId, author, content, timestamp, tts, mentionEveryone, mentions, mentionRoles, attachments, embeds, pinned, type},
                         new String[]{ID_KEY, CHANNEL_ID_KEY, AUTHOR_KEY, CONTENT_KEY, TIMESTAMP_KEY, TTS_KEY, MENTION_EVERYONE_KEY, MENTIONS_KEY, MENTION_ROLES_KEY, ATTACHMENTS_KEY, EMBEDS_KEY, PINNED_KEY, TYPE_KEY});
             }

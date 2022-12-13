@@ -33,6 +33,7 @@ import me.linusdev.lapi.api.communication.retriever.query.Query;
 import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.Channel;
+import me.linusdev.lapi.api.objects.channel.ChannelFlag;
 import me.linusdev.lapi.api.objects.channel.ChannelType;
 import me.linusdev.lapi.api.objects.channel.thread.AutoArchiveDuration;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
@@ -43,6 +44,7 @@ import me.linusdev.lapi.api.objects.invite.Invite;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.message.embed.Embed;
+import me.linusdev.lapi.api.objects.other.ImageData;
 import me.linusdev.lapi.api.objects.permission.Permission;
 import me.linusdev.lapi.api.objects.timestamp.ISO8601Timestamp;
 import me.linusdev.lapi.api.objects.user.User;
@@ -51,6 +53,7 @@ import me.linusdev.lapi.api.other.placeholder.PlaceHolder;
 import me.linusdev.lapi.api.request.AnchorType;
 import me.linusdev.lapi.api.request.BiContainer;
 import me.linusdev.lapi.api.request.RequestFactory;
+import me.linusdev.lapi.api.templates.channel.EditChannelTemplate;
 import me.linusdev.lapi.api.templates.message.AllowedMentions;
 import me.linusdev.lapi.api.templates.message.EditMessageTemplate;
 import me.linusdev.lapi.api.templates.message.ForumThreadMessageTemplate;
@@ -60,6 +63,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static me.linusdev.lapi.api.request.RequestFactory.LIMIT_KEY;
@@ -67,30 +71,123 @@ import static me.linusdev.lapi.api.request.requests.RequestUtils.*;
 
 public interface ChannelRequests extends HasLApi {
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-     *                                                               *
-     *                                                               *
-     *                   Get/Modify/Delete Channel                   *
-     *                                                               *
-     *                                                               *
-     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                                                                           *
+     *                                                                                                           *
+     *                                          Get/Modify/Delete Channel                                        *
+     *                                                                                                           *
+     *  Done:       13.12.2022                                                                                   *
+     *  Updated:    13.12.2022                                                                                   *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
      *
      * @param channelId the id of the {@link Channel}, which should be retrieved
      * @return {@link Queueable} which can retrieve the {@link Channel}
+     * @see Link#GET_CHANNEL
      * @see Queueable#queue()
      */
-    default @NotNull Queueable<Channel> getChannel(@NotNull String channelId){
+    default @NotNull Queueable<Channel> getChannel(@NotNull String channelId) {
         return new ConvertingRetriever<>(
                 new LinkQuery(getLApi(), Link.GET_CHANNEL,
                         Name.CHANNEL_ID.withValue(channelId)),
                 Channel::channelFromData);
     }
 
-    //TODO: modify Channel request
+    /**
+     * <p>
+     *     Modify a {@link ChannelType#GROUP_DM group dm} channel.
+     * </p>
+     * <p>
+     *     For more information see {@link Link#MODIFY_CHANNEL}.
+     * </p>
+     * @param channelId id of the (group dm) channel to modify
+     * @param name new channel name or {@code null}
+     * @param icon new icon or {@code null}
+     * @return {@link Queueable} that can modify and retrieve the {@link Channel}.
+     * @see Link#MODIFY_CHANNEL
+     * @see Queueable#queue()
+     */
+    default @NotNull Queueable<Channel> modifyChannel(@NotNull String channelId, @Nullable String name, @Nullable ImageData icon) {
+        SOData json = SOData.newOrderedDataWithKnownSize(2);
 
-    //TODO: Delete/Close Channel request
+        json.addIfNotNull(Channel.NAME_KEY, name);
+        json.addIfNotNull(Channel.ICON_KEY, icon);
+
+        Query query = new LinkQuery(getLApi(), Link.MODIFY_CHANNEL, new LApiHttpBody(json), Name.CHANNEL_ID.withValue(channelId));
+        return new ConvertingRetriever<>(query, Channel::channelFromData);
+    }
+
+    /**
+     * <p>
+     *     Modify a guild channel.
+     * </p>
+     * <p>
+     *     For more information see {@link Link#MODIFY_CHANNEL}.
+     * </p>
+     * @param channelId id of the (guild) channel to modify
+     * @param template {@link EditChannelTemplate}
+     * @return {@link Queueable} than can modify and retrieve the {@link Channel}.
+     * @see Link#MODIFY_CHANNEL
+     * @see Queueable#queue()
+     */
+    default @NotNull Queueable<Channel> modifyChannel(@NotNull String channelId, @NotNull EditChannelTemplate template) {
+        Query query = new LinkQuery(getLApi(), Link.MODIFY_CHANNEL, template.getBody(), Name.CHANNEL_ID.withValue(channelId));
+        return new ConvertingRetriever<>(query, Channel::channelFromData);
+    }
+
+    /**
+     * <p>
+     *     Modify a {@link Channel#isThread() thread} channel
+     * </p>
+     * <p>
+     *     For more information see {@link Link#MODIFY_CHANNEL}.
+     * </p>
+     * @param channelId id of the ({@link Channel#isThread() thread}) channel to modify
+     * @param name new name or {@code null}
+     * @param archived new value or {@code null}
+     * @param autoArchiveDuration new value or {@code null}
+     * @param locked new value or {@code null}
+     * @param invitable new value or {@code null}
+     * @param rateLimitPerUser new value or {@code null}
+     * @param flags new value or {@code null}
+     * @param appliedTags new value or {@code null}
+     * @return {@link Queueable} than can modify and retrieve the {@link Channel}.
+     */
+    default @NotNull Queueable<Channel> modifyChannel(@NotNull String channelId, @Nullable String name, @Nullable Boolean archived,
+                                                      @Nullable AutoArchiveDuration autoArchiveDuration, @Nullable Boolean locked,
+                                                      @Nullable Boolean invitable, @Nullable OptionalValue<Integer> rateLimitPerUser,
+                                                      @Nullable Collection<ChannelFlag> flags, @Nullable Collection<String> appliedTags) {
+
+        SOData json = SOData.newOrderedDataWithKnownSize(8);
+
+        json.addIfNotNull(Channel.NAME_KEY, name);
+        json.addIfNotNull(ThreadMetadata.ARCHIVED_KEY, archived);
+        json.addIfNotNull(ThreadMetadata.AUTO_ARCHIVE_DURATION_KEY, autoArchiveDuration);
+        json.addIfNotNull(ThreadMetadata.LOCKED_KEY, locked);
+        json.addIfNotNull(ThreadMetadata.INVITABLE_KEY, invitable);
+        if(rateLimitPerUser != null) json.addIfOptionalExists(Channel.RATE_LIMIT_PER_USER_KEY, rateLimitPerUser);
+        json.addIfNotNull(Channel.FLAGS_KEY, flags);
+        json.addIfNotNull(Channel.APPLIED_TAGS_KEY, appliedTags);
+
+        Query query = new LinkQuery(getLApi(), Link.MODIFY_CHANNEL, new LApiHttpBody(json), Name.CHANNEL_ID.withValue(channelId));
+        return new ConvertingRetriever<>(query, Channel::channelFromData);
+    }
+
+    /**
+     * <p>
+     *     Deletes a {@link Channel}. This cannot be undone. For more information see {@link Link#DELETE_CHANNEL}
+     * </p>
+     * @param channelId the id of the {@link Channel}, which should be deleted
+     * @return {@link Queueable} which can delete the {@link Channel} and retrieve it
+     * @see Link#DELETE_CHANNEL
+     * @see Queueable#queue()
+     */
+    default @NotNull Queueable<Channel> deleteChannel(@NotNull String channelId) {
+        Query query = new LinkQuery(getLApi(), Link.DELETE_CHANNEL, Name.CHANNEL_ID.withValue(channelId));
+
+        return new ConvertingRetriever<>(query, Channel::channelFromData);
+    }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
      *                                                               *

@@ -20,6 +20,7 @@ import me.linusdev.lapi.api.communication.ApiVersion;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
 import me.linusdev.lapi.api.communication.http.request.body.LApiHttpMultiPartBodyPublisher;
 import me.linusdev.lapi.api.communication.http.response.HttpResponseCode;
+import me.linusdev.lapi.api.objects.guild.enums.GuildFeature;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.message.concrete.ChannelMessage;
 import me.linusdev.lapi.api.objects.channel.Channel;
@@ -354,7 +355,7 @@ public enum Link implements AbstractLink{
      *                                                    Channel                                                *
      *                                                                                                           *
      *  Done:       02.09.2022                                                                                   *
-     *  Updated:    00.00.0000                                                                                   *
+     *  Updated:    13.12.2022                                                                                   *
      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     /**
@@ -364,12 +365,68 @@ public enum Link implements AbstractLink{
      * a {@link Channel#getMember() thread member} object is included in the returned result.
      *
      * @see Name#CHANNEL_ID
-     * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel" target="_top">Get Channel</a>
+     * @see <a href="https://discord.com/developers/docs/resources/channel#get-channel" target="_top">Discord Documentation</a>
+     * @updated 12.12.2022
      */
     GET_CHANNEL(Method.GET, CHANNELS, CHANNEL_ID),
 
-    MODIFY_CHANNEL(Method.PATCH, CHANNELS, CHANNEL_ID),
-    DELETE_CHANNEL(Method.DELETE, CHANNELS, CHANNEL_ID),
+    /**
+     * <p>
+     *     Update a channel's settings. Returns a {@link Channel channel} on success, and
+     *     a {@link HttpResponseCode#BAD_REQUEST 400 BAD REQUEST} on invalid parameters. All JSON parameters are optional.
+     * </p>
+     *
+     * <p>
+     *     The possible json parameters depend on the type of channel. An up-to-date description of possible parameters
+     *     can be found in the
+     *     <a href="https://discord.com/developers/docs/resources/channel#modify-channel" target="_top">Discord Documentation</a>.
+     * </p>
+     *
+     * <p>  <h3>Group DM</h3>
+     *      Fires a {@link GatewayEvent#CHANNEL_UPDATE Channel Update} Gateway event.
+     * </p>
+     * <p>  <h3>Guild Channel</h3>
+     *      Requires the {@link Permission#MANAGE_CHANNELS MANAGE_CHANNELS} permission for the guild.
+     *      Fires a {@link GatewayEvent#CHANNEL_UPDATE Channel Update} Gateway event. If modifying a category,
+     *      individual {@link GatewayEvent#CHANNEL_UPDATE Channel Update} events will fire for each child channel that
+     *      also changes. If modifying permission overwrites, the {@link Permission#MANAGE_ROLES MANAGE_ROLES} permission
+     *      is required. Only permissions your bot has in the guild or parent channel (if applicable) can be allowed/denied
+     *      (unless your bot has a {@link Permission#MANAGE_ROLES MANAGE_ROLES} overwrite in the channel).
+     * </p>
+     * <p>  <h3>Thread</h3>
+     *      When setting archived to false, when locked is also false, only the {@link Permission#SEND_MESSAGES SEND_MESSAGES} permission is required.
+     *      <br>
+     *      Otherwise, requires the {@link Permission#MANAGE_THREADS MANAGE_THREADS} permission.
+     *      Fires a {@link GatewayEvent#THREAD_UPDATE Thread Update} Gateway event. Requires the thread to have archived
+     *      set to false or be set to false in the request.
+     * </p>
+     * @see Name#CHANNEL_ID
+     * @see <a href="https://discord.com/developers/docs/resources/channel#modify-channel" target="_top">Discord Documentation</a>
+     * @updated 13.12.2022
+     */
+    MODIFY_CHANNEL(Method.PATCH, true, true, CHANNELS, CHANNEL_ID),
+
+    /**
+     * <p>
+     *     Delete a channel, or close a private message. Requires the {@link Permission#MANAGE_CHANNELS MANAGE_CHANNELS}
+     *     permission for the guild, or {@link Permission#MANAGE_THREADS MANAGE_THREADS} if the channel is a {@link Channel#isThread() thread}.
+     *     Deleting a category does not delete its child channels; they will have their parent_id removed and a
+     *     {@link GatewayEvent#CHANNEL_UPDATE Channel Update} Gateway event will fire for each of them.
+     * </p>
+     * <p>
+     *     Returns a {@link Channel channel object} on success. Fires a {@link GatewayEvent#CHANNEL_DELETE Channel Delete}
+     *     Gateway event (or Thread Delete if the channel was a thread).
+     * </p>
+     * <p>
+     *     For {@link GuildFeature#COMMUNITY Community} guilds, the Rules or Guidelines channel and the
+     *     Community Updates channel cannot be deleted.
+     * </p>
+     *
+     * @see Name#CHANNEL_ID
+     * @updated 12.12.2022
+     * @see <a href="https://discord.com/developers/docs/resources/channel#deleteclose-channel" target="_top">Discord Documentation</a>
+     */
+    DELETE_CHANNEL(Method.DELETE, true, true, CHANNELS, CHANNEL_ID),
 
     /**
      * <p>
