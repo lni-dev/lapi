@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.exceptions.InvalidDataException;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.attachment.Attachment;
+import me.linusdev.lapi.api.objects.channel.PartialChannel;
 import me.linusdev.lapi.api.objects.guild.member.PartialMember;
 import me.linusdev.lapi.api.objects.message.AnyMessage;
 import me.linusdev.lapi.api.objects.channel.Channel;
@@ -36,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- *
+ * @updated 15.12.2022
  * @see <a href="https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure" target="_top">Resolved Data Strcuture</a>
  */
 public class ResolvedData implements Datable, HasLApi {
@@ -53,7 +54,7 @@ public class ResolvedData implements Datable, HasLApi {
     private final @Nullable SAOData<User> users;
     private final @Nullable SAOData<PartialMember> members;
     private final @Nullable SAOData<Role> roles;
-    private final @Nullable SAOData<Channel> channels;
+    private final @Nullable SAOData<PartialChannel> channels;
     private final @Nullable SAOData<AnyMessage> messages;
     private final @Nullable SAOData<Attachment> attachments;
 
@@ -67,7 +68,7 @@ public class ResolvedData implements Datable, HasLApi {
      * @param attachments the ids and attachment objects
      */
     public ResolvedData(@NotNull LApi lApi, @Nullable SAOData<User> users, @Nullable SAOData<PartialMember> members,
-                        @Nullable SAOData<Role> roles, @Nullable SAOData<Channel> channels,
+                        @Nullable SAOData<Role> roles, @Nullable SAOData<PartialChannel> channels,
                         @Nullable SAOData<AnyMessage> messages, @Nullable SAOData<Attachment> attachments) {
         this.lApi = lApi;
         this.users = users;
@@ -122,15 +123,14 @@ public class ResolvedData implements Datable, HasLApi {
         }
 
         //channels
-        //TODO: Partial channel
         SOData channelsData = data.getAs(CHANNELS_KEY);
-        SAOData<Channel> channels = null;
+        SAOData<PartialChannel> channels = null;
 
         if(channelsData != null) {
             channels = new SAODataListImpl<>(new ArrayList<>(channelsData.size()));
 
             for(Entry<String, Object> entry : channelsData)
-                channels.add(entry.getKey(), Channel.channelFromData(lApi, (SOData) entry.getValue()));
+                channels.add(entry.getKey(), Channel.partialChannelFromData(lApi, (SOData) entry.getValue()));
         }
 
         //messages
@@ -182,7 +182,7 @@ public class ResolvedData implements Datable, HasLApi {
     /**
      * 	the ids and partial Channel objects
      */
-    public @Nullable SAOData<Channel> getChannels() {
+    public @Nullable SAOData<PartialChannel> getChannels() {
         return channels;
     }
 
