@@ -17,10 +17,16 @@
 package me.linusdev.lapi.api.lapi;
 
 import me.linusdev.data.parser.exceptions.ParseException;
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.Nothing;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownExecutor;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
+import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.GuildPool;
@@ -45,9 +51,11 @@ import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
 import me.linusdev.lapi.api.communication.http.queue.QueueThread;
+import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,6 +66,8 @@ import java.net.URLConnection;
 import java.net.http.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.*;
 
@@ -71,16 +81,6 @@ public class LApiImpl implements LApi {
 
     public static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    /**
-     * The Discord id of the creator of this api UwU
-     */
-    public static final String CREATOR_ID = "247421526532554752";
-
-    public static final String LAPI_URL = "https://github.com/lni-dev/lapi";
-    public static final String LAPI_VERSION = "1.0.4";
-    public static final String LAPI_NAME = "LApi";
-
-    public static final ApiVersion DEFAULT_API_VERSION = ApiVersion.V10;
     public static final long DEFAULT_GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT = 40;
     public static final long DEFAULT_HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT = 3;
     public static final int DEFAULT_BUCKETS_CHECK_AMOUNT = 50;
@@ -103,7 +103,7 @@ public class LApiImpl implements LApi {
     //Http
     private final LApiHttpHeader authorizationHeader;
     private final LApiHttpHeader userAgentHeader = new LApiHttpHeader(ATTRIBUTE_USER_AGENT_NAME,
-            ATTRIBUTE_USER_AGENT_VALUE.replace(Name.LAPI_URL.toString(), LAPI_URL).replace(Name.LAPI_VERSION.toString(), LAPI_VERSION));
+            ATTRIBUTE_USER_AGENT_VALUE.replace(Name.LAPI_URL.toString(), LApi.LAPI_URL).replace(Name.LAPI_VERSION.toString(), LApi.LAPI_VERSION));
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final @NotNull RequestFactory requestFactory;
@@ -113,7 +113,7 @@ public class LApiImpl implements LApi {
 
     //Queue
     private final Queue<QueueableFuture<?>> queue;
-    private final QueueThread queueThread;
+    private final @NotNull QueueThread queueThread;
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
     //LApiReadyEventListener
@@ -143,6 +143,9 @@ public class LApiImpl implements LApi {
      */
     private final @Nullable GuildManager guildManager;
 
+    //shutdownables
+    private final @NotNull LinusLinkedList<Shutdownable> shutdownables;
+
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
 
@@ -153,6 +156,9 @@ public class LApiImpl implements LApi {
         //Config
         this.token = config.getToken();
         this.config = config;
+
+        //shutdownables
+        this.shutdownables = new LinusLinkedList<>();
 
         //Thread
         this.lApiThreadGroup = new LApiThreadGroup(this);
@@ -268,6 +274,7 @@ public class LApiImpl implements LApi {
                         }
                     } catch (Throwable e) {
                         log.debug("Internet is most likely not connected");
+                        //noinspection BusyWait: Thread can't work, if no internet connection is available
                         java.lang.Thread.sleep(notConnectedWaitMillis);
                         notConnectedWaitMillis = Math.min(NOT_CONNECTED_WAIT_MILLIS_MAX, notConnectedWaitMillis + NOT_CONNECTED_WAIT_MILLIS_INCREASE);
                         //while loop will retry...
@@ -352,6 +359,68 @@ public class LApiImpl implements LApi {
         });
     }
 
+    @Override
+    @Blocking
+    public void shutdown(@NotNull List<ShutdownOption> options) {
+
+        final LogInstance log = Logger.getLogger("Shutdown Sequence");
+        final Executor executor = new ShutdownExecutor(this);
+
+        List<Future<Nothing, Shutdownable>> futures = new ArrayList<>(options.size());
+
+        for(Shutdownable shutdownable : shutdownables) {
+            futures.add(shutdownable.shutdown(this, options, log, executor));
+        }
+
+        try {
+            int i = 0;
+            for(Future<Nothing, Shutdownable> future : futures) {
+                i++;
+
+                if(future == null) {
+                    log.info(shutdownables.get(i-1).getShutdownableName() + " did not return a " +
+                            "shutdown future.");
+                    continue;
+                }
+
+                ComputationResult<Nothing, Shutdownable> result;
+                try {
+                    result = future.get();
+                } catch (CancellationException e) {
+                    log.error("Future of the shutdownable "
+                            + shutdownables.get(i-1).getShutdownableName() +
+                            " was canceled.");
+                    continue;
+                }
+
+
+                String name = result.getSecondary().getShutdownableName();
+
+                if(result.getError() != null) {
+                    log.error("Error while shutting down " + name + ".");
+                    result.getError().log(log);
+
+                } else {
+                    log.info(name + " shut down successfully.");
+
+                }
+
+            }
+        } catch (InterruptedException e) {
+            log.error("Shutdown sequence was interrupted. Calling shutdownNow()...");
+            shutdownNow();
+        }
+    }
+
+    public void shutdownNow() {
+        //TODO: implement
+    }
+
+    @Override
+    public void registerShutdownable(@NotNull Shutdownable shutdownable) {
+        this.shutdownables.add(shutdownable);
+    }
+
     //Getter
 
     @Override
@@ -390,17 +459,17 @@ public class LApiImpl implements LApi {
     }
 
     @Override
-    public VoiceRegionManager getVoiceRegionManager() {
+    public @Nullable VoiceRegionManager getVoiceRegionManager() {
         return voiceRegionManager;
     }
 
     @Override
-    public GatewayWebSocket getGateway() {
+    public @Nullable GatewayWebSocket getGateway() {
         return gateway;
     }
 
     @Override
-    public Cache getCache() {
+    public @Nullable Cache getCache() {
         return cache;
     }
 
@@ -417,6 +486,10 @@ public class LApiImpl implements LApi {
     @Override
     public @NotNull LApi getLApi() {
         return this;
+    }
+
+    public @NotNull QueueThread getQueueThread() {
+        return queueThread;
     }
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

@@ -24,6 +24,8 @@ import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
+import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.GuildPool;
@@ -49,6 +51,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.util.List;
 
 /**
  * <h2 style="margin:0;padding:0;">What is LApi?</h2>
@@ -91,7 +94,7 @@ import java.io.*;
  *     for more information see {@link me.linusdev.lapi.api.communication.gateway.events.transmitter.EventListener EventListener}
  * </div>
  */
-@SuppressWarnings("UnnecessaryModifier")
+@SuppressWarnings({"UnnecessaryModifier", "unused"})
 public interface LApi extends HasLApi {
 
     /**
@@ -99,15 +102,12 @@ public interface LApi extends HasLApi {
      */
     public static final String CREATOR_ID = "247421526532554752";
 
-    public static final String LAPI_URL = "https://lni-dev.github.io/";
-    public static final String LAPI_VERSION = "1.0.0";
+    public static final String LAPI_URL = "https://github.com/lni-dev/lapi";
+    public static final String LAPI_VERSION = "1.0.6";
     public static final String LAPI_NAME = "LApi";
 
-    public static final ApiVersion NEWEST_API_VERSION = ApiVersion.V10;
-
-    public static final long NOT_CONNECTED_WAIT_MILLIS_STANDARD = 10_000L;
-    public static final long NOT_CONNECTED_WAIT_MILLIS_INCREASE = 30_000L;
-    public static final long NOT_CONNECTED_WAIT_MILLIS_MAX = 300_000L;
+    public static final @NotNull ApiVersion NEWEST_API_VERSION = ApiVersion.V10;
+    public static final @NotNull ApiVersion DEFAULT_API_VERSION = NEWEST_API_VERSION;
 
     public static final String LAPI_ARRAY_WRAPPER_KEY = "lapi_array_wrapper";
 
@@ -185,6 +185,10 @@ public interface LApi extends HasLApi {
     @ApiStatus.Internal
     void runSupervised(@NotNull Runnable runnable);
 
+    void shutdown(@NotNull List<ShutdownOption> options);
+
+    @ApiStatus.Internal
+    void registerShutdownable(@NotNull Shutdownable shutdownable);
 
     //Getter
 
