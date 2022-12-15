@@ -450,12 +450,12 @@ public class ConfigBuilder implements Datable {
 
     /**
      * <em>Optional</em><br>
-     * Default: {@link LApiImpl#DEFAULT_API_VERSION}
+     * Default: {@link LApi#DEFAULT_API_VERSION}
      * <p>
      *     {@link ApiVersion discord api version} used for HttpRequests
      * </p>
      * <p>
-     *      Set to {@code null} to reset to {@link LApiImpl#DEFAULT_API_VERSION default}
+     *      Set to {@code null} to reset to {@link LApi#DEFAULT_API_VERSION default}
      * </p>
      * @param apiVersion discord api version
      */
@@ -839,7 +839,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElse(httpRateLimitAssumedBucketLimit, LApiImpl.DEFAULT_HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT),
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
-                applicationId, Objects.requireNonNullElse(apiVersion, LApiImpl.DEFAULT_API_VERSION),
+                applicationId, Objects.requireNonNullElse(apiVersion, LApi.DEFAULT_API_VERSION),
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(debugRateLimitBuckets, false),
                 Objects.requireNonNullElse(bucketsCheckAmount, LApiImpl.DEFAULT_BUCKETS_CHECK_AMOUNT),

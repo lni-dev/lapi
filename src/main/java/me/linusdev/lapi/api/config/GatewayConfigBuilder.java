@@ -132,7 +132,7 @@ public class GatewayConfigBuilder implements Datable {
 
     /**
      * <em>Optional / Not Recommended</em><br>
-     * Default: {@link LApi#NEWEST_API_VERSION}<br>
+     * Default: {@link LApi#DEFAULT_API_VERSION}<br>
      * <p>
      * Sets the {@link ApiVersion discord api version} the {@link GatewayWebSocket gateway} should use.
      * I recommend to let this be default, other api versions are only experimentally supported.
@@ -412,7 +412,7 @@ public class GatewayConfigBuilder implements Datable {
     @ApiStatus.Internal
     @Contract(value = "-> new", pure = true)
     GatewayConfig build() {
-        if (apiVersion == null) apiVersion = LApi.NEWEST_API_VERSION;
+        if (apiVersion == null) apiVersion = LApi.DEFAULT_API_VERSION;
         if (encoding == null) encoding = GatewayEncoding.JSON;
         if (compression == null) compression = GatewayCompression.NONE;
         if (os == null) os = System.getProperty("os.name");
