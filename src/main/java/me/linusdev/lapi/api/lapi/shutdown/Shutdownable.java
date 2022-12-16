@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NonBlocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.concurrent.Executor;
 
 public interface Shutdownable extends HasLApi {
@@ -46,7 +45,7 @@ public interface Shutdownable extends HasLApi {
     @ApiStatus.Internal
     @ApiStatus.OverrideOnly
     @NonBlocking
-    @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, @NotNull List<ShutdownOption> shutdownOptions,
+    @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions,
                                                      @NotNull LogInstance log, @NotNull Executor shutdownExecutor);
 
     default void registerShutdownable() {

@@ -17,15 +17,21 @@
 package me.linusdev.lapi.api.communication.http.queue;
 
 import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.Nothing;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
 import me.linusdev.lapi.api.communication.http.ratelimit.*;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.communication.retriever.query.Query;
+import me.linusdev.lapi.api.event.EventAwaiter;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.interfaces.HasLApi;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOptions;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownTask;
+import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
 import me.linusdev.lapi.log.LogInstance;
@@ -34,11 +40,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
@@ -48,7 +52,7 @@ import java.util.function.Supplier;
  * This is a special thread for the {@link LApi#queue}.
  * Only one instance of this Thread should be alive at the same time.
  */
-public class QueueThread extends LApiThread implements QExecutor, HasLApi {
+public class QueueThread extends LApiThread implements Shutdownable,QExecutor, HasLApi {
 
     private final @NotNull LApiImpl lApi;
     private final @NotNull Queue<QueueableFuture<?>> queue;
@@ -59,6 +63,7 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
     private final @NotNull Object bucketsWriteLock = new Object();
     private final @NotNull AtomicInteger sharedResourceRateLimitSize = new AtomicInteger(0);
 
+    private final @NotNull AtomicBoolean acceptNewFutures = new AtomicBoolean(true);
     private final @NotNull AtomicBoolean stopIfEmpty = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean stopImmediately = new AtomicBoolean(false);
 
@@ -69,6 +74,8 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
     private final @NotNull AtomicBoolean allowInterrupts;
     private volatile long lastCheckTime;
     private final @NotNull Object waitingLock = new Object();
+
+    private final @NotNull EventAwaiter queueEndAwaiter;
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
 
@@ -84,11 +91,23 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
         this.buckets = new ConcurrentHashMap<>();
         this.bucketsForId = new ConcurrentHashMap<>();
         this.lastCheckTime = System.currentTimeMillis();
+
+        this.queueEndAwaiter = new EventAwaiter();
+
+        registerShutdownable();
     }
 
     @ApiStatus.Internal
     public @NotNull BucketDebugger debug() {
         return new BucketDebugger(bucketsForId, globalBucket);
+    }
+
+    public boolean queueFuture(@NotNull QueueableFuture<?> future) {
+        if(!acceptNewFutures.get()) {
+            return false;
+        }
+
+        return queue.offer(future);
     }
 
     @Override
@@ -234,6 +253,9 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
             //Otherwise, they would just vanish and no one would know what happened
             log.error(t);
 
+        } finally {
+            queueEndAwaiter.trigger();
+
         }
     }
 
@@ -279,6 +301,10 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
 
             return other;
         }
+    }
+
+    public void disableAcceptNewFutures() {
+        this.acceptNewFutures.set(false);
     }
 
     public void stopIfEmpty() {
@@ -403,5 +429,36 @@ public class QueueThread extends LApiThread implements QExecutor, HasLApi {
                 }
             }
         }
+    }
+
+    @ApiStatus.Internal
+    @Override
+    public @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions, @NotNull LogInstance log, @NotNull Executor shutdownExecutor) {
+
+        QueueThread this_ = this;
+        ShutdownTask task = new ShutdownTask(lApi, this, shutdownExecutor, log) {
+            @Override
+            public @NotNull ComputationResult<Nothing, Shutdownable> execute() throws InterruptedException {
+
+                if(!ShutdownOptions.QUEUE_ACCEPT_NEW_FUTURES.isSet(shutdownOptions)) {
+                    this_.disableAcceptNewFutures();
+                }
+
+                if(ShutdownOptions.QUEUE_STOP_IF_EMPTY.isSet(shutdownOptions)) {
+                    //TODO: specify a max amount of qed futures
+                    this_.stopIfEmpty();
+                }
+
+                if(ShutdownOptions.QUEUE_STOP_IMMEDIATELY.isSet(shutdownOptions)) {
+                    this_.stopImmediately();
+                }
+
+                queueEndAwaiter.awaitFirst();
+
+                return new ComputationResult<>(Nothing.getInstance(), parent, null);
+            }
+        };
+
+        return task.queue();
     }
 }

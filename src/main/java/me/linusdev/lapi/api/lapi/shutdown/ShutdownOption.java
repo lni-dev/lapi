@@ -16,8 +16,22 @@
 
 package me.linusdev.lapi.api.lapi.shutdown;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface ShutdownOption {
 
-    int id();
+    long id();
+
+    long mutuallyExclusiveWith();
+
+    default boolean canBeSet(long bitfield) {
+        return (bitfield & mutuallyExclusiveWith()) == 0L;
+    }
+
+    @NotNull String name();
+
+    default boolean isSet(long bitfield) {
+        return (bitfield & id()) > 0L;
+    }
 
 }

@@ -22,35 +22,36 @@ import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.Nothing;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.cache.Cache;
-import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
-import me.linusdev.lapi.api.event.ReadyEventAwaiter;
-import me.linusdev.lapi.api.lapi.shutdown.ShutdownExecutor;
-import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
-import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
-import me.linusdev.lapi.api.manager.command.CommandManager;
-import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
-import me.linusdev.lapi.api.manager.guild.GuildPool;
-import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.other.placeholder.Name;
-import me.linusdev.lapi.api.exceptions.LApiException;
-import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.AbstractEventTransmitter;
+import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventTransmitter;
 import me.linusdev.lapi.api.communication.gateway.presence.SelfUserPresenceUpdater;
 import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
+import me.linusdev.lapi.api.communication.http.queue.QueueThread;
 import me.linusdev.lapi.api.communication.http.request.IllegalRequestMethodException;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpHeader;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpRequest;
 import me.linusdev.lapi.api.communication.http.response.LApiHttpResponse;
 import me.linusdev.lapi.api.config.Config;
 import me.linusdev.lapi.api.config.ConfigFlag;
+import me.linusdev.lapi.api.event.ReadyEventAwaiter;
+import me.linusdev.lapi.api.exceptions.LApiException;
+import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownExecutor;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOptions;
+import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
+import me.linusdev.lapi.api.manager.command.CommandManager;
+import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
+import me.linusdev.lapi.api.manager.guild.GuildPool;
+import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManager;
+import me.linusdev.lapi.api.other.placeholder.Name;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
-import me.linusdev.lapi.api.communication.http.queue.QueueThread;
 import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
@@ -59,16 +60,18 @@ import org.jetbrains.annotations.Blocking;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.http.*;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.*;
@@ -112,7 +115,6 @@ public class LApiImpl implements LApi {
     private final @NotNull LApiThreadGroup lApiThreadGroup;
 
     //Queue
-    private final Queue<QueueableFuture<?>> queue;
     private final @NotNull QueueThread queueThread;
     private long notConnectedWaitMillis = NOT_CONNECTED_WAIT_MILLIS_STANDARD;
 
@@ -170,8 +172,7 @@ public class LApiImpl implements LApi {
         this.supervisedRunnableExecutor = Executors.newScheduledThreadPool(4, new LApiThreadFactory(this, true, "supervised-runnable-thread"));
 
         //Queue
-        this.queue = config.getNewQueue();
-        this.queueThread = new QueueThread(this, lApiThreadGroup, queue);
+        this.queueThread = new QueueThread(this, lApiThreadGroup, config.getNewQueue());
         this.queueThread.start();
         if(config.isDebugRateLimitBucketsEnabled()) this.queueThread.debug();
 
@@ -227,7 +228,7 @@ public class LApiImpl implements LApi {
     @Override
     @ApiStatus.Internal
     public <T> void queue(@NotNull QueueableFuture<T> future) {
-        queue.offer(future);
+        queueThread.queueFuture(future);
         //notify the queue in case it is waiting.
         queueThread.notifyAllAwaiting();
     }
@@ -359,17 +360,44 @@ public class LApiImpl implements LApi {
         });
     }
 
+    /**
+     * Attempts to shut {@link LApi} down with given {@link ShutdownOption}s.<br>
+     * This will block the current thread.
+     * @param options {@link ShutdownOptions}
+     */
     @Override
     @Blocking
-    public void shutdown(@NotNull List<ShutdownOption> options) {
-
+    public void shutdown(@NotNull List<@NotNull ShutdownOption> options) {
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
+
+        long optionBitfield = 0L;
+
+        for(ShutdownOption option : options) {
+            if(!option.canBeSet(optionBitfield)) {
+                List<ShutdownOption> mutuallyExclusive = new ArrayList<>();
+                for(ShutdownOption o : options) {
+                    if((o.id() & option.mutuallyExclusiveWith()) > 0L) {
+                        mutuallyExclusive.add(o);
+                    }
+                }
+
+                StringBuilder meo = new StringBuilder();
+                boolean first = true;
+                for(ShutdownOption o : mutuallyExclusive) {
+                    if(first) first = false;
+                    else meo.append(", ");
+                    meo.append(o);
+                }
+
+                throw new IllegalArgumentException(option.name() + " cannot be applied with " + meo + ".");
+            }
+        }
 
         List<Future<Nothing, Shutdownable>> futures = new ArrayList<>(options.size());
 
         for(Shutdownable shutdownable : shutdownables) {
-            futures.add(shutdownable.shutdown(this, options, log, executor));
+            futures.add(shutdownable.shutdown(this, optionBitfield, log, executor));
         }
 
         try {

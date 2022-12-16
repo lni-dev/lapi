@@ -16,25 +16,28 @@
 
 package me.linusdev.lapi.api.lapi.shutdown;
 
-import org.jetbrains.annotations.NotNull;
-
 public enum ShutdownOptions implements ShutdownOption {
 
-    STOP_QUEUE_IF_EMPTY(0, 1),
-    STOP_QUEUE_IMMEDIATELY(1, 0),
+    QUEUE_STOP_IF_EMPTY(1 << 0, 1 << 1),
+    QUEUE_STOP_IMMEDIATELY(1 << 1, 1 << 0),
+    QUEUE_ACCEPT_NEW_FUTURES(1 << 2, 0),
     ;
 
-    private final int id;
-    private final int @NotNull [] mutuallyExclusiveWith;
-    //TODO: how to check mutuallyExclusiveWith, maybe move it to ShutdownOption
+    private final long id;
+    private final long mutuallyExclusiveWith;
 
-    ShutdownOptions(int id, int @NotNull ... mutuallyExclusiveWith) {
+    ShutdownOptions(long id, long mutuallyExclusiveWith) {
         this.id = id;
         this.mutuallyExclusiveWith = mutuallyExclusiveWith;
     }
 
     @Override
-    public int id() {
+    public long id() {
         return id;
+    }
+
+    @Override
+    public long mutuallyExclusiveWith() {
+        return mutuallyExclusiveWith;
     }
 }

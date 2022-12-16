@@ -24,7 +24,7 @@ public class EventAwaiter {
 
     private final AtomicBoolean bool;
 
-    EventAwaiter(){
+    public EventAwaiter(){
         this.bool = new AtomicBoolean(false);
     }
 
@@ -59,7 +59,7 @@ public class EventAwaiter {
      * will be notified.
      */
     @ApiStatus.Internal
-    synchronized void trigger() {
+    public synchronized void trigger() {
         bool.set(true);
         this.notifyAll();
     }
