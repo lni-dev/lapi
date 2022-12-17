@@ -42,6 +42,9 @@ public enum StandardErrorTypes implements ErrorType, SimpleDatable {
 
     HTTP_ERROR_MESSAGE,
 
+    SHUTDOWN_TIMEOUT,
+    SHUTDOWN_ERROR,
+
     ;
 
     @Override

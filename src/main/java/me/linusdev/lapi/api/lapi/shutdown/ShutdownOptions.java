@@ -18,8 +18,20 @@ package me.linusdev.lapi.api.lapi.shutdown;
 
 public enum ShutdownOptions implements ShutdownOption {
 
+    /**
+     * Stops the queue the next time it is empty.
+     */
     QUEUE_STOP_IF_EMPTY(1 << 0, 1 << 1),
+
+    /**
+     * Stops the queue as soon as possible.
+     */
     QUEUE_STOP_IMMEDIATELY(1 << 1, 1 << 0),
+
+    /**
+     * If you set this, the queue will accept new futures. This may lead to
+     * a never stopping queue.
+     */
     QUEUE_ACCEPT_NEW_FUTURES(1 << 2, 0),
     ;
 

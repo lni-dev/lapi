@@ -228,7 +228,12 @@ public class LApiImpl implements LApi {
     @Override
     @ApiStatus.Internal
     public <T> void queue(@NotNull QueueableFuture<T> future) {
-        queueThread.queueFuture(future);
+        if(!queueThread.queueFuture(future)) {
+            //This only happens, when the queue is currently shutting down and does not accept
+            //any futures anymore. So it can safely be ignored
+            log.warning("Queue does not accept any futures. A future was ignored. Queue is likely shutting down.");
+            return;
+        }
         //notify the queue in case it is waiting.
         queueThread.notifyAllAwaiting();
     }
@@ -368,6 +373,7 @@ public class LApiImpl implements LApi {
     @Override
     @Blocking
     public void shutdown(@NotNull List<@NotNull ShutdownOption> options) {
+        final long shutdownBy = System.currentTimeMillis() + 3000; //TODO: add this time to the config
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
 
@@ -397,7 +403,7 @@ public class LApiImpl implements LApi {
         List<Future<Nothing, Shutdownable>> futures = new ArrayList<>(options.size());
 
         for(Shutdownable shutdownable : shutdownables) {
-            futures.add(shutdownable.shutdown(this, optionBitfield, log, executor));
+            futures.add(shutdownable.shutdown(this, optionBitfield, log, executor, shutdownBy));
         }
 
         try {

@@ -19,6 +19,8 @@ package me.linusdev.lapi.api.communication.http.queue;
 import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.Future;
 import me.linusdev.lapi.api.async.Nothing;
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
 import me.linusdev.lapi.api.async.queue.QResponse;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.async.queue.QueueableImpl;
@@ -43,6 +45,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
@@ -374,6 +377,64 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
         return false;
     }
 
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+     *                                                               *
+     *                                                               *
+     *                          Shutdownable                         *
+     *                                                               *
+     *                                                               *
+     * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+    @ApiStatus.Internal
+    @Override
+    public @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions,
+                                                            @NotNull LogInstance log, @NotNull Executor shutdownExecutor,
+                                                            long shutdownBy) {
+
+        QueueThread this_ = this;
+        ShutdownTask task = new ShutdownTask(lApi, this, shutdownExecutor, log) {
+            @Override
+            public @NotNull ComputationResult<Nothing, Shutdownable> execute() throws InterruptedException {
+
+                if(!ShutdownOptions.QUEUE_ACCEPT_NEW_FUTURES.isSet(shutdownOptions)) {
+                    this_.disableAcceptNewFutures();
+                }
+
+                if(ShutdownOptions.QUEUE_STOP_IF_EMPTY.isSet(shutdownOptions)) {
+                    this_.stopIfEmpty();
+                }
+
+                if(ShutdownOptions.QUEUE_STOP_IMMEDIATELY.isSet(shutdownOptions)) {
+                    this_.stopImmediately();
+                }
+
+                try {
+                    long remainingTime = shutdownBy - System.currentTimeMillis() - 150;
+
+                    if(remainingTime < 150) {
+                        throw new TimeoutException();
+                    }
+
+                    queueEndAwaiter.awaitFirst(remainingTime);
+                } catch (TimeoutException e) {
+                    this_.stopImmediately();
+                    try {
+                        queueEndAwaiter.awaitFirst(100);
+                    } catch (TimeoutException ex) {
+                        return new ComputationResult<>(Nothing.getInstance(), parent,
+                                new MessageError("Shutdown of " + parent.getShutdownableName() + " failed", StandardErrorTypes.SHUTDOWN_ERROR));
+                    }
+                    return new ComputationResult<>(Nothing.getInstance(), parent,
+                            new MessageError("Shutdown of " + parent.getShutdownableName() + " took too long and was shutdown immediately.", StandardErrorTypes.SHUTDOWN_TIMEOUT));
+                }
+
+                return new ComputationResult<>(Nothing.getInstance(), parent, null);
+            }
+        };
+
+        return task.queue();
+    }
+
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -429,36 +490,5 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
                 }
             }
         }
-    }
-
-    @ApiStatus.Internal
-    @Override
-    public @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions, @NotNull LogInstance log, @NotNull Executor shutdownExecutor) {
-
-        QueueThread this_ = this;
-        ShutdownTask task = new ShutdownTask(lApi, this, shutdownExecutor, log) {
-            @Override
-            public @NotNull ComputationResult<Nothing, Shutdownable> execute() throws InterruptedException {
-
-                if(!ShutdownOptions.QUEUE_ACCEPT_NEW_FUTURES.isSet(shutdownOptions)) {
-                    this_.disableAcceptNewFutures();
-                }
-
-                if(ShutdownOptions.QUEUE_STOP_IF_EMPTY.isSet(shutdownOptions)) {
-                    //TODO: specify a max amount of qed futures
-                    this_.stopIfEmpty();
-                }
-
-                if(ShutdownOptions.QUEUE_STOP_IMMEDIATELY.isSet(shutdownOptions)) {
-                    this_.stopImmediately();
-                }
-
-                queueEndAwaiter.awaitFirst();
-
-                return new ComputationResult<>(Nothing.getInstance(), parent, null);
-            }
-        };
-
-        return task.queue();
     }
 }

@@ -33,20 +33,24 @@ public interface Shutdownable extends HasLApi {
     /**
      * <p>
      *     This method should not do any blocking operations. It should instead do it's shutdown sequence
-     *     inside a {@link ShutdownTask} and return the corresponding {@link Future}.
+     *     inside a {@link ShutdownTask} and return the corresponding {@link Future}. This {@link Future} should try
+     *     to be finished at given {@code shutdownBy} time or earlier.
      * </p>
      *
      * @param lApi {@link LApiImpl} which is shutting down
      * @param shutdownOptions different {@link ShutdownOptions}
      * @param log {@link LogInstance} which should be used to log shutdown related stuff (best effort)
      * @param shutdownExecutor {@link Executor} which should be used to execute the {@link ShutdownTask}
+     * @param shutdownBy Your {@link Shutdownable} should try on a best-effort basis to be completed at this time or earlier.
+     *                   (in milliseconds since 01.01.1970 00:00:00:000)
      * @return {@link Future} of your shutdown task or {@code null} if no shutdown sequence is required.
      */
     @ApiStatus.Internal
     @ApiStatus.OverrideOnly
     @NonBlocking
     @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions,
-                                                     @NotNull LogInstance log, @NotNull Executor shutdownExecutor);
+                                                     @NotNull LogInstance log, @NotNull Executor shutdownExecutor,
+                                                     long shutdownBy);
 
     default void registerShutdownable() {
         getLApi().registerShutdownable(this);

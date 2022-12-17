@@ -18,6 +18,7 @@ package me.linusdev.lapi.api.event;
 
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EventAwaiter {
@@ -36,6 +37,19 @@ public class EventAwaiter {
     public synchronized void awaitFirst() throws InterruptedException {
         if(bool.get()) return;
         this.wait();
+    }
+
+    /**
+     * Waits for the first occurrence of this event. If the event has already occurred before the message call,
+     * this method will return immediately without blocking the current thread.
+     * @param timeout maximal time to wait in milliseconds
+     * @throws InterruptedException if interrupted.
+     * @throws TimeoutException if the event did not happen within the timout time.
+     */
+    public synchronized void awaitFirst(long timeout) throws InterruptedException, TimeoutException {
+        if(bool.get()) return;
+        this.wait(timeout);
+        if(!bool.get()) throw new TimeoutException("Waited " + timeout + " ms, but the event did not happen.");
     }
 
     /**
