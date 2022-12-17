@@ -435,6 +435,20 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
         return task.queue();
     }
 
+    @Override
+    public void shutdownNow(@NotNull LApiImpl lApi, @NotNull LogInstance log, @NotNull Executor shutdownExecutor) {
+        this.disableAcceptNewFutures();
+        this.stopImmediately();
+        shutdownExecutor.execute(() -> {
+            try {
+                queueEndAwaiter.awaitFirst(100);
+            } catch (InterruptedException ignored) {
+            } catch (TimeoutException e) {
+                log.error("Queue could not shutdown immediately.");
+            }
+        });
+    }
+
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

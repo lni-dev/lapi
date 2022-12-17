@@ -40,7 +40,6 @@ import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.exceptions.LApiRuntimeException;
 import me.linusdev.lapi.api.lapi.shutdown.ShutdownExecutor;
 import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
-import me.linusdev.lapi.api.lapi.shutdown.ShutdownOptions;
 import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
@@ -55,10 +54,7 @@ import me.linusdev.lapi.api.thread.LApiThreadGroup;
 import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Blocking;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.*;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -365,15 +361,10 @@ public class LApiImpl implements LApi {
         });
     }
 
-    /**
-     * Attempts to shut {@link LApi} down with given {@link ShutdownOption}s.<br>
-     * This will block the current thread.
-     * @param options {@link ShutdownOptions}
-     */
     @Override
     @Blocking
     public void shutdown(@NotNull List<@NotNull ShutdownOption> options) {
-        final long shutdownBy = System.currentTimeMillis() + 3000; //TODO: add this time to the config
+        final long shutdownBy = System.currentTimeMillis() + config.getMaxShutdownTime();
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
 
@@ -446,8 +437,16 @@ public class LApiImpl implements LApi {
         }
     }
 
+    @NonBlocking
+    @Override
     public void shutdownNow() {
-        //TODO: implement
+        final LogInstance log = Logger.getLogger("Shutdown Sequence");
+        final Executor executor = new ShutdownExecutor(this);
+
+
+        for(Shutdownable shutdownable : shutdownables) {
+           shutdownable.shutdownNow(this, log, executor);
+        }
     }
 
     @Override

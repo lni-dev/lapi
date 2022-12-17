@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.*;
+import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -86,6 +87,7 @@ public class ConfigBuilder implements Datable {
     public final static String APPLICATION_ID_KEY = "application_id";
     public static final String API_VERSION_KEY = "apiVersion";
     public final static String FLAGS_KEY = "flags";
+    public final static String MAX_SHUTDOWN_TIME_KEY = "max_shutdown_time";
     public final static String GATEWAY_CONFIG_KEY = "gateway_config";
 
     public final static String DEBUG_RATE_LIMIT_BUCKETS_KEY = "debug_rate_limit_buckets";
@@ -103,6 +105,7 @@ public class ConfigBuilder implements Datable {
     private @Nullable Snowflake applicationId;
     private ApiVersion apiVersion = null;
     private long flags = 0;
+    private Long maxShutdownTime = null;
 
     //Queue
     private Boolean debugRateLimitBuckets = null;
@@ -265,6 +268,24 @@ public class ConfigBuilder implements Datable {
      */
     public ConfigBuilder setToken(@NotNull String token){
         this.token = token;
+        return this;
+    }
+
+    /**
+     * <em>Optional</em><br>
+     * Default: {@value LApi#DEFAULT_MAX_SHUTDOWN_TIME}
+     * <p>
+     *     The maximal time, in milliseconds, {@link LApi} should <b>try</b> to {@link LApi#shutdown(List) shutdown} in.<br>
+     *     Code should not depend on this time.
+     * </p>
+     * <p>
+     *      Set to {@code null} to reset to default.
+     * </p>
+     * @param maxShutdownTime maximal shutdown time
+     * @return this
+     */
+    public ConfigBuilder setMaxShutdownTime(@Nullable Long maxShutdownTime) {
+        this.maxShutdownTime = maxShutdownTime;
         return this;
     }
 
@@ -777,6 +798,14 @@ public class ConfigBuilder implements Datable {
         data.processIfNotNull(BUCKET_QUEUE_CHECK_SIZE_KEY,
                 (Number o) -> minTimeBetweenChecks = o.longValue());
 
+        data.getContainer(MAX_SHUTDOWN_TIME_KEY).ifExists().<Number>cast().process(number -> {
+           if(number != null) maxShutdownTime = number.longValue();
+        });
+
+        data.getContainer(DEBUG_RATE_LIMIT_BUCKETS_KEY).ifExists().<Boolean>cast().process(aBoolean -> {
+            if(aBoolean != null) debugRateLimitBuckets = aBoolean;
+        });
+
         return this;
     }
 
@@ -828,7 +857,7 @@ public class ConfigBuilder implements Datable {
      * </p>
      * @return {@link Config}
      */
-    @SuppressWarnings("Convert2MethodRef")
+    @SuppressWarnings({"Convert2MethodRef", "RedundantSuppression"})
     public @NotNull Config build(){
 
         if(token == null) throw new LApiRuntimeException("Token is null. A config always requires a token.");
@@ -840,6 +869,7 @@ public class ConfigBuilder implements Datable {
                 Objects.requireNonNullElseGet(queueSupplier, () -> ConcurrentLinkedQueue::new),
                 token,
                 applicationId, Objects.requireNonNullElse(apiVersion, LApi.DEFAULT_API_VERSION),
+                Objects.requireNonNullElse(maxShutdownTime, LApi.DEFAULT_MAX_SHUTDOWN_TIME),
                 gatewayConfigBuilder.build(),
                 Objects.requireNonNullElse(debugRateLimitBuckets, false),
                 Objects.requireNonNullElse(bucketsCheckAmount, LApiImpl.DEFAULT_BUCKETS_CHECK_AMOUNT),
@@ -887,8 +917,10 @@ public class ConfigBuilder implements Datable {
         data.addIfNotNull(APPLICATION_ID_KEY, applicationId);
         data.addIfNotNull(API_VERSION_KEY, apiVersion);
         data.add(FLAGS_KEY, ConfigFlag.toData(flags));
+        data.addIfNotNull(MAX_SHUTDOWN_TIME_KEY, maxShutdownTime);
         data.add(GATEWAY_CONFIG_KEY, gatewayConfigBuilder);
 
+        data.addIfNotNull(DEBUG_RATE_LIMIT_BUCKETS_KEY, debugRateLimitBuckets);
         data.addIfNotNull(GLOBAL_HTTP_RATE_LIMIT_RETRY_LIMIT_KEY, globalHttpRateLimitRetryLimit);
         data.addIfNotNull(HTTP_RATE_LIMIT_ASSUMED_BUCKET_LIMIT_KEY, httpRateLimitAssumedBucketLimit);
         data.addIfNotNull(BUCKETS_CHECK_AMOUNT_KEY, bucketsCheckAmount);
