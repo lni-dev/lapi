@@ -25,6 +25,7 @@ import me.linusdev.lapi.api.cache.Cache;
 import me.linusdev.lapi.api.communication.gateway.events.transmitter.EventIdentifier;
 import me.linusdev.lapi.api.event.ReadyEventAwaiter;
 import me.linusdev.lapi.api.lapi.shutdown.ShutdownOption;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOptions;
 import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.manager.command.CommandManager;
 import me.linusdev.lapi.api.manager.command.CommandManagerImpl;
@@ -46,9 +47,7 @@ import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.thread.LApiThread;
-import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.*;
 
 import java.io.*;
 import java.util.List;
@@ -109,6 +108,11 @@ public interface LApi extends HasLApi {
     public static final @NotNull ApiVersion NEWEST_API_VERSION = ApiVersion.V10;
     public static final @NotNull ApiVersion DEFAULT_API_VERSION = NEWEST_API_VERSION;
 
+    /**
+     * Default max shutdown time in milliseconds.
+     */
+    public static final long DEFAULT_MAX_SHUTDOWN_TIME = 3000;
+
     public static final String LAPI_ARRAY_WRAPPER_KEY = "lapi_array_wrapper";
 
     @Contract(value = "_ -> new", pure = true)
@@ -136,7 +140,6 @@ public interface LApi extends HasLApi {
      * @param queueable {@link Queueable}
      * @param <T> Return Type of {@link Queueable}
      */
-    @SuppressWarnings("JavadocReference")
     @ApiStatus.Internal
     <T> void queue(@NotNull QueueableFuture<T> queueable);
 
@@ -185,7 +188,20 @@ public interface LApi extends HasLApi {
     @ApiStatus.Internal
     void runSupervised(@NotNull Runnable runnable);
 
+    /**
+     * Attempts to shut {@link LApi} down with given {@link ShutdownOption}s.<br>
+     * This will block the current thread.
+     * @param options {@link ShutdownOptions}
+     */
+    @Blocking
     void shutdown(@NotNull List<ShutdownOption> options);
+
+    /**
+     * Attempts to shut down {@link LApi} as quick as possible.
+     * Does not block the current thread.
+     */
+    @NonBlocking
+    public void shutdownNow();
 
     @ApiStatus.Internal
     void registerShutdownable(@NotNull Shutdownable shutdownable);

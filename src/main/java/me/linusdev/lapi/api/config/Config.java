@@ -49,6 +49,7 @@ public class Config {
     private final @NotNull String token;
     private final @Nullable Snowflake applicationId;
     private final @NotNull ApiVersion apiVersion;
+    private final long maxShutdownTime;
     private final @NotNull GatewayConfig gatewayConfig;
 
     //Queue
@@ -79,7 +80,7 @@ public class Config {
     private final @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory;
 
     public Config(long flags, long globalHttpRateLimitRetryLimit, long httpRateLimitAssumedBucketLimit, @NotNull Supplier<Queue<QueueableFuture<?>>> queueSupplier, @NotNull String token,
-                  @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, @NotNull GatewayConfig gatewayConfig,
+                  @Nullable Snowflake applicationId, @NotNull ApiVersion apiVersion, long maxShutdownTime, @NotNull GatewayConfig gatewayConfig,
                   boolean debugRateLimitBuckets, int bucketsCheckAmount, long assumedBucketMaxLifeTime, long bucketMaxLastUsedTime, long minTimeBetweenChecks, int bucketQueueCheckSize, @NotNull RateLimitedQueueCheckerFactory bucketQueueCheckerFactory, @NotNull CommandProvider commandProvider, @NotNull ManagerFactory<GuildManager> guildManagerFactory,
                   @NotNull ManagerFactory<RoleManager> roleManagerFactory,
                   @NotNull ManagerFactory<ListManager<EmojiObject>> emojiManagerFactory, @NotNull ManagerFactory<ListManager<Sticker>> stickerManagerFactory, @NotNull ManagerFactory<VoiceStateManager> voiceStateManagerFactory, @NotNull ManagerFactory<MemberManager> memberManagerFactory, @NotNull ManagerFactory<ListManager<Channel>> channelManagerFactory, @NotNull ManagerFactory<ThreadManager> threadsManagerFactory, @NotNull ManagerFactory<PresenceManager> presenceManagerFactory, @NotNull ManagerFactory<ListManager<StageInstance>> stageInstanceManagerFactory, @NotNull ManagerFactory<GuildScheduledEventManager> guildScheduledEventManagerFactory){
@@ -91,6 +92,7 @@ public class Config {
         this.queueSupplier = queueSupplier;
         this.applicationId = applicationId;
         this.apiVersion = apiVersion;
+        this.maxShutdownTime = maxShutdownTime;
         this.gatewayConfig = gatewayConfig;
         this.debugRateLimitBuckets = debugRateLimitBuckets;
         this.bucketsCheckAmount = bucketsCheckAmount;
@@ -227,5 +229,9 @@ public class Config {
 
     public @NotNull ManagerFactory<GuildScheduledEventManager> getGuildScheduledEventManagerFactory() {
         return guildScheduledEventManagerFactory;
+    }
+
+    public long getMaxShutdownTime() {
+        return maxShutdownTime;
     }
 }

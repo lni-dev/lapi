@@ -51,6 +51,10 @@ public interface Shutdownable extends HasLApi {
     @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions,
                                                      @NotNull LogInstance log, @NotNull Executor shutdownExecutor,
                                                      long shutdownBy);
+    @ApiStatus.Internal
+    @ApiStatus.OverrideOnly
+    @NonBlocking
+    void shutdownNow(@NotNull LApiImpl lApi, @NotNull LogInstance log, @NotNull Executor shutdownExecutor);
 
     default void registerShutdownable() {
         getLApi().registerShutdownable(this);
