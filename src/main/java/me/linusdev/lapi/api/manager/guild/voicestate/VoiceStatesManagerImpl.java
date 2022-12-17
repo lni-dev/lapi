@@ -66,10 +66,7 @@ public class VoiceStatesManagerImpl implements VoiceStateManager {
 
     @Override
     public @NotNull Update<VoiceState, VoiceState> update(@NotNull SOData voiceStateData) throws InvalidDataException {
-        String userId = (String) voiceStateData.get(VoiceState.USER_ID_KEY);
-
-        if (userId == null)
-            throw new InvalidDataException(voiceStateData, "missing user id.", null, VoiceState.USER_ID_KEY);
+        String userId = (String) voiceStateData.getAndRequireNotNull(VoiceState.USER_ID_KEY, InvalidDataException.SUPPLIER);
 
         VoiceState state = get(userId);
 

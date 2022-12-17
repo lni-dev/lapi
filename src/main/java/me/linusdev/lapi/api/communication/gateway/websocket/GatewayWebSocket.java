@@ -363,7 +363,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                             + "&" + QUERY_STRING_ENCODING_KEY + "=" + encoding.getValue()
                             + (compression.getValue() != null ? "&" + QUERY_STRING_COMPRESS_KEY + "=" + compression.getValue() : ""));
 
-                    logger.debug("Gateway connecting to " + uri.toString());
+                    logger.debug("Gateway connecting to " + uri);
 
                     final GatewayWebSocket _this = this;
                     pendingConnects.incrementAndGet();
@@ -419,7 +419,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
      *
      * @param payload {@link GatewayPayloadAbstract}
      */
-    @SuppressWarnings("DuplicateBranchesInSwitch")
     @ApiStatus.Internal
     public void handleReceivedEvent(@NotNull GatewayPayloadAbstract payload) {
         try {
@@ -597,7 +596,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case CHANNEL_PINS_UPDATE:
                     {
                         @Nullable String guildId = (String) data.get(Channel.GUILD_ID_KEY);
-                        @NotNull String channelId = (String) data.get(CHANNEL_ID_KEY);
+                        @NotNull String channelId = (String) data.getAndRequireNotNull(CHANNEL_ID_KEY, InvalidDataException.SUPPLIER);
                         @Nullable ISO8601Timestamp lastPinTimestamp = data.getAndConvert(LAST_PIN_TIMESTAMP, ISO8601Timestamp::fromString);
 
                         ChannelPinsUpdateEvent event = new ChannelPinsUpdateEvent(lApi, payload,
@@ -863,9 +862,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case GUILD_DELETE:
                 {
                         if (guildManager == null) {
-                            String guildId = (String) data.get(GUILD_ID_KEY);
-
-                            if (guildId == null) throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                            String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                             transmitter.onGuildDelete(lApi, new GuildDeleteEvent(lApi, payload, guildId));
                             break;
@@ -886,11 +883,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_BAN_ADD:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData user = (SOData) data.get(USER_KEY);
-
-                        if (guildId == null || user == null)
-                            throw new InvalidDataException(data, null, null, GUILD_ID_KEY, USER_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData user = (SOData) data.getAndRequireNotNull(USER_KEY, InvalidDataException.SUPPLIER);
 
                         GuildBanEvent event = new GuildBanEvent(lApi, payload, Snowflake.fromString(guildId),
                                 User.fromData(lApi, user));
@@ -901,11 +895,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_BAN_REMOVE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData user = (SOData) data.get(USER_KEY);
-
-                        if (guildId == null || user == null)
-                            throw new InvalidDataException(data, null, null, GUILD_ID_KEY, USER_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData user = (SOData) data.getAndRequireNotNull(USER_KEY, InvalidDataException.SUPPLIER);
 
                         GuildBanEvent event = new GuildBanEvent(lApi, payload, Snowflake.fromString(guildId),
                                 User.fromData(lApi, user));
@@ -916,12 +907,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_EMOJIS_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
                         ArrayList<SOData> emojisData = data.getListAndConvert(EMOJIS_KEY, convertible -> (SOData) convertible);
 
-
-                        if (guildId == null || emojisData == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY, EMOJIS_KEY);
+                        if(emojisData == null) throw InvalidDataException.SUPPLIER.supply(data, EMOJIS_KEY);
 
                         if (guildManager == null) {
                             transmitter.onGuildEmojisUpdate(lApi,
@@ -955,12 +944,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_STICKERS_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
                         ArrayList<SOData> stickersData = data.getListAndConvert(STICKERS_KEY, convertible -> (SOData) convertible);
 
-
-                        if (guildId == null || stickersData == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY, STICKERS_KEY);
+                        if(stickersData == null) throw InvalidDataException.SUPPLIER.supply(data, STICKERS_KEY);
 
                         if (guildManager == null) {
                             transmitter.onGuildStickersUpdate(lApi,
@@ -994,10 +981,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_INTEGRATIONS_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if(guildId == null)
-                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         transmitter.onGuildIntegrationsUpdate(lApi,
                                 new GuildIntegrationsUpdateEvent(lApi, payload, Snowflake.fromString(guildId)));
@@ -1006,14 +990,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_MEMBER_ADD:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData userData = (SOData) data.get(Member.USER_KEY);
-                        if(userData == null || guildId == null)
-                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
-
-                        String userId = (String) userData.get(User.ID_KEY);
-                        if(userId == null)
-                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if(guildManager == null) {
                             transmitter.onGuildMemberAdd(lApi,
@@ -1047,14 +1024,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_MEMBER_REMOVE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData userData = (SOData) data.get(Member.USER_KEY);
-                        if(userData == null || guildId == null)
-                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
-
-                        String userId = (String) userData.get(User.ID_KEY);
-                        if(userId == null)
-                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData userData = (SOData) data.getAndRequireNotNull(Member.USER_KEY, InvalidDataException.SUPPLIER);
+                        String userId = (String) userData.getAndRequireNotNull(User.ID_KEY, InvalidDataException.SUPPLIER);
 
                         if(guildManager == null) {
                             transmitter.onGuildMemberRemove(lApi, new GuildMemberRemoveEvent(lApi,
@@ -1086,14 +1058,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_MEMBER_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData userData = (SOData) data.get(Member.USER_KEY);
-                        if(userData == null || guildId == null)
-                            throw new InvalidDataException(data, "guildId or user missing", null, GUILD_ID_KEY, Member.USER_KEY);
-
-                        String userId = (String) userData.get(User.ID_KEY);
-                        if(userId == null)
-                            throw new InvalidDataException(userData, "userId missing", null, User.ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData userData = (SOData) data.getAndRequireNotNull(Member.USER_KEY, InvalidDataException.SUPPLIER);
+                        String userId = (String) userData.getAndRequireNotNull(User.ID_KEY, InvalidDataException.SUPPLIER);
 
                         if(guildManager == null) {
                             transmitter.onGuildMemberUpdate(lApi, new GuildMemberUpdateEvent(
@@ -1137,9 +1104,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_MEMBERS_CHUNK:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        if(guildId == null)
-                            throw new InvalidDataException(data, "guildId missing", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         transmitter.onGuildMembersChunk(lApi, new GuildMembersChunkEvent(lApi,
                                 payload, Snowflake.fromString(guildId),
@@ -1149,11 +1114,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_ROLE_CREATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData roleData = (SOData) data.get(ROLE_KEY);
-
-                        if (guildId == null || roleData == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData roleData = (SOData) data.getAndRequireNotNull(ROLE_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onGuildRoleCreate(lApi, new GuildRoleCreateEvent(lApi, payload, Snowflake.fromString(guildId), Role.fromData(lApi, roleData)));
@@ -1181,11 +1143,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_ROLE_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        SOData roleData = (SOData) data.get(ROLE_KEY);
-
-                        if (guildId == null || roleData == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        SOData roleData = (SOData) data.getAndRequireNotNull(ROLE_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             Update<Role, Role> role = new Update<>(null, Role.fromData(lApi, roleData));
@@ -1227,11 +1186,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_ROLE_DELETE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        String roleId = (String) data.get(ROLE_ID_KEY);
-
-                        if (guildId == null || roleId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY, ROLE_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        String roleId = (String) data.getAndRequireNotNull(ROLE_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onGuildRoleDelete(lApi, new GuildRoleDeleteEvent(lApi, payload, guildId, roleId));
@@ -1268,10 +1224,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_SCHEDULED_EVENT_CREATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
@@ -1297,14 +1250,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                         }
 
                         GuildScheduledEvent scheduledEvent = guildScheduledEventManager.onAdd(data);
-                        if (scheduledEvent == null) {
-                            //RoleManagerImpl didn't contain this role...
-                            transmitter.onLApiError(lApi, new LApiErrorEvent(lApi, payload, type,
-                                    new LApiError(LApiError.ErrorCode.UNKNOWN_GUILD_SCHEDULED_EVENT, null)));
-                            transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
-                                    GuildScheduledEventEvent.Type.CREATE, GuildScheduledEvent.fromData(lApi, data)));
-                            break;
-                        }
                         transmitter.onGuildScheduledEventCreate(lApi, new GuildScheduledEventEvent(lApi, payload,
                                 GuildScheduledEventEvent.Type.CREATE, scheduledEvent));
                     }
@@ -1312,10 +1257,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_SCHEDULED_EVENT_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onGuildScheduledEventUpdate(lApi, new GuildScheduledEventEvent(lApi, payload,
@@ -1356,10 +1298,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case GUILD_SCHEDULED_EVENT_DELETE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onGuildScheduledEventDelete(lApi, new GuildScheduledEventEvent(lApi, payload,
@@ -1477,13 +1416,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case INTEGRATION_CREATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
                         Integration integration = Integration.fromData(lApi, data);
-
-                        if(guildId == null) {
-                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
-                                    new Object[]{guildId,}, new String[]{GUILD_ID_KEY});
-                        }
 
                         transmitter.onIntegrationCreate(lApi,
                                 new IntegrationCreateEvent(lApi, payload, Snowflake.fromString(guildId), integration));
@@ -1492,13 +1426,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case INTEGRATION_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
                         Integration integration = Integration.fromData(lApi, data);
-
-                        if(guildId == null) {
-                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
-                                    new Object[]{guildId,}, new String[]{GUILD_ID_KEY});
-                        }
 
                         transmitter.onIntegrationUpdate(lApi,
                                 new IntegrationUpdateEvent(lApi, payload, Snowflake.fromString(guildId), integration));
@@ -1507,15 +1436,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case INTEGRATION_DELETE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        Snowflake integrationId = data.getAndConvert(Integration.ID_KEY, Snowflake::fromString);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        Snowflake integrationId = data.getAndRequireNotNullAndConvert(Integration.ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
                         @Nullable Snowflake applicationId = data.getAndConvert(IntegrationDeleteEvent.APPLICATION_ID_KEY, Snowflake::fromString);
-
-                        if(guildId == null || integrationId == null) {
-                            InvalidDataException.throwException(data, null, IntegrationDeleteEvent.class,
-                                    new Object[]{guildId, integrationId}, new String[]{GUILD_ID_KEY, Integration.ID_KEY});
-                            return; //unreachable statement
-                        }
 
                         transmitter.onIntegrationDelete(lApi,
                                 new IntegrationDeleteEvent(lApi, payload, Snowflake.fromString(guildId), integrationId, applicationId));
@@ -1563,15 +1486,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case MESSAGE_DELETE:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        String channelId = (String) data.get(AnyMessage.CHANNEL_ID_KEY);
-                        String messageId = (String) data.get(AnyMessage.ID_KEY);
-
-                        if(messageId == null || channelId == null) {
-                            InvalidDataException.throwException(data, null, MessageDeleteEvent.class,
-                                    new Object[]{guildId, channelId, messageId},
-                                    new String[]{GUILD_ID_KEY, AnyMessage.CHANNEL_ID_KEY, AnyMessage.ID_KEY});
-                            break; //unreachable statement
-                        }
+                        String channelId = (String) data.getAndRequireNotNull(AnyMessage.CHANNEL_ID_KEY, InvalidDataException.SUPPLIER);
+                        String messageId = (String) data.getAndRequireNotNull(AnyMessage.ID_KEY, InvalidDataException.SUPPLIER);
 
                         MessageDeleteEvent event = new MessageDeleteEvent(lApi, payload, Snowflake.fromString(guildId),
                                 Snowflake.fromString(messageId), Snowflake.fromString(channelId));
@@ -1583,14 +1499,11 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case MESSAGE_DELETE_BULK:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        String channelId = (String) data.get(CHANNEL_ID_KEY);
+                        String channelId = (String) data.getAndRequireNotNull(CHANNEL_ID_KEY, InvalidDataException.SUPPLIER);
                         List<String> messageIds = data.getListAndConvert(MessageDeleteBulkEvent.IDS_KEY, convertible -> (String) convertible);
 
-                        if(channelId == null || messageIds == null){
-                            InvalidDataException.throwException(data, null, MessageDeleteBulkEvent.class,
-                                    new Object[]{channelId, messageIds}, new String[]{CHANNEL_ID_KEY, MessageDeleteBulkEvent.IDS_KEY});
-                            break; //unreachable statement
-                        }
+                        if(messageIds == null)
+                            throw InvalidDataException.SUPPLIER.supply(data, MessageDeleteBulkEvent.IDS_KEY);
 
                         MessageDeleteBulkEvent event = new MessageDeleteBulkEvent(lApi, payload, Snowflake.fromString(guildId),
                                 messageIds, Snowflake.fromString(channelId));
@@ -1620,14 +1533,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case MESSAGE_REACTION_REMOVE_ALL:
                     {
                         String guildId = (String) data.get(GUILD_ID_KEY);
-                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
-                        Snowflake messageId = data.getAndConvert(MESSAGE_ID_KEY, Snowflake::fromString);
-
-                        if(channelId == null || messageId == null) {
-                            InvalidDataException.throwException(data, null, MessageReactionRemoveAllEvent.class,
-                                    new Object[]{channelId, messageId}, new String[]{CHANNEL_ID_KEY, MESSAGE_ID_KEY});
-                            break; //unreachable statement
-                        }
+                        Snowflake channelId = data.getAndRequireNotNullAndConvert(CHANNEL_ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
+                        Snowflake messageId = data.getAndRequireNotNullAndConvert(MESSAGE_ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
 
                         transmitter.onMessageReactionRemoveAll(lApi,
                                 new MessageReactionRemoveAllEvent(lApi, payload,
@@ -1637,16 +1544,10 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case MESSAGE_REACTION_REMOVE_EMOJI:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
-                        Snowflake messageId = data.getAndConvert(MESSAGE_ID_KEY, Snowflake::fromString);
-                        EmojiObject emoji = data.getAndConvertWithException(EMOJI_KEY, (SOData c)  -> EmojiObject.fromData(lApi, c), null);
-
-                        if(channelId == null || messageId == null || emoji == null) {
-                            InvalidDataException.throwException(data, null, MessageReactionRemoveEmojiEvent.class,
-                                    new Object[]{channelId, messageId, emoji}, new String[]{CHANNEL_ID_KEY, MESSAGE_ID_KEY, EMOJI_KEY});
-                            break; //unreachable statement
-                        }
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        Snowflake channelId = data.getAndRequireNotNullAndConvert(CHANNEL_ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
+                        Snowflake messageId = data.getAndRequireNotNullAndConvert(MESSAGE_ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
+                        EmojiObject emoji = data.getAndRequireNotNullAndConvertWithException(EMOJI_KEY, (SOData c)  -> EmojiObject.fromData(lApi, c), InvalidDataException.SUPPLIER);
 
                         transmitter.onMessageReactionRemoveEmoji(lApi,
                                 new MessageReactionRemoveEmojiEvent(lApi, payload,
@@ -1702,10 +1603,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case STAGE_INSTANCE_CREATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onStageInstanceCreate(lApi, new StageInstanceEvent(lApi, payload,
@@ -1742,10 +1640,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case STAGE_INSTANCE_DELETE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onStageInstanceDelete(lApi, new StageInstanceEvent(lApi, payload,
@@ -1792,10 +1687,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case STAGE_INSTANCE_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-
-                        if (guildId == null)
-                            throw new InvalidDataException(data, "", null, GUILD_ID_KEY);
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
 
                         if (guildManager == null) {
                             transmitter.onStageInstanceUpdate(lApi, new StageInstanceEvent(lApi, payload,
@@ -1857,11 +1749,6 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
                 case VOICE_STATE_UPDATE:
                     {
                         String guildId = (String) data.get(VoiceState.GUILD_ID_KEY);
-                        String userId = (String) data.get(VoiceState.USER_ID_KEY);
-
-                        if (userId == null) {
-                            throw new InvalidDataException(data, null, null, VoiceState.GUILD_ID_KEY, VoiceState.USER_ID_KEY);
-                        }
 
                         if (guildManager == null || guildId == null) {
                             //TODO: Maybe add a manager for VoiceStates, which are not part of a guild. A Bot cant receive these tho.
@@ -1896,16 +1783,9 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case VOICE_SERVER_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        String token = (String) data.get(VoiceServerUpdateEvent.TOKEN_KEY);
-                        String endpoint = (String) data.get(VoiceServerUpdateEvent.ENDPOINT_KEY);
-
-                        if(token == null || guildId == null) {
-                            InvalidDataException.throwException(data, null, VoiceServerUpdateEvent.class,
-                                    new Object[]{guildId, token},
-                                    new String[]{GUILD_ID_KEY, VoiceServerUpdateEvent.TOKEN_KEY});
-                            break; //unreachable statement
-                        }
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        String token = (String) data.getAndRequireNotNull(VoiceServerUpdateEvent.TOKEN_KEY, InvalidDataException.SUPPLIER);
+                        String endpoint = (String) data.getAndRequireNotNull(VoiceServerUpdateEvent.ENDPOINT_KEY, InvalidDataException.SUPPLIER);
 
                         VoiceServerUpdateEvent event = new VoiceServerUpdateEvent(lApi, payload,
                                 Snowflake.fromString(guildId), token, endpoint);
@@ -1916,15 +1796,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
                 case WEBHOOKS_UPDATE:
                     {
-                        String guildId = (String) data.get(GUILD_ID_KEY);
-                        Snowflake channelId = data.getAndConvert(CHANNEL_ID_KEY, Snowflake::fromString);
-
-                        if(guildId == null || channelId == null) {
-                            InvalidDataException.throwException(data, null, VoiceServerUpdateEvent.class,
-                                    new Object[]{guildId, channelId},
-                                    new String[]{GUILD_ID_KEY, CHANNEL_ID_KEY});
-                            break; //unreachable statement
-                        }
+                        String guildId = (String) data.getAndRequireNotNull(GUILD_ID_KEY, InvalidDataException.SUPPLIER);
+                        Snowflake channelId = data.getAndRequireNotNullAndConvert(CHANNEL_ID_KEY, Snowflake::fromString, InvalidDataException.SUPPLIER);
 
                         WebhooksUpdateEvent event = new WebhooksUpdateEvent(lApi, payload,
                                 Snowflake.fromString(guildId), channelId);
@@ -2008,8 +1881,14 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
             //the payload data is a json with contains the heartbeat_interval
             Object data = payload.getPayloadData();
 
+            if(data == null) {
+                unexpectedEventHandler.onFatal(lApi, this,"payload in " + GatewayOpcode.HELLO + " was null", null);
+                return;
+            }
+
             Number heartbeatInterval = (Number) ((SOData) data).get(HEARTBEAT_INTERVAL_KEY);
             if (heartbeatInterval == null) {
+                unexpectedEventHandler.onFatal(lApi, this,"No " + HEARTBEAT_INTERVAL_KEY + " received", null);
                 disconnect("No " + HEARTBEAT_INTERVAL_KEY + " received");
                 return;
             }
@@ -2064,9 +1943,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         heartbeatFuture.cancel(true);
 
         if(!webSocket.isOutputClosed() && sendClose){
-            disconnect(null).whenComplete((webSocket, throwable) -> {
-                webSocket.abort();
-            });
+            disconnect(null).whenComplete((webSocket, throwable) -> webSocket.abort());
             //disconnect will call resetState(), no need to call it here
             start();
             return;
@@ -2121,19 +1998,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
     public void resume(SOData data) throws InvalidDataException {
         if(webSocket != null) throw new UnsupportedOperationException("resume(Data) is exclusive to start()");
 
-        String sessionId = (String) data.get(SESSION_ID_KEY);
-        Boolean canResume = (Boolean) data.get(CAN_RESUME_KEY);
-        SOData dispatchEventQueueData = (SOData) data.get(DISPATCH_EVENT_QUEUE_KEY);
-        Number heartbeatsSent = (Number) data.get(HEARTBEATS_SENT_KEY);
-        Number heartbeatsAcksReceived = (Number) data.get(HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY);
-        Number genMillis = (Number) data.get(DATA_GENERATED_TIME_MILLIS_KEY);
-
-        if(sessionId == null || canResume == null || dispatchEventQueueData == null || heartbeatsSent == null ||
-        heartbeatsAcksReceived == null || genMillis == null){
-            InvalidDataException.throwException(data, null, GatewayWebSocket.class,
-                    new Object[]{sessionId, canResume, dispatchEventQueueData, heartbeatsSent, heartbeatsAcksReceived, genMillis},
-                    new String[]{SESSION_ID_KEY, CAN_RESUME_KEY, DISPATCH_EVENT_QUEUE_KEY, HEARTBEATS_SENT_KEY, HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY, DATA_GENERATED_TIME_MILLIS_KEY});
-        }
+        @NotNull String sessionId = (String) data.getAndRequireNotNull(SESSION_ID_KEY, InvalidDataException.SUPPLIER);
+        @NotNull Boolean canResume = (Boolean) data.getAndRequireNotNull(CAN_RESUME_KEY, InvalidDataException.SUPPLIER);
+        @NotNull SOData dispatchEventQueueData = (SOData) data.getAndRequireNotNull(DISPATCH_EVENT_QUEUE_KEY, InvalidDataException.SUPPLIER);
+        @NotNull Number heartbeatsSent = (Number) data.getAndRequireNotNull(HEARTBEATS_SENT_KEY, InvalidDataException.SUPPLIER);
+        @NotNull  Number heartbeatsAcksReceived = (Number) data.getAndRequireNotNull(HEARTBEAT_ACKNOWLEDGEMENTS_RECEIVED_KEY, InvalidDataException.SUPPLIER);
+        @NotNull Number genMillis = (Number) data.getAndRequireNotNull(DATA_GENERATED_TIME_MILLIS_KEY, InvalidDataException.SUPPLIER);
 
         long timePasted = System.currentTimeMillis() - genMillis.longValue();
 
@@ -2502,7 +2372,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
 
         /**
          * Either we already tried to connect 3 times in a row, without success or something unexpected happened.<br>
-         * Anyways, the {@link GatewayWebSocket} will <b>not</b> automatically reconnect
+         * Anyway, the {@link GatewayWebSocket} will <b>not</b> automatically reconnect
          *
          * @param lApi {@link LApi}
          * @param gatewayWebSocket the {@link GatewayWebSocket}
@@ -2520,6 +2390,7 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
          * @param canResume {@code true} means the {@link GatewayWebSocket} will try to {@link #resume() resume}.
          * {@code false} means the {@link GatewayWebSocket} will try to {@link #reconnect(boolean) reconnect}
          */
+        @SuppressWarnings("unused")
         default void onInvalidSession(@NotNull LApi lApi, @NotNull GatewayWebSocket gatewayWebSocket, boolean canResume){}
 
     }

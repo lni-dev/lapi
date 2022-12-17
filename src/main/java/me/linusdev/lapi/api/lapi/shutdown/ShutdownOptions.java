@@ -16,10 +16,16 @@
 
 package me.linusdev.lapi.api.lapi.shutdown;
 
+import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
+import me.linusdev.lapi.api.config.Config;
+
 public enum ShutdownOptions implements ShutdownOption {
 
     /**
-     * Stops the queue the next time it is empty.
+     * Stops the queue the next time it is empty.<br>
+     * Note: if the queue reaches the {@link Config#getMaxShutdownTime() max shutdown time} it will
+     * try to stop immediately instead.
      */
     QUEUE_STOP_IF_EMPTY(1 << 0, 1 << 1),
 
@@ -29,10 +35,20 @@ public enum ShutdownOptions implements ShutdownOption {
     QUEUE_STOP_IMMEDIATELY(1 << 1, 1 << 0),
 
     /**
-     * If you set this, the queue will accept new futures. This may lead to
-     * a never stopping queue.
+     * If you set this, the queue will accept new futures.<br>
+     * Note: if the queue reaches the {@link Config#getMaxShutdownTime() max shutdown time} it will
+     * try to stop immediately instead.
      */
     QUEUE_ACCEPT_NEW_FUTURES(1 << 2, 0),
+
+    /**
+     * The {@link GatewayWebSocket gateway} will {@link GatewayWebSocket#abort() abort} it's connection instead
+     * of {@link GatewayWebSocket#disconnect(String) disconnecting}.
+     * This is useful, if you want to try to {@link GatewayWebSocket#resume(SOData) resume} the session after
+     * restarting your bot. You should get the {@link GatewayWebSocket#getData() gateway data} directly after
+     * calling the shutdown method.
+     */
+    GATEWAY_ABORT(1 << 3, 0),
     ;
 
     private final long id;

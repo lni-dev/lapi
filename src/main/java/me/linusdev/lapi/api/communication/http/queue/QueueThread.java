@@ -444,7 +444,7 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
                 queueEndAwaiter.awaitFirst(100);
             } catch (InterruptedException ignored) {
             } catch (TimeoutException e) {
-                log.error("Queue could not shutdown immediately.");
+                log.error(this.getShutdownableName() + " could not shutdown immediately.");
             }
         });
     }
