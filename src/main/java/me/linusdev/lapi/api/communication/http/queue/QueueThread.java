@@ -400,12 +400,10 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
                     this_.disableAcceptNewFutures();
                 }
 
-                if(ShutdownOptions.QUEUE_STOP_IF_EMPTY.isSet(shutdownOptions)) {
-                    this_.stopIfEmpty();
-                }
-
                 if(ShutdownOptions.QUEUE_STOP_IMMEDIATELY.isSet(shutdownOptions)) {
                     this_.stopImmediately();
+                } else {
+                    this_.stopIfEmpty();
                 }
 
                 try {

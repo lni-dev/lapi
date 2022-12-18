@@ -69,6 +69,7 @@ import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static me.linusdev.lapi.api.communication.DiscordApiCommunicationHelper.*;
 
@@ -143,6 +144,9 @@ public class LApiImpl implements LApi {
 
     //shutdownables
     private final @NotNull LinusLinkedList<Shutdownable> shutdownables;
+    private final @NotNull AtomicBoolean shutdownSequenceStarted = new AtomicBoolean(false);
+    private final @NotNull AtomicBoolean shutdownNowSequenceStarted = new AtomicBoolean(false);
+    private final @NotNull AtomicBoolean isShutdown = new AtomicBoolean(false);
 
     //Logger
     private final LogInstance log = Logger.getLogger(LApi.class.getSimpleName(), Logger.Type.INFO);
@@ -155,11 +159,22 @@ public class LApiImpl implements LApi {
         this.token = config.getToken();
         this.config = config;
 
-        //shutdownables
-        this.shutdownables = new LinusLinkedList<>();
-
         //Thread
         this.lApiThreadGroup = new LApiThreadGroup(this);
+
+        //shutdownables
+        this.shutdownables = new LinusLinkedList<>();
+        Runtime.getRuntime().addShutdownHook(new LApiThread(this, lApiThreadGroup, "shutdown-hook") {
+            @Override
+            public boolean allowBlockingOperations() {
+                return true;
+            }
+
+            @Override
+            public void run() {
+                shutdown(List.of());
+            }
+        });
 
         //http
         this.authorizationHeader = new LApiHttpHeader(ATTRIBUTE_AUTHORIZATION_NAME, ATTRIBUTE_AUTHORIZATION_VALUE.replace(Name.TOKEN.toString(), this.token));
@@ -364,6 +379,12 @@ public class LApiImpl implements LApi {
     @Override
     @Blocking
     public void shutdown(@NotNull List<@NotNull ShutdownOption> options) {
+
+        synchronized (shutdownSequenceStarted) {
+            if(shutdownSequenceStarted.get()) return;
+            shutdownSequenceStarted.set(true);
+        }
+
         final long shutdownBy = System.currentTimeMillis() + config.getMaxShutdownTime();
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
@@ -435,17 +456,31 @@ public class LApiImpl implements LApi {
             log.error("Shutdown sequence was interrupted. Calling shutdownNow()...");
             shutdownNow();
         }
+
+        synchronized (isShutdown) {
+            isShutdown.set(true);
+        }
     }
 
     @NonBlocking
     @Override
     public void shutdownNow() {
+
+        synchronized (shutdownNowSequenceStarted) {
+            if(shutdownNowSequenceStarted.get()) return;
+            shutdownNowSequenceStarted.set(true);
+        }
+
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
 
 
         for(Shutdownable shutdownable : shutdownables) {
            shutdownable.shutdownNow(this, log, executor);
+        }
+
+        synchronized (isShutdown) {
+            isShutdown.set(true);
         }
     }
 

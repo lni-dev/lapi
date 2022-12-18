@@ -25,7 +25,8 @@ public enum ShutdownOptions implements ShutdownOption {
     /**
      * Stops the queue the next time it is empty.<br>
      * Note: if the queue reaches the {@link Config#getMaxShutdownTime() max shutdown time} it will
-     * try to stop immediately instead.
+     * try to stop immediately instead. <br><br>
+     * This is the default. If {@link #QUEUE_STOP_IMMEDIATELY} is not set, this will automatically be used.
      */
     QUEUE_STOP_IF_EMPTY(1 << 0, 1 << 1),
 

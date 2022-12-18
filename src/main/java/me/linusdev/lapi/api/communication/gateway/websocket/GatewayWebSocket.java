@@ -20,13 +20,20 @@ import me.linusdev.data.Datable;
 import me.linusdev.data.functions.ExceptionConverter;
 import me.linusdev.data.parser.JsonParser;
 import me.linusdev.data.so.SOData;
+import me.linusdev.lapi.api.async.ComputationResult;
+import me.linusdev.lapi.api.async.Future;
+import me.linusdev.lapi.api.async.Nothing;
+import me.linusdev.lapi.api.async.error.MessageError;
+import me.linusdev.lapi.api.async.error.StandardErrorTypes;
+import me.linusdev.lapi.api.async.error.ThrowableError;
 import me.linusdev.lapi.api.communication.ApiVersion;
-import me.linusdev.lapi.api.exceptions.InvalidDataException;
-import me.linusdev.lapi.api.exceptions.LApiException;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommand;
 import me.linusdev.lapi.api.communication.gateway.command.GatewayCommandType;
-import me.linusdev.lapi.api.communication.gateway.enums.*;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayCloseStatusCode;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayIntent;
+import me.linusdev.lapi.api.communication.gateway.enums.GatewayOpcode;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelCreateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelDeleteEvent;
 import me.linusdev.lapi.api.communication.gateway.events.channel.ChannelPinsUpdateEvent;
@@ -83,8 +90,14 @@ import me.linusdev.lapi.api.communication.gateway.resume.Resume;
 import me.linusdev.lapi.api.communication.gateway.update.Update;
 import me.linusdev.lapi.api.communication.http.request.LApiHttpHeader;
 import me.linusdev.lapi.api.config.Config;
+import me.linusdev.lapi.api.exceptions.InvalidDataException;
+import me.linusdev.lapi.api.exceptions.LApiException;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownOptions;
+import me.linusdev.lapi.api.lapi.shutdown.ShutdownTask;
+import me.linusdev.lapi.api.lapi.shutdown.Shutdownable;
 import me.linusdev.lapi.api.manager.guild.GuildManager;
 import me.linusdev.lapi.api.manager.guild.member.MemberManager;
 import me.linusdev.lapi.api.manager.guild.role.RoleManager;
@@ -96,7 +109,6 @@ import me.linusdev.lapi.api.manager.guild.voicestate.VoiceStateManager;
 import me.linusdev.lapi.api.manager.list.ListManager;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
 import me.linusdev.lapi.api.manager.presence.PresenceManager;
-import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.objects.channel.Channel;
 import me.linusdev.lapi.api.objects.channel.thread.ThreadMember;
 import me.linusdev.lapi.api.objects.emoji.EmojiObject;
@@ -143,7 +155,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @see <a href="https://discord.com/developers/docs/topics/gateway#gateways" target="_top">Gateways</a>
  */
-public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
+public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable, Shutdownable {
 
 
     public static final String QUERY_STRING_API_VERSION_KEY = "v";
@@ -2111,12 +2123,12 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         }
     }
 
-     public synchronized void sendNextInCommandQueue(){
+    public synchronized void sendNextInCommandQueue() {
         GatewayCommand cmd = commandQueue.poll();
-        if(cmd != null) {
+        if (cmd != null) {
             queueWorking.set(true);
             sendCommand(cmd.getType(), cmd.getObject());
-        }else{
+        } else {
             queueWorking.set(false);
         }
     }
@@ -2336,6 +2348,61 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable {
         data.add(DATA_GENERATED_TIME_MILLIS_KEY, System.currentTimeMillis());
 
         return data;
+    }
+
+    @Override
+    public @Nullable Future<Nothing, Shutdownable> shutdown(@NotNull LApiImpl lApi, long shutdownOptions, @NotNull LogInstance log, @NotNull Executor shutdownExecutor, long shutdownBy) {
+
+        ShutdownTask task = new ShutdownTask(lApi, this, shutdownExecutor, log) {
+            @Override
+            public @NotNull ComputationResult<Nothing, Shutdownable> execute() throws InterruptedException {
+
+                if(ShutdownOptions.GATEWAY_ABORT.isSet(shutdownOptions)) {
+                    log.info("Gateway aborting...");
+                    abort();
+                    return new ComputationResult<>(Nothing.getInstance(), parent, null);
+                }
+
+                CompletableFuture<WebSocket> f = disconnect(null);
+
+                try {
+                    long remainingTime = shutdownBy - System.currentTimeMillis() - 150;
+
+                    if(remainingTime < 150) {
+                        throw new TimeoutException();
+                    }
+
+                    f.get(remainingTime, TimeUnit.MILLISECONDS);
+                } catch (TimeoutException e) {
+                    return new ComputationResult<>(Nothing.getInstance(), parent,
+                            new MessageError("Shutdown of " + parent.getShutdownableName() + " took too long and could not disconnect the websocket", StandardErrorTypes.SHUTDOWN_TIMEOUT));
+
+                } catch (ExecutionException e) {
+                    return new ComputationResult<>(Nothing.getInstance(), parent, new ThrowableError(e));
+
+                }
+
+                return new ComputationResult<>(Nothing.getInstance(), parent, null);
+            }
+        };
+
+        return task.queue();
+    }
+
+    @Override
+    public void shutdownNow(@NotNull LApiImpl lApi, @NotNull LogInstance log, @NotNull Executor shutdownExecutor) {
+        shutdownExecutor.execute(() -> {
+            try {
+                disconnect(null).get(100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {
+            } catch (ExecutionException e) {
+                log.error(this.getShutdownableName() + " could not shutdown immediately: An ExecutionException occurred while trying to disconnect the websocket.");
+                log.error(e);
+            } catch (TimeoutException e) {
+                log.error(this.getShutdownableName() + " could not shutdown immediately.");
+            }
+        });
+
     }
 
 
