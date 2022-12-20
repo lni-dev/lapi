@@ -92,6 +92,12 @@ public class BucketDebugger extends JFrame {
         repaint();
     }
 
+    @Override
+    public void dispose() {
+        executor.shutdownNow();
+        super.dispose();
+    }
+
     private static class BucketView extends JLabel {
         private final @NotNull Bucket bucket;
 

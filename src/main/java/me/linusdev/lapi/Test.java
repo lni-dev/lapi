@@ -72,6 +72,7 @@ import me.linusdev.lapi.api.communication.gateway.websocket.GatewayWebSocket;
 import me.linusdev.lapi.api.config.ConfigBuilder;
 import me.linusdev.lapi.api.config.ConfigFlag;
 import me.linusdev.lapi.api.lapi.LApi;
+import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.list.ListUpdate;
@@ -172,6 +173,11 @@ public class Test implements EventListener{
         long tiem = System.currentTimeMillis();
         lApi.waitUntilLApiReadyEvent();
         System.out.println("yay took: " + (System.currentTimeMillis() - tiem) + " millis");
+
+
+        Thread.sleep(2000);
+        Logger.getLogger("main").log("shutting down");
+        lApi.shutdown(List.of());
 
     }
 

@@ -345,6 +345,8 @@ public class GatewayWebSocket implements WebSocket.Listener, HasLApi, Datable, S
         this.bytesToPayloadConverter = bytesToPayloadConverter;
 
         this.commandQueue = new ConcurrentLinkedQueue<>();
+
+        registerShutdownable();
     }
 
     public void start() {

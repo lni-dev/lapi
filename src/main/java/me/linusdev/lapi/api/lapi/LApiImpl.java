@@ -385,9 +385,12 @@ public class LApiImpl implements LApi {
             shutdownSequenceStarted.set(true);
         }
 
-        final long shutdownBy = System.currentTimeMillis() + config.getMaxShutdownTime();
+        final long shutdownStart = System.currentTimeMillis();
+        final long shutdownBy = shutdownStart + config.getMaxShutdownTime();
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
+
+        log.log("Starting shutdown sequence. Max shutdown time: " + config.getMaxShutdownTime() + " milliseconds.");
 
         long optionBitfield = 0L;
 
@@ -457,9 +460,23 @@ public class LApiImpl implements LApi {
             shutdownNow();
         }
 
+        supervisedRunnableExecutor.shutdownNow();
+        try {
+            long remaining = Shutdownable.calcRemainingShutdownTime(shutdownBy, 50);
+            if(remaining > 0) {
+                //noinspection ResultOfMethodCallIgnored: checked below
+                supervisedRunnableExecutor.awaitTermination(remaining, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException ignored) {}
+
+        if(!supervisedRunnableExecutor.isTerminated())
+            log.warning("Executor for supervised runnables could not shutdown successfully.");
+
         synchronized (isShutdown) {
             isShutdown.set(true);
         }
+
+        log.log("Shutdown finished. Took " + (System.currentTimeMillis() - shutdownStart) + " milliseconds.");
     }
 
     @NonBlocking

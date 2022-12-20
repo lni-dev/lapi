@@ -64,4 +64,14 @@ public interface Shutdownable extends HasLApi {
         return this.getClass().getSimpleName();
     }
 
+    /**
+     *
+     * @param shutdownBy when the shutdown should be completed. In milliseconds since 01.01.1970
+     * @param puffer some puffer time or 0. In milliseconds.
+     * @return remaining time to shut down. In milliseconds.
+     */
+    static long calcRemainingShutdownTime(long shutdownBy, long puffer) {
+       return shutdownBy - System.currentTimeMillis() - puffer;
+    }
+
 }

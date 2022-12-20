@@ -42,6 +42,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -81,6 +82,7 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
     private final @NotNull EventAwaiter queueEndAwaiter;
 
     private final @NotNull LogInstance log = Logger.getLogger(this);
+    private @Nullable BucketDebugger bucketDebugger = null;
 
     public QueueThread(@NotNull LApiImpl lApi, @NotNull LApiThreadGroup group, @NotNull Queue<QueueableFuture<?>> queue) {
         super(lApi, group, "queue-thread");
@@ -102,7 +104,10 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
 
     @ApiStatus.Internal
     public @NotNull BucketDebugger debug() {
-        return new BucketDebugger(bucketsForId, globalBucket);
+        if(bucketDebugger == null) {
+            bucketDebugger = new BucketDebugger(bucketsForId, globalBucket);
+        }
+        return bucketDebugger;
     }
 
     public boolean queueFuture(@NotNull QueueableFuture<?> future) {
@@ -312,6 +317,7 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
 
     public void stopIfEmpty() {
         this.stopIfEmpty.set(true);
+        notifyAllAwaiting();
     }
 
     public void stopImmediately() {
@@ -391,6 +397,10 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
                                                             @NotNull LogInstance log, @NotNull Executor shutdownExecutor,
                                                             long shutdownBy) {
 
+        if(this.bucketDebugger != null) {
+            SwingUtilities.invokeLater(() -> this.bucketDebugger.dispose());
+        }
+
         QueueThread this_ = this;
         ShutdownTask task = new ShutdownTask(lApi, this, shutdownExecutor, log) {
             @Override
@@ -437,6 +447,11 @@ public class QueueThread extends LApiThread implements Shutdownable,QExecutor, H
     public void shutdownNow(@NotNull LApiImpl lApi, @NotNull LogInstance log, @NotNull Executor shutdownExecutor) {
         this.disableAcceptNewFutures();
         this.stopImmediately();
+
+        if(this.bucketDebugger != null) {
+            SwingUtilities.invokeLater(() -> this.bucketDebugger.dispose());
+        }
+
         shutdownExecutor.execute(() -> {
             try {
                 queueEndAwaiter.awaitFirst(100);
