@@ -70,7 +70,7 @@ public class Logger {
      * @throws URISyntaxException
      */
     public static void start(boolean override, boolean dateInFileName) throws IOException, URISyntaxException {
-        if(!ENABLE_LOG) return;
+        if(!ENABLE_LOG || writer != null) return;
         if(logFolder == null){
             logFolder = Helper.getJarPath().getParent().resolve("log");
         }
@@ -87,22 +87,22 @@ public class Logger {
         if(Files.exists(logFile)) Files.delete(logFile);
         Files.createFile(logFile);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }));
-
         writer = Files.newBufferedWriter(logFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         log(Type.INFO, Logger.class.getSimpleName(), null, "Log started...", false);
         log(Type.INFO, Logger.class.getSimpleName(), null, "writing to " + logFile.toString(), false);
     }
 
     public static void close() throws IOException {
-        if(!ENABLE_LOG) return;
-        if(writer != null) writer.close();
+        if(writer != null) {
+            //noinspection SynchronizeOnNonFinalField: Field never changes after calling start() once
+            synchronized (writer) {
+                if(!ENABLE_LOG) return;
+                if(writer != null) writer.close();
+                writer = null;
+            }
+        }
+
+
     }
 
     public static LogInstance getLogger(@NotNull String source){
@@ -117,7 +117,7 @@ public class Logger {
         return new LogInstance(source, defaultType);
     }
 
-    public static enum Type{
+    public enum Type{
         DEBUG("DEBUG"),
         DEBUG_DATA("DEBUG-DATA"),
         INFO("INFO"),

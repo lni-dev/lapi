@@ -477,6 +477,13 @@ public class LApiImpl implements LApi {
         }
 
         log.log("Shutdown finished. Took " + (System.currentTimeMillis() - shutdownStart) + " milliseconds.");
+
+        //finally close the Logger stream
+        try {
+            Logger.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @NonBlocking
@@ -488,6 +495,7 @@ public class LApiImpl implements LApi {
             shutdownNowSequenceStarted.set(true);
         }
 
+        final long shutdownStart = System.currentTimeMillis();
         final LogInstance log = Logger.getLogger("Shutdown Sequence");
         final Executor executor = new ShutdownExecutor(this);
 
@@ -498,6 +506,15 @@ public class LApiImpl implements LApi {
 
         synchronized (isShutdown) {
             isShutdown.set(true);
+        }
+
+        log.log("ShutdownNow finished. Took " + (System.currentTimeMillis() - shutdownStart) + " milliseconds.");
+
+        //finally close the Logger stream
+        try {
+            Logger.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
