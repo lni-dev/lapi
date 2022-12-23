@@ -185,7 +185,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
 
     /**
      * <p>
-     *     Caches all {@link {@link Channel#isThread() threads} retrieved by the
+     *     Caches all {@link Channel#isThread() threads} retrieved by the
      *     {@link GatewayEvent#GUILD_CREATE GUILD_CREATE} events.
      * </p>
      */
@@ -284,14 +284,14 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
     ;
 
     private final long value;
-    private final @Nullable Requireable[] requires;
+    private final @NotNull Requireable @Nullable [] requires;
 
     ConfigFlag(long value) {
         this.value = value;
         this.requires = null;
     }
 
-    ConfigFlag(long value, @Nullable Requireable... requires) {
+    ConfigFlag(long value, @NotNull Requireable @Nullable ... requires) {
         this.value = value;
         this.requires = requires;
     }
@@ -364,7 +364,7 @@ public enum ConfigFlag implements Requireable, SimpleDatable {
     }
 
     @Override
-    public @Nullable Requireable[] requires() {
+    public @NotNull Requireable @Nullable [] requires() {
         return requires;
     }
 

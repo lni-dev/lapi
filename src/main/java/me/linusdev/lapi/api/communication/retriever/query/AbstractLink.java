@@ -80,10 +80,10 @@ public interface AbstractLink {
     /**
      * <ul>
      *     <li>
-     *         0 <= {@link Link#uniqueId()} < {@link Link#amount}
+     *         0 &lt;= {@link Link#uniqueId()} &lt; {@link Link#amount}
      *     </li>
      *     <li>
-     *         {@link Link#amount} <= {@link ImageLink#uniqueId()} < {@link ImageLink#amount}
+     *         {@link Link#amount} &lt;= {@link ImageLink#uniqueId()} &lt; {@link ImageLink#amount}
      *     </li>
      * </ul>
      * @return a unique integer for this link

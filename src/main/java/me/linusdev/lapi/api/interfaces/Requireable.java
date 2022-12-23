@@ -25,6 +25,10 @@ import java.util.ArrayList;
 
 public interface Requireable {
 
+    /**
+     * the {@link Requireable}s required by this {@link Requireable}.
+     * @return Array of {@link Requireable} or {@code null}.
+     */
     @NotNull Requireable @Nullable[] requires();
 
     boolean isPresent(@NotNull LApiImpl lApi);
