@@ -37,6 +37,7 @@ tasks.named('jar') {
 
 dependencies {
     api 'io.github.lni-dev:data:2.0.19'
+    implementation 'de.linusdev:lutils:1.0.0'
     api 'org.jetbrains:annotations:23.0.0'
 }
 

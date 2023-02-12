@@ -16,15 +16,14 @@
 
 package me.linusdev.lapi.api.communication.http.ratelimit;
 
+import de.linusdev.lutils.llist.LLinkedList;
 import me.linusdev.lapi.api.async.queue.QueueableFuture;
 import me.linusdev.lapi.api.lapi.LApiImpl;
-import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,7 +50,7 @@ public class Bucket {
     private volatile long resetAfterMillis;
     private volatile @Nullable String bucket;
 
-    private final @NotNull LinusLinkedList<RateLimitId> ids;
+    private final @NotNull LLinkedList<RateLimitId> ids;
 
     private final @NotNull Object assumedLock = new Object();
     /**
@@ -74,7 +73,7 @@ public class Bucket {
         this.assumed = assumed;
         this.limitless = limitless;
         this.queue = new ConcurrentLinkedQueue<>();
-        this.ids = new LinusLinkedList<>();
+        this.ids = new LLinkedList<>();
         this.created = System.currentTimeMillis();
         this.lastUsed = created;
     }
@@ -273,7 +272,7 @@ public class Bucket {
                     queue.removeIf(checker::check);
                     if(checker.checkAgain()) queue.removeIf(checker::check);
                 }
-            };
+            }
         }
         checkReset();
     }

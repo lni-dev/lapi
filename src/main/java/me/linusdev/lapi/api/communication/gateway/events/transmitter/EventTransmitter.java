@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
+import de.linusdev.lutils.llist.LLinkedList;
 import me.linusdev.lapi.api.cache.CacheReadyEvent;
 import me.linusdev.lapi.api.communication.gateway.abstracts.GatewayPayloadAbstract;
 import me.linusdev.lapi.api.communication.gateway.enums.GatewayEvent;
@@ -61,14 +62,12 @@ import me.linusdev.lapi.api.communication.gateway.events.user.UserUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceServerUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.voice.VoiceStateUpdateEvent;
 import me.linusdev.lapi.api.communication.gateway.events.webhooks.WebhooksUpdateEvent;
+import me.linusdev.lapi.api.interfaces.HasLApi;
 import me.linusdev.lapi.api.lapi.LApi;
 import me.linusdev.lapi.api.lapi.LApiImpl;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerInitializedEvent;
 import me.linusdev.lapi.api.manager.command.event.CommandManagerReadyEvent;
 import me.linusdev.lapi.api.manager.voiceregion.VoiceRegionManagerReadyEvent;
-import me.linusdev.lapi.api.interfaces.HasLApi;
-import me.linusdev.lapi.list.LinusLinkedList;
-
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,8 +81,8 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
 
     private final @NotNull LApiImpl lApi;
 
-    private final LinusLinkedList<AnyEventListener> anyEventListeners = new LinusLinkedList<>();
-    private final LinusLinkedList<EventListener> listeners = new LinusLinkedList<>();
+    private final LLinkedList<AnyEventListener> anyEventListeners = new LLinkedList<>();
+    private final LLinkedList<EventListener> listeners = new LLinkedList<>();
     private final EventIdentifierList specifiedListeners = new EventIdentifierList();
 
     private final AtomicBoolean triggeredGuildsReadyEvent = new AtomicBoolean(false);
@@ -125,7 +124,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
         boolean r = true;
 
         for(EventIdentifier spec : specifications){
-            LinusLinkedList<EventListener> listeners = specifiedListeners.get(spec);
+            LLinkedList<EventListener> listeners = specifiedListeners.get(spec);
             if(listeners == null){
                 r = false;
                 continue;
@@ -155,7 +154,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(identifier);
+        LLinkedList<EventListener> listeners = specifiedListeners.get(identifier);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {
@@ -188,7 +187,7 @@ public class EventTransmitter implements HasLApi, EventListener, AbstractEventTr
             }
         }
 
-        LinusLinkedList<EventListener> listeners = specifiedListeners.get(UNKNOWN);
+        LLinkedList<EventListener> listeners = specifiedListeners.get(UNKNOWN);
         if(listeners != null){
             for(EventListener listener : listeners){
                 try {

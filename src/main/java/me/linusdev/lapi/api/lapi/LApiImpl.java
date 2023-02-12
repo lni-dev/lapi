@@ -16,6 +16,7 @@
 
 package me.linusdev.lapi.api.lapi;
 
+import de.linusdev.lutils.llist.LLinkedList;
 import me.linusdev.data.parser.exceptions.ParseException;
 import me.linusdev.lapi.api.async.ComputationResult;
 import me.linusdev.lapi.api.async.Future;
@@ -51,7 +52,6 @@ import me.linusdev.lapi.api.request.RequestFactory;
 import me.linusdev.lapi.api.thread.LApiThread;
 import me.linusdev.lapi.api.thread.LApiThreadFactory;
 import me.linusdev.lapi.api.thread.LApiThreadGroup;
-import me.linusdev.lapi.list.LinusLinkedList;
 import me.linusdev.lapi.log.LogInstance;
 import me.linusdev.lapi.log.Logger;
 import org.jetbrains.annotations.*;
@@ -143,7 +143,7 @@ public class LApiImpl implements LApi {
     private final @Nullable GuildManager guildManager;
 
     //shutdownables
-    private final @NotNull LinusLinkedList<Shutdownable> shutdownables;
+    private final @NotNull LLinkedList<Shutdownable> shutdownables;
     private final @NotNull AtomicBoolean shutdownSequenceStarted = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean shutdownNowSequenceStarted = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean isShutdown = new AtomicBoolean(false);
@@ -163,7 +163,7 @@ public class LApiImpl implements LApi {
         this.lApiThreadGroup = new LApiThreadGroup(this);
 
         //shutdownables
-        this.shutdownables = new LinusLinkedList<>();
+        this.shutdownables = new LLinkedList<>();
         Runtime.getRuntime().addShutdownHook(new LApiThread(this, lApiThreadGroup, "shutdown-hook") {
             @Override
             public boolean allowBlockingOperations() {

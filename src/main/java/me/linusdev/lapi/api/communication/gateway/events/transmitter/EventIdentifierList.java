@@ -16,28 +16,28 @@
 
 package me.linusdev.lapi.api.communication.gateway.events.transmitter;
 
-import me.linusdev.lapi.list.LinusLinkedList;
+import de.linusdev.lutils.llist.LLinkedList;
 import org.jetbrains.annotations.NotNull;
 
 
 public class EventIdentifierList {
 
-    final LinusLinkedList<?>[] listenersMap;
+    final LLinkedList<?>[] listenersMap;
     final Object writeLock = new Object();
 
     public EventIdentifierList() {
-        listenersMap = new LinusLinkedList[EventIdentifier.values().length];
+        listenersMap = new LLinkedList[EventIdentifier.values().length];
     }
 
     @SuppressWarnings("unchecked")
-    public LinusLinkedList<EventListener> get(@NotNull EventIdentifier identifier) {
-        return (LinusLinkedList<EventListener>) listenersMap[identifier.ordinal()];
+    public LLinkedList<EventListener> get(@NotNull EventIdentifier identifier) {
+        return (LLinkedList<EventListener>) listenersMap[identifier.ordinal()];
     }
 
     public void put(@NotNull EventIdentifier identifier, @NotNull EventListener listener) {
         synchronized (writeLock) {
             if(listenersMap[identifier.ordinal()] == null) {
-                listenersMap[identifier.ordinal()] = new LinusLinkedList<EventListener>();
+                listenersMap[identifier.ordinal()] = new LLinkedList<EventListener>();
             }
         }
 
